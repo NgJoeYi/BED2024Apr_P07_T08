@@ -50,3 +50,4 @@ This is the final submission; you should have completed all functions and pages 
 ## CREDITS
 - [bcrypt to compare hashed stored password in database](https://stackoverflow.com/questions/40076638/compare-passwords-bcryptjs)
 - <a href="https://www.freepik.com/free-vector/hand-drawn-glossary-illustration_41099328.htm#fromView=search&page=1&position=4&uuid=6caa4ec3-e237-437b-b17f-5bdb2c55dbef">Image by pikisuperstar on Freepik</a>
+- https://www.canva.com/
