@@ -6,8 +6,6 @@ const dbConfig = require("./dbConfig");
 // SQL data for seeding the database
 const seedSQL = 
 `
-
-
 -- REMOVING FOREIGN KEYS
 declare @sqlf nvarchar(max) = (
     select 
@@ -39,7 +37,7 @@ CREATE TABLE Users(
     role VARCHAR(8) NOT NULL
 );
 
-CREATE TABLE Profile_Pictures (
+CREATE TABLE ProfilePic (
     pic_id INT PRIMARY KEY IDENTITY,
     user_id INT NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES Users(id),

@@ -4,6 +4,11 @@ const bcrypt = require('bcrypt');
 const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
+        // Check if user already exists
+        const existingUser = await User.userExists(newUserData);
+        if (existingUser) {
+            return res.status(400).send('User already exists');
+        }
         // Hash the password
         const hashedPassword = await bcrypt.hash(newUserData.password, 10);
         newUserData.password = hashedPassword; // Replace plain text password with hashed password  
@@ -23,6 +28,11 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
     const userLoginData = req.body; // user filled in email and password field
     try {
+        // Check if user exists
+        const user = await User.userExists(userLoginData);
+        if (!user) {
+            return res.status(404).send('User does not exist');
+        }
         const loginSuccess = await User.loginUser(userLoginData);
         if (!loginSuccess) {
             console.log('Login failed: Invalid email or password');
