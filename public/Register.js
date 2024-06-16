@@ -32,17 +32,24 @@ document.getElementById('register-form').addEventListener('submit', async functi
         data[key] = value;
     });
 
-    const response = await fetch('/users/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
+    try {
+        const response = await fetch('/users/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
 
-    if (response.ok) {
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+
+        const result = await response.json();
         alert('Registration successful!');
-    } else {
-        alert('Registration failed!');
+    } catch (error) {
+        // Display the error message
+        alert(`Registration failed: ${error.message}`);
     }
 });

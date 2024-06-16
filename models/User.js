@@ -11,6 +11,30 @@ class User {
         this.role = role;
     }
 
+    // check if user exists or not. verify email exists in users table
+    static async userExists(loginInput) {
+        let connection;
+        try{
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
+            const request = connection.request();
+            request.input('emailInput', loginInput.email);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            // return only the first one because email is unique
+            return result.recordset[0]; 
+        } catch(error) {
+            console.error('Error checking if user exists:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
     // newUserData sent in req.body rmb to extract
     static async createUser(newUserData) {
         let connection;
@@ -32,7 +56,7 @@ class User {
             }
             return result.recordset[0];
         } catch(error) {
-            console.error(error);
+            console.error('Error creating user:', error);
             throw error;
         } finally {
             if (connection) {
