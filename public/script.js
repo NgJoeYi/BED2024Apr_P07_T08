@@ -228,3 +228,14 @@ function confirmDeleteAccount() {
     alert('Account deletion cancelled.');
   }
 }
+function confirmCancel() {
+  const userConfirmed = confirm('Are you sure you want to Cancel?');
+  if (userConfirmed) {
+    // User clicked "OK"
+    alert('Upload cancelled.');
+    // Add your logout logic here
+  } else {
+    // User clicked "Cancel"
+    alert('Continue uploading course.');
+  }
+}

@@ -108,6 +108,80 @@ header .navbar {
   display: none; /* Initially hide the hamburger button */
 }
 
+/*Upload courses styling*/
+
+.course-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  padding-top:150px;
+}
+
+.course-name, .course-arrangement, .course-details, .course-skills-covered {
+  background-color: #FCE4D8;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.upload-course-title {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.course-name .edit-icon, .course-arrangement .edit-icon ,
+.course-details .edit-icon, .course-skills-covered .edit-icon{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.course-arrangement .chapter {
+  margin-top: 20px;
+}
+
+.course-arrangement .chapter .delete-icon {
+  float: right;
+  cursor: pointer;
+}
+
+.course-arrangement .chapter .files {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+.files p , .chapter p , .course-name p ,
+.course-details p, .course-skills-covered p{
+  color: #000;
+  font-size: 20px;
+}
+.course-name p{
+  margin-top:20px;
+}
+
+.course-details p, .course-skills-covered p{
+  margin-top:20px;
+  margin-bottom:100px;
+}
+.new-btn-container{
+  display: flex;
+  justify-content: flex-end;
+}
+.new-btn{
+  display: flex;
+  justify-content: flex-end;
+  align-content: flex-end;
+  margin-top: 20px;
+}
+.new-btn:hover{
+  color: #000;
+  background-color: white;
+}
+
+
 /* Media queries for responsive design */
 /* Mobile view */
 @media (max-width: 600px) {
@@ -2547,7 +2621,7 @@ input[type="text"] {
   margin-top: 10px;
 }
 
-.btn, .action-btn{
+.btn, .action-btn, .save-btn, .cancel-btn{
   background-color: #d18f7b;
   color: white;
   border: none;
@@ -2557,7 +2631,7 @@ input[type="text"] {
   cursor: pointer;
 }
 
-.btn:hover, .action-btn:hover{
+.btn:hover, .action-btn:hover, .save-btn:hover ,.cancel-btn:hover{
   background-color: white;
   color: black;
 }
@@ -2573,7 +2647,7 @@ input[type="text"] {
   margin-top: 20px; /* Optional: adds space above the button group */
 }
 
-.logout-btn, .delete-btn, .edit-btn{
+.logout-btn, .delete-btn, .edit-btn, .new-btn{
   background-color: #d18f7b;
   color: white;
   border: none;
@@ -2585,7 +2659,7 @@ input[type="text"] {
 #edit-course,#delete-course{
   margin-right:50px;
 }
-#delete-course:hover,#edit-course:hover{
+#delete-course:hover,#edit-course:hover {
   background-color: #E8998D;
 }
 .gameDiv {
