@@ -224,7 +224,7 @@ header .navbar {
   right: 0;
   border-radius: 3px 0 0 3px;
 }
-.mySlides img {
+.mySlides img , .courses img{
   width: 100%;
   height: 110%;
 }
@@ -2171,44 +2171,132 @@ input[type=email], input[type=password], input[type=text] {
 
 /* Profile container styles */
 .profile-card {
-  height: 100%;
-  width: 100%; /* Adjust as necessary */
-  background-color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 100px 100px;
-  overflow: hidden;
-}
-
-.profile-background {
   position: relative;
-  height: 150px;
-  width: 100%; /* Adjust as necessary */
+  height: auto;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
-
-.background-image {
-  width: 100%;
-  height: auto;
+.profile-background {
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 300px; /* Adjust height as needed */
+  overflow: hidden;
+}
+.edit-background-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  background-color: white;
+  border-radius: 50%;
+  padding: 5px;
 }
 
-.profile-header {
-  text-align: center;
-  padding: 50px;
+.edit-background-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+
+.background-image {
   width: 100%;
-  background: #F4D9C6; /* Or any other light gray color */
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-content {
   position: relative;
+  padding: 20px;
+  margin-top: 200px; /* Adjust this value to control the vertical spacing */
+  z-index: 1;
+}
+.profile-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: rgba(244, 217, 198, 0.7); /* Semi-transparent background */
+  border-radius: 10px;
 }
 
 .profile-image {
-  width: 250px;
-  height: 250px;
-  position: absolute;
-  top: -10%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 20px;
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.profile-info p {
+  margin: 5px 0 0;
+  color: gray;
+  font-size: 14px;
+}
+
+/* Style the input field when it is not in edit mode */
+.username-input{
+  border: none;
+  background: none;
+  font-size: 30px;
+  font-family: inherit;
+  color: #333;
+  text-decoration: underline;
+}
+
+/* Hide the border and background when input field is focused (edit mode) */
+.username-input:focus {
+  outline: none;
+  border-bottom: 2px solid black; /* Optional: Add a bottom border to indicate edit mode */
+  text-decoration: none;
+}
+
+/* Hide the default border */
+input[type="text"] {
+  border: none;
+  outline: none;
+}
+
+.done-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  padding: 20px 0;
+}
+
+.title {
+  text-align: center;
+}
+
+.big-title{
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.filter {
+  font-size: 18px; /* Increase the font size */
+  padding: 10px; /* Increase the padding for a larger clickable area */
+  width: 200px; /* Set a larger width */
+  border-radius: 5px; /* Add some border radius for better appearance */
+  border: 1px solid #ccc; /* Define border properties */
 }
 
 .profile-header h1 {
@@ -2222,49 +2310,164 @@ input[type=email], input[type=password], input[type=text] {
   font-size: 14px;
 }
 
-.add-button {
-  background-color: black;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  text-transform: uppercase;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 20px;
-  margin-top: 10px;
-}
-
-.profile-stats {
+.courses-container {
   display: flex;
-  justify-content: space-around;
-  margin-top: 20px;
-  padding: 20px 0;
+  flex-wrap: wrap; /* Allows wrapping of course cards */
+  justify-content: space-between; /* Distributes space evenly */
 }
 
-.stat {
-  text-align: center;
+.course {
+  cursor: pointer;
+  flex: 1 1 30%; /* Ensures course cards are responsive and fit inside the container */
+  margin: 15px;
+  padding: 20px; /* Adjusted padding for better layout */
+  border: 2px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the content inside the course card */
+  justify-content: space-between; /* Ensures even spacing between items */
+  box-sizing: border-box;
 }
 
-.stat-number {
-  display: block;
-  font-size: 16px;
-  font-weight: bold;
+.course img {
+  width: 100%; /* Ensures the image takes the full width of the container */
+  height: auto; /* Keeps the aspect ratio of the image */
+  max-height: 200px; /* Set a max height for the image */
+  object-fit: contain; /* Ensures the whole image is displayed */
 }
 
-.stat-label {
-  font-size: 14px;
-  color: #888;
+.course .title, .course .rating {
+  font-size: 15px;
+  text-align: center; /* Centers the text inside the course card */
 }
+
+.course .title {
+  margin-top: 10px; /* Margin to separate from the image */
+}
+
+.course .rating {
+  margin-bottom: 10px; /* Margin to separate from the bottom */
+}
+
+.account-prev, .account-next{
+  cursor: pointer;
+  color:#CD8D7A;
+  border: none;
+  font-size: 20px;
+  font-weight: bolder;
+  transform: translateY(50%);
+  margin:10px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px; /* Adjust the padding as needed */
+}
+.button-container button{
+  margin:5px;
+}
+
 
 .user-name {
   text-transform: capitalize;
-  font-size: 20px;
+  font-size: 30px;
 }
 
-.user-email {
-  font-size: 20px;
+/* Account.html review card */
+.review-wrapper, .comments-wrapper{
+  display: flex;
+  justify-content: center;
 }
 
+.review-card,.comment-container {
+  background-color: rgba(228, 179, 164, 0.8); /* Semi-transparent color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 80%;
+  max-width: 600px;
+}
+
+.review-header,.comment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.profile-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.review-info {
+  flex-grow: 1;
+  margin-left: 15px;
+}
+
+.stars {
+  display: flex;
+}
+
+.review-date, .comment-date {
+  font-size: 14px;
+  color: #666;
+}
+
+.review-content ,.comment-body{
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.review-actions, .comment-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.btn, .action-btn{
+  background-color: #d18f7b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn:hover, .action-btn:hover{
+  background-color: white;
+  color: black;
+}
+.likes{
+  margin-right:10px;
+  margin-top:15px;
+}
+.ending-buttons {
+  display: flex;
+  justify-content: center; /* Centers items horizontally */
+  align-items: center; /* Centers items vertically */
+  gap: 50px; /* Adds space between the buttons */
+  margin-top: 20px; /* Optional: adds space above the button group */
+}
+
+.logout-btn, .delete-btn, .edit-btn{
+  background-color: #d18f7b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#edit-course,#delete-course{
+  margin-right:50px;
+}
+#delete-course:hover,#edit-course:hover{
+  background-color: #E8998D;
+}
 .gameDiv {
   border: 3px solid #9a9c84; /* Adjust border thickness here */
   padding: 20px 15px;
