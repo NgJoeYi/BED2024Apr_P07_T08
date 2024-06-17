@@ -81,42 +81,25 @@ function filterImages(category) {
 
 // Feature 4: Username editing functionality in account.html
 document.getElementById('edit-icon').addEventListener('click', function() {
-  const userName = document.querySelector('.user-name');
-  const usernameInput = document.getElementById('username-input');
-  
-  if (usernameInput.style.display === 'none') {
-    usernameInput.value = userName.textContent; // Ensure the input value is current
-    usernameInput.style.display = 'block';
-    userName.style.display = 'none';
-    usernameInput.focus();
-  } else {
-    const newUsername = usernameInput.value;
-    userName.textContent = newUsername;
-    
-    // Update all elements with the class 'user-name' in reviews and comments
-    document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
-      element.textContent = newUsername;
-    });
-
-    usernameInput.style.display = 'none';
-    userName.style.display = 'block';
-  }
+  const editAccountDetails = document.getElementById('edit-account-details');
+  editAccountDetails.style.display = editAccountDetails.style.display === 'none' || editAccountDetails.style.display === '' ? 'block' : 'none';
 });
 
-document.getElementById('username-input').addEventListener('blur', function() {
-  const userName = document.querySelector('.user-name');
-  const usernameInput = document.getElementById('username-input');
-  const newUsername = usernameInput.value;
+document.getElementById('save-changes').addEventListener('click', function() {
+  const newUsername = document.getElementById('edit-name').value;
+  const newBirthDate = document.getElementById('edit-birth-date').value;
+  const newEmail = document.getElementById('edit-email').value;
   
-  userName.textContent = newUsername;
+  // Update the profile info
+  document.querySelector('.profile-info .user-name').textContent = newUsername;
 
   // Update all elements with the class 'user-name' in reviews and comments
   document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
     element.textContent = newUsername;
   });
 
-  usernameInput.style.display = 'none';
-  userName.style.display = 'block';
+  // Hide the edit section
+  document.getElementById('edit-account-details').style.display = 'none';
 });
 
 
