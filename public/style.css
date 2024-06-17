@@ -33,21 +33,21 @@ header .navbar {
   padding: 20px;
 }
 
-/* Logo styling */
+/* Global Logo styling */
 .navbar .logo {
   margin-left: 20px;
   display: flex;
-  color: white;
+  color: white; /* Default color */
   opacity: 1; /* Set text color for the logo */
   font-size: 30px; /* Set font size for the logo */
   text-decoration: none; /* Remove underline from the logo text */
 }
 
 .navbar .logo span {
-  color: #9E9D89; /* Set text color for the span within the logo */
+  color: #9E9D89; /* Default color for the span within the logo */
 }
 
-/* Menu links styling */
+/* Global Menu links styling */
 .navbar .menu-links {
   display: flex; /* Use flexbox for layout of menu links */
   list-style: none; /* Remove default list styles */
@@ -56,17 +56,166 @@ header .navbar {
   gap: 30px; /* Set the gap between menu links */
 }
 
+#account-menu-links a {
+  color: black; /* Ensure color is black for account menu links */
+}
+
 .navbar a {
   padding-top: 8px;
-  color: white; /* Set text color for menu links */
+  color: white; /* Default color for menu links */
   font-size: small; /* Set font size for menu links */
   text-decoration: none; /* Remove underline from menu links */
   transition: 0.2s ease; /* Add a smooth transition effect */
 }
 
-.navbar a:hover {
+/* Styling for the account page */
+#account-page header, 
+#account-page .navbar {
+  background-color: #ffffff; /* Set background color for the header */
+}
+#account-page .navbar .logo {
+  color: black; /* Set text color for the logo */
+}
+
+#account-page .navbar .logo span {
+  color: black; /* Set text color for the span within the logo */
+}
+
+#account-page .navbar .menu-links a {
+  color: black; /* Set text color for menu links */
+}
+
+#account-page .navbar .menu-links a:hover {
   color: black; /* Change text color on hover for menu links */
 }
+
+#account-page #hamburger-btn {
+  color: black; /* Set text color for the hamburger button */
+}
+
+/* Mobile menu and hamburger button styling */
+#close-menu-btn {
+  position: absolute; /* Set the position to absolute for the close menu button */
+  right: 20px; /* Set the right position for the close menu button */
+  top: 20px; /* Set the top position for the close menu button */
+  cursor: pointer; /* Set cursor to pointer for the close menu button */
+  display: none; /* Initially hide the close menu button */
+}
+
+#hamburger-btn {
+  color: #c9beb4; /* Set text color for the hamburger button */
+  cursor: pointer; /* Set cursor to pointer for the hamburger button */
+  display: none; /* Initially hide the hamburger button */
+}
+
+/* Media queries for responsive design */
+/* Mobile view */
+@media (max-width: 600px) {
+  header .navbar {
+    padding: 10px;
+  }
+
+  header.show-mobile-menu::before {
+    content: "";
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 80%;
+    backdrop-filter: blur(5px);
+  }
+
+  .navbar {
+    z-index: 1000;
+  }
+
+  .navbar .logo {
+    font-size: 1.7rem;
+  }
+
+  #hamburger-btn,
+  #close-menu-btn {
+    display: flex;
+  }
+
+  .navbar .menu-links {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    padding: 70px 40px 0;
+    transition: left 0.2s ease;
+  }
+
+  header.show-mobile-menu .navbar .menu-links {
+    left: 0;
+  }
+
+  .navbar a {
+    color: #D2B48C;
+  }
+
+  .navbar a:hover {
+    color: #023030;
+  }
+}
+
+@media (max-width: 1024px) {
+  header .navbar {
+    padding: 10px;
+  }
+
+  header.show-mobile-menu::before {
+    content: "";
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+  }
+
+  .navbar {
+    z-index: 1000;
+  }
+
+  .navbar .logo {
+    font-size: 1.7rem;
+  }
+
+  #hamburger-btn,
+  #close-menu-btn {
+    display: flex;
+  }
+
+  .navbar .menu-links {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    padding: 70px 40px 0;
+    transition: left 0.2s ease;
+  }
+
+  header.show-mobile-menu .navbar .menu-links {
+    left: 0;
+  }
+
+  .navbar a {
+    color: #D2B48C;
+  }
+
+  .navbar a:hover {
+    color: #023030;
+  }
+}
+
 
 /* Mobile menu and hamburger button styling */
 #close-menu-btn {
@@ -2178,40 +2327,11 @@ input[type=email], input[type=password], input[type=text] {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
-.profile-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 300px; /* Adjust height as needed */
-  overflow: hidden;
-}
-.edit-background-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  background-color: white;
-  border-radius: 50%;
-  padding: 5px;
-}
-
-.edit-background-icon img {
-  width: 20px;
-  height: 20px;
-}
-
-
-.background-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 
 .profile-content {
   position: relative;
   padding: 20px;
-  margin-top: 200px; /* Adjust this value to control the vertical spacing */
+  margin-top: 100px; /* Adjust this value to control the vertical spacing */
   z-index: 1;
 }
 .profile-header {

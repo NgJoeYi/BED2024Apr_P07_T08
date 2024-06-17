@@ -47,20 +47,22 @@ if (document.querySelectorAll('.mySlides').length > 0) {
 }
 
 // Feature 2: Navbar color change on scroll
-window.addEventListener('scroll', function() {
-  var navbar = document.querySelector('.navbar');
-  if (window.scrollY > 0) {
-    navbar.style.backgroundColor = "#fff";
-    navbar.querySelectorAll('a').forEach(function(link) {
-      link.style.color = "black";
-    });
-  } else {
-    navbar.style.backgroundColor = "transparent";
-    navbar.querySelectorAll('a').forEach(function(link) {
-      link.style.color = "white";
-    });
-  }
-});
+if (document.body.id !== 'account-page') {
+  window.addEventListener('scroll', function() {
+    var navbar = document.querySelector('.navbar');
+    if (window.scrollY > 0) {
+      navbar.style.backgroundColor = "#fff";
+      navbar.querySelectorAll('a').forEach(function(link) {
+        link.style.color = "black";
+      });
+    } else {
+      navbar.style.backgroundColor = "transparent";
+      navbar.querySelectorAll('a').forEach(function(link) {
+        link.style.color = "white";
+      });
+    }
+  });
+}
 
 // Feature 3: Image filtering functionality
 function filterImages(category) {
