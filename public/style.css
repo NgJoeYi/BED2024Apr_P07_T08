@@ -33,21 +33,21 @@ header .navbar {
   padding: 20px;
 }
 
-/* Logo styling */
+/* Global Logo styling */
 .navbar .logo {
   margin-left: 20px;
   display: flex;
-  color: white;
+  color: white; /* Default color */
   opacity: 1; /* Set text color for the logo */
   font-size: 30px; /* Set font size for the logo */
   text-decoration: none; /* Remove underline from the logo text */
 }
 
 .navbar .logo span {
-  color: #9E9D89; /* Set text color for the span within the logo */
+  color: #9E9D89; /* Default color for the span within the logo */
 }
 
-/* Menu links styling */
+/* Global Menu links styling */
 .navbar .menu-links {
   display: flex; /* Use flexbox for layout of menu links */
   list-style: none; /* Remove default list styles */
@@ -56,17 +56,240 @@ header .navbar {
   gap: 30px; /* Set the gap between menu links */
 }
 
+#account-menu-links a {
+  color: black; /* Ensure color is black for account menu links */
+}
+
 .navbar a {
   padding-top: 8px;
-  color: white; /* Set text color for menu links */
+  color: white; /* Default color for menu links */
   font-size: small; /* Set font size for menu links */
   text-decoration: none; /* Remove underline from menu links */
   transition: 0.2s ease; /* Add a smooth transition effect */
 }
 
-.navbar a:hover {
+/* Styling for the account page */
+#account-page header, 
+#account-page .navbar {
+  background-color: #ffffff; /* Set background color for the header */
+}
+#account-page .navbar .logo {
+  color: black; /* Set text color for the logo */
+}
+
+#account-page .navbar .logo span {
+  color: black; /* Set text color for the span within the logo */
+}
+
+#account-page .navbar .menu-links a {
+  color: black; /* Set text color for menu links */
+}
+
+#account-page .navbar .menu-links a:hover {
   color: black; /* Change text color on hover for menu links */
 }
+
+#account-page #hamburger-btn {
+  color: black; /* Set text color for the hamburger button */
+}
+
+/* Mobile menu and hamburger button styling */
+#close-menu-btn {
+  position: absolute; /* Set the position to absolute for the close menu button */
+  right: 20px; /* Set the right position for the close menu button */
+  top: 20px; /* Set the top position for the close menu button */
+  cursor: pointer; /* Set cursor to pointer for the close menu button */
+  display: none; /* Initially hide the close menu button */
+}
+
+#hamburger-btn {
+  color: #c9beb4; /* Set text color for the hamburger button */
+  cursor: pointer; /* Set cursor to pointer for the hamburger button */
+  display: none; /* Initially hide the hamburger button */
+}
+
+/*Upload courses styling*/
+
+.course-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  padding-top:150px;
+}
+
+.course-name, .course-arrangement, .course-details, .course-skills-covered {
+  background-color: #FCE4D8;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.upload-course-title {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.course-name .edit-icon, .course-arrangement .edit-icon ,
+.course-details .edit-icon, .course-skills-covered .edit-icon{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.course-arrangement .chapter {
+  margin-top: 20px;
+}
+
+.course-arrangement .chapter .delete-icon {
+  float: right;
+  cursor: pointer;
+}
+
+.course-arrangement .chapter .files {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+.files p , .chapter p , .course-name p ,
+.course-details p, .course-skills-covered p{
+  color: #000;
+  font-size: 20px;
+}
+.course-name p{
+  margin-top:20px;
+}
+
+.course-details p, .course-skills-covered p{
+  margin-top:20px;
+  margin-bottom:100px;
+}
+.new-btn-container{
+  display: flex;
+  justify-content: flex-end;
+}
+.new-btn{
+  display: flex;
+  justify-content: flex-end;
+  align-content: flex-end;
+  margin-top: 20px;
+}
+.new-btn:hover{
+  color: #000;
+  background-color: white;
+}
+
+
+/* Media queries for responsive design */
+/* Mobile view */
+@media (max-width: 600px) {
+  header .navbar {
+    padding: 10px;
+  }
+
+  header.show-mobile-menu::before {
+    content: "";
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 80%;
+    backdrop-filter: blur(5px);
+  }
+
+  .navbar {
+    z-index: 1000;
+  }
+
+  .navbar .logo {
+    font-size: 1.7rem;
+  }
+
+  #hamburger-btn,
+  #close-menu-btn {
+    display: flex;
+  }
+
+  .navbar .menu-links {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    padding: 70px 40px 0;
+    transition: left 0.2s ease;
+  }
+
+  header.show-mobile-menu .navbar .menu-links {
+    left: 0;
+  }
+
+  .navbar a {
+    color: #D2B48C;
+  }
+
+  .navbar a:hover {
+    color: #023030;
+  }
+}
+
+@media (max-width: 1024px) {
+  header .navbar {
+    padding: 10px;
+  }
+
+  header.show-mobile-menu::before {
+    content: "";
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+  }
+
+  .navbar {
+    z-index: 1000;
+  }
+
+  .navbar .logo {
+    font-size: 1.7rem;
+  }
+
+  #hamburger-btn,
+  #close-menu-btn {
+    display: flex;
+  }
+
+  .navbar .menu-links {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    padding: 70px 40px 0;
+    transition: left 0.2s ease;
+  }
+
+  header.show-mobile-menu .navbar .menu-links {
+    left: 0;
+  }
+
+  .navbar a {
+    color: #D2B48C;
+  }
+
+  .navbar a:hover {
+    color: #023030;
+  }
+}
+
 
 /* Mobile menu and hamburger button styling */
 #close-menu-btn {
@@ -224,7 +447,7 @@ header .navbar {
   right: 0;
   border-radius: 3px 0 0 3px;
 }
-.mySlides img {
+.mySlides img , .courses img{
   width: 100%;
   height: 110%;
 }
@@ -2171,44 +2394,103 @@ input[type=email], input[type=password], input[type=text] {
 
 /* Profile container styles */
 .profile-card {
-  height: 100%;
-  width: 100%; /* Adjust as necessary */
-  background-color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 100px 100px;
-  overflow: hidden;
-}
-
-.profile-background {
   position: relative;
-  height: 150px;
-  width: 100%; /* Adjust as necessary */
-  overflow: hidden;
-}
-
-.background-image {
-  width: 100%;
   height: auto;
-  position: absolute;
-  top: 0;
-  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.profile-header {
-  text-align: center;
-  padding: 50px;
-  width: 100%;
-  background: #F4D9C6; /* Or any other light gray color */
+.profile-content {
   position: relative;
+  padding: 20px;
+  margin-top: 100px; /* Adjust this value to control the vertical spacing */
+  z-index: 1;
+}
+.profile-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: rgba(244, 217, 198, 0.7); /* Semi-transparent background */
+  border-radius: 10px;
 }
 
 .profile-image {
-  width: 250px;
-  height: 250px;
-  position: absolute;
-  top: -10%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 20px;
+}
+
+.profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.profile-info p {
+  margin: 5px 0 0;
+  color: gray;
+  font-size: 14px;
+}
+
+/* Style the input field when it is not in edit mode */
+.username-input{
+  border: none;
+  background: none;
+  font-size: 30px;
+  font-family: inherit;
+  color: #333;
+  text-decoration: underline;
+}
+
+/* Hide the border and background when input field is focused (edit mode) */
+.username-input:focus {
+  outline: none;
+  border-bottom: 2px solid black; /* Optional: Add a bottom border to indicate edit mode */
+  text-decoration: none;
+}
+
+/* Hide the default border */
+input[type="text"] {
+  border: none;
+  outline: none;
+}
+
+.done-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  padding: 20px 0;
+}
+
+.title {
+  text-align: center;
+}
+
+.big-title{
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.filter {
+  font-size: 18px; /* Increase the font size */
+  padding: 10px; /* Increase the padding for a larger clickable area */
+  width: 200px; /* Set a larger width */
+  border-radius: 5px; /* Add some border radius for better appearance */
+  border: 1px solid #ccc; /* Define border properties */
 }
 
 .profile-header h1 {
@@ -2222,49 +2504,164 @@ input[type=email], input[type=password], input[type=text] {
   font-size: 14px;
 }
 
-.add-button {
-  background-color: black;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  text-transform: uppercase;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 20px;
-  margin-top: 10px;
-}
-
-.profile-stats {
+.courses-container {
   display: flex;
-  justify-content: space-around;
-  margin-top: 20px;
-  padding: 20px 0;
+  flex-wrap: wrap; /* Allows wrapping of course cards */
+  justify-content: space-between; /* Distributes space evenly */
 }
 
-.stat {
-  text-align: center;
+.course {
+  cursor: pointer;
+  flex: 1 1 30%; /* Ensures course cards are responsive and fit inside the container */
+  margin: 15px;
+  padding: 20px; /* Adjusted padding for better layout */
+  border: 2px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the content inside the course card */
+  justify-content: space-between; /* Ensures even spacing between items */
+  box-sizing: border-box;
 }
 
-.stat-number {
-  display: block;
-  font-size: 16px;
-  font-weight: bold;
+.course img {
+  width: 100%; /* Ensures the image takes the full width of the container */
+  height: auto; /* Keeps the aspect ratio of the image */
+  max-height: 200px; /* Set a max height for the image */
+  object-fit: contain; /* Ensures the whole image is displayed */
 }
 
-.stat-label {
-  font-size: 14px;
-  color: #888;
+.course .title, .course .rating {
+  font-size: 15px;
+  text-align: center; /* Centers the text inside the course card */
 }
+
+.course .title {
+  margin-top: 10px; /* Margin to separate from the image */
+}
+
+.course .rating {
+  margin-bottom: 10px; /* Margin to separate from the bottom */
+}
+
+.account-prev, .account-next{
+  cursor: pointer;
+  color:#CD8D7A;
+  border: none;
+  font-size: 20px;
+  font-weight: bolder;
+  transform: translateY(50%);
+  margin:10px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 20px; /* Adjust the padding as needed */
+}
+.button-container button{
+  margin:5px;
+}
+
 
 .user-name {
   text-transform: capitalize;
-  font-size: 20px;
+  font-size: 30px;
 }
 
-.user-email {
-  font-size: 20px;
+/* Account.html review card */
+.review-wrapper, .comments-wrapper{
+  display: flex;
+  justify-content: center;
 }
 
+.review-card,.comment-container {
+  background-color: rgba(228, 179, 164, 0.8); /* Semi-transparent color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 80%;
+  max-width: 600px;
+}
+
+.review-header,.comment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.profile-pic {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.review-info {
+  flex-grow: 1;
+  margin-left: 15px;
+}
+
+.stars {
+  display: flex;
+}
+
+.review-date, .comment-date {
+  font-size: 14px;
+  color: #666;
+}
+
+.review-content ,.comment-body{
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.review-actions, .comment-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.btn, .action-btn, .save-btn, .cancel-btn{
+  background-color: #d18f7b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn:hover, .action-btn:hover, .save-btn:hover ,.cancel-btn:hover{
+  background-color: white;
+  color: black;
+}
+.likes{
+  margin-right:10px;
+  margin-top:15px;
+}
+.ending-buttons {
+  display: flex;
+  justify-content: center; /* Centers items horizontally */
+  align-items: center; /* Centers items vertically */
+  gap: 50px; /* Adds space between the buttons */
+  margin-top: 20px; /* Optional: adds space above the button group */
+}
+
+.logout-btn, .delete-btn, .edit-btn, .new-btn{
+  background-color: #d18f7b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-left: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#edit-course,#delete-course{
+  margin-right:50px;
+}
+#delete-course:hover,#edit-course:hover {
+  background-color: #E8998D;
+}
 .gameDiv {
   border: 3px solid #9a9c84; /* Adjust border thickness here */
   padding: 20px 15px;

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <!--linking to another external to get images for ICON-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
+   
+
+    
+    <title>EduHelper | Upload Courses</title>
+    <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
+</head>
+<body>
+
+<!--Top Navigation Bar--> 
+<header>
+  <nav class="navbar" >
+    <a class="logo" href="Index.html" style="color: black;"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
+    <ul class="menu-links" id = "account-menu-links">
+      <span id="close-menu-btn" class="material-symbols-outlined">close</span>
+      <li><a href="Index.html" style="color: black;">HOME</a></li>
+      <li><a href="uploadCourses.html" style="color: black;">COURSES</a></li>
+      <li><a href="account.html" style="color: black;">ACCOUNT</a></li>
+      <li><a href="ContactUs.html" style="color: black;">CONTACT US</a></li>
+      <li><a href="Login.html" style="color: black;" id="navbar-login">LOG IN </a></li>
+      <li><a href="Register.html" style="color: black;" id="navbar-signup">SIGN UP </a></li>
+    </ul>
+    <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
+  </nav>
+</header>
+<div class="course-container">
+  <div class="course-name">
+      <span class = "upload-course-title">Course Name :</span>
+      <p>I LOVE BED</p>
+      <span class="edit-icon">
+        <i class="fa-solid fa-pencil" style="color: #030303;"></i>
+      </span>
+  </div>
+  <div class="course-arrangement">
+    <span class = "upload-course-title">Course Arrangement :</span>
+    <div class="chapter">
+      <p>Chapter Name : Introduction</p>
+      <span class="edit-icon">
+        <i class="fa-solid fa-pencil" style="color: #030303;"></i>
+      </span>
+      <span class="delete-icon">
+        <i class="fa-solid fa-x" style="color: #ff3838;"></i>
+      </span>
+      <div class="files">
+        <div>
+          <p>
+            ⇒ 
+            <i class="fa-solid fa-file" style="color: #000000;"></i>
+            Introduction.mp4
+          </p>
+        </div>
+        <div>
+          <p>
+            ⇒ 
+            <i class="fa-solid fa-file" style="color: #000000;"></i>
+            Introduction.mp4
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class = "new-btn-container">
+      <button class="new-btn">New</button>
+    </div>
+  </div>
+  <div class="course-details">
+    <span class = "upload-course-title">Course Details :</span>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
+      labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
+      Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
+   </p>
+    <span class="edit-icon">
+      <i class="fa-solid fa-pencil" style="color: #030303;"></i>
+    </span>
+  </div>
+  <div class="course-skills-covered">
+    <span class = "upload-course-title">Skills Covered :</span>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
+      labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
+      Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
+   </p>
+    <span class="edit-icon">
+      <i class="fa-solid fa-pencil" style="color: #030303;"></i>
+    </span>
+  </div>
+  <div class="ending-buttons" >
+    <button class="ending-buttons save-btn" onclick="alert('Course saved!')">Save</button>
+    <button class="ending-buttons cancel-btn" onclick="confirmCancel()">Cancel</button>
+  </div>
+</div>
+
+
+<!--Footer-->
+<footer>
+  <div class="footer">
+    <div class="row">
+      <a href="#"><i class="fa fa-facebook"></i></a>
+      <a href="#"><i class="fa fa-instagram"></i></a>
+      <a href="#"><i class="fa fa-youtube"></i></a>
+      <a href="#"><i class="fa fa-twitter"></i></a>
+    </div>
+    <div class="row">
+      <ul>
+        <li><a href="#">Contact us</a></li>
+        <li><a href="#">Our Services</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="#">Career</a></li>
+      </ul>
+    </div>
+    <div class="row">
+      SATURDAY Copyright © 2024 Saturday.- All rights reserved 
+    </div>
+  </div>
+</footer>
+
+
+
+
+<!--Linking js to html-->
+<script src="Script.js"></script>
+<script src="Link to API & Cart JS/api.js"></script>
+</body>
+</html>
