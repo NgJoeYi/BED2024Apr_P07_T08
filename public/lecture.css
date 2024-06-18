@@ -1,0 +1,242 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    overflow-x: hidden; /* Get rid of excess white space horizontally */
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container {
+    display: flex;
+    margin-top: 30px;
+}
+
+.sidebar {
+    width: 290px;
+    background-color: #3C4443;
+    padding: 20px;
+    transition: width 0.3s;
+    margin-right: 25px;
+}
+
+.hamburger {
+    display: none;
+    cursor: pointer;
+}
+
+.hamburger span {
+    font-size: 24px;
+}
+
+.nav {
+    margin-top: 20px;
+}
+
+.nav-item {
+    margin-bottom: 10px;
+}
+
+.nav-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    background-color: #EFD0CE;
+}
+
+.sub-nav {
+    display: none;
+    margin-left: 20px;
+}
+
+.sub-nav-item {
+    padding: 5px 0;
+}
+
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background-color: #EFD0CE;
+}
+
+.video-placeholder {
+    width: 100%;
+    height: 80vh;
+    background-color: #aaa;
+}
+
+.review-section {
+    margin-top: 30px;
+    width: 80%;
+    padding: 50px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.review-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-sort {
+    display: flex;
+}
+
+.filter, .sort {
+    margin-left: 20px;
+}
+
+.reviews {
+    margin-bottom: 20px;
+}
+
+.review {
+    display: flex;
+    justify-content: space-between;
+    background-color: #eee;
+    padding: 35px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.review-content {
+    display: flex;
+}
+
+.review-author {
+    display: flex;
+    align-items: center;
+}
+
+.author-avatar {
+    width: 80px; /* Adjust the size as needed */
+    height: 80px; /* Adjust the size as needed */
+    overflow: hidden; /* Ensures the image does not overflow the container */
+    border-radius: 50%; /* Makes the container circular */
+    object-fit: cover; /* Ensures the image covers the container */
+    margin-right: 20px;
+}
+
+.review-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-name {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.rating {
+    font-size: 30px;
+    margin-top: 5px;
+}
+
+.review-date {
+    font-size: 14px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.review-text p {
+    font-size: 17px;
+    margin-top: 7px;
+}
+
+.review-actions {
+    display: flex;
+    align-items: center;
+}
+
+.review-actions button {
+    margin-left: 10px;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background-color: #333;
+    padding: 90px;
+    border-radius: 8px;
+    color: #fff;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.rating .fa-star {
+    font-size: 24px;
+    color: grey;
+    cursor: pointer;
+}
+
+.rating .fa-star.selected {
+    color: gold;
+}
+
+.stars .fa-star {
+    font-size: 32px;
+    color: grey;
+    cursor: pointer;
+}
+
+.stars .fa-star:hover,
+.stars .fa-star.selected {
+    color: gold;
+}
+
+.review .rating .fa-star {
+    pointer-events: none;
+}
+
+textarea, input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: none;
+    resize: none;
+}
+
+button {
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #555;
+}
