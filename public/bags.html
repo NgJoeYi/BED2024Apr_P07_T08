@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saturday |  Bags</title>
+    <title>Courses</title>
     <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
     <link rel="stylesheet" href="style.css">
-    <!--linking to another external to get images for ICON-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -15,202 +14,130 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
-    <!-- favicon -->
-
 </head>
-<body class="">
+<body>
     <header>
-        <!-- <div class="top">
-          <a href="register.html"><p>Welcome to Shoe, register now to get 10% off first purchase</p></a>
-        </div> -->
         <nav class="navbar" style="background-color: white;">
           <a class="logo" href="Index.html" style="color: black;"><i class="fa fa-slideshare"></i>&nbsp;Saturday<span>.</span></a>
           <ul class="menu-links">
             <span id="close-menu-btn" class="material-symbols-outlined">close</span>
             <li><a href="Index.html" style="color: black;">HOME</a></li>
             <li><a href="NEWIN.html"style="color: black;">NEW IN</a></li>
-            <li><a href="bags.html"style="color: black;">BAGS</a></li>
-            <li><a href="shoe.html"style="color: black;">SHOES</a></li>
-            <li><a href="Rewards.html"style="color: black;">GET $100</a></li>
+            <li><a href="bags.html"style="color: black;">COURSES</a></li>
+            <li><a href="shoe.html"style="color: black;">ACTIVTYFEED</a></li>
             <li><a href="ContactUs.html"style="color: black;">CONTACT US</a></li>
             <li><a href="Login.html"style="color: black;" id="navbar-login">LOG IN </a></li>
             <li><a href="Register.html"style="color: black;" id="navbar-signup">SIGN UP </a></li>
             <li><a href="games.html" id="gamestoearn" style="display: none; color: black;" ><i class="fa fa-gamepad" style="font-size: 15px;"></i></a></li>
             <li><a href="account.html" id="navbar-account" style="display: none; color: black;"><i class="fa fa-user" style="font-size: 15px;" ></i></a></li>
             <li><a href="shoppingcart.html" style="color: black;">  <i style="margin-right: 1%; font-size: 15px;" class="fa-solid fa-cart-shopping justify-content-end fa-xl" ></i></a></li>
-            
           </ul>
           <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
         </nav>
+    </header>
+
+    <br><br><br><br><br><br>
+
+    <div class="main-courses-unique">
+        <div class="course-header-unique">
+          <h1>Courses</h1>
+        </div>
+
+        <div class="question-section">
+            <div class="search-container">
+                <i class="fa fa-search search-icon"></i>
+                <input type="text" placeholder="Search.." class="question-input" style="padding-left:30px;">
+            </div>
+            <button class="add-button">+</button>
+        </div>
+
         
-      </header>
-
-
-  <br><br><br><br><br><br><br>
-
-  <div class="MainText">
-    <h1>All Bags</h1>
-    <p>Purchase now and get $100 voucher</p>
-    <!-- for this my idea is to when they check out they will have a pop up 
-    to navigate me to the rewards/games page so tht they can use the voucher to
-    offset the purchase! -->
-  </div>
-  
-  <div class="ImageFilter">
-    <div class="filter-buttons">
-      <!-- its here bcs of the css  -->
-    </div>
-
-    <!-- filter -->
-    <div class="filterable_cards">
-
-        <!-- Card 1 -->
-        <div class="card" data-name="" data-price="24.90" data-image="Images/bags1.jpg">
-            <img src="Images/bags1.jpg" alt="Aiko Gem-embellished Mules in Cream">
-            <div class="cardbody">
-                <h6 class="cardtitle">Classic Tote Bag</h6><br>
-                <p class="cardtext">$24.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Classic Tote Bag', 24.90, 'Images/bags1.jpg')">Add to Cart</a></p>
+        <div class="filter-sort-unique">
+            <div class="filter-unique">
+                Filter by: 
+                <select id="filter-category">
+                    <option value="all">All</option>
+                    <option value="math">Math</option>
+                    <option value="coding">Coding</option>
+                    <option value="english">English</option>
+                    <option value="microsoft">Microsoft</option>
+                    <!-- Add more categories as needed -->
+                </select>
+            </div>
+            <div class="sort-unique">
+                Sort by: 
+                <select id="sort-date">
+                    <option value="most-recent">Most Recent</option>
+                    <option value="oldest">Oldest</option>
+                </select>
             </div>
         </div>
-    
-        <!-- Card 2 -->
-        <div class="card" data-name="cb" data-price="40.90" data-image="Images/bags2.jpg">
-            <img src="Images/bags2.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Leather Crossbody Bag</h6><br>
-                <p class="cardtext">$40.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Leather Crossbody Bag', 40.90, 'Images/bags2.jpg')">Add to Cart</a></p>
+        
+        
+        <div class="courses-grid-unique">
+            <div class="course-cd-unique" data-category="coding" data-date="2024-01-01">
+                <img src="python.png" alt="Course Image">
+                <div class="course-details-unique">
+                    <p class="category">Coding</p>
+                    <h6>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h6>
+                    <div class="course-meta">
+                        <span>23 modules</span>
+                        <span>1 hr 30 min</span>
+                    </div>
+                    <p class="posted-date">Posted on: January 1, 2024</p>
+                </div>
+            </div>
+
+            <!-- Repeat course-cd-unique for more courses -->
+            <div class="course-cd-unique" data-category="math" data-date="2024-01-02">
+                <img src="python.png" alt="Course Image">
+                <div class="course-details-unique">
+                    <p class="category">Math</p>
+                    <h6>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h6>
+                    <div class="course-meta">
+                        <span>23 modules</span>
+                        <span>1 hr 30 min</span>
+                    </div>
+                    <p class="posted-date">Posted on: January 2, 2024</p>
+                </div>
             </div>
         </div>
-    
-        <!-- Card 3 -->
-        <div class="card" data-name="cb" data-price="32.90" data-image="Images/bags3.jpg">
-            <img src="Images/bags3.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Canvas Backpack</h6><br>
-                <p class="cardtext">$32.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Canvas Backpack', 32.90, 'Images/bags3.jpg')">Add to Cart</a></p>
+        <div class="pagination-unique">
+          <span>&lt;</span>
+          <span>1</span>
+          <span>2</span>
+          <span>3</span>
+          <span>&gt;</span>
+          <!-- Pagination buttons -->
+        </div>
+      </div>
+
+    <footer>
+        <div class="footer">
+            <div class="row">
+                <a href="#"><i class="fa fa-facebook"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+                <a href="#"><i class="fa fa-youtube"></i></a>
+                <a href="#"><i class="fa fa-twitter"></i></a>
+            </div>
+            <div class="row">
+                <ul>
+                    <li><a href="#">Contact us</a></li>
+                    <li><a href="#">Our Services</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Career</a></li>
+                </ul>
+            </div>
+            <div class="row">
+                SATURDAY Copyright © 2024 Saturday.- All rights reserved 
             </div>
         </div>
-    
-        <!-- Card 4 -->
-        <div class="card" data-name="cb" data-price="69.90" data-image="Images/bags4.jpg">
-            <img src="Images/bags4.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Chic Shoulder Bag</h6><br>
-                <p class="cardtext">$69.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Chic Shoulder Bag', 69.90, 'Images/bags4.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-        <!-- Card 5 -->
-        <div class="card" data-name="cb" data-price="19.90" data-image="Images/bags5.jpg">
-            <img src="Images/bags5.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Satchel Purse</h6><br>
-                <p class="cardtext">$19.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Satchel Purse', 19.90, 'Images/bags5.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-        <!-- Card 6 -->
-        <div class="card" data-name="cb" data-price="15.90" data-image="Images/bags6.jpg">
-            <img src="Images/bags6.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Vintage Clutch</h6><br>
-                <p class="cardtext">$15.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Vintage Clutch', 15.90, 'Images/bags6.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-        <!-- Card 7 -->
-        <div class="card" data-name="ic" data-price="17.90" data-image="Images/bags7.jpg">
-            <img src="Images/bags7.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Quilted Chain Bag</h6><br>
-                <p class="cardtext">$17.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Quilted Chain Bag', 17.90, 'Images/bags7.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-        <!-- Card 8 -->
-        <div class="card" data-name="ic" data-price="28.90" data-image="Images/bags8.jpg">
-            <img src="Images/bags8.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Messenger Bag</h6><br>
-                <p class="cardtext">$28.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Messenger Bag', 28.90, 'Images/bags8.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-        <!-- Card 9 -->
-        <div class="card" data-name="ic" data-price="12.90" data-image="Images/bags9.jpg">
-            <img src="Images/bags9.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Boho Fringe Handbag</h6><br>
-                <p class="cardtext">$12.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Boho Fringe Handbag', 12.90, 'Images/bags9.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-        <!-- Card 10 -->
-        <div class="card" data-name="ic" data-price="38.90" data-image="Images/bags10.jpg">
-            <img src="Images/bags10.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Travel Duffel</h6><br>
-                <p class="cardtext">$38.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Travel Duffel', 38.90, 'Images/bags10.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-        <!-- Card 11 -->
-        <div class="card" data-name="ic" data-price="25.90" data-image="Images/bags11.jpg">
-            <img src="Images/bags11.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Laptop Briefcase</h6><br>
-                <p class="cardtext">$25.90<br><br> <a href="shoppingcart.html" onclick="addToCart('Laptop Briefcase', 25.90, 'Images/bags11.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-        <!-- Card 12 -->
-        <div class="card" data-name="ic" data-price="67.00" data-image="Images/bags12.jpg">
-            <img src="Images/bags12.jpg" alt="STARRIA Dress">
-            <div class="cardbody">
-                <h6 class="cardtitle">Hobo Bag</h6><br>
-                <p class="cardtext">$67.00<br><br> <a href="shoppingcart.html" onclick="addToCart('Hobo Bag', 67.00, 'Images/bags12.jpg')">Add to Cart</a></p>
-            </div>
-        </div>
-    
-    </div>
-  </div>
-    
+    </footer>
 
+    <script src="script.js"></script>
+    <script src="Link to API & Cart JS/api.js"></script>
+    <script src="Link to API & Cart JS/shoppingcart.js"></script>
 
-
-
-
-
-
-
-<!-- footer  -->
-<footer>
-<div class="footer">
-<div class="row">
-<a href="#"><i class="fa fa-facebook"></i></a>
-<a href="#"><i class="fa fa-instagram"></i></a>
-<a href="#"><i class="fa fa-youtube"></i></a>
-<a href="#"><i class="fa fa-twitter"></i></a>
-</div>
-
-<div class="row">
-<ul>
-<li><a href="#">Contact us</a></li>
-<li><a href="#">Our Services</a></li>
-<li><a href="#">Privacy Policy</a></li>
-<li><a href="#">Terms & Conditions</a></li>
-<li><a href="#">Career</a></li>
-</ul>
-</div>
-
-<div class="row">
-SATURDAY Copyright © 2024 Saturday.- All rights reserved 
-</div>
-</div>
-</footer>
-
-<script src="Script.js"></script>
-<script src="Link to API & Cart JS/api.js"></script>
-<script src="Link to API & Cart JS/shoppingcart.js"></script>
 </body>
 </html>
