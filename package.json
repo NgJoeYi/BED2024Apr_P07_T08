@@ -1,7 +1,7 @@
 {
   "name": "bed2024apr_p07_t08-",
   "version": "1.0.0",
-  "description": "",
+  "description": "- The team leader should create a remote GitHub repository named `BED2024Apr_P<x>_T<y>`, where `<x>` is your tutorial group number and `<y>` is your assignment team number or name.\r - Give everyone in your group and your tutor collaborator rights.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

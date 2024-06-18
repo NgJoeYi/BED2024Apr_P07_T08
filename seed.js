@@ -43,6 +43,15 @@ CREATE TABLE ProfilePic (
     FOREIGN KEY (user_id) REFERENCES Users(id),
     img VARCHAR(MAX) NOT NULL
 );
+
+CREATE TABLE Discussions (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    title NVARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category NVARCHAR(50) NOT NULL,
+    posted_date DATETIME DEFAULT GETDATE()
+);
+
 `;
 
 // Load the SQL and run the seed process
