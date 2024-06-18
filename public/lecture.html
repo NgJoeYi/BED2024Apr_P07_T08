@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saturday | Lecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Boogaloo' rel='stylesheet'>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Trirong">
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
+    <link rel="stylesheet" href="lecture.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="hamburger">
+                <span>&#9776;</span>
+            </div>
+            <div class="nav">
+                <div class="nav-item">
+                    <div class="nav-title">Introduction <span>&#9660;</span></div>
+                    <div class="sub-nav">
+                        <div class="sub-nav-item">L1 - ABC</div>
+                        <div class="sub-nav-item">L2 - ABC</div>
+                        <div class="sub-nav-item">L3 - ABC</div>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-title">Chapter 1 <span>&#9660;</span></div>
+                    <div class="sub-nav">
+                        <div class="sub-nav-item">L1 - ABC</div>
+                        <div class="sub-nav-item">L2 - ABC</div>
+                        <div class="sub-nav-item">L3 - ABC</div>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-title">Chapter 2 <span>&#9660;</span></div>
+                    <div class="sub-nav">
+                        <div class="sub-nav-item">L1 - ABC</div>
+                        <div class="sub-nav-item">L2 - ABC</div>
+                        <div class="sub-nav-item">L3 - ABC</div>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-title">Chapter 3 <span>&#9660;</span></div>
+                    <div class="sub-nav">
+                        <div class="sub-nav-item">L1 - ABC</div>
+                        <div class="sub-nav-item">L2 - ABC</div>
+                        <div class="sub-nav-item">L3 - ABC</div>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-title">Chapter 4 <span>&#9660;</span></div>
+                    <div class="sub-nav">
+                        <div class="sub-nav-item">L1 - ABC</div>
+                        <div class="sub-nav-item">L2 - ABC</div>
+                        <div class="sub-nav-item">L3 - ABC</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <iframe width="950" height="650" src="https://www.youtube.com/embed/uTuuz__8gUM?si=lzYUVuW-NOBydB_A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <div class="review-section">
+        <h2>Learner Reviews</h2>
+        <div class="review-summary">
+            <p><strong>4.8</strong> out of 5</p>
+            <div class="filter-sort">
+                <div class="filter">
+                    Filter by:
+                    <select id="filter" onchange="filterReviews()">
+                        <option value="all">All</option>
+                        <option value="5">5 stars</option>
+                        <option value="4">4 stars</option>
+                        <option value="3">3 stars</option>
+                        <option value="2">2 stars</option>
+                        <option value="1">1 star</option>
+                    </select>
+                </div>
+                <div class="sort">
+                    Sort by:
+                    <select id="sort" onchange="sortReviews()">
+                        <option value="mostRecent">Most Recent</option>
+                        <option value="highestRating">Highest Rating</option>
+                        <option value="lowestRating">Lowest Rating</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="reviews" id="reviews">
+            <div class="review" data-date="2024-06-14">
+                <div class="review-content">
+                    <div class="review-author">
+                        <img src="images/profilePic2" alt="Author Avatar" class="author-avatar">
+                        <div class="review-details">
+                            <div class="author-name">Bot</div>
+                            <div class="rating">
+                                <i class="fa fa-star selected" data-value="1"></i>
+                                <i class="fa fa-star selected" data-value="2"></i>
+                                <i class="fa fa-star selected" data-value="3"></i>
+                                <i class="fa fa-star" data-value="4"></i>
+                                <i class="fa fa-star" data-value="5"></i>
+                            </div>
+                            <p>Very very good!</p>
+                            <p class="review-date">Posted on: June 14, 2024</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-actions">
+                    <button onclick="editReview(this)">Edit</button>
+                    <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
+                    <button class="helpful">👍 Helpful</button>
+                </div>
+            </div>
+            <div class="review" data-date="2023-07-14">
+                <div class="review-content">
+                    <div class="review-author">
+                        <img src="images/profilePic2" alt="Author Avatar" class="author-avatar">
+                        <div class="review-details">
+                            <div class="author-name">Bot</div>
+                            <div class="rating">
+                                <i class="fa fa-star selected" data-value="1"></i>
+                                <i class="fa fa-star selected" data-value="2"></i>
+                                <i class="fa fa-star selected" data-value="3"></i>
+                                <i class="fa fa-star selected" data-value="4"></i>
+                                <i class="fa fa-star selected" data-value="5"></i>
+                            </div>
+                            <p>Very very good!</p>
+                            <p class="review-date">Posted on: July 14, 2023</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-actions">
+                    <button onclick="editReview(this)">Edit</button>
+                    <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
+                    <button class="helpful">👍 Helpful</button>
+                </div>
+            </div>
+            <div class="review" data-date="2024-05-04">
+                <div class="review-content">
+                    <div class="review-author">
+                        <img src="images/profilePic2" alt="Author Avatar" class="author-avatar">
+                        <div class="review-details">
+                            <div class="author-name">Bot</div>
+                            <div class="rating">
+                                <i class="fa fa-star selected" data-value="1"></i>
+                                <i class="fa fa-star selected" data-value="2"></i>
+                                <i class="fa fa-star selected" data-value="3"></i>
+                                <i class="fa fa-star" data-value="4"></i>
+                                <i class="fa fa-star" data-value="5"></i>
+                            </div>
+                            <p>Very very good!</p>
+                            <p class="review-date">Posted on: May 4, 2024</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-actions">
+                    <button onclick="editReview(this)">Edit</button>
+                    <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
+                    <button class="helpful">👍 Helpful</button>
+                </div>
+            </div>
+            <div class="review" data-date="2024-12-09">
+                <div class="review-content">
+                    <div class="review-author">
+                        <img src="images/profilePic2" alt="Author Avatar" class="author-avatar">
+                        <div class="review-details">
+                            <div class="author-name">Bot</div>
+                            <div class="rating">
+                                <i class="fa fa-star selected" data-value="1"></i>
+                                <i class="fa fa-star" data-value="2"></i>
+                                <i class="fa fa-star" data-value="3"></i>
+                                <i class="fa fa-star" data-value="4"></i>
+                                <i class="fa fa-star" data-value="5"></i>
+                            </div>
+                            <p>Very very good!</p>
+                            <p class="review-date">Posted on: December 9, 2024</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-actions">
+                    <button onclick="editReview(this)">Edit</button>
+                    <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
+                    <button class="helpful">👍 Helpful</button>
+                </div>
+            </div>
+        </div>
+        <button class="show-more">Show more reviews</button>
+        <button class="add-review" onclick="showPopup('add')">Add review</button>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <h2>Leave a Review</h2>
+            <div class="stars">
+                <i class="fa fa-star" data-value="1"></i>
+                <i class="fa fa-star" data-value="2"></i>
+                <i class="fa fa-star" data-value="3"></i>
+                <i class="fa fa-star" data-value="4"></i>
+                <i class="fa fa-star" data-value="5"></i>
+            </div>
+            <textarea id="review-text" placeholder="Review.."></textarea>
+            <button onclick="postReview()">Post!</button>
+        </div>
+    </div>
+
+    <script src="lecture.js"></script>
+</body>
+</html>
