@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const dbConfig = require("./dbConfig");
 const userController = require('./controllers/userController');
 const discussionController = require('./controllers/discussionController');
+const courseController = require("./controllers/coursesController");
 // const methodOverride = require('method-override');
 
 const app = express();
@@ -32,6 +33,13 @@ app.post('/discussions', discussionController.createDiscussion);
 app.get('/discussions/:id/edit', discussionController.getDiscussionById);
 app.put('/discussions/:id', discussionController.updateDiscussion);
 app.delete('/discussions/:id', discussionController.deleteDiscussion);
+
+// Add Routes for courses
+app.get('/courses', courseController.getAllCourses);
+app.get('/courses/:id', courseController.getCoursesById);
+app.post('/courses', courseController.createCourse);
+app.put('/courses/:id', courseController.updateCourse);
+app.delete('/courses/:id', courseController.deleteCourse);
 
 app.listen(port, async () => {
   try {

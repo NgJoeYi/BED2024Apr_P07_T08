@@ -7,26 +7,22 @@ const dbConfig = require("./dbConfig");
 const seedSQL = 
 `
 -- REMOVING FOREIGN KEYS
-declare @sqlf nvarchar(max) = (
-    select 
-        'alter table ' + quotename(schema_name(schema_id)) + '.' +
-        quotename(object_name(parent_object_id)) +
-        ' drop constraint '+quotename(name) + ';'
-    from sys.foreign_keys
-    for xml path('')
+DECLARE @sqlf NVARCHAR(max) = (
+    SELECT 
+        'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' +
+        QUOTENAME(OBJECT_NAME(parent_object_id)) +
+        ' DROP CONSTRAINT ' + QUOTENAME(name) + ';'
+    FROM sys.foreign_keys
+    FOR XML PATH('')
 );
-exec sp_executesql @sqlf;
-
+EXEC sp_executesql @sqlf;
 
 -- DROPPING ALL TABLES
-DECLARE @sql NVARCHAR(max)=''
-
-SELECT @sql += ' Drop table ' + QUOTENAME(TABLE_SCHEMA) + '.'+ QUOTENAME(TABLE_NAME) + '; '
-FROM   INFORMATION_SCHEMA.TABLES
-WHERE  TABLE_TYPE = 'BASE TABLE'
-
-Exec Sp_executesql @sql
-
+DECLARE @sql NVARCHAR(max) = ''
+SELECT @sql += ' DROP TABLE ' + QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) + '; '
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE'
+EXEC sp_executesql @sql;
 
 -- CREATE AND INSERT TABLES  
 CREATE TABLE Users(
@@ -70,7 +66,6 @@ CREATE TABLE Courses (
     CreatedAt DATETIME DEFAULT GETDATE(),
     CourseImage VARBINARY(MAX)
 );
-
 CREATE TABLE Lectures (
     LectureID INT PRIMARY KEY IDENTITY(1,1),
     CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
@@ -83,7 +78,6 @@ CREATE TABLE Lectures (
     Position INT, -- Position in the course sequence
     CreatedAt DATETIME DEFAULT GETDATE()
 );
-
 `;
 
 // Load the SQL and run the seed process
