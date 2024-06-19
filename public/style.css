@@ -1647,12 +1647,13 @@ table td:nth-last-child(1) {
   margin-bottom: 20px;
 }
 
-input[type=email], input[type=password], input[type=text] {
+input[type=email], input[type=password], input[type=text], input[type=date] {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
+  color: #333;
 }
 
 form button {
