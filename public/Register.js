@@ -47,7 +47,8 @@ document.getElementById('register-form').addEventListener('submit', async functi
         }
 
         const result = await response.json();
-        alert('Registration successful!');
+        alert('Registration successful!');        
+        window.location.href = 'Login.html';
     } catch (error) {
         // Display the error message
         alert(`Registration failed: ${error.message}`);
