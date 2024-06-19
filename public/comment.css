@@ -1,0 +1,219 @@
+*{
+    margin: 0; /* Reset margin to zero for all elements */
+    padding: 0; 
+    overflow-x: hidden; /* Get rid of excess white space horizontally */
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.post, .comment {
+    background-color: #ffffff;
+    margin-top: 30px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 800px;
+    transition: box-shadow 0.3s;
+}
+
+.post:hover, .comment:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-left: -10px;
+}
+
+/* General styling for the avatar container */
+.avatar {
+    width: 50px; /* Adjust the size as needed */
+    height: 50px; /* Adjust the size as needed */
+    overflow: hidden; /* Ensures the image does not overflow the container */
+    border-radius: 50%; /* Makes the container circular */
+    margin-right: 10px;
+}
+
+/* Styling for the image inside the avatar container */
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the container */
+}
+
+.username {
+    font-weight: 900;
+    font-size: 23px;
+    color: black;
+    margin-left: 5px;
+}
+
+.post-content, .comment-content {
+    margin-top: 10px;
+    color: #546e7a;
+}
+
+.post-actions, .comment-actions {
+    margin-top: 10px;
+}
+
+.post-actions span, .comment-actions button {
+    margin-right: 10px;
+}
+
+.comments-title {
+    margin-top: 30px;
+    margin-left: 900px; /* Ensure there's no left margin */
+    text-align: left; /* Align the text to the left */
+    width: 100%; /* Ensure it spans the full width */
+}
+
+
+.comments-section {
+    width: 90%;
+    max-width: 800px;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center-align the comments section */
+}
+
+#addCommentBtn {
+    background-color: #d18f7b;
+    margin-bottom: 10px;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+    transition: background-color 0.3s;
+}
+
+#addCommentBtn:hover {
+    background-color: white;
+    color: black;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+textarea {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-family: 'Roboto', sans-serif;
+    font-size: 17px;
+    color: #333;
+    resize: none;
+}
+
+button {
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: background-color 0.3s;
+    font-size: 15px;
+}
+
+button:hover {
+    background-color: #004d40;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+h3 {
+    color: #37474f;
+    margin-left: 10px;
+}
+
+.avatar {
+    width: 65px;
+    height: 65px;
+    background-color: #aaa;
+    border-radius: 50%;
+    margin-left: 15px;
+    margin-top: 5px;
+}
+
+.popup {
+    width: 50%;
+    height: 80%;
+    background-color: rgba(0, 0, 0, 0);
+    justify-content: center;
+    margin-left: 420px;
+    margin-top: 100px;
+}
+
+.popup-content {
+    background-color: #AE8381;
+    padding: 70px;
+    color: #fff;
+    width: 100%;
+    position: relative;
+    border: 8px solid #74676F; /* Add this line for border around the popup content */
+    border-radius: 30px;
+}
+
+.popup-content h2{
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 30px;
+}
+
+.popup-content button{
+    background-color: #74676F;
+    margin-left: 280px;
+    height: 50px;
+    width: 140px;
+    margin-top: 30px;
+    font-size: 20px;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+
+
+
+
+
+
+
+
+
