@@ -1,4 +1,3 @@
-// Import necessary modules
 const sql = require("mssql");
 const path = require("path");
 const dbConfig = require("./dbConfig");
@@ -6,7 +5,6 @@ const dbConfig = require("./dbConfig");
 // SQL data for seeding the database
 const seedSQL = 
 `
-<<<<<<< HEAD
 -- REMOVING FOREIGN KEYS
 DECLARE @sqlf NVARCHAR(max) = (
     SELECT 
@@ -25,19 +23,22 @@ FROM INFORMATION_SCHEMA.TABLES
 WHERE TABLE_TYPE = 'BASE TABLE'
 EXEC sp_executesql @sql;
 
+
+
 -- CREATE AND INSERT TABLES  
 CREATE TABLE Users(
-    id INT PRIMARY KEY IDENTITY,
+    userId INT PRIMARY KEY IDENTITY,
     name VARCHAR(50) NOT NULL,
+    dob DATE NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(8) NOT NULL
-=======
+);
+
 CREATE TABLE members (
     id INT IDENTITY(1,1) PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     member_role VARCHAR(20) NOT NULL
->>>>>>> 61b199b1c8bdd77dd46b33bb553e7e293bf605a4
 );
 
 CREATE TABLE member_comments (
@@ -78,7 +79,7 @@ INSERT INTO member_comments (member_id, content, parent_comment_id) VALUES
 
 CREATE TABLE Lecturer (
     LecturerID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT FOREIGN KEY REFERENCES Users(id),
+    UserID INT FOREIGN KEY REFERENCES Users(userId),
     ProfilePicture VARBINARY(MAX),
     CreatedAt DATETIME DEFAULT GETDATE()
 );
