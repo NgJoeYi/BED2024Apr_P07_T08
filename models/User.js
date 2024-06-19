@@ -3,9 +3,10 @@ const bcrypt = require('bcrypt');
 const dbConfig = require('../dbConfig');
 
 class User {
-    constructor(userId, name, email, password, role) {
-        this.userId = userId;
+    constructor(id, name, dob, email, password, role) {
+        this.id = id;
         this.name = name;
+        this.dob = dob;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -16,9 +17,9 @@ class User {
         let connection;
         try{
             connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
+            const sqlQuery = `SELECT * FROM Users WHERE email=@inputEmail`;
             const request = connection.request();
-            request.input('emailInput', loginInput.email);
+            request.input('inputEmail', loginInput.email);
             const result = await request.query(sqlQuery);
             if (result.recordset.length === 0) {
                 return null;
@@ -35,26 +36,51 @@ class User {
         }
     }
 
+    static async getUserById(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `SELECT * FROM Users WHERE id=@inputUserId`;
+            const request = connection.request();
+            request.input('inputUserId', userId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            const row = result.recordset[0];
+            return new User(row.id, row.dob ,row.name, row.email, row.password, row.role);
+        } catch(error) {
+            console.error('Error retrieving a user:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
     // newUserData sent in req.body rmb to extract
     static async createUser(newUserData) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            INSERT INTO Users (name, email, password, role) 
-            VALUES (@name, @email, @password, @role);
+            INSERT INTO Users (name, dob, email, password, role) 
+            VALUES (@inputName, @inputDob, @inputEmail, @inputPassword, @inputRole);
             SELECT SCOPE_IDENTITY() AS userId;
             `;
             const request = connection.request();
-            request.input('name', newUserData.name);
-            request.input('email', newUserData.email);
-            request.input('password', newUserData.password);
-            request.input('role', newUserData.role);
+            request.input('inputName', newUserData.name);
+            request.input('inputDob', newUserData.dob);
+            request.input('inputEmail', newUserData.email);
+            request.input('inputPassword', newUserData.password);
+            request.input('inputRole', newUserData.role);
             const result = await request.query(sqlQuery);
             if (result.rowsAffected[0] === 0) {
                 throw new Error("User not created");
             }
-            return result.recordset[0];
+            const row = result.recordset[0];
+            return new User(row.name, row.dob, row.email, row.password, row.role);
         } catch(error) {
             console.error('Error creating user:', error);
             throw error;
@@ -71,10 +97,10 @@ class User {
         try{
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            SELECT * FROM Users WHERE email=@userEmail
+            SELECT * FROM Users WHERE email=@inputEmail
             `;
             const request = connection.request();
-            request.input('userEmail', userLoginData.email);
+            request.input('inputEmail', userLoginData.email);
 
             const result = await request.query(sqlQuery);
 
@@ -91,7 +117,7 @@ class User {
                 throw new Error("Invalid Password");
             }
             
-            return new User(user.userId, user.name, user.email, user.password, user.role);
+            return new User(user.id, user.dob, user.name, user.email, user.password, user.role);
         } catch(error) {
             console.error('Error during login:', error);
             throw error;
