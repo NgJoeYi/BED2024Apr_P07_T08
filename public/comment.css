@@ -103,6 +103,7 @@ body {
 #addCommentBtn:hover {
     background-color: white;
     color: black;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .close {
@@ -135,7 +136,6 @@ textarea {
 }
 
 button {
-    background-color: #00796b;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -143,178 +143,17 @@ button {
     cursor: pointer;
     align-self: flex-end;
     transition: background-color 0.3s;
+    font-size: 15px;
 }
 
 button:hover {
     background-color: #004d40;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 h3 {
     color: #37474f;
     margin-left: 10px;
-}
-
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f1f1f1;
-    padding: 10px;
-    width: 100%;
-    font-size: 18px;
-}
-
-.navbar-left, .navbar-center, .navbar-right {
-    flex: 1;
-    text-align: center;
-}
-
-a {
-    text-decoration: none;
-    color: black;
-}
-
-.container {
-    display: flex;
-    margin-top: 30px;
-}
-
-.sidebar {
-    width: 290px;
-    background-color: #f0f0f0;
-    padding: 20px;
-    transition: width 0.3s;
-    margin-right: 25px;
-}
-
-.hamburger {
-    display: none;
-    cursor: pointer;
-}
-
-.hamburger span {
-    font-size: 24px;
-}
-
-.nav {
-    margin-top: 20px;
-}
-
-.nav-item {
-    margin-bottom: 10px;
-}
-
-.nav-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 10px;
-    background-color: #ccc;
-}
-
-.sub-nav {
-    display: none;
-    margin-left: 20px;
-}
-
-.sub-nav-item {
-    padding: 5px 0;
-}
-
-.main-content {
-    flex: 1;
-    padding: 30px;
-    background-color: #ddd;
-}
-
-.video-placeholder {
-    width: 100%;
-    height: 80vh;
-    background-color: #aaa;
-}
-
-.review-section {
-    margin-top: 30px;
-    width: 80%;
-    padding: 50px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.review-summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.filter-sort {
-    display: flex;
-}
-
-.filter, .sort {
-    margin-left: 20px;
-}
-
-.reviews {
-    margin-bottom: 20px;
-}
-
-.review {
-    display: flex;
-    justify-content: space-between;
-    background-color: #eee;
-    padding: 35px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-
-.review-content {
-    display: flex;
-}
-
-.review-author {
-    display: flex;
-    align-items: flex-start;
-}
-
-.author-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.author-name {
-    font-weight: bold;
-    font-size: 20px;
-    margin-left: 15px;
-    margin-top: 5px;
-}
-
-.rating {
-    margin-top: 10px;
-    font-size: 30px;
-}
-
-.review-date {
-    font-size: 14px;
-    color: #888;
-    margin-top: 5px;
-}
-
-.review-text {
-    margin-top: 20px;
-    margin-left: -35px;
-}
-
-.review-text p {
-    font-size: 17px;
-    margin-top: 7px;
-    margin-left: 5px;
-}
-
-.review-text textarea {
-    margin-top: 20px;
 }
 
 .avatar {
@@ -326,20 +165,13 @@ a {
     margin-top: 5px;
 }
 
-.review-actions {
-    display: flex;
-    align-items: center;
-}
-
-.review-actions button {
-    margin-left: 10px;
-}
-
 .popup {
     width: 50%;
-    height: 100%;
+    height: 80%;
     background-color: rgba(0, 0, 0, 0);
     justify-content: center;
+    margin-left: 420px;
+    margin-top: 100px;
 }
 
 .popup-content {
@@ -352,6 +184,22 @@ a {
     border-radius: 30px;
 }
 
+.popup-content h2{
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 30px;
+}
+
+.popup-content button{
+    background-color: #74676F;
+    margin-left: 280px;
+    height: 50px;
+    width: 140px;
+    margin-top: 30px;
+    font-size: 20px;
+}
+
 .close {
     position: absolute;
     top: 10px;
@@ -359,4 +207,13 @@ a {
     cursor: pointer;
     font-size: 24px;
 }
+
+
+
+
+
+
+
+
+
 
