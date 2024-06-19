@@ -1,0 +1,15 @@
+const commentModel = require('../models/Comment');
+
+async function getComments(req, res) {
+    try {
+        const comments = await commentModel.getAllComments();
+        res.json(comments);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching comments");
+    }
+}
+
+module.exports = {
+    getComments
+};
