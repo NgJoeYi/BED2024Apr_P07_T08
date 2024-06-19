@@ -55,7 +55,7 @@ class Courses {
             console.error('Error retrieving course:', error);
             throw error;
         }finally{
-            connection.close();
+            await connection.close();
         }
     }
 
@@ -111,23 +111,12 @@ class Courses {
     static async createCourse(newCourseData) {
         const connection = await sql.connect(dbConfig);
         try {
-            const request = connection.request();
-    
-            // Enable IDENTITY_INSERT for the Courses table
-            await request.query(`SET IDENTITY_INSERT Courses ON`);
-    
-            // Retrieve the largest CourseID
-            const maxCourseIDQuery = `SELECT MAX(CourseID) AS MaxCourseID FROM Courses`;
-            const maxCourseIDResult = await request.query(maxCourseIDQuery);
-            const maxCourseID = maxCourseIDResult.recordset[0].MaxCourseID || 0;
-            const newCourseID = maxCourseID + 1;
-    
-            // Insert the new course with the new CourseID
             const sqlQuery = `
-                INSERT INTO Courses (CourseID, LecturerID, Title, Description, Category, Level, Duration, CreatedAt, CourseImage)
-                VALUES (@CourseID, @LecturerID, @Title, @Description, @Category, @Level, @Duration, @CreatedAt, @CourseImage);
+                INSERT INTO Courses (LecturerID, Title, Description, Category, Level, Duration, CreatedAt, CourseImage)
+                VALUES (@LecturerID, @Title, @Description, @Category, @Level, @Duration, @CreatedAt, @CourseImage);
+                SELECT SCOPE_IDENTITY() AS CourseID;
             `;
-            request.input("CourseID", sql.Int, newCourseID);
+            const request = connection.request();
             request.input("LecturerID", sql.Int, newCourseData.lecturerID);
             request.input("Title", sql.NVarChar, newCourseData.title);
             request.input("Description", sql.NVarChar, newCourseData.description);
@@ -137,10 +126,8 @@ class Courses {
             request.input("CreatedAt", sql.DateTime, new Date());
             request.input("CourseImage", sql.VarBinary, newCourseData.courseImage);
     
-            await request.query(sqlQuery);
-    
-            // Disable IDENTITY_INSERT for the Courses table
-            await request.query(`SET IDENTITY_INSERT Courses OFF`);
+            const result = await request.query(sqlQuery);
+            const newCourseID = result.recordset[0].CourseID;
     
             return newCourseID;
         } catch (error) {
@@ -150,7 +137,6 @@ class Courses {
             await connection.close();
         }
     }
-    
     
     
 }
