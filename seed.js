@@ -6,6 +6,53 @@ const dbConfig = require("./dbConfig");
 // SQL data for seeding the database
 const seedSQL = 
 `
+-- REMOVING FOREIGN KEYS
+declare @sqlf nvarchar(max) = (
+    select 
+        'alter table ' + quotename(schema_name(schema_id)) + '.' +
+        quotename(object_name(parent_object_id)) +
+        ' drop constraint '+quotename(name) + ';'
+    from sys.foreign_keys
+    for xml path('')
+);
+exec sp_executesql @sqlf;
+
+
+-- DROPPING ALL TABLES
+DECLARE @sql NVARCHAR(max)=''
+
+SELECT @sql += ' Drop table ' + QUOTENAME(TABLE_SCHEMA) + '.'+ QUOTENAME(TABLE_NAME) + '; '
+FROM   INFORMATION_SCHEMA.TABLES
+WHERE  TABLE_TYPE = 'BASE TABLE'
+
+Exec Sp_executesql @sql
+
+
+-- CREATE AND INSERT TABLES  
+CREATE TABLE Users(
+    id INT PRIMARY KEY IDENTITY,
+    name VARCHAR(50) NOT NULL,
+    dob DATE NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(8) NOT NULL
+);
+
+CREATE TABLE ProfilePic (
+    pic_id INT PRIMARY KEY IDENTITY,
+    user_id INT NOT NULL UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    img VARCHAR(MAX) NOT NULL
+);
+
+CREATE TABLE Discussions (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    title NVARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    category NVARCHAR(50) NOT NULL,
+    posted_date DATETIME DEFAULT GETDATE()
+);
+
 CREATE TABLE members (
     id INT IDENTITY(1,1) PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
