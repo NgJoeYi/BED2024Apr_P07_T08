@@ -13,7 +13,7 @@ module.exports = {
 };
 */
 
-/*
+
 //JOEYI'S
 module.exports = {
   user: "BED2024Apr_login", // Replace with your SQL Server login username aka the security login thingy
@@ -26,4 +26,3 @@ module.exports = {
     connectionTimeout: 60000, // Connection timeout in milliseconds
   },
 };
-*/
