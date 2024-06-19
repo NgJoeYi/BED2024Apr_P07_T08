@@ -95,6 +95,10 @@ body {
     margin-bottom: 20px;
 }
 
+.review-rate{
+  font-size: 20px;
+}
+
 .filter-sort {
     display: flex;
     font-size: 19px;
@@ -182,9 +186,10 @@ body {
 }
 
 .review-actions button {
-    margin-left: 10px;
+    margin-left: 15px;
     background-color: #AE8381;
     font-size: 15px;
+    font-family: 'Afacad';
 }
 
 .popup {
@@ -216,6 +221,7 @@ body {
     text-align: center;
     margin-bottom: 20px;
     font-size: 30px;
+    font-family: 'Afacad';
 }
 
 .close {
@@ -282,10 +288,13 @@ button {
     border: none;
     border-radius: 4px;
     background-color: #AE8381;
+    font-family: 'Afacad';
+    font-size: 15px;
 }
 
 button:hover {
     background-color: white;
+    font-family: 'Afacad';
     color: black;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }

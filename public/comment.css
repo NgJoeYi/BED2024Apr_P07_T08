@@ -60,6 +60,7 @@ body {
 .post-content, .comment-content {
     margin-top: 10px;
     color: #546e7a;
+    font-size: 20px;
 }
 
 .post-actions, .comment-actions {
@@ -206,6 +207,12 @@ h3 {
     right: 10px;
     cursor: pointer;
     font-size: 24px;
+}
+
+.comment-date{
+    color: #bbb9b9;
+    margin-top: 10px;
+    font-size: 18px;
 }
 
 
