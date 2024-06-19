@@ -95,6 +95,14 @@ function showPopup(type) {
     const popupContent = popup.querySelector('.popup-content h2');
     popupContent.textContent = type === 'add' ? 'Leave a Review' : 'Edit Review';
     popup.style.display = 'flex';
+
+    if (type === 'add') {
+        // Clear the popup for new review
+        document.getElementById('review-text').value = '';
+        document.querySelectorAll('.popup .fa-star').forEach(star => {
+            star.classList.remove('selected');
+        });
+    }
 }
 
 function closePopup() {
@@ -134,9 +142,6 @@ function sortReviews() {
     reviews.forEach(review => reviewsContainer.appendChild(review));
 }
 
-
-
-
 function deleteReview(button) {
     const review = button.closest('.review');
     if (confirm("Are you sure you want to delete this review?")) {
@@ -145,10 +150,26 @@ function deleteReview(button) {
 }
 
 function editReview(button) {
+    const review = button.closest('.review');
+    const reviewText = review.querySelector('.review-details p').textContent;
+    const reviewStars = review.querySelectorAll('.fa-star');
+    const popupStars = document.querySelectorAll('.popup .fa-star');
+    
+    document.getElementById('review-text').value = reviewText;
+
+    const rating = Array.from(reviewStars).filter(star => star.classList.contains('selected')).length;
+    
+    popupStars.forEach(star => {
+        if (star.getAttribute('data-value') <= rating) {
+            star.classList.add('selected');
+        } else {
+            star.classList.remove('selected');
+        }
+    });
+
     showPopup('edit');
 }
 
 function postReview() {
     closePopup();
 }
-
