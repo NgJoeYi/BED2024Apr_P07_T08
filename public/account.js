@@ -242,8 +242,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         
         // Prefill edit form fields
         document.getElementById('edit-name').value = user.name;
-        document.getElementById('edit-birth-date').value = user.dob.split('T')[0]; // date doesnt show time
+        document.getElementById('edit-birth-date').value = user.dob.split('T')[0];
         document.getElementById('edit-email').value = user.email;
+        
+        // Update other elements with the user's name
+        document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
+          element.textContent = user.name;
+        });
+
       } else {
         console.error('Failed to fetch user data');
       }
@@ -254,8 +260,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.error('No user is logged in');
   }
   
-  // Event listener for edit icon click
+  // Toggle visibility for edit account details
   document.getElementById('edit-icon').addEventListener('click', function () {
-    document.getElementById('edit-account-details').style.display = 'block';
+    const editAccountDetails = document.getElementById('edit-account-details');
+    if (editAccountDetails.style.display === 'block') {
+      editAccountDetails.style.display = 'none';
+    } else {
+      editAccountDetails.style.display = 'block';
+    }
   });
 });
+
