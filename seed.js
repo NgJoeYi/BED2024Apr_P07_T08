@@ -1,8 +1,3 @@
-// Import necessary modules
-const sql = require("mssql");
-const path = require("path");
-const dbConfig = require("./dbConfig");
-
 // SQL data for seeding the database
 const seedSQL = 
 `
@@ -57,7 +52,6 @@ CREATE TABLE Lecturer (
 
 CREATE TABLE Courses (
     CourseID INT PRIMARY KEY IDENTITY(1,1),
-    LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
     Title NVARCHAR(200) NOT NULL,
     Description NVARCHAR(2000),
     Category NVARCHAR(100),
@@ -66,9 +60,11 @@ CREATE TABLE Courses (
     CreatedAt DATETIME DEFAULT GETDATE(),
     CourseImage VARBINARY(MAX)
 );
+
 CREATE TABLE Lectures (
     LectureID INT PRIMARY KEY IDENTITY(1,1),
     CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
+    LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
     Title NVARCHAR(200) NOT NULL,
     Description NVARCHAR(2000),
     VideoURL NVARCHAR(256),
