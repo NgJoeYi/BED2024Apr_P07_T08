@@ -1656,6 +1656,11 @@ input[type=email], input[type=password], input[type=text], input[type=date] {
   color: #333;
 }
 
+input[disabled] {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
 form button {
   background-color: #CD8D7A;
   color: white;
