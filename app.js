@@ -36,6 +36,7 @@ app.get('/comments', commentController.getComments);
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews);
+app.get('/reviews/:id', reviewController.getReviewById);
 
 app.listen(port, async () => {
   try {
@@ -55,3 +56,4 @@ process.on("SIGINT", async () => {
   console.log("Database connection closed");
   process.exit(0);
 });
+
