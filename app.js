@@ -1,6 +1,7 @@
 const express = require('express');
 const sql = require('mssql');
 const bodyParser = require('body-parser');
+const path = require('path'); // Make sure to include this for setting views directory
 const dbConfig = require('./dbConfig');
 const userController = require('./controllers/userController');
 const discussionController = require('./controllers/discussionController');
@@ -12,6 +13,7 @@ const port = process.env.PORT || 3000; // Use environment variable/default port
 
 // Set up the view engine
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); // Add this line if not already present
 
 // Serve static files from the public directory
 app.use(express.static('public'));
@@ -37,8 +39,7 @@ app.delete('/discussions/:id', discussionController.deleteDiscussion);
 app.get('/comments', commentController.getComments);
 
 // Add Routes for reviews
-app.get('/reviews', reviewController.getReviews);
-app.get('/reviews/:id', reviewController.getReviewById);
+app.get('/reviews', reviewController.getReviews); // Updated to render reviews view
 
 app.listen(port, async () => {
   try {
