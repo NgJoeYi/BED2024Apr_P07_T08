@@ -235,12 +235,13 @@ document.addEventListener('DOMContentLoaded', async function () {
       const response = await fetch(`/account/${userId}`);
       
       if (response.ok) {
+        // awaiting the for the user data sent from res.status(200).json(user);
         const user = await response.json();
         
-        // Populate profile info
+        // populate profile username
         document.querySelector('.profile-info .user-name').textContent = user.name;
         
-        // Prefill edit form fields
+        // prefill the edit form fields
         document.getElementById('edit-name').value = user.name;
         document.getElementById('edit-birth-date').value = user.dob.split('T')[0];
         document.getElementById('edit-email').value = user.email;
@@ -260,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.error('No user is logged in');
   }
   
-  // Toggle visibility for edit account details
+  // toggle visibility for edit account details
   document.getElementById('edit-icon').addEventListener('click', function () {
     const editAccountDetails = document.getElementById('edit-account-details');
     if (editAccountDetails.style.display === 'block') {
