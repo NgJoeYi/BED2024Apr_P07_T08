@@ -3352,3 +3352,16 @@ main {
   border: 1px solid #ccc;
   margin: 0 10px; /* Increased margin between pagination buttons */
 }
+
+
+.like-button, .dislike-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-block;
+}
+
+.like-button:focus, .dislike-button:focus {
+  outline: none;
+}

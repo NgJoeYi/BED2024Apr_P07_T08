@@ -1,33 +1,27 @@
-// Import necessary modules
 const sql = require("mssql");
-const path = require("path");
 const dbConfig = require("./dbConfig");
 
 // SQL data for seeding the database
-const seedSQL = 
-`
--- REMOVING FOREIGN KEYS
-declare @sqlf nvarchar(max) = (
-    select 
-        'alter table ' + quotename(schema_name(schema_id)) + '.' +
-        quotename(object_name(parent_object_id)) +
-        ' drop constraint '+quotename(name) + ';'
-    from sys.foreign_keys
-    for xml path('')
+const seedSQL = `
+-- Remove foreign keys
+DECLARE @sqlf NVARCHAR(MAX) = (
+    SELECT 'ALTER TABLE ' + QUOTENAME(SCHEMA_NAME(schema_id)) + '.' +
+           QUOTENAME(OBJECT_NAME(parent_object_id)) +
+           ' DROP CONSTRAINT ' + QUOTENAME(name) + ';'
+    FROM sys.foreign_keys
+    FOR XML PATH('')
 );
-exec sp_executesql @sqlf;
+EXEC sp_executesql @sqlf;
 
--- DROPPING ALL TABLES
-DECLARE @sql NVARCHAR(max)=''
+-- Drop all tables
+DECLARE @sql NVARCHAR(MAX) = '';
+SELECT @sql += ' DROP TABLE ' + QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME) + ';'
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE';
+EXEC sp_executesql @sql;
 
-SELECT @sql += ' Drop table ' + QUOTENAME(TABLE_SCHEMA) + '.'+ QUOTENAME(TABLE_NAME) + '; '
-FROM   INFORMATION_SCHEMA.TABLES
-WHERE  TABLE_TYPE = 'BASE TABLE'
-
-Exec Sp_executesql @sql
-
--- CREATE AND INSERT TABLES  
-CREATE TABLE Users(
+-- Create Users table
+CREATE TABLE Users (
     id INT PRIMARY KEY IDENTITY,
     name VARCHAR(50) NOT NULL,
     dob DATE NOT NULL,
@@ -36,6 +30,7 @@ CREATE TABLE Users(
     role VARCHAR(8) NOT NULL
 );
 
+-- Create ProfilePic table
 CREATE TABLE ProfilePic (
     pic_id INT PRIMARY KEY IDENTITY,
     user_id INT NOT NULL UNIQUE,
@@ -43,14 +38,20 @@ CREATE TABLE ProfilePic (
     img VARCHAR(MAX) NOT NULL
 );
 
+-- Create Discussions table
 CREATE TABLE Discussions (
     id INT PRIMARY KEY IDENTITY(1,1),
     title NVARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     category NVARCHAR(50) NOT NULL,
-    posted_date DATETIME DEFAULT GETDATE()
+    posted_date DATETIME DEFAULT GETDATE(),
+    user_id INT NOT NULL,
+    likes INT DEFAULT 0,
+    dislikes INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
+-- Create user_comments table
 CREATE TABLE user_comments (
     id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL,
@@ -61,6 +62,7 @@ CREATE TABLE user_comments (
     FOREIGN KEY (parent_comment_id) REFERENCES user_comments(id)
 );
 
+-- Create user_reviews table
 CREATE TABLE user_reviews (
     review_id INT PRIMARY KEY IDENTITY,
     user_id INT NOT NULL,
@@ -81,6 +83,11 @@ INSERT INTO Users (name, dob, email, password, role) VALUES
 ('Bob Pink', '1985-03-22', 'bob.pink@example.com', 'password456', 'student'),
 ('Charlie Grey', '1992-07-30', 'charlie.grey@example.com', 'password789', 'student'),
 ('Diana Prince', '1988-11-08', 'diana.prince@example.com', 'password321', 'student');
+
+-- Insert sample discussions
+INSERT INTO Discussions (title, description, category, posted_date, user_id) VALUES
+('Coding for python', 'Python design philosophy emphasizes code readability and syntax that allows programmers to express concepts in fewer lines of code compared to languages such as C++ or Java.', 'coding', GETDATE(), 1),
+('Advanced Algebra', 'Advanced algebra is a branch of mathematics that extends the principles and concepts of elementary algebra into more complex and abstract areas.', 'math', GETDATE(), 2);
 
 -- Inserting the main discussion comment
 INSERT INTO user_comments (user_id, content) VALUES
@@ -109,7 +116,7 @@ VALUES
 // Load the SQL and run the seed process
 async function run() {
     try {
-        // make sure that any items are correctly URL encoded in the connection string
+        // Make sure that any items are correctly URL encoded in the connection string
         const connection = await sql.connect(dbConfig);
         const request = connection.request();
         const result = await request.query(seedSQL);
@@ -117,7 +124,7 @@ async function run() {
 
         connection.close();
     } catch (err) {
-        console.log(err);
+        console.error(err);
     }
 }
 
