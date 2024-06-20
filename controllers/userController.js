@@ -1,6 +1,21 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
+const getUserById = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    try {
+        const user = await User.getUserById(userId);
+        if (!user) {
+            return res.status(404).send('User does not exist');
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Server error:', error); // Log error details
+        res.status(500).send('Server error');
+    }
+};
+
+
 const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
@@ -46,6 +61,7 @@ const loginUser = async (req, res) => {
 };
 
 module.exports = {
+    getUserById,
     createUser,
     loginUser
 };
