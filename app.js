@@ -11,6 +11,9 @@ const reviewController = require('./controllers/reviewController');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Set up the view engine
+app.set('view engine', 'ejs');
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -36,24 +39,22 @@ app.get('/comments', commentController.getComments);
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews);
-app.get('/reviews/:id', reviewController.getReviewById);
 
 app.listen(port, async () => {
-  try {
-    await sql.connect(dbConfig);
-    console.log("Database connection established successfully");
-  } catch (err) {
-    console.error("Database connection error:", err);
-    process.exit(1);
-  }
+    try {
+        await sql.connect(dbConfig);
+        console.log("Database connection established successfully");
+    } catch (err) {
+        console.error("Database connection error:", err);
+        process.exit(1);
+    }
 
-  console.log(`Server listening on port ${port}`);
+    console.log(`Server listening on port ${port}`);
 });
 
 process.on("SIGINT", async () => {
-  console.log("Server is gracefully shutting down");
-  await sql.close();
-  console.log("Database connection closed");
-  process.exit(0);
+    console.log("Server is gracefully shutting down");
+    await sql.close();
+    console.log("Database connection closed");
+    process.exit(0);
 });
-
