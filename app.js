@@ -6,7 +6,8 @@ const userController = require('./controllers/userController');
 const discussionController = require('./controllers/discussionController');
 const commentController = require('./controllers/commentController');
 const reviewController = require('./controllers/reviewController'); // Add this line
-
+const courseController = require("./controllers/coursesController");
+// const methodOverride = require('method-override');
 const app = express();
 const port = process.env.PORT || 3000; // Use environment variable/default port
 
@@ -36,6 +37,13 @@ app.post('/discussions', discussionController.createDiscussion);
 app.post('/discussions/like', discussionController.incrementLikes);
 app.post('/discussions/dislike', discussionController.incrementDislikes);
 
+
+// Add Routes for courses
+app.get('/courses', courseController.getAllCourses);
+app.get('/courses/:id', courseController.getCoursesById);
+app.post('/courses', courseController.createCourse);
+app.put('/courses/:id', courseController.updateCourse);
+app.delete('/courses/:id', courseController.deleteCourse);
 
 app.listen(port, async () => {
     try {

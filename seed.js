@@ -62,6 +62,37 @@ CREATE TABLE user_comments (
     FOREIGN KEY (parent_comment_id) REFERENCES user_comments(id)
 );
 
+CREATE TABLE Lecturer (
+    LecturerID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT FOREIGN KEY REFERENCES Users(id),
+    ProfilePicture VARBINARY(MAX),
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE Courses (
+    CourseID INT PRIMARY KEY IDENTITY(1,1),
+    Title NVARCHAR(200) NOT NULL,
+    Description NVARCHAR(2000),
+    Category NVARCHAR(100),
+    Level NVARCHAR(50),
+    Duration INT, -- Duration in minutes
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    CourseImage VARBINARY(MAX)
+);
+
+CREATE TABLE Lectures (
+    LectureID INT PRIMARY KEY IDENTITY(1,1),
+    CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
+    LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
+    Title NVARCHAR(200) NOT NULL,
+    Description NVARCHAR(2000),
+    VideoURL NVARCHAR(256),
+    Video VARBINARY(MAX),
+    LectureImage VARBINARY(MAX),
+    Duration INT, -- Duration in minutes
+    Position INT, -- Position in the course sequence
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
 -- Create user_reviews table
 CREATE TABLE user_reviews (
     review_id INT PRIMARY KEY IDENTITY,
@@ -130,3 +161,7 @@ async function run() {
 
 run();
 console.log("Seeding completed");
+
+
+
+
