@@ -235,13 +235,12 @@ document.addEventListener('DOMContentLoaded', async function () {
       const response = await fetch(`/account/${userId}`);
       
       if (response.ok) {
-        // awaiting the for the user data sent from res.status(200).json(user);
         const user = await response.json();
         
-        // populate profile username
+        // Populate profile info
         document.querySelector('.profile-info .user-name').textContent = user.name;
         
-        // prefill the edit form fields
+        // Prefill edit form fields
         document.getElementById('edit-name').value = user.name;
         document.getElementById('edit-birth-date').value = user.dob.split('T')[0];
         document.getElementById('edit-email').value = user.email;
@@ -261,7 +260,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.error('No user is logged in');
   }
   
-  // toggle visibility for edit account details
+  // Toggle visibility for edit account details
   document.getElementById('edit-icon').addEventListener('click', function () {
     const editAccountDetails = document.getElementById('edit-account-details');
     if (editAccountDetails.style.display === 'block') {
@@ -270,5 +269,56 @@ document.addEventListener('DOMContentLoaded', async function () {
       editAccountDetails.style.display = 'block';
     }
   });
-});
 
+  // Handle form submission
+  document.getElementById('save-changes').addEventListener('click', async function (event) {
+    event.preventDefault();
+    
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('edit-password').value;
+    const confirmPassword = document.getElementById('edit-confirm-password').value;
+    
+    if (newPassword !== confirmPassword) {
+      alert('New passwords do not match');
+      return;
+    }
+    
+    const updatedUserData = {
+      name: document.getElementById('edit-name').value,
+      dob: document.getElementById('edit-birth-date').value,
+      email: document.getElementById('edit-email').value,
+      currentPassword: currentPassword,
+      newPassword: newPassword
+    };
+    
+    try {
+      const response = await fetch(`/account/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedUserData)
+      });
+      
+      if (response.ok) {
+        const updatedUser = await response.json();
+        alert('User details updated successfully');
+        
+        // Update displayed user info
+        document.querySelector('.profile-info .user-name').textContent = updatedUser.name;
+        document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
+          element.textContent = updatedUser.name;
+        });
+
+        // Close the edit fields
+        document.getElementById('edit-account-details').style.display = 'none';
+        
+      } else {
+        const errorData = await response.json();
+        alert(`Error updating user details: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+});
