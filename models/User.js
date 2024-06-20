@@ -48,7 +48,7 @@ class User {
                 return null;
             }
             const row = result.recordset[0];
-            return new User(row.id, row.dob ,row.name, row.email, row.password, row.role);
+            return new User(row.id, row.name ,row.dob, row.email, row.password, row.role);
         } catch(error) {
             console.error('Error retrieving a user:', error);
             throw error;
@@ -80,7 +80,7 @@ class User {
                 throw new Error("User not created");
             }
             const row = result.recordset[0];
-            return new User(row.name, row.dob, row.email, row.password, row.role);
+            return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
         } catch(error) {
             console.error('Error creating user:', error);
             throw error;
@@ -117,7 +117,7 @@ class User {
                 throw new Error("Invalid Password");
             }
             
-            return new User(user.id, user.dob, user.name, user.email, user.password, user.role);
+            return new User(user.id, user.name, user.dob, user.email, user.password, user.role);
         } catch(error) {
             console.error('Error during login:', error);
             throw error;
