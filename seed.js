@@ -182,6 +182,26 @@ async function run() {
         `;
         await connection.request().query(insertUserReviews);
 
+        // Insert main discussion comment and replies
+        const insertDiscussionComments = `
+        -- Inserting the main discussion comment
+        INSERT INTO user_comments (user_id, content) VALUES
+        (2, 'Understanding advanced calculus can be challenging for many students. What strategies have you found most effective in mastering these concepts?');
+
+        -- Get the ID of the main comment
+        DECLARE @MainCommentId INT;
+        SET @MainCommentId = SCOPE_IDENTITY();
+
+        -- Inserting replies to the main comment
+        INSERT INTO user_comments (user_id, content, parent_comment_id) VALUES
+        (1, 'One strategy that has helped me is breaking down complex problems into smaller, more manageable parts. This makes it easier to understand the underlying concepts.', @MainCommentId),
+        (3, 'I find it helpful to visualize the problems graphically. Drawing diagrams or using graphing tools can provide a different perspective on the problem.', @MainCommentId),
+        (4, 'As a lecturer, I encourage students to form study groups. Discussing problems and solutions with peers can lead to a deeper understanding and uncover different approaches.', @MainCommentId),
+        (5, 'I also recommend using online resources like video tutorials and interactive problem solvers. These tools can offer additional explanations and practice opportunities.', @MainCommentId),
+        (3, 'Another approach is to seek help from instructors during office hours. Getting direct feedback and guidance can significantly improve your understanding.', @MainCommentId);
+        `;
+        await connection.request().query(insertDiscussionComments);
+
         connection.close();
         console.log("Seeding completed");
     } catch (err) {

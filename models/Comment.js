@@ -17,3 +17,4 @@ async function getAllComments() {
 module.exports = {
     getAllComments
 };
+

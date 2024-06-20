@@ -177,6 +177,7 @@ function postReview() {
     closePopup();
 }
 
+
 function fetchReviews() {
     fetch('/reviews')
         .then(response => response.json())

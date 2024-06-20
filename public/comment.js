@@ -142,3 +142,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchComments(); // Load comments when the page loads
 });
+
