@@ -1,26 +1,22 @@
 const express = require('express');
 const sql = require('mssql');
 const bodyParser = require('body-parser');
-const path = require('path'); // Make sure to include this for setting views directory
+const path = require('path');
 const dbConfig = require('./dbConfig');
 const userController = require('./controllers/userController');
 const discussionController = require('./controllers/discussionController');
 const commentController = require('./controllers/commentController');
-const reviewController = require('./controllers/reviewController'); // Add this line
+const reviewController = require('./controllers/reviewController');
 
 const app = express();
-const port = process.env.PORT || 3000; // Use environment variable/default port
-
-// Set up the view engine
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views')); // Add this line if not already present
+const port = process.env.PORT || 3000;
 
 // Serve static files from the public directory
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Include body-parser middleware to handle JSON data
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // For form data handling
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Add Routes for users
 app.post('/users/register', userController.createUser);
@@ -39,25 +35,23 @@ app.delete('/discussions/:id', discussionController.deleteDiscussion);
 app.get('/comments', commentController.getComments);
 
 // Add Routes for reviews
-app.get('/reviews', reviewController.getReviews); // Updated to render reviews view
+app.get('/reviews', reviewController.getReviews);
 
 app.listen(port, async () => {
   try {
-    // Connect to the database
     await sql.connect(dbConfig);
     console.log("Database connection established successfully");
   } catch (err) {
     console.error("Database connection error:", err);
-    process.exit(1); // Exit with code 1 indicating an error
+    process.exit(1);
   }
 
   console.log(`Server listening on port ${port}`);
 });
 
-// Close the connection pool on SIGINT signal
 process.on("SIGINT", async () => {
   console.log("Server is gracefully shutting down");
   await sql.close();
   console.log("Database connection closed");
-  process.exit(0); // Exit with code 0 indicating successful shutdown
+  process.exit(0);
 });
