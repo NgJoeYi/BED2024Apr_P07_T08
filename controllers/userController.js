@@ -1,6 +1,21 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 
+const getUserById = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    try {
+        const user = await User.getUserById(userId);
+        if (!user) {
+            return res.status(404).send('User does not exist');
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        console.error('Server error:', error); // Log error details
+        res.status(500).send('Server error');
+    }
+};
+
+
 const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
@@ -45,7 +60,33 @@ const loginUser = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    const newUserData = req.body;
+    try {
+        // get the current user 
+        const user = await User.getUserById(userId);
+        if (!user) {
+            return res.status(404).send('User does not exist');
+        }
+
+        // compare current password and the password in the database 
+        const isPasswordMatch = await bcrypt.compare(newUserData.currentPassword, user.password);
+        if (!isPasswordMatch) {
+            return res.status(400).json({ message: 'Current password is incorrect' });
+        }
+
+        const updatedUser = await User.updateUser(userId, newUserData);
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error('Server error:', error); // Log error details
+        res.status(500).send('Server error');
+    }
+};
+
 module.exports = {
+    getUserById,
     createUser,
-    loginUser
+    loginUser,
+    updateUser
 };
