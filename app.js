@@ -39,6 +39,8 @@ app.get('/comments', commentController.getComments);
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews);
+app.put('/reviews/:id', reviewController.updateReview); 
+
 
 app.listen(port, async () => {
     try {

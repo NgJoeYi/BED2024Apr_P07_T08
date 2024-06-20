@@ -15,8 +15,24 @@ async function getAllReviews() {
     }
 }
 
+async function updateReview(id, review_text, rating) {
+    try {
+        const pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('review_id', sql.Int, id)
+            .input('review_text', sql.NVarChar, review_text)
+            .input('rating', sql.Int, rating)
+            .query(`
+                UPDATE user_reviews
+                SET review_text = @review_text, rating = @rating
+                WHERE review_id = @review_id
+            `);
+    } catch (err) {
+        throw new Error(err);
+    }
+}
 
 module.exports = {
     getAllReviews,
+    updateReview, 
 };
-

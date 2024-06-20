@@ -152,6 +152,10 @@ function deleteReview(button) {
     }
 }
 
+function postReview() {
+    closePopup();
+}
+
 function editReview(button) {
     const review = button.closest('.review');
     const reviewText = review.querySelector('.review-details p').textContent;
@@ -171,12 +175,29 @@ function editReview(button) {
     });
 
     showPopup('edit');
-}
 
-function postReview() {
-    closePopup();
-}
+    // Add event listener to the post button to handle the update
+    const postButton = document.querySelector('.popup-content button');
+    postButton.onclick = () => {
+        const updatedText = document.getElementById('review-text').value;
+        const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
 
+        fetch(`/reviews/${review.getAttribute('data-id')}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ review_text: updatedText, rating: updatedRating })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message); // Show success message
+            closePopup();
+            fetchReviews(); // Refresh reviews
+        })
+        .catch(error => console.error('Error updating review:', error));
+    };
+}
 
 function fetchReviews() {
     fetch('/reviews')
@@ -188,6 +209,7 @@ function fetchReviews() {
             reviews.forEach(review => {
                 const reviewElement = document.createElement('div');
                 reviewElement.classList.add('review');
+                reviewElement.setAttribute('data-id', review.review_id); // Add this line
                 reviewElement.setAttribute('data-date', review.review_date);
                 reviewElement.innerHTML = `
                     <div class="review-content">
