@@ -5,6 +5,7 @@ const dbConfig = require('./dbConfig');
 const userController = require('./controllers/userController');
 const discussionController = require('./controllers/discussionController');
 const commentController = require('./controllers/commentController');
+const reviewController = require('./controllers/reviewController'); // Add this line
 
 const app = express();
 const port = process.env.PORT || 3000; // Use environment variable/default port
@@ -34,6 +35,10 @@ app.delete('/discussions/:id', discussionController.deleteDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
+
+// Add Routes for reviews
+app.get('/reviews', reviewController.getReviews);
+app.get('/reviews/:id', reviewController.getReviewById);
 
 app.listen(port, async () => {
   try {

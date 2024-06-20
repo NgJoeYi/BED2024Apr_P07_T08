@@ -51,14 +51,23 @@ CREATE TABLE Discussions (
     posted_date DATETIME DEFAULT GETDATE()
 );
 
-CREATE TABLE member_comments (
+CREATE TABLE user_comments (
     id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT NOT NULL,
     content TEXT NOT NULL,
     created_at DATETIME DEFAULT GETDATE(),
     parent_comment_id INT NULL,
     FOREIGN KEY (user_id) REFERENCES Users(id),
-    FOREIGN KEY (parent_comment_id) REFERENCES member_comments(id)
+    FOREIGN KEY (parent_comment_id) REFERENCES user_comments(id)
+);
+
+CREATE TABLE user_reviews (
+    review_id INT PRIMARY KEY IDENTITY,
+    user_id INT NOT NULL,
+    review_text TEXT NOT NULL,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    review_date DATE DEFAULT GETDATE(),
+    FOREIGN KEY (user_id) REFERENCES Users(id)
 );
 
 -- Inserting data into the Users table
@@ -67,10 +76,14 @@ INSERT INTO Users (name, dob, email, password, role) VALUES
 ('Jane Smith', '1985-02-02', 'jane_smith@example.com', 'hashed_password', 'lecturer'),
 ('Alice Jones', '1992-03-03', 'alice_jones@example.com', 'hashed_password', 'student'),
 ('Bob Brown', '1988-04-04', 'bob_brown@example.com', 'hashed_password', 'lecturer'),
-('Carol White', '1995-05-05', 'carol_white@example.com', 'hashed_password', 'student');
+('Carol White', '1995-05-05', 'carol_white@example.com', 'hashed_password', 'student'),
+('Alison Johnson', '1990-01-15', 'alice.johnson@example.com', 'password123', 'student'),
+('Bob Pink', '1985-03-22', 'bob.pink@example.com', 'password456', 'student'),
+('Charlie Grey', '1992-07-30', 'charlie.grey@example.com', 'password789', 'student'),
+('Diana Prince', '1988-11-08', 'diana.prince@example.com', 'password321', 'student');
 
 -- Inserting the main discussion comment
-INSERT INTO member_comments (user_id, content) VALUES
+INSERT INTO user_comments (user_id, content) VALUES
 (2, 'Understanding advanced calculus can be challenging for many students. What strategies have you found most effective in mastering these concepts?');
 
 -- Get the ID of the main comment
@@ -78,12 +91,19 @@ DECLARE @MainCommentId INT;
 SET @MainCommentId = SCOPE_IDENTITY();
 
 -- Inserting replies to the main comment
-INSERT INTO member_comments (user_id, content, parent_comment_id) VALUES
+INSERT INTO user_comments (user_id, content, parent_comment_id) VALUES
 (1, 'One strategy that has helped me is breaking down complex problems into smaller, more manageable parts. This makes it easier to understand the underlying concepts.', @MainCommentId),
 (3, 'I find it helpful to visualize the problems graphically. Drawing diagrams or using graphing tools can provide a different perspective on the problem.', @MainCommentId),
 (4, 'As a lecturer, I encourage students to form study groups. Discussing problems and solutions with peers can lead to a deeper understanding and uncover different approaches.', @MainCommentId),
 (5, 'I also recommend using online resources like video tutorials and interactive problem solvers. These tools can offer additional explanations and practice opportunities.', @MainCommentId),
 (3, 'Another approach is to seek help from instructors during office hours. Getting direct feedback and guidance can significantly improve your understanding.', @MainCommentId);
+
+INSERT INTO user_reviews (user_id, review_text, rating)
+VALUES 
+(6, 'Great course content, very informative!', 5),
+(7, 'Needs improvement in course materials.', 3),
+(8, 'Well-structured lectures and helpful professor.', 4),
+(9, 'Lecture pace was too fast to follow.', 2);
 `;
 
 // Load the SQL and run the seed process
