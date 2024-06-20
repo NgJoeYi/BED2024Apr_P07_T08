@@ -1,4 +1,4 @@
-/* 
+
 //AMELIA'S
 module.exports = {
   user: "booksapi_user", // Replace with your SQL Server login username aka the security login thingy
@@ -11,10 +11,11 @@ module.exports = {
     connectionTimeout: 60000, // Connection timeout in milliseconds
   },
 };
-*/
+
 
 
 //JOEYI'S
+/*
 module.exports = {
   user: "BED2024Apr_login", // Replace with your SQL Server login username aka the security login thingy
   password: "28D685372b05", // Replace with your SQL Server login password
@@ -26,3 +27,4 @@ module.exports = {
     connectionTimeout: 60000, // Connection timeout in milliseconds
   },
 };
+*/

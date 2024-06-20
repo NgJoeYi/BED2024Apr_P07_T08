@@ -2,9 +2,9 @@ const sql = require('mssql');
 
 async function getAllComments() {
     const query = `
-        SELECT mc.id, mc.content, mc.created_at, mc.parent_comment_id, m.username 
+        SELECT mc.id, mc.content, mc.created_at, mc.parent_comment_id, u.name AS username 
         FROM member_comments mc
-        JOIN members m ON mc.member_id = m.id
+        JOIN Users u ON mc.user_id = u.id
     `;
     try {
         const result = await sql.query(query);
