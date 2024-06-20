@@ -80,27 +80,27 @@ function filterImages(category) {
 }
 
 // Feature 4: Username editing functionality in account.html
-document.getElementById('edit-icon').addEventListener('click', function() {
-  const editAccountDetails = document.getElementById('edit-account-details');
-  editAccountDetails.style.display = editAccountDetails.style.display === 'none' || editAccountDetails.style.display === '' ? 'block' : 'none';
-});
+// document.getElementById('edit-icon').addEventListener('click', function() {
+//   const editAccountDetails = document.getElementById('edit-account-details');
+//   editAccountDetails.style.display = editAccountDetails.style.display === 'none' || editAccountDetails.style.display === '' ? 'block' : 'none';
+// });
 
-document.getElementById('save-changes').addEventListener('click', function() {
-  const newUsername = document.getElementById('edit-name').value;
-  const newBirthDate = document.getElementById('edit-birth-date').value;
-  const newEmail = document.getElementById('edit-email').value;
+// document.getElementById('save-changes').addEventListener('click', function() {
+//   const newUsername = document.getElementById('edit-name').value;
+//   const newBirthDate = document.getElementById('edit-birth-date').value;
+//   const newEmail = document.getElementById('edit-email').value;
   
-  // Update the profile info
-  document.querySelector('.profile-info .user-name').textContent = newUsername;
+//   // Update the profile info
+//   document.querySelector('.profile-info .user-name').textContent = newUsername;
 
-  // Update all elements with the class 'user-name' in reviews and comments
-  document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
-    element.textContent = newUsername;
-  });
+//   // Update all elements with the class 'user-name' in reviews and comments
+//   document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
+//     element.textContent = newUsername;
+//   });
 
-  // Hide the edit section
-  document.getElementById('edit-account-details').style.display = 'none';
-});
+//   // Hide the edit section
+//   document.getElementById('edit-account-details').style.display = 'none';
+// });
 
 
 // Feature 5: Popup functionality
@@ -222,3 +222,103 @@ function confirmCancel() {
     alert('Continue uploading course.');
   }
 }
+
+
+// --------------- edit and delete account 
+
+// populate data to make it a prefilled form and ready to be editted but does not update in db yet
+document.addEventListener('DOMContentLoaded', async function () {
+  const userId = sessionStorage.getItem('userId');
+  
+  if (userId) {
+    try {
+      const response = await fetch(`/account/${userId}`);
+      
+      if (response.ok) {
+        const user = await response.json();
+        
+        // Populate profile info
+        document.querySelector('.profile-info .user-name').textContent = user.name;
+        
+        // Prefill edit form fields
+        document.getElementById('edit-name').value = user.name;
+        document.getElementById('edit-birth-date').value = user.dob.split('T')[0];
+        document.getElementById('edit-email').value = user.email;
+        
+        // Update other elements with the user's name
+        document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
+          element.textContent = user.name;
+        });
+
+      } else {
+        console.error('Failed to fetch user data');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  } else {
+    console.error('No user is logged in');
+  }
+  
+  // Toggle visibility for edit account details
+  document.getElementById('edit-icon').addEventListener('click', function () {
+    const editAccountDetails = document.getElementById('edit-account-details');
+    if (editAccountDetails.style.display === 'block') {
+      editAccountDetails.style.display = 'none';
+    } else {
+      editAccountDetails.style.display = 'block';
+    }
+  });
+
+  // Handle form submission
+  document.getElementById('save-changes').addEventListener('click', async function (event) {
+    event.preventDefault();
+    
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('edit-password').value;
+    const confirmPassword = document.getElementById('edit-confirm-password').value;
+    
+    if (newPassword !== confirmPassword) {
+      alert('New passwords do not match');
+      return;
+    }
+    
+    const updatedUserData = {
+      name: document.getElementById('edit-name').value,
+      dob: document.getElementById('edit-birth-date').value,
+      email: document.getElementById('edit-email').value,
+      currentPassword: currentPassword,
+      newPassword: newPassword
+    };
+    
+    try {
+      const response = await fetch(`/account/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedUserData)
+      });
+      
+      if (response.ok) {
+        const updatedUser = await response.json();
+        alert('User details updated successfully');
+        
+        // Update displayed user info
+        document.querySelector('.profile-info .user-name').textContent = updatedUser.name;
+        document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
+          element.textContent = updatedUser.name;
+        });
+
+        // Close the edit fields
+        document.getElementById('edit-account-details').style.display = 'none';
+        
+      } else {
+        const errorData = await response.json();
+        alert(`Error updating user details: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+});
