@@ -12,4 +12,3 @@ async function getReviews(req, res) {
 module.exports = {
     getReviews,
 };
-

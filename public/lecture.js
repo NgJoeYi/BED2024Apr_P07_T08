@@ -213,4 +213,3 @@ function fetchReviews() {
         })
         .catch(error => console.error('Error fetching reviews:', error));
 }
-
