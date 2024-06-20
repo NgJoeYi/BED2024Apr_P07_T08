@@ -128,6 +128,50 @@ class User {
         }
     }
 
+    static async updateUser(userId, newUserData) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = 
+            `
+            UPDATE Users SET 
+            name=@inputName, email=@inputEmail, password=@inputPassword
+            WHERE id=@inputUserId
+            `;
+            const request = connection.request();
+            request.input('inputName', newUserData.name);
+            request.input('inputEmail', newUserData.email);
+            if (newUserData.newPassword) {
+                const hashedPassword = await bcrypt.hash(newUserData.newPassword, 10);
+                request.input('inputPassword', hashedPassword);
+            } else {
+                request.input('inputPassword', newUserData.currentPassword);
+            }
+            request.input('inputUserId', userId);            
+            const result = await request.query(sqlQuery);
+            if (result.rowsAffected[0] === 0) {
+                throw new Error("User not updated");
+            }
+            return await this.getUserById(userId);
+        } catch(error) {
+            console.error('Error updating user:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 }
 
 module.exports = User;
+
+// ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
+// 1. hashing the password so if even 2 users have the same password, the hash value is different
+
+// 2. bcrypt.hash(newUserData.newPassword, 10) the 10 in this is the level of security, 
+// the higher the value, the more secure it is because it is the number of times hashing algo is executed
+// it is known as salt rounds
+
+// 3. bcrypt.compare(userLoginData.password, user.password) this bcrypt.compare 
+// compares the plain text password and the hashed password, returns true if match, & false otherwise

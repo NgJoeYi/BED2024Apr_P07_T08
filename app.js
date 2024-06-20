@@ -23,6 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // For form data handling
 app.post('/users/register', userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
+app.put('/account/:id', userController.updateUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
