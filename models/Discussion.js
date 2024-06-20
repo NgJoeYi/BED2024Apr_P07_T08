@@ -1,94 +1,91 @@
-// models/Discussion.js
-const sql = require('mssql');
-const dbConfig = require('../dbConfig');
+document.addEventListener('DOMContentLoaded', function () {
+    fetchDiscussions();
+});
 
-class Discussion {
-    constructor(id, title, description, category, posted_date) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.category = category;
-        this.posted_date = posted_date;
-    }
-
-    static async create(discussionData) {
-        try {
-            const pool = await sql.connect(dbConfig);
-            const result = await pool.request()
-                .input('title', sql.NVarChar, discussionData.title)
-                .input('description', sql.NVarChar, discussionData.description)
-                .input('category', sql.NVarChar, discussionData.category)
-                .input('posted_date', sql.DateTime, discussionData.posted_date)
-                .query(`
-                    INSERT INTO Discussions (title, description, category, posted_date)
-                    VALUES (@title, @description, @category, @posted_date);
-                    SELECT SCOPE_IDENTITY() AS id;
-                `);
-            return { id: result.recordset[0].id, ...discussionData };
-        } catch (error) {
-            console.error('Error creating discussion:', error);
-            throw error;
+function fetchDiscussions() {
+    fetch('/discussions')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const feed = document.querySelector('.activity-feed');
+            feed.innerHTML = ''; // Clear the feed
+            data.discussions.forEach(discussion => {
+                addDiscussionToFeed(discussion);
+            });
+        } else {
+            alert('Error fetching discussions.');
         }
-    }
-
-    static async getAll() {
-        try {
-            const pool = await sql.connect(dbConfig);
-            const result = await pool.request().query('SELECT * FROM Discussions');
-            return result.recordset;
-        } catch (error) {
-            console.error('Error retrieving discussions:', error);
-            throw error;
-        }
-    }
-
-    static async getById(id) {
-        try {
-            const pool = await sql.connect(dbConfig);
-            const result = await pool.request()
-                .input('id', sql.Int, id)
-                .query('SELECT * FROM Discussions WHERE id = @id');
-            return result.recordset[0];
-        } catch (error) {
-            console.error('Error retrieving discussion:', error);
-            throw error;
-        }
-    }
-
-    static async update(id, updatedData) {
-        try {
-            const pool = await sql.connect(dbConfig);
-            await pool.request()
-                .input('id', sql.Int, id)
-                .input('title', sql.NVarChar, updatedData.title)
-                .input('description', sql.NVarChar, updatedData.description)
-                .input('category', sql.NVarChar, updatedData.category)
-                .input('posted_date', sql.DateTime, updatedData.posted_date)
-                .query(`
-                    UPDATE Discussions SET 
-                    title = @title, 
-                    description = @description, 
-                    category = @category, 
-                    posted_date = @posted_date 
-                    WHERE id = @id
-                `);
-        } catch (error) {
-            console.error('Error updating discussion:', error);
-            throw error;
-        }
-    }
-
-    static async delete(id) {
-        try {
-            const pool = await sql.connect(dbConfig);
-            await pool.request()
-                .input('id', sql.Int, id)
-                .query('DELETE FROM Discussions WHERE id = @id');
-        } catch (error) {
-            console.error('Error deleting discussion:', error);
-            throw error;
-        }
-    }
+    })
+    .catch(error => console.error('Error:', error));
 }
 
-module.exports = Discussion;
+function addDiscussionToFeed(discussion) {
+    const feed = document.querySelector('.activity-feed');
+    const post = document.createElement('div');
+    post.classList.add('post');
+
+    post.innerHTML = `
+        <div class="post-header">
+            <div class="profile-pic">
+                <img src="${discussion.profilePic}" alt="Profile Picture">
+            </div>
+            <div class="username">${discussion.username}</div>
+        </div>
+        <div class="post-meta">
+            <span class="category">Category: ${discussion.category}</span>
+            <span class="posted-date-activity">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+        </div>
+        <div class="post-content">
+            <p>${discussion.description}</p>
+        </div>
+        <div class="post-footer">
+            <div class="likes-dislikes">
+                <span>👍 0 Likes</span>
+                <span>👎 0 Dislikes</span>
+                <span>💬 0 Comments</span>
+            </div>
+            <button class="comment-button">Go to Comment</button>
+        </div>
+    `;
+
+    feed.prepend(post);
+}
+
+// Example form submission handler to add a discussion (assuming user is logged in and their ID is available)
+document.getElementById('addDiscussionForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the form from submitting the traditional way
+
+    const title = document.getElementById('title').value;
+    const category = document.getElementById('category').value;
+    const description = document.getElementById('description').value;
+    const userId = getCurrentUserId(); // Implement this function to get the current user's ID
+
+    const data = {
+        title: title,
+        category: category,
+        description: description,
+        userId: userId
+    };
+
+    fetch('/discussions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            addDiscussionToFeed(data.discussion);
+            closePopup();
+        } else {
+            alert('Error adding discussion.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+}

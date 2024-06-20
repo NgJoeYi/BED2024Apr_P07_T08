@@ -1,115 +1,177 @@
-// Feature 5: Popup functionality
-// Define the popup functions outside the conditional block
-function openPopup() {
-    if (document.querySelectorAll('.popup').length > 0) {
-      document.querySelector(".popup").style.display = "block";
-    }
-  }
-  
-  function closePopup() {
-    if (document.querySelectorAll('.popup').length > 0) {
-      document.querySelector(".popup").style.display = "none";
-    }
-  }
-  
-  if (document.querySelectorAll('.popup').length > 0) {
-    window.addEventListener("load", function() {
-      setTimeout(function() {
-        openPopup();
-      }, 2000);
-    });
-  
-    document.querySelector(".close").addEventListener("click", function() {
-      closePopup();
-    });
-  }
-  
-  // Feature 3: Image filtering functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const filterCategory = document.getElementById('filter-category');
-    const sortDate = document.getElementById('sort-date');
-    const coursesGrid = document.querySelector('.courses-grid-unique');
-    const courses = Array.from(document.querySelectorAll('.course-cd-unique'));
-  
-    function filterAndSortCourses() {
-        const categoryValue = filterCategory.value;
-        const sortValue = sortDate.value;
-  
-        // Filter courses by category
-        const filteredCourses = courses.filter(course => {
-            if (categoryValue === 'all') {
-                return true;
+// Replace this function with the actual logic to get the current user's ID
+function getCurrentUserId() {
+    // For demonstration purposes, we return 1.
+    // Replace this with the actual logic to retrieve the current user's ID.
+    return 1; // Example user ID for demonstration purposes
+}
+
+// Fetch discussions and display them
+document.addEventListener('DOMContentLoaded', function () {
+    fetchDiscussions();
+});
+
+function fetchDiscussions() {
+    fetch('/discussions')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const feed = document.querySelector('.activity-feed');
+                feed.innerHTML = ''; // Clear the feed
+                data.discussions.forEach(discussion => {
+                    addDiscussionToFeed(discussion);
+                });
             } else {
-                return course.getAttribute('data-category') === categoryValue;
+                console.error('Error response from server:', data.error); // Add this line
+                alert('Error fetching discussions.');
             }
+        })
+        .catch(error => {
+            console.error('Network or server error:', error); // Add this line
+            alert('Error fetching discussions.');
         });
-  
-        // Sort courses by date
-        const sortedCourses = filteredCourses.sort((a, b) => {
-            const dateA = new Date(a.getAttribute('data-date'));
-            const dateB = new Date(b.getAttribute('data-date'));
-  
-            if (sortValue === 'most-recent') {
-                return dateB - dateA;
-            } else {
-                return dateA - dateB;
-            }
-        });
-  
-        // Clear the course grid and append the sorted courses
-        coursesGrid.innerHTML = '';
-        sortedCourses.forEach(course => {
-            coursesGrid.appendChild(course);
-        });
-    }
-  
-    filterCategory.addEventListener('change', filterAndSortCourses);
-    sortDate.addEventListener('change', filterAndSortCourses);
-  });
-  
+}
 
+function addDiscussionToFeed(discussion) {
+    const feed = document.querySelector('.activity-feed');
+    const post = document.createElement('div');
+    post.classList.add('post');
+    post.setAttribute('data-id', discussion.id);
 
+    const likesText = `👍 ${discussion.likes} Likes`;
+    const dislikesText = `👎 ${discussion.dislikes} Dislikes`;
 
+    post.innerHTML = `
+        <div class="post-header">
+            <div class="profile-pic">
+                <img src="${discussion.profilePic || 'profilePic.jpeg'}" alt="Profile Picture">
+            </div>
+            <div class="username">${discussion.username}</div>
+        </div>
+        <div class="post-meta">
+            <span class="category">Category: ${discussion.category}</span>
+            <span class="posted-date-activity">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+        </div>
+        <div class="post-content">
+            <p>${discussion.description}</p>
+        </div>
+        <div class="post-footer">
+            <div class="likes-dislikes">
+                <button class="like-button" data-liked="false">${likesText}</button>
+                <button class="dislike-button" data-disliked="false">${dislikesText}</button>
+            </div>
+            <button class="comment-button">Go to Comment</button>
+        </div>
+    `;
 
+    feed.prepend(post);
 
-    // shoe, acvtivtyfeed
-// Function to filter and sort the posts
-function filterAndSortPosts() {
-    const categoryFilter = document.getElementById('filter-category').value;
-    const sortOption = document.getElementById('sort-date').value;
-  
-    const posts = document.querySelectorAll('.post');
-  
-    // Filter posts by category
-    posts.forEach(post => {
-        const postCategory = post.querySelector('.category').textContent.toLowerCase().replace('category: ', '');
-        if (categoryFilter === 'all' || postCategory === categoryFilter) {
-            post.style.display = 'block';
-        } else {
-            post.style.display = 'none';
+    const likeButton = post.querySelector('.like-button');
+    const dislikeButton = post.querySelector('.dislike-button');
+
+    likeButton.addEventListener('click', () => {
+        if (likeButton.getAttribute('data-liked') === 'false') {
+            incrementLikes(discussion.id, post, likeButton, dislikeButton);
         }
     });
-  
-  
-  
-    // Sort posts by date
-    const sortedPosts = Array.from(posts).sort((a, b) => {
-        const dateA = new Date(a.querySelector('.posted-date-activity').textContent.replace('Posted on: ', ''));
-        const dateB = new Date(b.querySelector('.posted-date-activity').textContent.replace('Posted on: ', ''));
-        return sortOption === 'most-recent' ? dateB - dateA : dateA - dateB;
+
+    dislikeButton.addEventListener('click', () => {
+        if (dislikeButton.getAttribute('data-disliked') === 'false') {
+            incrementDislikes(discussion.id, post, likeButton, dislikeButton);
+        }
     });
-  
-    // Reorder posts in the DOM
-    const activityFeed = document.querySelector('.activity-feed');
-    activityFeed.innerHTML = '';
-    sortedPosts.forEach(post => {
-        activityFeed.appendChild(post);
-    });
-  }
-  
-  // Event listeners for filter and sort dropdowns
-  document.getElementById('filter-category').addEventListener('change', filterAndSortPosts);
-  document.getElementById('sort-date').addEventListener('change', filterAndSortPosts);
-  
-  // Initial filter and sort on page load
-  filterAndSortPosts();
+}
+
+function incrementLikes(discussionId, post, likeButton, dislikeButton) {
+    fetch('/discussions/like', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ discussionId: discussionId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const likesText = `👍 ${data.likes} Likes`;
+            likeButton.textContent = likesText;
+            likeButton.setAttribute('data-liked', 'true');
+            dislikeButton.setAttribute('data-disliked', 'true'); // Prevent disliking if liked
+        } else {
+            alert('Error liking discussion.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function incrementDislikes(discussionId, post, likeButton, dislikeButton) {
+    fetch('/discussions/dislike', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ discussionId: discussionId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const dislikesText = `👎 ${data.dislikes} Dislikes`;
+            dislikeButton.textContent = dislikesText;
+            dislikeButton.setAttribute('data-disliked', 'true');
+            likeButton.setAttribute('data-liked', 'true'); // Prevent liking if disliked
+        } else {
+            alert('Error disliking discussion.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Define the popup functions
+function openPopup() {
+    document.getElementById("popup").style.display = "block";
+}
+
+function closePopup() {
+    document.getElementById("popup").style.display = "none";
+}
+
+// Close the popup when clicking outside the popup content
+window.onclick = function(event) {
+    if (event.target == document.getElementById("popup")) {
+        document.getElementById("popup").style.display = "none";
+    }
+}
+
+// Form submission handler to add a discussion
+document.getElementById('addDiscussionForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the form from submitting the traditional way
+
+    const title = document.getElementById('title').value;
+    const category = document.getElementById('category').value;
+    const description = document.getElementById('description').value;
+    const userId = getCurrentUserId(); // Implement this function to get the current user's ID
+
+    const data = {
+        title: title,
+        category: category,
+        description: description,
+        userId: userId
+    };
+
+    fetch('/discussions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            addDiscussionToFeed(data.discussion);
+            closePopup();
+        } else {
+            alert('Error adding discussion.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
