@@ -9,14 +9,13 @@ async function getReviews(req, res) {
     }
 }
 
-async function getReviewById(req, res) {
+async function updateReview(req, res) {
+    const { id } = req.params;
+    const { review_text, rating } = req.body;
+    
     try {
-        const reviewId = parseInt(req.params.id, 10);
-        const review = await reviewModel.getReviewById(reviewId);
-        if (!review) {
-            return res.status(404).json({ error: 'Review not found' });
-        }
-        res.status(200).json(review);
+        await reviewModel.updateReview(id, review_text, rating);
+        res.status(200).json({ message: 'Review updated successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -24,5 +23,5 @@ async function getReviewById(req, res) {
 
 module.exports = {
     getReviews,
-    getReviewById
+    updateReview, 
 };

@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Fetch and display reviews
+    fetchReviews();
+
     // Navigation bar interaction
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
@@ -149,6 +152,10 @@ function deleteReview(button) {
     }
 }
 
+function postReview() {
+    closePopup();
+}
+
 function editReview(button) {
     const review = button.closest('.review');
     const reviewText = review.querySelector('.review-details p').textContent;
@@ -168,8 +175,65 @@ function editReview(button) {
     });
 
     showPopup('edit');
+
+    // Add event listener to the post button to handle the update
+    const postButton = document.querySelector('.popup-content button');
+    postButton.onclick = () => {
+        const updatedText = document.getElementById('review-text').value;
+        const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
+
+        fetch(`/reviews/${review.getAttribute('data-id')}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ review_text: updatedText, rating: updatedRating })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message); // Show success message
+            closePopup();
+            fetchReviews(); // Refresh reviews
+        })
+        .catch(error => console.error('Error updating review:', error));
+    };
 }
 
-function postReview() {
-    closePopup();
+function fetchReviews() {
+    fetch('/reviews')
+        .then(response => response.json())
+        .then(reviews => {
+            const reviewsContainer = document.getElementById('reviews');
+            reviewsContainer.innerHTML = ''; // Clear existing reviews
+
+            reviews.forEach(review => {
+                const reviewElement = document.createElement('div');
+                reviewElement.classList.add('review');
+                reviewElement.setAttribute('data-id', review.review_id); // Add this line
+                reviewElement.setAttribute('data-date', review.review_date);
+                reviewElement.innerHTML = `
+                    <div class="review-content">
+                        <div class="review-author">
+                            <img src="images/profilePic2" alt="Author Avatar" class="author-avatar">
+                            <div class="review-details">
+                                <div class="author-name">${review.user_name}</div>
+                                <div class="rating">
+                                    ${[...Array(5)].map((_, i) => `<i class="fa fa-star ${i < review.rating ? 'selected' : ''}" data-value="${i + 1}"></i>`).join('')}
+                                </div>
+                                <p>${review.review_text}</p>
+                                <p class="review-date">Posted on: ${new Date(review.review_date).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-actions">
+                        <button onclick="editReview(this)">Edit</button>
+                        <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
+                        <button class="helpful">👍 Helpful</button>
+                    </div>
+                `;
+                reviewsContainer.appendChild(reviewElement);
+            });
+        })
+        .catch(error => console.error('Error fetching reviews:', error));
 }
+

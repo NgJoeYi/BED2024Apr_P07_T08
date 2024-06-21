@@ -4,10 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const closePopupBtn = document.querySelector('.popup .close');
     let editMode = false;
     let currentComment = null;
+    let currentCommentId = null;  // New variable to store comment ID
 
     addCommentBtn.addEventListener('click', () => {
-        // Show your comment popup or perform any relevant action
-        popup.style.display = 'flex'; // Example to show a popup
+        showPopup('add');  // Call showPopup with 'add'
     });
 
     closePopupBtn.addEventListener('click', closePopup);
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
             commentText.value = '';
             editMode = false;
             currentComment = null;
+            currentCommentId = null;  // Reset the comment ID
         } else {
             popupTitle.textContent = 'Edit Comment';
             commentText.value = currentComment.querySelector('.comment-content').textContent.trim();
@@ -34,15 +35,32 @@ document.addEventListener('DOMContentLoaded', () => {
         popup.style.display = 'none';
     }
 
-    function saveComment() {
+    async function saveComment() {
         const commentText = document.getElementById('comment-text').value;
         if (commentText) {
             if (editMode && currentComment) {
-                currentComment.querySelector('.comment-content').textContent = commentText;
+                try {
+                    const response = await fetch(`/comments/${currentCommentId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ content: commentText })
+                    });
+                    if (response.ok) {
+                        currentComment.querySelector('.comment-content').textContent = commentText;
+                        closePopup();
+                        alert('Comment updated successfully!')
+                    } else {
+                        console.error('Failed to update comment');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
             } else {
                 addNewComment(commentText);
+                closePopup();
             }
-            closePopup();
         }
     }
 
@@ -73,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.editComment = function(button) {
         currentComment = button.closest('.comment');
+        currentCommentId = currentComment.dataset.id;  // Get the comment ID
         showPopup('edit');
     };
 
@@ -117,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mainPost.appendChild(commentElement);
             } else {
                 commentElement.classList.add('comment');
+                commentElement.dataset.id = comment.id;  // Set the comment ID
                 commentElement.innerHTML = `
                     <div class="user-info">
                         <div class="avatar">
@@ -141,4 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     fetchComments(); // Load comments when the page loads
+
+    // Make the functions accessible globally
+    window.saveComment = saveComment;
+    window.closePopup = closePopup;
 });

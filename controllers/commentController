@@ -10,6 +10,19 @@ async function getComments(req, res) {
     }
 }
 
+async function updateComment(req, res) {
+    const { id } = req.params;
+    const { content } = req.body;
+    try {
+        const updatedComment = await commentModel.updateComment(id, content);
+        res.json(updatedComment);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error updating comment");
+    }
+}
+
 module.exports = {
-    getComments
+    getComments,
+    updateComment  
 };
