@@ -202,6 +202,14 @@ async function run() {
         `;
         await connection.request().query(insertDiscussionComments);
 
+        // Insert data into Discussions table
+        const insertDiscussions = `
+        INSERT INTO Discussions (title, description, category, posted_date, user_id) VALUES
+        ('Coding for python', 'Python design philosophy emphasizes code readability and syntax that allows programmers to express concepts in fewer lines of code compared to languages such as C++ or Java.', 'coding', GETDATE(), (SELECT id FROM Users WHERE email = 'john_doe@example.com')),
+        ('Advanced Algebra', 'Advanced algebra is a branch of mathematics that extends the principles and concepts of elementary algebra into more complex and abstract areas.', 'math', GETDATE(), (SELECT id FROM Users WHERE email = 'jane_smith@example.com'));
+        `;
+        await connection.request().query(insertDiscussions);
+
         connection.close();
         console.log("Seeding completed");
     } catch (err) {

@@ -3,12 +3,28 @@ const dbConfig = require('../dbConfig');
 
 const getDiscussions = async (req, res) => {
     try {
-        const pool = await sql.connect(dbConfig);
-        const result = await pool.request().query(`
+        const category = req.query.category;
+        const sort = req.query.sort;
+
+        let query = `
             SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username
             FROM Discussions d
             LEFT JOIN Users u ON d.user_id = u.id
-        `);
+        `;
+
+        if (category && category !== 'all') {
+            query += ` WHERE d.category = '${category}'`;
+        }
+
+        if (sort === 'most-recent') {
+            query += ` ORDER BY d.posted_date DESC`;
+        } else if (sort === 'oldest') {
+            query += ` ORDER BY d.posted_date ASC`;
+        }
+
+        const pool = await sql.connect(dbConfig);
+        const result = await pool.request().query(query);
+
         res.json({ success: true, discussions: result.recordset });
     } catch (err) {
         console.error('Error getting discussions:', err);
@@ -18,20 +34,14 @@ const getDiscussions = async (req, res) => {
 
 const createDiscussion = async (req, res) => {
     try {
+        if (!req.body.userId) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+
         const { title, category, description, userId } = req.body;
         const posted_date = new Date();
 
         const pool = await sql.connect(dbConfig);
-
-        const userResult = await pool.request()
-            .input('userId', sql.Int, userId)
-            .query('SELECT name FROM Users WHERE id = @userId');
-
-        if (userResult.recordset.length === 0) {
-            return res.status(404).json({ success: false, error: 'User not found' });
-        }
-
-        const user = userResult.recordset[0];
 
         const discussionResult = await pool.request()
             .input('title', sql.NVarChar, title)
@@ -45,6 +55,12 @@ const createDiscussion = async (req, res) => {
                 SELECT SCOPE_IDENTITY() AS id;
             `);
 
+        const userResult = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query('SELECT name FROM Users WHERE id = @userId');
+
+        const user = userResult.recordset[0];
+
         const newDiscussion = {
             id: discussionResult.recordset[0].id,
             title: title,
@@ -53,7 +69,8 @@ const createDiscussion = async (req, res) => {
             posted_date: posted_date,
             likes: 0,
             dislikes: 0,
-            username: user.name
+            username: user.name,
+            profilePic: 'profilePic.jpeg' // or fetch the actual profile picture URL
         };
 
         res.json({ success: true, discussion: newDiscussion });
@@ -61,22 +78,6 @@ const createDiscussion = async (req, res) => {
         console.error('Error creating discussion:', err);
         res.status(500).json({ success: false, error: err.message });
     }
-};
-
-// Add these placeholder functions for routes
-const getDiscussionById = async (req, res) => {
-    // Placeholder logic
-    res.status(200).send("getDiscussionById function placeholder");
-};
-
-const updateDiscussion = async (req, res) => {
-    // Placeholder logic
-    res.status(200).send("updateDiscussion function placeholder");
-};
-
-const deleteDiscussion = async (req, res) => {
-    // Placeholder logic
-    res.status(200).send("deleteDiscussion function placeholder");
 };
 
 const incrementLikes = async (req, res) => {
@@ -122,9 +123,6 @@ const incrementDislikes = async (req, res) => {
 module.exports = {
     getDiscussions,
     createDiscussion,
-    getDiscussionById,
-    updateDiscussion,
-    deleteDiscussion,
     incrementLikes,
     incrementDislikes
 };
