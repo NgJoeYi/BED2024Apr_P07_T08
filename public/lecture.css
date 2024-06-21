@@ -332,8 +332,9 @@ header {
     display: flex; /* Use flexbox for layout of menu links */
     list-style: none; /* Remove default list styles */
     padding-top: 15px;
-    margin-right: 20px;
+    margin-right: 50px;
     gap: 30px; /* Set the gap between menu links */
+    font-family: 'Afacad';
   }
   
   #account-menu-links a {
@@ -474,11 +475,14 @@ header {
   /* New footer terying out */
   .footer {
     background: #F4D9C6;
-    padding: 30px 0px;
-    font-family: 'Play', sans-serif;
+    padding: 20px 0px;
     text-align: center;
+    margin-top: 60px;
+    width: 1700px;
+    height: 200px;
+    font-family: 'Afacad';
   }
-  
+
   .footer .row {
     width: 100%;
     margin: 1% 0%;
