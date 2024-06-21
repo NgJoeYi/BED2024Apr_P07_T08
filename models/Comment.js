@@ -14,7 +14,24 @@ async function getAllComments() {
     }
 }
 
-module.exports = {
-    getAllComments
-};
+async function updateComment(id, content) {
+    const query = `
+        UPDATE user_comments
+        SET content = @content
+        WHERE id = @id
+    `;
+    try {
+        const request = new sql.Request();
+        request.input('id', sql.Int, id);
+        request.input('content', sql.NVarChar, content);
+        const result = await request.query(query);
+        return result.rowsAffected;
+    } catch (err) {
+        throw new Error('Error updating comment: ' + err.message);
+    }
+}
 
+module.exports = {
+    getAllComments,
+    updateComment  
+};

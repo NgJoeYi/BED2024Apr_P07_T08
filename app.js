@@ -36,6 +36,7 @@ app.delete('/discussions/:id', discussionController.deleteDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
+app.put('/comments/:id', commentController.updateComment); 
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews);
