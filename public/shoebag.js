@@ -1,17 +1,55 @@
-// Replace this function with the actual logic to get the current user's ID
-function getCurrentUserId() {
-    // For demonstration purposes, we return 1.
-    // Replace this with the actual logic to retrieve the current user's ID.
-    return 1; // Example user ID for demonstration purposes
-}
-
-// Fetch discussions and display them
 document.addEventListener('DOMContentLoaded', function () {
     fetchDiscussions();
+    // Add event listeners for filter and sort options
+    document.getElementById('filter-category').addEventListener('change', fetchDiscussions);
+    document.getElementById('sort-date').addEventListener('change', fetchDiscussions);
+    // Form submission handler to add a discussion
+    document.getElementById('addDiscussionForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the form from submitting the traditional way
+
+        const title = document.getElementById('title').value;
+        const category = document.getElementById('category').value;
+        const description = document.getElementById('description').value;
+        const userId = getCurrentUserId(); // Implement this function to get the current user's ID
+
+        const data = {
+            title: title,
+            category: category,
+            description: description,
+            userId: userId
+        };
+
+        fetch('/discussions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addDiscussionToFeed(data.discussion);
+                closePopup();
+            } else {
+                alert('Error adding discussion.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    function getCurrentUserId() {
+        // Implement the logic to get the current user's ID.
+        // This might be from a global variable set during login or from a cookie/session storage.
+        return sessionStorage.getItem('userId');
+    }
 });
 
 function fetchDiscussions() {
-    fetch('/discussions')
+    const category = document.getElementById('filter-category').value;
+    const sort = document.getElementById('sort-date').value;
+
+    fetch(`/discussions?category=${category}&sort=${sort}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -21,12 +59,12 @@ function fetchDiscussions() {
                     addDiscussionToFeed(discussion);
                 });
             } else {
-                console.error('Error response from server:', data.error); // Add this line
+                console.error('Error response from server:', data.error);
                 alert('Error fetching discussions.');
             }
         })
         .catch(error => {
-            console.error('Network or server error:', error); // Add this line
+            console.error('Network or server error:', error);
             alert('Error fetching discussions.');
         });
 }
@@ -140,38 +178,3 @@ window.onclick = function(event) {
         document.getElementById("popup").style.display = "none";
     }
 }
-
-// Form submission handler to add a discussion
-document.getElementById('addDiscussionForm').addEventListener('submit', function (event) {
-    event.preventDefault(); // Prevent the form from submitting the traditional way
-
-    const title = document.getElementById('title').value;
-    const category = document.getElementById('category').value;
-    const description = document.getElementById('description').value;
-    const userId = getCurrentUserId(); // Implement this function to get the current user's ID
-
-    const data = {
-        title: title,
-        category: category,
-        description: description,
-        userId: userId
-    };
-
-    fetch('/discussions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            addDiscussionToFeed(data.discussion);
-            closePopup();
-        } else {
-            alert('Error adding discussion.');
-        }
-    })
-    .catch(error => console.error('Error:', error));
-});
