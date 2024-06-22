@@ -5,7 +5,7 @@ async function getAllReviews() {
     try {
         const pool = await sql.connect(dbConfig);
         const result = await pool.request().query(`
-            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, u.name AS user_name
+            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name
             FROM user_reviews ur
             JOIN Users u ON ur.user_id = u.id
         `);
@@ -15,10 +15,25 @@ async function getAllReviews() {
     }
 }
 
-async function updateReview(id, review_text, rating) {
+async function getReviewById(connection, id) {
     try {
-        const pool = await sql.connect(dbConfig);
-        await pool.request()
+        const result = await connection.request()
+            .input('review_id', sql.Int, id)
+            .query(`
+                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name
+                FROM user_reviews ur
+                JOIN Users u ON ur.user_id = u.id
+                WHERE ur.review_id = @review_id
+            `);
+        return result.recordset[0];
+    } catch (err) {
+        throw new Error(err);
+    }
+}
+
+async function updateReview(connection, id, review_text, rating) {
+    try {
+        await connection.request()
             .input('review_id', sql.Int, id)
             .input('review_text', sql.NVarChar, review_text)
             .input('rating', sql.Int, rating)
@@ -34,5 +49,6 @@ async function updateReview(id, review_text, rating) {
 
 module.exports = {
     getAllReviews,
-    updateReview, 
+    getReviewById,
+    updateReview,
 };
