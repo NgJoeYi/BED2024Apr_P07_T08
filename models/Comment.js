@@ -66,9 +66,25 @@ async function updateComment(connection, id, content) {
     }
 }
 
+async function deleteComment(connection, id) {
+    const query = `
+        DELETE FROM user_comments
+        WHERE id = @id
+    `;
+    try {
+        const request = new sql.Request(connection);
+        request.input('id', sql.Int, id);
+        const result = await request.query(query);
+        return result.rowsAffected;
+    } catch (err) {
+        throw new Error('Error deleting comment: ' + err.message);
+    }
+}
+
 module.exports = {
     getAllComments,
     getCommentById,
     createComment,
-    updateComment
+    updateComment,
+    deleteComment
 };

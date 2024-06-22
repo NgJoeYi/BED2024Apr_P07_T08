@@ -24,6 +24,9 @@ async function updateReview(req, res) {
     try {
         connection = await sql.connect(dbConfig);
         const review = await reviewModel.getReviewById(connection, id);
+        if (!review) {
+            return res.status(404).json({ error: 'Review not found' });
+        }
         if (parseInt(review.user_id, 10) !== parseInt(userId, 10)) {
             return res.status(403).send('You can only edit your own reviews.');
         }
@@ -48,8 +51,33 @@ async function createReview(req, res) {
     }
 }
 
+async function deleteReview(req, res) {
+    const { id } = req.params;
+    const { userId } = req.body;
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        const review = await reviewModel.getReviewById(connection, id);
+        if (!review) {
+            return res.status(404).json({ error: 'Review not found' });
+        }
+        if (parseInt(review.user_id, 10) !== parseInt(userId, 10)) {
+            return res.status(403).send('You can only delete your own reviews.');
+        }
+        await reviewModel.deleteReview(connection, id);
+        res.status(200).json({ message: 'Review deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
 module.exports = {
     getReviews,
     updateReview,
     createReview,
+    deleteReview,
 };

@@ -97,10 +97,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    window.deleteComment = function(button) {
+    window.deleteComment = async function(button) {
         const comment = button.closest('.comment');
-        if (confirm("Are you sure you want to delete this comment?")) {
-            comment.remove();
+        const commentId = comment.dataset.id;
+        const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
+
+        if (commentUserId === parseInt(currentUserId, 10)) {
+            if (confirm("Are you sure you want to delete this comment?")) {
+                try {
+                    const response = await fetch(`/comments/${commentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userId: currentUserId })
+                    });
+                    if (response.ok) {
+                        comment.remove();
+                        alert('Comment deleted successfully!');
+                    } else {
+                        console.error('Failed to delete comment');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        } else {
+            alert('You can only delete your own comments.');
         }
     };
 

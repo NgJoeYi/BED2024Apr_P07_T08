@@ -144,10 +144,33 @@ function sortReviews() {
     reviews.forEach(review => reviewsContainer.appendChild(review));
 }
 
-function deleteReview(button) {
+async function deleteReview(button) {
     const review = button.closest('.review');
-    if (confirm("Are you sure you want to delete this review?")) {
-        review.remove();
+    const reviewId = review.getAttribute('data-id');
+    const userId = sessionStorage.getItem('userId');
+
+    console.log(`Attempting to delete review with ID: ${reviewId} by user ID: ${userId}`);
+
+    try {
+        const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId }) // Include userId in the body
+        });
+
+        if (response.ok) {
+            alert('Review deleted successfully!');
+            review.remove();
+        } else {
+            const errorMessage = await response.text();
+            console.error('Failed to delete review:', errorMessage);
+            alert('You can only delete your own reviews');
+        }
+    } catch (error) {
+        console.error('Error deleting review:', error);
+        alert('Error deleting review');
     }
 }
 
@@ -156,7 +179,7 @@ function postReview() {
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
     const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
 
-    fetch('/reviews', {
+    fetch('http://localhost:3000/reviews', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -205,7 +228,7 @@ function editReview(button) {
         const updatedText = document.getElementById('review-text').value;
         const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
 
-        fetch(`/reviews/${review.getAttribute('data-id')}`, {
+        fetch(`http://localhost:3000/reviews/${review.getAttribute('data-id')}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -223,7 +246,7 @@ function editReview(button) {
 }
 
 function fetchReviews() {
-    fetch('/reviews')
+    fetch('http://localhost:3000/reviews')
         .then(response => response.json())
         .then(reviews => {
             const reviewsContainer = document.getElementById('reviews');

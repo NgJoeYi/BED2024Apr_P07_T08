@@ -35,11 +35,13 @@ app.post('/discussions', discussionController.createDiscussion);
 app.get('/comments', commentController.getComments);
 app.put('/comments/:id', commentController.updateComment);
 app.post('/comments', commentController.createComment); 
+app.delete('/comments/:id', commentController.deleteComment);
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews);
 app.put('/reviews/:id', reviewController.updateReview);
 app.post('/reviews', reviewController.createReview); 
+app.delete('/reviews/:id', reviewController.deleteReview);
 
 app.listen(port, async () => {
     try {
