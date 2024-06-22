@@ -61,8 +61,31 @@ async function updateComment(req, res) {
     }
 }
 
+async function deleteComment(req, res) {
+    const { id } = req.params;
+    const { userId } = req.body;
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        const comment = await commentModel.getCommentById(connection, id);
+        if (parseInt(comment.user_id, 10) !== parseInt(userId, 10)) {
+            return res.status(403).send('You can only delete your own comments.');
+        }
+        const deletedComment = await commentModel.deleteComment(connection, id);
+        res.json(deletedComment);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error deleting comment");
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
 module.exports = {
     getComments,
     createComment,
     updateComment,
+    deleteComment,
 };
