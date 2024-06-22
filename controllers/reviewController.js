@@ -38,7 +38,18 @@ async function updateReview(req, res) {
     }
 }
 
+async function createReview(req, res) {
+    const { review_text, rating, userId } = req.body;
+    try {
+        await reviewModel.createReview(userId, review_text, rating);
+        res.status(201).json({ message: 'Review created successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
 module.exports = {
     getReviews,
     updateReview,
+    createReview,
 };

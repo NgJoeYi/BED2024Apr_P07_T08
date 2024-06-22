@@ -37,7 +37,7 @@
         </nav>
     </header>
 
-    <div id="main-post" class="post">
+    <div id="main-post" class="post" data-main-comment-id="1"> <!-- Add data attribute for main comment ID -->
         <!-- Main post will be dynamically inserted here -->
     </div>
 
@@ -45,8 +45,11 @@
         <h2> Comments </h2>
     </div>
 
+    <div class="add-comment-container">
+        <button id="addCommentBtn" class="btn">Add Comment</button> <!-- Add Comment Button -->
+    </div>
+
     <div class="comments-section">
-        <button id="addCommentBtn" class="btn">Add Comment</button>
         <!-- Comments will be dynamically inserted here -->
     </div>
 
@@ -82,7 +85,6 @@
         </div>
     </footer>
 
-    <script src="/comment.js"></script>
+    <script src="comment.js"></script>
 </body>
 </html>
-

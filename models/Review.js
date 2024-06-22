@@ -47,8 +47,25 @@ async function updateReview(connection, id, review_text, rating) {
     }
 }
 
+async function createReview(userId, review_text, rating) {
+    try {
+        const pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('user_id', sql.Int, userId)
+            .input('review_text', sql.NVarChar, review_text)
+            .input('rating', sql.Int, rating)
+            .query(`
+                INSERT INTO user_reviews (user_id, review_text, rating, review_date)
+                VALUES (@user_id, @review_text, @rating, GETDATE())
+            `);
+    } catch (err) {
+        throw new Error(err);
+    }
+}
+
 module.exports = {
     getAllReviews,
     getReviewById,
     updateReview,
+    createReview,
 };

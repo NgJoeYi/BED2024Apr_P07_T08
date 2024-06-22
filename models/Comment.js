@@ -32,6 +32,23 @@ async function getCommentById(connection, id) {
     }
 }
 
+async function createComment(connection, content, userId, parent_comment_id) {
+    const query = `
+        INSERT INTO user_comments (content, user_id, parent_comment_id, created_at)
+        VALUES (@content, @userId, @parent_comment_id, GETDATE())
+    `;
+    try {
+        const request = new sql.Request(connection);
+        request.input('content', sql.NVarChar, content);
+        request.input('userId', sql.Int, userId);
+        request.input('parent_comment_id', sql.Int, parent_comment_id);
+        const result = await request.query(query);
+        return result.rowsAffected;
+    } catch (err) {
+        throw new Error('Error creating comment: ' + err.message);
+    }
+}
+
 async function updateComment(connection, id, content) {
     const query = `
         UPDATE user_comments
@@ -52,5 +69,6 @@ async function updateComment(connection, id, content) {
 module.exports = {
     getAllComments,
     getCommentById,
+    createComment,
     updateComment
 };
