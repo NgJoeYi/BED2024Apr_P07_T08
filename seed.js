@@ -1,5 +1,6 @@
 const sql = require("mssql");
 const dbConfig = require("./dbConfig");
+const bcrypt = require('bcrypt');
 
 async function run() {
     try {
@@ -116,20 +117,26 @@ async function run() {
         `;
         await connection.request().query(createTables);
 
-        // Insert data into Users table
-        const insertUsers = `
-        INSERT INTO Users (name, dob, email, password, role) VALUES 
-        ('John Doe', '1990-01-01', 'john_doe@example.com', 'hashed_password', 'student'),
-        ('Jane Smith', '1985-02-02', 'jane_smith@example.com', 'hashed_password', 'lecturer'),
-        ('Alice Jones', '1992-03-03', 'alice_jones@example.com', 'hashed_password', 'student'),
-        ('Bob Brown', '1988-04-04', 'bob_brown@example.com', 'hashed_password', 'lecturer'),
-        ('Carol White', '1995-05-05', 'carol_white@example.com', 'hashed_password', 'student'),
-        ('Alison Johnson', '1990-01-15', 'alice.johnson@example.com', 'password123', 'student'),
-        ('Bob Pink', '1985-03-22', 'bob.pink@example.com', 'password456', 'student'),
-        ('Charlie Grey', '1992-07-30', 'charlie.grey@example.com', 'password789', 'student'),
-        ('Diana Prince', '1988-11-08', 'diana.prince@example.com', 'password321', 'student');
-        `;
-        await connection.request().query(insertUsers);
+        // Insert data into Users table with hashed passwords
+        const users = [
+            { name: 'John Doe', dob: '1990-01-01', email: 'john_doe@example.com', password: 'password123', role: 'student' },
+            { name: 'Jane Smith', dob: '1985-02-02', email: 'jane_smith@example.com', password: 'password456', role: 'lecturer' },
+            { name: 'Alice Jones', dob: '1992-03-03', email: 'alice_jones@example.com', password: 'password789', role: 'student' },
+            { name: 'Bob Brown', dob: '1988-04-04', email: 'bob_brown@example.com', password: 'password000', role: 'lecturer' },
+            { name: 'Carol White', dob: '1995-05-05', email: 'carol_white@example.com', password: 'password111', role: 'student' },
+            { name: 'Alison Johnson', dob: '1990-01-15', email: 'alice.johnson@example.com', password: 'password222', role: 'student' },
+            { name: 'Bob Pink', dob: '1985-03-22', email: 'bob.pink@example.com', password: 'password333', role: 'student' },
+            { name: 'Charlie Grey', dob: '1992-07-30', email: 'charlie.grey@example.com', password: 'password444', role: 'student' },
+            { name: 'Diana Prince', dob: '1988-11-08', email: 'diana.prince@example.com', password: 'password555', role: 'student' },
+        ];
+
+        for (let user of users) {
+            const hashedPassword = await bcrypt.hash(user.password, 10);
+            await connection.request().query(`
+                INSERT INTO Users (name, dob, email, password, role) 
+                VALUES ('${user.name}', '${user.dob}', '${user.email}', '${hashedPassword}', '${user.role}')
+            `);
+        }
 
         // Insert data into Lecturer table
         const insertLecturers = `

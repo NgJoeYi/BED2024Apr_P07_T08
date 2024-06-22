@@ -120,7 +120,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     display: block;
-    margin-left: auto;
+    margin-left: 880px;
     transition: background-color 0.3s;
 }
 

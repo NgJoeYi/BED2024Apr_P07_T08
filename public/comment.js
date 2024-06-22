@@ -4,10 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const closePopupBtn = document.querySelector('.popup .close');
     let editMode = false;
     let currentComment = null;
-    let currentCommentId = null;  // New variable to store comment ID
+    let currentCommentId = null;
+    const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+
+    console.log('Current User ID:', currentUserId); // Debug log
 
     addCommentBtn.addEventListener('click', () => {
-        showPopup('add');  // Call showPopup with 'add'
+        showPopup('add');
     });
 
     closePopupBtn.addEventListener('click', closePopup);
@@ -15,19 +18,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function showPopup(type) {
         const popupTitle = popup.querySelector('h2');
         const commentText = document.getElementById('comment-text');
-        
+
         if (type === 'add') {
             popupTitle.textContent = 'Leave a Comment';
             commentText.value = '';
             editMode = false;
             currentComment = null;
-            currentCommentId = null;  // Reset the comment ID
+            currentCommentId = null;
+            const saveButton = popup.querySelector('button');
+            saveButton.onclick = saveComment; // Set onclick to saveComment for adding new comments
         } else {
             popupTitle.textContent = 'Edit Comment';
             commentText.value = currentComment.querySelector('.comment-content').textContent.trim();
             editMode = true;
+            const saveButton = popup.querySelector('button');
+            saveButton.onclick = saveComment; // Set onclick to saveComment for editing comments
         }
-        
+
         popup.style.display = 'flex';
     }
 
@@ -37,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveComment() {
         const commentText = document.getElementById('comment-text').value;
+        const mainCommentId = document.getElementById('main-post').dataset.mainCommentId;
+        console.log('Main Comment ID:', mainCommentId); // Debug log
+
         if (commentText) {
             if (editMode && currentComment) {
                 try {
@@ -45,12 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ content: commentText })
+                        body: JSON.stringify({ content: commentText, userId: currentUserId })
                     });
                     if (response.ok) {
                         currentComment.querySelector('.comment-content').textContent = commentText;
                         closePopup();
-                        alert('Comment updated successfully!')
+                        alert('Comment updated successfully!');
                     } else {
                         console.error('Failed to update comment');
                     }
@@ -58,44 +68,83 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Error:', error);
                 }
             } else {
-                addNewComment(commentText);
+                await postComment(commentText, mainCommentId);
                 closePopup();
             }
         }
     }
 
-    function addNewComment(text) {
-        const commentsSection = document.querySelector('.comments-section');
-        const newComment = document.createElement('div');
-        newComment.classList.add('comment');
-        newComment.innerHTML = `
-            <div class="user-info">
-                <div class="avatar"></div>
-                <div class="username">Bot</div>
-            </div>
-            <div class="comment-content">${text}</div>
-            <div class="comment-actions">
-                <button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
-                <button class="edit-btn btn" onclick="editComment(this)">Edit</button>
-            </div>
-        `;
-        commentsSection.appendChild(newComment);
+    async function postComment(text, parentCommentId) {
+        console.log('Posting Comment:', text); // Debug log
+        console.log('Parent Comment ID:', parentCommentId); // Debug log
+
+        try {
+            const response = await fetch('/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: text, userId: currentUserId, parent_comment_id: parentCommentId })
+            });
+            if (response.ok) {
+                alert('Comment posted successfully!');
+                fetchComments(); // Refresh comments
+            } else {
+                console.error('Failed to post comment');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
-    window.deleteComment = function(button) {
+    window.deleteComment = async function(button) {
         const comment = button.closest('.comment');
-        if (confirm("Are you sure you want to delete this comment?")) {
-            comment.remove();
+        const commentId = comment.dataset.id;
+        const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
+
+        if (commentUserId === parseInt(currentUserId, 10)) {
+            if (confirm("Are you sure you want to delete this comment?")) {
+                try {
+                    const response = await fetch(`/comments/${commentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userId: currentUserId })
+                    });
+                    if (response.ok) {
+                        comment.remove();
+                        alert('Comment deleted successfully!');
+                    } else {
+                        console.error('Failed to delete comment');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        } else {
+            alert('You can only delete your own comments.');
         }
     };
 
     window.editComment = function(button) {
-        currentComment = button.closest('.comment');
-        currentCommentId = currentComment.dataset.id;  // Get the comment ID
-        showPopup('edit');
+        const comment = button.closest('.comment');
+        const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
+
+        console.log('Comment User ID:', comment.dataset.userId); // Debug log
+        console.log('Comment User ID (parsed):', commentUserId); // Debug log
+        console.log('Current User ID:', parseInt(currentUserId, 10)); // Debug log
+
+        if (commentUserId === parseInt(currentUserId, 10)) {
+            currentComment = comment;
+            currentCommentId = comment.dataset.id;
+            console.log('Current Comment ID:', currentCommentId); // Debug log
+            showPopup('edit');
+        } else {
+            alert('You can only edit your own comments.');
+        }
     };
 
-    // Fetch and display comments
     async function fetchComments() {
         try {
             const response = await fetch('/comments');
@@ -109,15 +158,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayComments(comments) {
         const mainPost = document.getElementById('main-post');
         const commentsSection = document.querySelector('.comments-section');
-        mainPost.innerHTML = ''; // Clear existing main post
+        mainPost.innerHTML = '';
         commentsSection.innerHTML = ''; // Clear existing comments
-        
+
         comments.forEach(comment => {
             const formattedUsername = formatUsername(comment.username);
             const commentElement = document.createElement('div');
-            
+
             if (comment.parent_comment_id === null) {
                 commentElement.classList.add('post');
+                commentElement.dataset.mainCommentId = comment.id; // Add data attribute for main comment ID
                 commentElement.innerHTML = `
                     <div class="user-info">
                         <div class="avatar">
@@ -136,7 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 mainPost.appendChild(commentElement);
             } else {
                 commentElement.classList.add('comment');
-                commentElement.dataset.id = comment.id;  // Set the comment ID
+                commentElement.dataset.id = comment.id;
+                commentElement.dataset.userId = comment.user_id; // Add user ID to comment element
+                console.log(`Comment ID: ${comment.id}, User ID: ${comment.user_id}`); // Debug log for each comment
                 commentElement.innerHTML = `
                     <div class="user-info">
                         <div class="avatar">
@@ -155,14 +207,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    
+
     function formatUsername(username) {
         return username.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
 
-    fetchComments(); // Load comments when the page loads
+    fetchComments();
 
-    // Make the functions accessible globally
     window.saveComment = saveComment;
     window.closePopup = closePopup;
 });
