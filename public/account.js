@@ -322,3 +322,159 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
 });
+
+// Fetch and display reviews
+async function fetchAndDisplayReviews() {
+  const userId = sessionStorage.getItem('userId'); // Get the logged-in user's ID
+  console.log('User ID:', userId); // Debugging
+  try {
+    const response = await fetch('/reviews');
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews');
+    }
+    const reviews = await response.json();
+    console.log('Fetched Reviews:', reviews); // Debugging
+    const reviewWrapper = document.querySelector('.review-wrapper');
+    reviewWrapper.innerHTML = ''; // Clear the existing placeholder content
+
+    // Filter reviews to show only those by the logged-in user
+    const userReviews = reviews.filter(review => review.user_id == userId);
+    console.log('Filtered Reviews:', userReviews); // Debugging
+
+    if (userReviews.length === 0) {
+      reviewWrapper.innerHTML = '<p>No reviews found for this user.</p>'; // Inform user
+    }
+
+    userReviews.forEach(review => {
+      const reviewCard = document.createElement('div');
+      reviewCard.className = 'review-card';
+      reviewCard.setAttribute('data-review-id', review.review_id); // Add data attribute for review ID
+
+      const reviewHeader = document.createElement('div');
+      reviewHeader.className = 'review-header';
+
+      const profilePic = document.createElement('img');
+      profilePic.src = 'images/profilePic.jpeg';
+      profilePic.alt = 'profile image';
+      profilePic.className = 'profile-pic';
+
+      const reviewInfo = document.createElement('div');
+      reviewInfo.className = 'review-info';
+
+      const userName = document.createElement('span');
+      userName.className = 'user-name';
+      userName.textContent = review.user_name;
+
+      const stars = document.createElement('div');
+      stars.className = 'stars';
+      for (let i = 0; i < review.rating; i++) {
+        const star = document.createElement('i');
+        star.className = 'fa-solid fa-star';
+        star.style.color = '#FFD43B';
+        stars.appendChild(star);
+      }
+      for (let i = review.rating; i < 5; i++) {
+        const star = document.createElement('i');
+        star.className = 'fa-solid fa-star';
+        star.style.color = '#ccc';
+        stars.appendChild(star);
+      }
+
+      const reviewDate = document.createElement('div');
+      reviewDate.className = 'review-date';
+      reviewDate.textContent = new Date(review.review_date).toLocaleDateString();
+
+      const reviewContent = document.createElement('div');
+      reviewContent.className = 'review-content';
+
+      const reviewText = document.createElement('p');
+      reviewText.textContent = review.review_text;
+
+      const reviewActions = document.createElement('div');
+      reviewActions.className = 'review-actions';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn delete-btn';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.addEventListener('click', () => deleteReview(review.review_id)); // Add event listener
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn edit-btn';
+      editBtn.textContent = 'Edit';
+      editBtn.addEventListener('click', () => editReview(review.review_id, review.review_text, review.rating)); // Add event listener
+
+      reviewActions.appendChild(deleteBtn);
+      reviewActions.appendChild(editBtn);
+
+      reviewInfo.appendChild(userName);
+      reviewInfo.appendChild(stars);
+
+      reviewHeader.appendChild(profilePic);
+      reviewHeader.appendChild(reviewInfo);
+      reviewHeader.appendChild(reviewDate);
+
+      reviewContent.appendChild(reviewText);
+
+      reviewCard.appendChild(reviewHeader);
+      reviewCard.appendChild(reviewContent);
+      reviewCard.appendChild(reviewActions);
+
+      reviewWrapper.appendChild(reviewCard);
+    });
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+  }
+}
+
+// Call the function to fetch and display reviews
+fetchAndDisplayReviews();
+
+// Delete review function
+async function deleteReview(reviewId) {
+  try {
+    const response = await fetch(`/reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId: sessionStorage.getItem('userId') })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete review');
+    }
+    alert('Review deleted successfully');
+    fetchAndDisplayReviews(); // Refresh the reviews
+  } catch (error) {
+    console.error('Error deleting review:', error);
+  }
+}
+
+// Edit review function
+function editReview(reviewId, currentText, currentRating) {
+  const newText = prompt('Enter new review text:', currentText);
+  const newRating = parseInt(prompt('Enter new rating (1-5):', currentRating), 10);
+  if (newText && newRating >= 1 && newRating <= 5) {
+    updateReview(reviewId, newText, newRating);
+  } else {
+    alert('Invalid input');
+  }
+}
+
+async function updateReview(reviewId, reviewText, rating) {
+  try {
+    const response = await fetch(`/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ review_text: reviewText, rating: rating, userId: sessionStorage.getItem('userId') })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update review');
+    }
+    alert('Review updated successfully');
+    fetchAndDisplayReviews(); // Refresh the reviews
+  } catch (error) {
+    console.error('Error updating review:', error);
+  }
+}

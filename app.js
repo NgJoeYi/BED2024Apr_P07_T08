@@ -21,6 +21,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Serve the HTML page
+app.get('/account', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'account.html'));
+});
+
 // Add Routes for users
 app.post('/users/register', userController.createUser);
 app.post('/users/login', userController.loginUser);
