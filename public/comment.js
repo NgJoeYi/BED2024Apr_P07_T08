@@ -25,10 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
             editMode = false;
             currentComment = null;
             currentCommentId = null;
+            const saveButton = popup.querySelector('button');
+            saveButton.onclick = saveComment; // Set onclick to saveComment for adding new comments
         } else {
             popupTitle.textContent = 'Edit Comment';
             commentText.value = currentComment.querySelector('.comment-content').textContent.trim();
             editMode = true;
+            const saveButton = popup.querySelector('button');
+            saveButton.onclick = saveComment; // Set onclick to saveComment for editing comments
         }
 
         popup.style.display = 'flex';
@@ -40,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveComment() {
         const commentText = document.getElementById('comment-text').value;
+        const mainCommentId = document.getElementById('main-post').dataset.mainCommentId;
+        console.log('Main Comment ID:', mainCommentId); // Debug log
+
         if (commentText) {
             if (editMode && currentComment) {
                 try {
@@ -61,29 +68,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Error:', error);
                 }
             } else {
-                addNewComment(commentText);
+                await postComment(commentText, mainCommentId);
                 closePopup();
             }
         }
     }
 
-    function addNewComment(text) {
-        const commentsSection = document.querySelector('.comments-section');
-        const newComment = document.createElement('div');
-        newComment.classList.add('comment');
-        newComment.dataset.userId = currentUserId; // Add user ID to comment
-        newComment.innerHTML = `
-            <div class="user-info">
-                <div class="avatar"></div>
-                <div class="username">Bot</div>
-            </div>
-            <div class="comment-content">${text}</div>
-            <div class="comment-actions">
-                <button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
-                <button class="edit-btn btn" onclick="editComment(this)">Edit</button>
-            </div>
-        `;
-        commentsSection.appendChild(newComment);
+    async function postComment(text, parentCommentId) {
+        console.log('Posting Comment:', text); // Debug log
+        console.log('Parent Comment ID:', parentCommentId); // Debug log
+
+        try {
+            const response = await fetch('/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: text, userId: currentUserId, parent_comment_id: parentCommentId })
+            });
+            if (response.ok) {
+                alert('Comment posted successfully!');
+                fetchComments(); // Refresh comments
+            } else {
+                console.error('Failed to post comment');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
     window.deleteComment = function(button) {
@@ -125,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const mainPost = document.getElementById('main-post');
         const commentsSection = document.querySelector('.comments-section');
         mainPost.innerHTML = '';
-        commentsSection.innerHTML = '';
+        commentsSection.innerHTML = ''; // Clear existing comments
 
         comments.forEach(comment => {
             const formattedUsername = formatUsername(comment.username);
@@ -133,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (comment.parent_comment_id === null) {
                 commentElement.classList.add('post');
+                commentElement.dataset.mainCommentId = comment.id; // Add data attribute for main comment ID
                 commentElement.innerHTML = `
                     <div class="user-info">
                         <div class="avatar">

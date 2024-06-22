@@ -101,6 +101,9 @@ function showPopup(type) {
         document.querySelectorAll('.popup .fa-star').forEach(star => {
             star.classList.remove('selected');
         });
+
+        const postButton = document.querySelector('.popup-content button');
+        postButton.onclick = postReview;
     }
 }
 
@@ -149,7 +152,24 @@ function deleteReview(button) {
 }
 
 function postReview() {
-    closePopup();
+    const reviewText = document.getElementById('review-text').value;
+    const rating = document.querySelectorAll('.popup .fa-star.selected').length;
+    const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+
+    fetch('/reviews', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ review_text: reviewText, rating: rating, userId: userId }) // Include userId
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        closePopup();
+        fetchReviews();
+    })
+    .catch(error => console.error('Error posting review:', error));
 }
 
 function editReview(button) {

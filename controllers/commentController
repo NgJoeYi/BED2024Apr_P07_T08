@@ -18,6 +18,23 @@ async function getComments(req, res) {
     }
 }
 
+async function createComment(req, res) {
+    const { content, userId, parent_comment_id } = req.body;
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        const result = await commentModel.createComment(connection, content, userId, parent_comment_id);
+        res.status(201).json(result);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error creating comment");
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
 async function updateComment(req, res) {
     const { id } = req.params;
     const { content, userId } = req.body;
@@ -46,5 +63,6 @@ async function updateComment(req, res) {
 
 module.exports = {
     getComments,
+    createComment,
     updateComment,
 };
