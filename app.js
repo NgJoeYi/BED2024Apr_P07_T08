@@ -31,15 +31,13 @@ app.put('/account/:id', userController.updateUser);
 app.get('/discussions', discussionController.getDiscussions);
 app.post('/discussions', discussionController.createDiscussion);
 
-
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
-app.put('/comments/:id', commentController.updateComment); 
+app.put('/comments/:id', commentController.updateComment);
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews);
-app.put('/reviews/:id', reviewController.updateReview); 
-
+app.put('/reviews/:id', reviewController.updateReview);
 
 app.listen(port, async () => {
     try {
