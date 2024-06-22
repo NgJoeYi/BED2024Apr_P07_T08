@@ -2,7 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch and display reviews
     fetchReviews();
 
-    // Navigation bar interaction
+    const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+    console.log('Current User ID:', currentUserId); // Debug log
+
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
         title.addEventListener('click', () => {
@@ -31,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Review stars interaction
     const reviewStars = document.querySelectorAll('.review .fa-star');
     reviewStars.forEach(star => {
         star.addEventListener('click', () => {
@@ -39,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const parent = star.closest('.rating');
             const stars = parent.querySelectorAll('.fa-star');
             if (star.classList.contains('selected') && value === '1') {
-                // If the first star is clicked twice, deselect all stars
                 stars.forEach(s => s.classList.remove('selected'));
             } else {
                 stars.forEach(s => {
@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Popup stars interaction
     const popupStars = document.querySelectorAll('.popup .fa-star');
     popupStars.forEach(star => {
         star.addEventListener('mouseover', () => {
@@ -74,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         star.addEventListener('click', () => {
             const value = star.getAttribute('data-value');
             if (star.classList.contains('selected') && value === '1') {
-                // If the first star is clicked twice, deselect all stars
                 popupStars.forEach(s => s.classList.remove('selected'));
             } else {
                 popupStars.forEach(s => {
@@ -88,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Set default sort option to "mostRecent" and sort reviews
     document.getElementById('sort').value = 'mostRecent'; // Set default value
     sortReviews(); // Sort reviews by most recent on page load
 });
@@ -100,7 +97,6 @@ function showPopup(type) {
     popup.style.display = 'flex';
 
     if (type === 'add') {
-        // Clear the popup for new review
         document.getElementById('review-text').value = '';
         document.querySelectorAll('.popup .fa-star').forEach(star => {
             star.classList.remove('selected');
@@ -158,14 +154,22 @@ function postReview() {
 
 function editReview(button) {
     const review = button.closest('.review');
+    const reviewUserId = parseInt(review.dataset.userId, 10); // Get the user ID from the review
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage
+
+    if (reviewUserId !== currentUserId) {
+        alert('You can only edit your own reviews.');
+        return;
+    }
+
     const reviewText = review.querySelector('.review-details p').textContent;
     const reviewStars = review.querySelectorAll('.fa-star');
     const popupStars = document.querySelectorAll('.popup .fa-star');
-    
+
     document.getElementById('review-text').value = reviewText;
 
     const rating = Array.from(reviewStars).filter(star => star.classList.contains('selected')).length;
-    
+
     popupStars.forEach(star => {
         if (star.getAttribute('data-value') <= rating) {
             star.classList.add('selected');
@@ -176,7 +180,6 @@ function editReview(button) {
 
     showPopup('edit');
 
-    // Add event listener to the post button to handle the update
     const postButton = document.querySelector('.popup-content button');
     postButton.onclick = () => {
         const updatedText = document.getElementById('review-text').value;
@@ -187,13 +190,13 @@ function editReview(button) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ review_text: updatedText, rating: updatedRating })
+            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, userId: currentUserId }) // Include userId
         })
         .then(response => response.json())
         .then(data => {
-            alert(data.message); // Show success message
+            alert(data.message);
             closePopup();
-            fetchReviews(); // Refresh reviews
+            fetchReviews();
         })
         .catch(error => console.error('Error updating review:', error));
     };
@@ -210,6 +213,7 @@ function fetchReviews() {
                 const reviewElement = document.createElement('div');
                 reviewElement.classList.add('review');
                 reviewElement.setAttribute('data-id', review.review_id); // Add this line
+                reviewElement.setAttribute('data-user-id', review.user_id); // Add this line
                 reviewElement.setAttribute('data-date', review.review_date);
                 reviewElement.innerHTML = `
                     <div class="review-content">
@@ -236,4 +240,3 @@ function fetchReviews() {
         })
         .catch(error => console.error('Error fetching reviews:', error));
 }
-
