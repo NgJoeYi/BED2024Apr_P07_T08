@@ -23,27 +23,68 @@ body {
   overflow: auto;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
-  padding-top: 60px;
+  padding-top: 120px;
 }
 
 .modal-content {
-  background-color: #fefefe;
+  background-color: #AE8381;
   margin: 5% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
+  border: 8px solid #74676F; 
+  padding: 100px;
+  color: #fff;
+  max-width: 800px;
+  max-height: 500px;
+  width: 100%;
+  border-radius: 30px;
+  position: relative;
+  font-size: 24px;
+  text-align: center;
+  font-family: 'Afacad';
 }
+
+.modal-content h2{
+  margin-top: -30px;
+}
+
+.modal-content textarea{
+  width: 600px;
+  height: 190px;
+  margin-top: 20px;
+  font-size: 20px;
+  margin-left: -5px;
+}
+
+button {
+  cursor: pointer;
+  padding: 10px 30px;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  background-color: #74676F;
+  font-family: 'Afacad';
+  font-size: 15px;
+  margin-top: 20px;
+}
+
+button:hover {
+  background-color: white;
+  font-family: 'Afacad';
+  color: black;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
 
 .close {
   color: #aaa;
   float: right;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: bold;
+  margin-top: -80px;
 }
 
 .close:hover,
 .close:focus {
-  color: black;
+  color: white;
   text-decoration: none;
   cursor: pointer;
 }
@@ -54,7 +95,14 @@ body {
   align-items: center;
 }
 
-.stars .fa-star {
+.stars{
+  font-size: 45px;
+  color: #ccc; /* Grey color */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.fa-star{
   font-size: 24px;
   color: #ccc; /* Grey color */
   cursor: pointer;
