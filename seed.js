@@ -83,6 +83,7 @@ async function run() {
 
         CREATE TABLE Courses (
             CourseID INT PRIMARY KEY IDENTITY(1,1),
+            LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
             Title NVARCHAR(200) NOT NULL,
             Description NVARCHAR(2000),
             Category NVARCHAR(100),
@@ -148,10 +149,10 @@ async function run() {
 
         // Insert data into Courses table
         const insertCourses = `
-        INSERT INTO Courses (Title, Description, Category, Level, Duration, CourseImage) VALUES 
-        ('Introduction to Python', 'Learn the basics of Python programming, including syntax, data types, and functions.', 'Programming', 'Beginner', 360, NULL),
-        ('Advanced Algebra', 'Dive deep into algebraic concepts and techniques used in advanced mathematics.', 'Mathematics', 'Advanced', 480, NULL),
-        ('Digital Marketing', 'Explore the strategies and tools used in digital marketing to reach and engage audiences.', 'Marketing', 'Intermediate', 300, NULL);
+        INSERT INTO Courses (LecturerID, Title, Description, Category, Level, Duration, CourseImage) VALUES 
+        (1,'Introduction to Python', 'Learn the basics of Python programming, including syntax, data types, and functions.', 'Programming', 'Beginner', 360, NULL),
+        (2,'Advanced Algebra', 'Dive deep into algebraic concepts and techniques used in advanced mathematics.', 'Mathematics', 'Advanced', 480, NULL),
+        (2,'Digital Marketing', 'Explore the strategies and tools used in digital marketing to reach and engage audiences.', 'Marketing', 'Intermediate', 300, NULL);
         `;
         await connection.request().query(insertCourses);
 

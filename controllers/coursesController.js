@@ -1,4 +1,4 @@
-const Courses = require("../models/courses");
+const Courses = require("../models/Courses");
 const sql = require("mssql");
 
 const getAllCourses = async (req, res) => {
@@ -42,11 +42,11 @@ const updateCourse = async (req, res) => {
     const newCourseData = req.body;
   
     try {
-      const upadtedCourse = await Courses.updateCourse(courseID, newCourseData);
-      if (!upadtedCourse) {
+      const updatedCourse = await Courses.updateCourse(courseID, newCourseData);
+      if (!updatedCourse) {
         return res.status(404).send("Course not found");
       }
-      res.json(upadtedCourse);
+      res.json(updatedCourse);
     } catch (error) {
       console.error(error);
       res.status(500).send("Error updating course");
