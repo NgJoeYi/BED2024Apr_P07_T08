@@ -14,9 +14,8 @@
   <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
-
 </head>
-<body id = "account-page">
+<body id="account-page">
   <header>
     <nav class="navbar">
       <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
@@ -29,7 +28,7 @@
         <li><a href="ContactUs.html">CONTACT US</a></li>
         <li><a href="Login.html" id="navbar-login">LOG IN </a></li>
         <li><a href="Register.html" id="navbar-signup">SIGN UP </a></li>
-        <li><a href="games.html" id="gamestoearn" style="display: none;"><i class="fa fa-gamepad" style="font-size: 15px;" ></i></a></li>
+        <li><a href="games.html" id="gamestoearn" style="display: none;"><i class="fa fa-gamepad" style="font-size: 15px;"></i></a></li>
         <li><a href="account.html" id="navbar-account" style="display: none;"><i class="fa fa-user" style="font-size: 15px;"></i></a></li>
       </ul>
       <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
@@ -81,237 +80,249 @@
     </div>
   </div>
 
-    <div id="carousel1" class="courses-carousel">
-      <div class="courses-container">
-        <a class="account-prev" onclick="changeSlide('carousel1', -1)">&#10094;</a>
-          <div class="course">
-            <img src="images/profilePic.jpeg" alt="course1">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/temp-pic.jpeg" alt="course2">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/register_bg.jpg" alt="course3">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/profilePic.jpeg" alt="course1">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/temp-pic.jpeg" alt="course2">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/register_bg.jpg" alt="course3">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-        <a class="account-next" onclick="changeSlide('carousel1', 1)">&#10095;</a>
+  <div id="carousel1" class="courses-carousel">
+    <div class="courses-container">
+      <a class="account-prev" onclick="changeSlide('carousel1', -1)">&#10094;</a>
+      <div class="course">
+        <img src="images/profilePic.jpeg" alt="course1">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
       </div>
-    </div>
-    <div class="review-actions">
-      <button id="delete-course" class = "btn delete-btn" type="button" onclick="alert('Course Deleted!')">Delete</button> 
-      <button id="edit-course" class = "btn edit-btn" type="button" onclick="alert('Course edited!')">Edit</button> 
-    </div>
-    <div class="done-container">
-      <div class="title">
-        <span class="big-title">In Progress</span>
+      <div class="course">
+        <img src="images/temp-pic.jpeg" alt="course2">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
       </div>
-      <div class="title">
-        <span class="big-title">Filter By:</span>
-        <select name="filter" class="filter">
-          <option value="courses">Courses</option>
-          <option value="Date">Date</option>
-        </select>
+      <div class="course">
+        <img src="images/register_bg.jpg" alt="course3">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
       </div>
+      <div class="course">
+        <img src="images/profilePic.jpeg" alt="course1">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
+      </div>
+      <div class="course">
+        <img src="images/temp-pic.jpeg" alt="course2">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
+      </div>
+      <div class="course">
+        <img src="images/register_bg.jpg" alt="course3">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
+      </div>
+      <a class="account-next" onclick="changeSlide('carousel1', 1)">&#10095;</a>
     </div>
+  </div>
+  <div class="review-actions">
+    <button id="delete-course" class="btn delete-btn" type="button" onclick="alert('Course Deleted!')">Delete</button>
+    <button id="edit-course" class="btn edit-btn" type="button" onclick="alert('Course edited!')">Edit</button>
+  </div>
+  <div class="done-container">
+    <div class="title">
+      <span class="big-title">In Progress</span>
+    </div>
+    <div class="title">
+      <span class="big-title">Filter By:</span>
+      <select name="filter" class="filter">
+        <option value="courses">Courses</option>
+        <option value="Date">Date</option>
+      </select>
+    </div>
+  </div>
 
-    <div id="carousel2" class="courses-carousel">
-      <div class="courses-container">
-        <a class="account-prev" onclick="changeSlide('carousel2', -1)">&#10094;</a>
-          <div class="course">
-            <img src="images/profilePic.jpeg" alt="course1">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/temp-pic.jpeg" alt="course2">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/register_bg.jpg" alt="course3">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/profilePic.jpeg" alt="course1">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/temp-pic.jpeg" alt="course2">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-          <div class="course">
-            <img src="images/register_bg.jpg" alt="course3">
-            <p class="title">Title: I LOVE BED</p>
-            <p class="rating">Rating:
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-              <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-            </p>
-          </div>
-        <a class="account-next" onclick="changeSlide('carousel2', 1)">&#10095;</a>
+  <div id="carousel2" class="courses-carousel">
+    <div class="courses-container">
+      <a class="account-prev" onclick="changeSlide('carousel2', -1)">&#10094;</a>
+      <div class="course">
+        <img src="images/profilePic.jpeg" alt="course1">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
       </div>
+      <div class="course">
+        <img src="images/temp-pic.jpeg" alt="course2">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
+      </div>
+      <div class="course">
+        <img src="images/register_bg.jpg" alt="course3">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
+      </div>
+      <div class="course">
+        <img src="images/profilePic.jpeg" alt="course1">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
+      </div>
+      <div class="course">
+        <img src="images/temp-pic.jpeg" alt="course2">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
+      </div>
+      <div class="course">
+        <img src="images/register_bg.jpg" alt="course3">
+        <p class="title">Title: I LOVE BED</p>
+        <p class="rating">
+          Rating:
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+          <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+        </p>
+      </div>
+      <a class="account-next" onclick="changeSlide('carousel2', 1)">&#10095;</a>
     </div>
-    <div class="done-container">
-      <div class="title">
-        <span class="big-title">Reviews</span>
-      </div>
-      <div class="title">
-        <span class="big-title">Filter By:</span>
-        <select name="filter" class="filter">
-          <option value="courses">Courses</option>
-          <option value="Date">Date</option>
-        </select>
-      </div>
+  </div>
+  <div class="done-container">
+    <div class="title">
+      <span class="big-title">Reviews</span>
     </div>
+    <div class="title">
+      <span class="big-title">Filter By:</span>
+      <select name="filter" class="filter">
+        <option value="courses">Courses</option>
+        <option value="Date">Date</option>
+      </select>
+    </div>
+  </div>
 
-    <div class="review-wrapper">
-      <!-- Reviews will be populated here -->
-    </div>
+  <div class="review-wrapper">
+    <!-- Reviews will be populated here -->
+  </div>
 
-    <div class="review-wrapper">
-      <!-- Reviews will be populated here -->
-    </div>
+  <div class="review-wrapper">
+    <!-- Reviews will be populated here -->
+  </div>
     
-    <div class="done-container">
-      <div class="title">
-        <span class="big-title">Questions Posted</span>
+  <div class="done-container">
+    <div class="title">
+      <span class="big-title">Questions Posted</span>
+    </div>
+    <div class="title">
+      <span class="big-title">Filter By:</span>
+      <select name="filter" class="filter">
+        <option value="courses">Courses</option>
+        <option value="Date">Date</option>
+      </select>
+    </div>
+  </div>
+  <div class="comments-wrapper">
+    <div class="comment-container">
+      <div class="comment-header">
+        <div class="comment-user-info">
+          <img src="images/profilePic.jpeg" alt="profile image" class="profile-pic">
+          <span class="user-name">User</span>
+        </div>
+        <span class="comment-date">14 April 2024</span>
       </div>
-      <div class="title">
-        <span class="big-title">Filter By:</span>
-        <select name="filter" class="filter">
-          <option value="courses">Courses</option>
-          <option value="Date">Date</option>
-        </select>
+      <div class="comment-body">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
+        labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
+        Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
+      </div>
+      <div class="likes">
+        <span class="likes">
+          <i class="fa-solid fa-thumbs-up" style="color: #000000;"></i>
+          13 Likes
+        </span>
+        <span class="dislikes">
+          <i class="fa-solid fa-thumbs-down" style="color: #000000;"></i>
+          100 Dislike
+        </span>
+      </div>
+      <div class="comment-actions">
+        <button class="action-btn delete-btn">Delete</button>
+        <button class="action-btn edit-btn">Edit</button>
+        <button class="action-btn comment-btn">Go to Comment</button>
       </div>
     </div>
-    <div class = "comments-wrapper">
-      <div class="comment-container">
-        <div class="comment-header">
-          <div class="comment-user-info">
-            <img src = "images/profilePic.jpeg" alt = "profile image" class = "profile-pic">
-            <span class="user-name">User</span>
-          </div>
-          <span class="comment-date">14 April 2024</span>
+          
+    <div class="comment-container">
+      <div class="comment-header">
+        <div class="comment-user-info">
+          <img src="images/profilePic.jpeg" alt="profile image" class="profile-pic">
+          <span class="user-name">User</span>
         </div>
-        <div class="comment-body">
+        <span class="comment-date">14 April 2024</span>
+      </div>
+      <div class="comment-body">
+        <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
           labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
           Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
-        </div>
-        <div class = "likes">
-          <span class="likes">
-            <i class="fa-solid fa-thumbs-up" style="color: #000000;"></i>
-            13 Likes
-          </span>
-          <span class="dislikes">
-            <i class="fa-solid fa-thumbs-down" style="color: #000000;"></i>
-            100 Dislike
-          </span>
-        </div>
-        <div class="comment-actions">
-          <button class="action-btn delete-btn">Delete</button>
-          <button class="action-btn edit-btn">Edit</button>
-          <button class="action-btn comment-btn">Go to Comment</button>
-        </div>
+        </p>
       </div>
-            
-      <div class="comment-container">
-        <div class="comment-header">
-          <div class="comment-user-info">
-            <img src = "images/profilePic.jpeg" alt = "profile image" class = "profile-pic">
-            <span class="user-name">User</span>
-          </div>
-          <span class="comment-date">14 April 2024</span>
-        </div>
-        <div class="comment-body">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
-            labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
-            Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
-         </p>
-        </div>
-        <div class = "likes">
-          <span class="likes">
-            <i class="fa-solid fa-thumbs-up" style="color: #000000;"></i>
-            13 Likes
-          </span>
-          <span class="dislikes">
-            <i class="fa-solid fa-thumbs-down" style="color: #000000;"></i>
-            100 Dislike
-          </span>
-        </div>
-        <div class="comment-actions">
-          <button class="action-btn delete-btn">Delete</button>
-          <button class="action-btn edit-btn">Edit</button>
-          <button class="action-btn comment-btn">Go to Comment</button>
-        </div>
+      <div class="likes">
+        <span class="likes">
+          <i class="fa-solid fa-thumbs-up" style="color: #000000;"></i>
+          13 Likes
+        </span>
+        <span class="dislikes">
+          <i class="fa-solid fa-thumbs-down" style="color: #000000;"></i>
+          100 Dislike
+        </span>
+      </div>
+      <div class="comment-actions">
+        <button class="action-btn delete-btn">Delete</button>
+        <button class="action-btn edit-btn">Edit</button>
+        <button class="action-btn comment-btn">Go to Comment</button>
+      </div>
     </div>
   </div>
   <div class="ending-buttons">
@@ -319,7 +330,23 @@
     <button class="ending-buttons delete-btn" onclick="confirmDeleteAccount()">Delete Account</button>
   </div>
   <br><br>
-</div>
+
+  <!-- Edit Review Modal -->
+  <div class="modal" id="editReviewModal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeEditReviewModal()">&times;</span>
+      <h2>Edit Review</h2>
+      <div class="stars">
+        <i class="fa fa-star" data-value="1"></i>
+        <i class="fa fa-star" data-value="2"></i>
+        <i class="fa fa-star" data-value="3"></i>
+        <i class="fa fa-star" data-value="4"></i>
+        <i class="fa fa-star" data-value="5"></i>
+      </div>
+      <textarea id="editReviewText" placeholder="Review.."></textarea>
+      <button id="submitEditedReview">Save Changes</button>
+    </div>
+  </div>
 
   <footer>
     <div class="footer">
@@ -343,6 +370,7 @@
       </div>
     </div>
   </footer>
+
   <!-- External JavaScript files -->
   <script src="account.js"></script>
 </body>
