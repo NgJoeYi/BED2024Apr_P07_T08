@@ -75,13 +75,13 @@ class Courses {
             `;
             const request = connection.request();
             request.input('id', sql.Int, id);
-            request.input('lecturerID', sql.Int, newCourseData.lecturerID || null);
-            request.input('title', sql.NVarChar, newCourseData.title || null);
-            request.input('description', sql.NVarChar, newCourseData.description || null);
-            request.input('category', sql.NVarChar, newCourseData.category || null);
-            request.input('level', sql.NVarChar, newCourseData.level || null);
-            request.input('duration', sql.Int, newCourseData.duration || null);
-            request.input('courseImage', sql.VarBinary, newCourseData.courseImage || null);
+            request.input('lecturerID', sql.Int, newCourseData.lecturerID);
+            request.input('title', sql.NVarChar, newCourseData.title);
+            request.input('description', sql.NVarChar, newCourseData.description);
+            request.input('category', sql.NVarChar, newCourseData.category);
+            request.input('level', sql.NVarChar, newCourseData.level );
+            request.input('duration', sql.Int, newCourseData.duration);
+            request.input('courseImage', sql.VarBinary, newCourseData.courseImage );
 
             await request.query(sqlQuery);
             connection.close();
