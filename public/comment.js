@@ -10,11 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Current User ID:', currentUserId); // Debug log
 
     addCommentBtn.addEventListener('click', () => {
-        if (currentUserId) {
-            showPopup('add');
-        } else {
-            alert('Please log in or sign up to add comments.');
-        }
+        showPopup('add');
     });
 
     closePopupBtn.addEventListener('click', closePopup);

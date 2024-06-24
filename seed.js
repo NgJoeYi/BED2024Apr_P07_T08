@@ -1,7 +1,8 @@
 const sql = require("mssql");
 const dbConfig = require("./dbConfig");
 const bcrypt = require('bcrypt');
-
+const fs = require('fs');
+const path = require('path');
 async function run() {
     try {
         // Connect to the database
@@ -138,7 +139,6 @@ async function run() {
                 VALUES ('${user.name}', '${user.dob}', '${user.email}', '${hashedPassword}', '${user.role}')
             `);
         }
-
         // Insert data into Lecturer table
         const insertLecturers = `
         INSERT INTO Lecturer (UserID, ProfilePicture) VALUES
@@ -147,38 +147,58 @@ async function run() {
         `;
         await connection.request().query(insertLecturers);
 
+        // Path to courseImage file
+        const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
+
+        // Read courseImage file 
+        const courseImageBuffer = fs.readFileSync(courseImagePath);
+
         // Insert data into Courses table
         const insertCourses = `
         INSERT INTO Courses (LecturerID, Title, Description, Category, Level, Duration, CourseImage) VALUES 
-        (1,'Introduction to Python', 'Learn the basics of Python programming, including syntax, data types, and functions.', 'Programming', 'Beginner', 360, NULL),
-        (2,'Advanced Algebra', 'Dive deep into algebraic concepts and techniques used in advanced mathematics.', 'Mathematics', 'Advanced', 480, NULL),
-        (2,'Digital Marketing', 'Explore the strategies and tools used in digital marketing to reach and engage audiences.', 'Marketing', 'Intermediate', 300, NULL);
+        (1,'Introduction to Python', 'Learn the basics of Python programming, including syntax, data types, and functions.', 'Programming', 'Beginner', 360, @image),
+        (2,'Advanced Algebra', 'Dive deep into algebraic concepts and techniques used in advanced mathematics.', 'Mathematics', 'Advanced', 480, @image),
+        (2,'Digital Marketing', 'Explore the strategies and tools used in digital marketing to reach and engage audiences.', 'Marketing', 'Intermediate', 300, @image);
         `;
-        await connection.request().query(insertCourses);
+        await connection.request()
+        .input('image',courseImageBuffer)
+        .query(insertCourses);
+        
+        // Path to external files 
+        const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
+        const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
+        
+        // Read external file
+        const videoBuffer = fs.readFileSync(videoFilePath);
+        const imageBuffer = fs.readFileSync(lectureImage);
 
         // Insert data into Lectures table
         const insertLectures = `
-        INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Duration, Position) VALUES
+        INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Video, LectureImage, Duration, Position) VALUES
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Python Basics', 'Introduction to Python programming basics.', 'http://example.com/python_basics', 60, 1),
+         'Python Basics', 'Introduction to Python programming basics.', 'http://example.com/python_basics', @Video, @Image, 60, 1),
+
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Data Types in Python', 'Understanding different data types in Python.', 'http://example.com/data_types', 90, 2),
+         'Data Types in Python', 'Understanding different data types in Python.', 'http://example.com/data_types',@Video,@Image, 90, 2),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
-         'Algebraic Structures', 'Exploring advanced algebraic structures.', 'http://example.com/algebraic_structures', 120, 1),
+         'Algebraic Structures', 'Exploring advanced algebraic structures.', 'http://example.com/algebraic_structures',@Video,@Image, 120, 1),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
-         'Polynomial Equations', 'Solving polynomial equations in algebra.', 'http://example.com/polynomial_equations', 100, 2),
+         'Polynomial Equations', 'Solving polynomial equations in algebra.', 'http://example.com/polynomial_equations', @Video,@Image,100, 2),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'SEO Basics', 'Introduction to Search Engine Optimization.', 'http://example.com/seo_basics', 75, 1),
+         'SEO Basics', 'Introduction to Search Engine Optimization.', 'http://example.com/seo_basics', @Video,@Image,75, 1),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Content Marketing', 'Strategies for effective content marketing.', 'http://example.com/content_marketing', 85, 2);
+         'Content Marketing', 'Strategies for effective content marketing.', 'http://example.com/content_marketing',@Video,@Image, 85, 2);
         `;
-        await connection.request().query(insertLectures);
+        await connection.request()
+        .input('Video', sql.VarBinary, videoBuffer)
+        .input('Image',sql.VarBinary,imageBuffer)
+        .query(insertLectures);
 
         // Insert data into user_reviews table
         const insertUserReviews = `
