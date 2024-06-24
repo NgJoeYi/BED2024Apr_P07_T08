@@ -3249,6 +3249,7 @@ main {
   border-radius: 4px;
   cursor: pointer;
   margin-top: 10px;
+  text-decoration: none;
 }
 
 .filter-sort-unique {
