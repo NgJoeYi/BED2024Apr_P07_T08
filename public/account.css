@@ -232,7 +232,7 @@ body {
     background: rgba(244, 217, 198, 0.7);
     border-radius: 10px;
   }
-  
+/*   
   .profile-image {
     width: 80px;
     height: 80px;
@@ -245,7 +245,54 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
+  } */
+
+
+
+  
+.profile-image-container {
+  position: relative;
+  width: 150px; /* Adjust the size as needed */
+  height: 150px;
+}
+
+.profile-image-container img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.plus-sign {
+  position: absolute;
+  bottom: -5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px; /* Ensure the plus sign is centered and visible */
+}
+
+.file-input-wrapper {
+  display: none;
+}
+
+.file-input-wrapper.active {
+  display: block;
+}
+
+
+
+
+
+
+
   
   .profile-info {
     flex: 1;

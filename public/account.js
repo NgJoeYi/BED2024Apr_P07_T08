@@ -224,7 +224,7 @@ function confirmCancel() {
 }
 
 
-// --------------- edit and delete account 
+// ---------------------------------------------- EDIT ACCOUNT ----------------------------------------------
 
 // populate data to make it a prefilled form and ready to be editted but does not update in db yet
 document.addEventListener('DOMContentLoaded', async function () {
@@ -322,6 +322,34 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
 });
+
+function previewImage(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function() {
+    const profilePicElements = document.querySelectorAll('.profile-pic');
+    profilePicElements.forEach((profilePic) => {
+      profilePic.src = reader.result;
+    });
+  };
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+}
+
+// Function to trigger the file input click
+function triggerFileInput() {
+  const fileInput = document.getElementById('file-input');
+  fileInput.click();
+}
+
+
+
+
+
+// ---------------------------------------------- EDIT AND DELETE REVIEWS ----------------------------------------------
 
 // Fetch and display reviews
 async function fetchAndDisplayReviews() {
