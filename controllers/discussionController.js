@@ -120,9 +120,81 @@ const incrementDislikes = async (req, res) => {
     }
 };
 
+// Fetch discussions by user ID
+const getDiscussionsByUser = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        const query = `
+            SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username
+            FROM Discussions d
+            LEFT JOIN Users u ON d.user_id = u.id
+            WHERE d.user_id = @userId
+            ORDER BY d.posted_date DESC
+        `;
+
+        const pool = await sql.connect(dbConfig);
+        const result = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query(query);
+
+        res.json({ success: true, discussions: result.recordset });
+    } catch (err) {
+        console.error('Error getting user discussions:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+// Update discussion
+const updateDiscussion = async (req, res) => {
+    try {
+        const discussionId = req.params.id;
+        const { description, rating, userId } = req.body;
+
+        const pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('discussionId', sql.Int, discussionId)
+            .input('description', sql.NVarChar, description)
+            .input('rating', sql.Int, rating)
+            .input('userId', sql.Int, userId)
+            .query(`
+                UPDATE Discussions
+                SET description = @description, rating = @rating
+                WHERE id = @discussionId AND user_id = @userId
+            `);
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error updating discussion:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+// Delete discussion
+const deleteDiscussion = async (req, res) => {
+    try {
+        const discussionId = req.params.id;
+        const { userId } = req.body;
+
+        const pool = await sql.connect(dbConfig);
+        await pool.request()
+            .input('discussionId', sql.Int, discussionId)
+            .input('userId', sql.Int, userId)
+            .query('DELETE FROM Discussions WHERE id = @discussionId AND user_id = @userId');
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Error deleting discussion:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
 module.exports = {
     getDiscussions,
+    getDiscussionsByUser,
     createDiscussion,
     incrementLikes,
-    incrementDislikes
+    incrementDislikes,
+    updateDiscussion,
+    deleteDiscussion
 };

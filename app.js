@@ -37,7 +37,10 @@ app.put('/account/:id', userController.updateUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
+app.get('/discussions/user/:userId', discussionController.getDiscussionsByUser);
 app.post('/discussions', discussionController.createDiscussion);
+app.put('/discussions/:id', discussionController.updateDiscussion);
+app.delete('/discussions/:id', discussionController.deleteDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
