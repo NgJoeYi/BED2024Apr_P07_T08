@@ -478,3 +478,145 @@ async function updateReview(reviewId, reviewText, rating) {
     console.error('Error updating review:', error);
   }
 }
+
+
+// ----------------------------------------------DISCUSSION--------------------------------------------------------------
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchUserDiscussions();
+});
+
+async function fetchUserDiscussions() {
+    const userId = getCurrentUserId(); // Function to get the current logged-in user's ID
+    if (!userId) {
+        console.error('No user ID found');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/discussions/user/${userId}`);
+        console.log('Fetch response:', response); // Debugging
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user discussions');
+        }
+
+        const data = await response.json();
+        console.log('Fetched data:', data); // Debugging
+
+        const discussionsContainer = document.querySelector('.user-discussions');
+        const noDiscussionsMessage = document.querySelector('.no-discussions-message');
+        
+        discussionsContainer.innerHTML = ''; // Clear previous discussions
+
+        if (data.success) {
+            if (data.discussions.length === 0) {
+                noDiscussionsMessage.style.display = 'block';
+            } else {
+                noDiscussionsMessage.style.display = 'none';
+                data.discussions.forEach(discussion => {
+                    addUserDiscussionToFeed(discussion);
+                });
+            }
+        } else {
+            console.error('Error response from server:', data.error);
+            alert('Error fetching user discussions.');
+        }
+    } catch (error) {
+        console.error('Error fetching user discussions:', error);
+        alert('Error fetching user discussions.');
+    }
+}
+
+function addUserDiscussionToFeed(discussion) {
+    const feed = document.querySelector('.user-discussions');
+    const post = document.createElement('div');
+    post.classList.add('post');
+    post.setAttribute('data-id', discussion.id);
+
+    post.innerHTML = `
+        <div class="post-header">
+            <div class="profile-pic">
+                <img src="${discussion.profilePic || 'profilePic2.jpeg'}" alt="Profile Picture">
+            </div>
+            <div class="username">${discussion.username}</div>
+        </div>
+        <div class="post-meta">
+            <span class="category">Category: ${discussion.category}</span>
+            <span class="posted-date-activity">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+        </div>
+        <div class="post-content">
+            <p>${discussion.description}</p>
+        </div>
+        <div class="post-footer">
+            <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
+            <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
+        </div>
+    `;
+
+    feed.appendChild(post);
+
+    // Add event listeners for edit and delete buttons
+    post.querySelector('.edit-btn').addEventListener('click', () => editUserDiscussion(discussion.id));
+    post.querySelector('.delete-btn').addEventListener('click', () => deleteUserDiscussion(discussion.id));
+}
+
+function getCurrentUserId() {
+    // Implement the logic to get the current user's ID.
+    return sessionStorage.getItem('userId');
+}
+
+// Edit discussion function
+function editUserDiscussion(discussionId) {
+    const currentText = prompt('Enter new discussion text:');
+    const currentCategory = prompt('Enter new category:', 'General'); // Add more fields if needed
+    if (currentText && currentCategory) {
+        updateDiscussion(discussionId, currentText, currentCategory);
+    } else {
+        alert('Invalid input');
+    }
+}
+
+// Update discussion function
+async function updateDiscussion(discussionId, description, category) {
+    try {
+        const response = await fetch(`/discussions/${discussionId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ description, category, userId: getCurrentUserId() })
+        });
+        if (!response.ok) {
+            throw new Error('Failed to update discussion');
+        }
+        alert('Discussion updated successfully');
+        fetchUserDiscussions(); // Refresh the discussions
+    } catch (error) {
+        console.error('Error updating discussion:', error);
+    }
+}
+
+
+
+
+// Delete discussion function
+async function deleteUserDiscussion(discussionId) {
+    try {
+        const response = await fetch(`/discussions/${discussionId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: getCurrentUserId() })
+        });
+        if (!response.ok) {
+            throw new Error('Failed to delete discussion');
+        }
+        alert('Discussion deleted successfully');
+        fetchUserDiscussions(); // Refresh the discussions
+    } catch (error) {
+        console.error('Error deleting discussion:', error);
+    }
+}
