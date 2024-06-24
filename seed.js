@@ -1,7 +1,8 @@
 const sql = require("mssql");
 const dbConfig = require("./dbConfig");
 const bcrypt = require('bcrypt');
-
+const fs = require('fs');
+const path = require('path');
 async function run() {
     try {
         // Connect to the database
@@ -155,30 +156,38 @@ async function run() {
         (2,'Digital Marketing', 'Explore the strategies and tools used in digital marketing to reach and engage audiences.', 'Marketing', 'Intermediate', 300, NULL);
         `;
         await connection.request().query(insertCourses);
+        // Path to video file 
+        const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
 
+        // Read video file
+        const videoBuffer = fs.readFileSync(videoFilePath);
+        
         // Insert data into Lectures table
         const insertLectures = `
-        INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Duration, Position) VALUES
+        INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Video, Duration, Position) VALUES
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Python Basics', 'Introduction to Python programming basics.', 'http://example.com/python_basics', 60, 1),
+         'Python Basics', 'Introduction to Python programming basics.', 'http://example.com/python_basics', @Video, 60, 1),
+
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Data Types in Python', 'Understanding different data types in Python.', 'http://example.com/data_types', 90, 2),
+         'Data Types in Python', 'Understanding different data types in Python.', 'http://example.com/data_types',@Video, 90, 2),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
-         'Algebraic Structures', 'Exploring advanced algebraic structures.', 'http://example.com/algebraic_structures', 120, 1),
+         'Algebraic Structures', 'Exploring advanced algebraic structures.', 'http://example.com/algebraic_structures',@Video, 120, 1),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
-         'Polynomial Equations', 'Solving polynomial equations in algebra.', 'http://example.com/polynomial_equations', 100, 2),
+         'Polynomial Equations', 'Solving polynomial equations in algebra.', 'http://example.com/polynomial_equations', @Video,100, 2),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'SEO Basics', 'Introduction to Search Engine Optimization.', 'http://example.com/seo_basics', 75, 1),
+         'SEO Basics', 'Introduction to Search Engine Optimization.', 'http://example.com/seo_basics', @Video,75, 1),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
          (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Content Marketing', 'Strategies for effective content marketing.', 'http://example.com/content_marketing', 85, 2);
+         'Content Marketing', 'Strategies for effective content marketing.', 'http://example.com/content_marketing',@Video, 85, 2);
         `;
-        await connection.request().query(insertLectures);
+        await connection.request()
+        .input('Video', sql.VarBinary, videoBuffer)
+        .query(insertLectures);
 
         // Insert data into user_reviews table
         const insertUserReviews = `
