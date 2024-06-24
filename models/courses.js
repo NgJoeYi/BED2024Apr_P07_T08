@@ -137,6 +137,25 @@ class Courses {
             await connection.close();
         }
     }
+    static async getCourseImage(id){
+        const connection = await sql.connect(dbConfig);
+        try{
+            const sqlQuery = `SELECT CourseImage FROM Courses WHERE CourseID = @id`;
+            const request = connection.request();
+            request.input("id", sql.Int, id);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0].CourseImage;
+        }catch (error) {
+            console.error('Error fetching course image:', error);
+            throw error;
+        } finally {
+            await connection.close();
+        }
+          
+    }
     
     
 }

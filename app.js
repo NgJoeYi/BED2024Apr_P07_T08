@@ -54,9 +54,11 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 // Add Routes for courses
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id' , courseController.getCoursesById);
+app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', courseController.createCourse); 
 app.delete('/courses/:id', courseController.deleteCourse);
+
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures);
