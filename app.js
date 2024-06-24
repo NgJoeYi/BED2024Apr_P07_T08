@@ -9,7 +9,6 @@ const commentController = require('./controllers/commentController');
 const reviewController = require('./controllers/reviewController');
 const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
-const lecturerController = require('./controllers/lecturerController');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -64,13 +63,6 @@ app.get('/lectures/:id' , lectureController.getLectureByID);
 app.put('/lectures/:id', lectureController.updateLecture);
 app.post('/lectures', lectureController.createLecture); 
 app.delete('/lectures/:id', lectureController.deleteLecture);
-
-// Add Routes for lecturer
-app.get('/lecturer', lecturerController.getAllLecturers);
-app.get('/lecturer/:id' , lecturerController.getLecturerByID);
-app.put('/lecturer/:id', lecturerController.updateLecturer);
-app.post('/lecturer', lecturerController.createLecturer); 
-app.delete('/lecturer/:id', lecturerController.deleteLecturer);
 
 
 app.listen(port, async () => {

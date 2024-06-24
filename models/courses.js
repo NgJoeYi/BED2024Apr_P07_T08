@@ -127,8 +127,9 @@ class Courses {
             request.input("CourseImage", sql.VarBinary, newCourseData.courseImage);
     
             const result = await request.query(sqlQuery);
+            const newCourseID = result.recordset[0].CourseID;
     
-            return await this.getCourseById(result.recordset[0].CourseID);
+            return newCourseID;
         } catch (error) {
             console.error('Error creating course:', error);
             throw error;

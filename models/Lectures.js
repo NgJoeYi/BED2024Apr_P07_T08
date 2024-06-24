@@ -138,8 +138,9 @@ class Lectures{
             // request.input('createdAt' , sql.DateTime,newLectureData.createdAt);
 
             const result = await request.query(sqlQuery);
-
-            return await this.getLectureByID(result.recordset[0].LectureID);
+            const newLectureID = result.recordset[0].LectureID;
+    
+            return newLectureID;
 
         }catch(error){
             console.error("Error creating lecture: ", error);
