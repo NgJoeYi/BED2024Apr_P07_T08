@@ -179,6 +179,11 @@ function postReview() {
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
     const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
 
+    if (!reviewText || !rating || !userId) {
+        alert('Please log in or sign up to add reviews.');
+        return;
+    }
+
     fetch('http://localhost:3000/reviews', {
         method: 'POST',
         headers: {
@@ -186,13 +191,21 @@ function postReview() {
         },
         body: JSON.stringify({ review_text: reviewText, rating: rating, userId: userId }) // Include userId
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text) });
+        }
+        return response.json();
+    })
     .then(data => {
         alert(data.message);
         closePopup();
         fetchReviews();
     })
-    .catch(error => console.error('Error posting review:', error));
+    .catch(error => {
+        console.error('Error posting review:', error);
+        alert(`Error posting review: ${error.message}`);
+    });
 }
 
 function editReview(button) {
