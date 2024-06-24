@@ -1,15 +1,14 @@
-// Initialize the selected role as 'student' and set the button active
+// JavaScript for capturing role selection and submitting registration form
+
+// Initialize the selected role as 'student'
 let selectedRole = 'student';
-document.getElementById('student-btn').classList.add('active'); 
 
 // Function to handle role button click
 function handleRoleButtonClick(role) {
     selectedRole = role;
-    // Remove 'active' class from both buttons
-    document.getElementById('lecturer-btn').classList.remove('active');
-    document.getElementById('student-btn').classList.remove('active');
-    // Add 'active' class to the selected button
-    document.getElementById(`${role}-btn`).classList.add('active');
+    // Add or remove 'active' class to visually indicate the selected role
+    document.getElementById('lecturer-btn').classList.toggle('active', role === 'lecturer');
+    document.getElementById('student-btn').classList.toggle('active', role === 'student');
 }
 
 // Add event listeners to role buttons

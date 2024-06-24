@@ -80,6 +80,153 @@ function filterImages(category) {
 }
 
 // Feature 4: Username editing functionality in account.html
+// document.getElementById('edit-icon').addEventListener('click', function() {
+//   const editAccountDetails = document.getElementById('edit-account-details');
+//   editAccountDetails.style.display = editAccountDetails.style.display === 'none' || editAccountDetails.style.display === '' ? 'block' : 'none';
+// });
+
+// document.getElementById('save-changes').addEventListener('click', function() {
+//   const newUsername = document.getElementById('edit-name').value;
+//   const newBirthDate = document.getElementById('edit-birth-date').value;
+//   const newEmail = document.getElementById('edit-email').value;
+  
+//   // Update the profile info
+//   document.querySelector('.profile-info .user-name').textContent = newUsername;
+
+//   // Update all elements with the class 'user-name' in reviews and comments
+//   document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
+//     element.textContent = newUsername;
+//   });
+
+//   // Hide the edit section
+//   document.getElementById('edit-account-details').style.display = 'none';
+// });
+
+
+// Feature 5: Popup functionality
+// Define the popup functions outside the conditional block
+function openPopup() {
+  if (document.querySelectorAll('.popup').length > 0) {
+    document.querySelector(".popup").style.display = "block";
+  }
+}
+
+function closePopup() {
+  if (document.querySelectorAll('.popup').length > 0) {
+    document.querySelector(".popup").style.display = "none";
+  }
+}
+
+if (document.querySelectorAll('.popup').length > 0) {
+  window.addEventListener("load", function() {
+    setTimeout(function() {
+      openPopup();
+    }, 2000);
+  });
+
+  document.querySelector("#close").addEventListener("click", function() {
+    closePopup();
+  });
+}
+
+// Feature 6 : Account.html multiple carousels on a page 
+function createCarousel(carouselId) {
+  let slideIndex = 0;
+
+  function showSlides() {
+    const carousel = document.getElementById(carouselId);
+    const slides = carousel.getElementsByClassName("course");
+    const totalSlides = slides.length;
+    const slidesToShow = 3;
+
+    for (let i = 0; i < totalSlides; i++) {
+      slides[i].style.display = "none";
+    }
+
+    for (let i = slideIndex; i < slideIndex + slidesToShow; i++) {
+      if (i < totalSlides) {
+        slides[i].style.display = "block";
+      }
+    }
+  }
+
+  function nextSlide(n) {
+    const carousel = document.getElementById(carouselId);
+    const slides = carousel.getElementsByClassName("course");
+    const totalSlides = slides.length;
+    const slidesToShow = 3;
+
+    slideIndex += n;
+
+    if (slideIndex >= totalSlides - slidesToShow + 1) {
+      slideIndex = totalSlides - slidesToShow;
+    }
+
+    if (slideIndex < 0) {
+      slideIndex = 0;
+    }
+
+    showSlides();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    showSlides();
+  });
+
+  return nextSlide;
+}
+
+const changeSlide1 = createCarousel('carousel1');
+const changeSlide2 = createCarousel('carousel2');
+
+function changeSlide(carouselId, n) {
+  if (carouselId === 'carousel1') {
+    changeSlide1(n);
+  } else if (carouselId === 'carousel2') {
+    changeSlide2(n);
+  }
+}
+
+// Feature 7 : Account.html confirm logout and delete account
+function confirmLogout() {
+  const userConfirmed = confirm('Are you sure you want to log out?');
+  if (userConfirmed) {
+    // User clicked "OK"
+    alert('You are logged out.');
+    // Add your logout logic here
+  } else {
+    // User clicked "Cancel"
+    alert('Logout cancelled.');
+  }
+}
+
+function confirmDeleteAccount() {
+  const userConfirmed = confirm('Are you sure you want to delete your account?');
+  if (userConfirmed) {
+    // User clicked "OK"
+    alert('Your account is deleted.');
+    // Add your account deletion logic here
+  } else {
+    // User clicked "Cancel"
+    alert('Account deletion cancelled.');
+  }
+}
+function confirmCancel() {
+  const userConfirmed = confirm('Are you sure you want to Cancel?');
+  if (userConfirmed) {
+    // User clicked "OK"
+    alert('Upload cancelled.');
+    // Add your logout logic here
+  } else {
+    // User clicked "Cancel"
+    alert('Continue uploading course.');
+  }
+}
+
+
+// --------------- edit and delete account 
+
+// populate data to make it a prefilled form and ready to be editted but does not update in db yet
 document.addEventListener('DOMContentLoaded', async function () {
   const userId = sessionStorage.getItem('userId');
   
@@ -302,189 +449,32 @@ async function deleteReview(reviewId) {
   }
 }
 
-// Edit review function to open the modal
+// Edit review function
 function editReview(reviewId, currentText, currentRating) {
-  openEditReviewModal(reviewId, currentText, currentRating);
-}
-
-// Function to open the edit review modal
-function openEditReviewModal(reviewId, currentText, currentRating) {
-  const modal = document.getElementById('editReviewModal');
-  modal.style.display = 'block';
-
-  document.getElementById('editReviewText').value = currentText;
-
-  // Set the selected rating
-  const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
-  stars.forEach((star, index) => {
-    star.classList.remove('selected');
-    if (index < currentRating) {
-      star.classList.add('selected');
-    }
-  });
-
-  // Add event listener to save button
-  document.getElementById('submitEditedReview').onclick = function () {
-    submitEditedReview(reviewId);
-  };
-}
-
-// Function to close the edit review modal
-function closeEditReviewModal() {
-  const modal = document.getElementById('editReviewModal');
-  modal.style.display = 'none';
-}
-
-// Function to submit the edited review
-async function submitEditedReview(reviewId) {
-  const newText = document.getElementById('editReviewText').value;
-  const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
-
+  const newText = prompt('Enter new review text:', currentText);
+  const newRating = parseInt(prompt('Enter new rating (1-5):', currentRating), 10);
   if (newText && newRating >= 1 && newRating <= 5) {
-    try {
-      const response = await fetch(`/reviews/${reviewId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ review_text: newText, rating: newRating, userId: sessionStorage.getItem('userId') })
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update review');
-      }
-      alert('Review updated successfully');
-      closeEditReviewModal();
-      fetchAndDisplayReviews(); // Refresh the reviews
-    } catch (error) {
-      console.error('Error updating review:', error);
-    }
+    updateReview(reviewId, newText, newRating);
   } else {
     alert('Invalid input');
   }
 }
 
-// Add click event listeners to stars for rating selection in modal
-document.querySelectorAll('#editReviewModal .stars .fa-star').forEach((star, index) => {
-  star.addEventListener('click', function () {
-    const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
-    stars.forEach((s, i) => {
-      if (i <= index) {
-        s.classList.add('selected');
-      } else {
-        s.classList.remove('selected');
-      }
+async function updateReview(reviewId, reviewText, rating) {
+  try {
+    const response = await fetch(`/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ review_text: reviewText, rating: rating, userId: sessionStorage.getItem('userId') })
     });
-  });
-
-  star.addEventListener('mouseover', function () {
-    const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
-    stars.forEach((s, i) => {
-      if (i <= index) {
-        s.classList.add('hover');
-      } else {
-        s.classList.remove('hover');
-      }
-    });
-  });
-
-  star.addEventListener('mouseout', function () {
-    const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
-    stars.forEach(s => {
-      s.classList.remove('hover');
-    });
-  });
-});
-
-// Feature 6 : Account.html multiple carousels on a page 
-function createCarousel(carouselId) {
-  let slideIndex = 0;
-
-  function showSlides() {
-    const carousel = document.getElementById(carouselId);
-    const slides = carousel.getElementsByClassName("course");
-    const totalSlides = slides.length;
-    const slidesToShow = 3;
-
-    for (let i = 0; i < totalSlides; i++) {
-      slides[i].style.display = "none";
+    if (!response.ok) {
+      throw new Error('Failed to update review');
     }
-
-    for (let i = slideIndex; i < slideIndex + slidesToShow; i++) {
-      if (i < totalSlides) {
-        slides[i].style.display = "block";
-      }
-    }
-  }
-
-  function nextSlide(n) {
-    const carousel = document.getElementById(carouselId);
-    const slides = carousel.getElementsByClassName("course");
-    const totalSlides = slides.length;
-    const slidesToShow = 3;
-
-    slideIndex += n;
-
-    if (slideIndex >= totalSlides - slidesToShow + 1) {
-      slideIndex = totalSlides - slidesToShow;
-    }
-
-    if (slideIndex < 0) {
-      slideIndex = 0;
-    }
-
-    showSlides();
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    showSlides();
-  });
-
-  return nextSlide;
-}
-
-const changeSlide1 = createCarousel('carousel1');
-const changeSlide2 = createCarousel('carousel2');
-
-function changeSlide(carouselId, n) {
-  if (carouselId === 'carousel1') {
-    changeSlide1(n);
-  } else if (carouselId === 'carousel2') {
-    changeSlide2(n);
-  }
-}
-
-// Feature 7 : Account.html confirm logout and delete account
-function confirmLogout() {
-  const userConfirmed = confirm('Are you sure you want to log out?');
-  if (userConfirmed) {
-    // User clicked "OK"
-    alert('You are logged out.');
-    // Add your logout logic here
-  } else {
-    // User clicked "Cancel"
-    alert('Logout cancelled.');
-  }
-}
-
-function confirmDeleteAccount() {
-  const userConfirmed = confirm('Are you sure you want to delete your account?');
-  if (userConfirmed) {
-    // User clicked "OK"
-    alert('Your account is deleted.');
-    // Add your account deletion logic here
-  } else {
-    // User clicked "Cancel"
-    alert('Account deletion cancelled.');
-  }
-}
-function confirmCancel() {
-  const userConfirmed = confirm('Are you sure you want to Cancel?');
-  if (userConfirmed) {
-    // User clicked "OK"
-    alert('Upload cancelled.');
-    // Add your logout logic here
-  } else {
-    // User clicked "Cancel"
-    alert('Continue uploading course.');
+    alert('Review updated successfully');
+    fetchAndDisplayReviews(); // Refresh the reviews
+  } catch (error) {
+    console.error('Error updating review:', error);
   }
 }
