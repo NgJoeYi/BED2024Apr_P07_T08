@@ -49,8 +49,8 @@ async function run() {
         CREATE TABLE ProfilePic (
             pic_id INT PRIMARY KEY IDENTITY,
             user_id INT NOT NULL UNIQUE,
-            FOREIGN KEY (user_id) REFERENCES Users(id),
-            img VARCHAR(MAX) NOT NULL
+            img VARCHAR(MAX) NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES Users(id)
         );
 
         CREATE TABLE Discussions (

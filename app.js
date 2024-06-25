@@ -10,6 +10,8 @@ const reviewController = require('./controllers/reviewController');
 const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
 const lecturerController = require('./controllers/lecturerController');
+const userValidation = require('./middleware/userValidation');
+const passwordValidation = require('./middleware/passwordValidation');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,10 +32,10 @@ app.get('/account', (req, res) => {
 });
 
 // Add Routes for users
-app.post('/users/register', userController.createUser);
+app.put('/account/:id', passwordValidation, userController.updateUser);
+app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
-app.put('/account/:id', userController.updateUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);

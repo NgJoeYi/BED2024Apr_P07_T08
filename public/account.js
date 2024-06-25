@@ -224,7 +224,7 @@ function confirmCancel() {
 }
 
 
-// --------------- edit and delete account 
+// ---------------------------------------------- EDIT ACCOUNT ----------------------------------------------
 
 // populate data to make it a prefilled form and ready to be editted but does not update in db yet
 document.addEventListener('DOMContentLoaded', async function () {
@@ -276,19 +276,21 @@ document.addEventListener('DOMContentLoaded', async function () {
     
     const currentPassword = document.getElementById('current-password').value;
     const newPassword = document.getElementById('edit-password').value;
-    const confirmPassword = document.getElementById('edit-confirm-password').value;
+    const confirmNewPassword = document.getElementById('edit-confirm-password').value;
     
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== confirmNewPassword) {
       alert('New passwords do not match');
       return;
     }
-    
+
     const updatedUserData = {
       name: document.getElementById('edit-name').value,
       dob: document.getElementById('edit-birth-date').value,
       email: document.getElementById('edit-email').value,
       currentPassword: currentPassword,
-      newPassword: newPassword
+      newPassword: newPassword,
+      confirmNewPassword: confirmNewPassword 
+
     };
     
     try {
@@ -322,6 +324,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
 });
+
+
+
+
+// ---------------------------------------------- EDIT AND DELETE REVIEWS ----------------------------------------------
 
 // Fetch and display reviews
 async function fetchAndDisplayReviews() {
