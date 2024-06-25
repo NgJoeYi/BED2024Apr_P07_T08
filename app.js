@@ -12,6 +12,7 @@ const lectureController = require('./controllers/lectureController');
 const lecturerController = require('./controllers/lecturerController');
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
+const deleteValidation = require('./middleware/deleteValidation');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -36,7 +37,7 @@ app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
-app.delete('/account/:id', userController.deleteUser);
+app.delete('/account/:id', deleteValidation, userController.deleteUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);

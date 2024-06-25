@@ -87,10 +87,17 @@ const updateUser = async (req, res) => {
 // after implementing the basics i want to prompt user to enter password before account is actually deleted
 const deleteUser = async (req, res) => {
     const userId = parseInt(req.params.id);
+    const passwordInput = req.body;
     try {
         const checkUser = await User.getUserById(userId);
         if (!checkUser) {
             return res.status(404).send('User does not exist');
+        }
+
+        // compare current password and the password in the database 
+        const isPasswordMatch = await bcrypt.compare(passwordInput.password, checkUser.password);
+        if (!isPasswordMatch) {
+            return res.status(400).json({ message: 'Password is incorrect' });
         }
 
         await User.deleteUser(userId);
