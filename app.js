@@ -11,7 +11,7 @@ const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
 const lecturerController = require('./controllers/lecturerController');
 const userValidation = require('./middleware/userValidation');
-const passwordValidation = require('./middleware/passwordValidation');
+const updateValidation = require('./middleware/updateValidation');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -32,10 +32,11 @@ app.get('/account', (req, res) => {
 });
 
 // Add Routes for users
-app.put('/account/:id', passwordValidation, userController.updateUser);
+app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
+app.delete('/account/:id', userController.deleteUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);

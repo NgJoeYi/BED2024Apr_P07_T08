@@ -84,9 +84,27 @@ const updateUser = async (req, res) => {
     }
 };
 
+// after implementing the basics i want to prompt user to enter password before account is actually deleted
+const deleteUser = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    try {
+        const checkUser = await User.getUserById(userId);
+        if (!checkUser) {
+            return res.status(404).send('User does not exist');
+        }
+
+        await User.deleteUser(userId);
+        res.status(200).send('User successfully deleted');
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).send('Server error');
+    }
+};
+
 module.exports = {
     getUserById,
     createUser,
     loginUser,
-    updateUser
+    updateUser,
+    deleteUser
 };
