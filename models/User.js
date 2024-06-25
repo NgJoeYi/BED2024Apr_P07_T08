@@ -163,7 +163,7 @@ class User {
         }
     }
 
-    // add bcrypt  to compare password either here or constructor 
+    // add bcrypt  to compare password either here or controller -- did it in controller 
     //and app.js -- done but not tested
     static async deleteUser(userId) {
         let connection;
