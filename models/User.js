@@ -163,6 +163,8 @@ class User {
         }
     }
 
+    // add bcrypt  to compare password either here or constructor 
+    //and app.js -- done but not tested
     static async deleteUser(userId) {
         let connection;
         try {
