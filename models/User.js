@@ -169,7 +169,7 @@ class User {
             connection = await sql.connect(dbConfig);
             const sqlQuery = 
             `
-            DELETE * FROM Users WHERE id=@userId
+            DELETE FROM Users WHERE id=@userId
             `;
             const request = connection.request();
             request.input('userId', userId);
