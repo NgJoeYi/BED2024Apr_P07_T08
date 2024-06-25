@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const validatePassword = (req, res, next) => {
+const updateValidation = (req, res, next) => {
     const schema = Joi.object({
         name: Joi.string().min(3).max(50).required(),
         dob: Joi.date().required(),
@@ -18,8 +18,8 @@ const validatePassword = (req, res, next) => {
         return res.status(400).json({ message: "Validation error", errors });
     }
 
-    console.log('Request body:', req.body);
+    //console.log('Request body:', req.body);
     next();
 };
 
-module.exports = validatePassword;
+module.exports = updateValidation;
