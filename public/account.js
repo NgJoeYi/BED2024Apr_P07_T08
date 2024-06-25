@@ -276,19 +276,21 @@ document.addEventListener('DOMContentLoaded', async function () {
     
     const currentPassword = document.getElementById('current-password').value;
     const newPassword = document.getElementById('edit-password').value;
-    const confirmPassword = document.getElementById('edit-confirm-password').value;
+    const confirmNewPassword = document.getElementById('edit-confirm-password').value;
     
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== confirmNewPassword) {
       alert('New passwords do not match');
       return;
     }
-    
+
     const updatedUserData = {
       name: document.getElementById('edit-name').value,
       dob: document.getElementById('edit-birth-date').value,
       email: document.getElementById('edit-email').value,
       currentPassword: currentPassword,
-      newPassword: newPassword
+      newPassword: newPassword,
+      confirmNewPassword: confirmNewPassword 
+
     };
     
     try {
@@ -322,29 +324,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
 });
-
-function previewImage(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-
-  reader.onload = function() {
-    const profilePicElements = document.querySelectorAll('.profile-pic');
-    profilePicElements.forEach((profilePic) => {
-      profilePic.src = reader.result;
-    });
-  };
-
-  if (file) {
-    reader.readAsDataURL(file);
-  }
-}
-
-// Function to trigger the file input click
-function triggerFileInput() {
-  const fileInput = document.getElementById('file-input');
-  fileInput.click();
-}
-
 
 
 
