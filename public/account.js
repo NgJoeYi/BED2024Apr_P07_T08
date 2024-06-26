@@ -328,6 +328,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 // ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
 // Function to confirm account deletion
 function confirmDeleteAccount() {
+  const userId = sessionStorage.getItem('userId');
+  
+  if (!userId) {
+    alert('No user is logged in');
+    return;
+  }
+
   document.getElementById('deleteModal').style.display = 'block';
 }
 
