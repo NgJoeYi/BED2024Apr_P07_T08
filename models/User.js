@@ -162,6 +162,33 @@ class User {
             }
         }
     }
+
+    // add bcrypt  to compare password either here or controller -- did it in controller 
+    //and app.js -- done but not tested
+    static async deleteUser(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = 
+            `
+            DELETE FROM Users WHERE id=@userId
+            `;
+            const request = connection.request();
+            request.input('userId', userId);
+            const results = await request.query(sqlQuery);
+            if (results.rowsAffected[0] === 0) {
+                throw new Error("User not deleted");
+            }
+            return results.rowsAffected[0] > 0; //returns true 
+        } catch(error) {
+            console.error('Error deleting user:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 }
 
 module.exports = User;

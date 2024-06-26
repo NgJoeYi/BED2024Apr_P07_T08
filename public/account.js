@@ -200,17 +200,17 @@ function confirmLogout() {
   }
 }
 
-function confirmDeleteAccount() {
-  const userConfirmed = confirm('Are you sure you want to delete your account?');
-  if (userConfirmed) {
-    // User clicked "OK"
-    alert('Your account is deleted.');
-    // Add your account deletion logic here
-  } else {
-    // User clicked "Cancel"
-    alert('Account deletion cancelled.');
-  }
-}
+// function confirmDeleteAccount() {
+//   const userConfirmed = confirm('Are you sure you want to delete your account?');
+//   if (userConfirmed) {
+//     // User clicked "OK"
+//     alert('Your account is deleted.');
+//     // Add your account deletion logic here
+//   } else {
+//     // User clicked "Cancel"
+//     alert('Account deletion cancelled.');
+//   }
+// }
 function confirmCancel() {
   const userConfirmed = confirm('Are you sure you want to Cancel?');
   if (userConfirmed) {
@@ -224,7 +224,7 @@ function confirmCancel() {
 }
 
 
-// --------------- edit and delete account 
+// ---------------------------------------------- EDIT ACCOUNT ----------------------------------------------
 
 // populate data to make it a prefilled form and ready to be editted but does not update in db yet
 document.addEventListener('DOMContentLoaded', async function () {
@@ -276,19 +276,21 @@ document.addEventListener('DOMContentLoaded', async function () {
     
     const currentPassword = document.getElementById('current-password').value;
     const newPassword = document.getElementById('edit-password').value;
-    const confirmPassword = document.getElementById('edit-confirm-password').value;
+    const confirmNewPassword = document.getElementById('edit-confirm-password').value;
     
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== confirmNewPassword) {
       alert('New passwords do not match');
       return;
     }
-    
+
     const updatedUserData = {
       name: document.getElementById('edit-name').value,
       dob: document.getElementById('edit-birth-date').value,
       email: document.getElementById('edit-email').value,
       currentPassword: currentPassword,
-      newPassword: newPassword
+      newPassword: newPassword,
+      confirmNewPassword: confirmNewPassword 
+
     };
     
     try {
@@ -322,6 +324,61 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
 });
+
+// ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
+// Function to confirm account deletion
+function confirmDeleteAccount() {
+  document.getElementById('deleteModal').style.display = 'block';
+}
+
+// Function to close the delete modal
+function closeDeleteModal() {
+  document.getElementById('deleteModal').style.display = 'none';
+}
+
+// Function to delete account with password authorization
+async function deleteAccount() {
+  const userId = sessionStorage.getItem('userId');
+  const password = document.getElementById('delete-password').value;
+
+  if (!userId) {
+    alert('No user is logged in');
+    return;
+  }
+
+  if (!password) {
+    alert('Please enter your password');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/account/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ password: password })
+    });
+
+    if (response.ok) {
+      alert('Account deleted successfully');
+      sessionStorage.removeItem('userId');
+      window.location.href = 'Index.html';
+    } else {
+      const errorData = await response.json();
+      alert(`Error deleting account: ${errorData.message}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    closeDeleteModal();
+  }
+}
+
+
+
+
+// ---------------------------------------------- EDIT AND DELETE REVIEWS ----------------------------------------------
 
 // Fetch and display reviews
 async function fetchAndDisplayReviews() {

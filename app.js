@@ -10,6 +10,9 @@ const reviewController = require('./controllers/reviewController');
 const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
 const lecturerController = require('./controllers/lecturerController');
+const userValidation = require('./middleware/userValidation');
+const updateValidation = require('./middleware/updateValidation');
+const deleteValidation = require('./middleware/deleteValidation');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,10 +33,11 @@ app.get('/account', (req, res) => {
 });
 
 // Add Routes for users
-app.post('/users/register', userController.createUser);
+app.put('/account/:id', updateValidation, userController.updateUser);
+app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
-app.put('/account/:id', userController.updateUser);
+app.delete('/account/:id', deleteValidation, userController.deleteUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
@@ -57,9 +61,11 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 // Add Routes for courses
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id' , courseController.getCoursesById);
+app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', courseController.createCourse); 
 app.delete('/courses/:id', courseController.deleteCourse);
+
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures);

@@ -39,9 +39,13 @@
   <div class="profile-card">
     <div class="profile-content">
       <div class="profile-header">
-        <div class="profile-image">
-          <img src="images/profilePic.jpeg" alt="Profile Image">
+        
+        <div class="profile-image-container">
+          <img src="images/profilePic.jpeg" alt="Profile Image" id="profile-pic" class="profile-pic">
+          <div class="plus-sign" onclick="triggerFileInput()">+</div>
+          <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="previewImage(event)">
         </div>
+
         <div class="profile-info">
           <h2 class="user-name">User</h2>
           <input type="text" class="username-input" id="username-input" value="" style="display: none;">
@@ -85,7 +89,7 @@
     <div class="courses-container">
       <a class="account-prev" onclick="changeSlide('carousel1', -1)">&#10094;</a>
         <div class="course">
-          <img src="images/profilePic.jpeg" alt="course1">
+          <img src="images/profilePic.jpeg" alt="Profile Image" id="profile-pic" class="profile-pic">
           <p class="title">Title: I LOVE BED</p>
           <p class="rating">Rating:
             <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
@@ -112,7 +116,7 @@
           </p>
         </div>
         <div class="course">
-          <img src="images/profilePic.jpeg" alt="course1">
+          <img src="images/profilePic.jpeg" alt="Profile Image" id="profile-pic" class="profile-pic">
           <p class="title">Title: I LOVE BED</p>
           <p class="rating">Rating:
             <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
@@ -162,7 +166,7 @@
     <div class="courses-container">
       <a class="account-prev" onclick="changeSlide('carousel2', -1)">&#10094;</a>
         <div class="course">
-          <img src="images/profilePic.jpeg" alt="course1">
+          <img src="images/profilePic.jpeg" alt="Profile Image" id="profile-pic" class="profile-pic">
           <p class="title">Title: I LOVE BED</p>
           <p class="rating">Rating:
             <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
@@ -189,7 +193,7 @@
           </p>
         </div>
         <div class="course">
-          <img src="images/profilePic.jpeg" alt="course1">
+          <img src="images/profilePic.jpeg" alt="Profile Image" id="profile-pic" class="profile-pic">
           <p class="title">Title: I LOVE BED</p>
           <p class="rating">Rating:
             <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
@@ -285,6 +289,22 @@
 </div>
 
 
+
+
+
+  <!-- Confirmation modal for account deletion with password -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeDeleteModal()">&times;</span>
+      <h2>Confirm Account Deletion</h2>
+      <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+      <label for="delete-password">Enter your password:</label>
+      <input type="password" id="delete-password" required>
+      <button onclick="deleteAccount()">Yes, Delete</button>
+      <button onclick="closeDeleteModal()">Cancel</button>
+    </div>
+  </div>
+
   <div class="ending-buttons">
     <button class="ending-buttons logout-btn" onclick="confirmLogout()">Log Out</button>
     <button class="ending-buttons delete-btn" onclick="confirmDeleteAccount()">Delete Account</button>
@@ -313,7 +333,7 @@
       </ul>
     </div>
     <div class="row">
-      SATURDAY Copyright © 2024 Saturday.- All rights reserved 
+      EduHelper Copyright © 2024 Saturday.- All rights reserved 
     </div>
   </div>
 </footer>
