@@ -453,6 +453,8 @@ async function deleteAccount() {
 
 
 
+
+
 // ---------------------------------------------- EDIT AND DELETE REVIEWS ----------------------------------------------
 
 // Fetch and display reviews
@@ -528,8 +530,8 @@ async function fetchAndDisplayReviews() {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn delete-btn';
       deleteBtn.textContent = 'Delete';
-      deleteBtn.addEventListener('click', () => deleteReview(review.review_id)); // Add event listener
-
+      deleteBtn.addEventListener('click', () => openDeleteModal(review.review_id)); // Add event listener
+      
       const editBtn = document.createElement('button');
       editBtn.className = 'btn edit-btn';
       editBtn.textContent = 'Edit';
@@ -561,9 +563,25 @@ async function fetchAndDisplayReviews() {
 // Call the function to fetch and display reviews
 fetchAndDisplayReviews();
 
-// Delete review function
+
+function openDeleteModal(reviewId) {
+  console.log('Opening delete modal for review:', reviewId); // Debugging
+  document.getElementById('deleteReviewModal').style.display = 'block';
+
+  // Ensure we set the correct onclick handler each time the modal is opened
+  document.getElementById('confirmReviewDelete').onclick = function () {
+    deleteReview(reviewId);
+  };
+}
+
+function closeDeleteModal() {
+  console.log('Closing delete modal'); // Debugging
+  document.getElementById('deleteReviewModal').style.display = 'none';
+}
+
 async function deleteReview(reviewId) {
   try {
+    console.log(`Attempting to delete review with ID: ${reviewId}`); // Debugging
     const response = await fetch(`/reviews/${reviewId}`, {
       method: 'DELETE',
       headers: {
@@ -571,15 +589,25 @@ async function deleteReview(reviewId) {
       },
       body: JSON.stringify({ userId: sessionStorage.getItem('userId') })
     });
+    
     if (!response.ok) {
       throw new Error('Failed to delete review');
     }
+    
+    const result = await response.json();
+    console.log('Server response:', result); // Debugging
+
     alert('Review deleted successfully');
+    closeDeleteModal(); // Close the modal after deletion
     fetchAndDisplayReviews(); // Refresh the reviews
   } catch (error) {
     console.error('Error deleting review:', error);
+    alert('Error deleting review: ' + error.message);
   }
 }
+
+
+
 
 // Edit review function to open the modal
 function editReview(reviewId, currentText, currentRating) {
@@ -744,8 +772,8 @@ function addUserDiscussionToFeed(discussion) {
       <p>${discussion.description}</p>
     </div>
     <div class="post-footer">
-      <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
       <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
+      <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
     </div>
   `;
 
@@ -799,33 +827,45 @@ async function saveEdit(discussionId) {
 
 // Delete Modal functions
 function openDeleteModal(discussionId) {
-  document.getElementById('deleteModal').style.display = 'block';
+  console.log('Opening delete modal for discussion ID:', discussionId);
+  document.getElementById('deleteDiscussionModal').style.display = 'block';
 
-  document.getElementById('confirmDelete').onclick = function () {
+  // Attach the onclick event to the confirm delete button
+  const confirmButton = document.getElementById('confirmDelete');
+  confirmButton.onclick = function () {
+    console.log('Confirm delete clicked for discussion ID:', discussionId);
     deleteDiscussion(discussionId);
   };
 }
 
 function closeDeleteModal() {
-  document.getElementById('deleteModal').style.display = 'none';
+  console.log('Closing delete modal');
+  document.getElementById('deleteDiscussionModal').style.display = 'none';
 }
 
 async function deleteDiscussion(discussionId) {
   try {
+    const userId = getCurrentUserId();
+    console.log('Deleting discussion with ID:', discussionId, 'for user ID:', userId);
+
     const response = await fetch(`/discussions/${discussionId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userId: getCurrentUserId() })
+      body: JSON.stringify({ userId: userId })
     });
+
     if (!response.ok) {
-      throw new Error('Failed to delete discussion');
+      const errorText = await response.text();
+      throw new Error(`Failed to delete discussion: ${errorText}`);
     }
+
     alert('Discussion deleted successfully');
     fetchUserDiscussions();
     closeDeleteModal();
   } catch (error) {
     console.error('Error deleting discussion:', error);
+    alert('Error deleting discussion: ' + error.message);
   }
 }

@@ -674,24 +674,25 @@
   display: flex;
   flex-direction: column;
   color: #666666;
-  font-size: 20px;
+  font-size: 15px;
   margin-bottom: 10px;
 }
 
-.category {
+.category-discussion {
   color: #888888;
 }
 
-.posted-date-activity {
+.posted-date-activity-dis {
   color: #888888;
   margin-top: 5px;
+  float: left;
 }
 
 /* Content of the post */
-.post-content p{
+.post-content-dis p{
     margin-top: 10px;
     color: #546e7a;
-    font-size: 24px;
+    font-size: 20px;
 }
 
 /* Footer for the post */
@@ -699,6 +700,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 10px;
 }
 
 .likes-dislikes {
@@ -734,7 +736,7 @@
 
 
 
-/* filter css in bag.html side  */
+/* filter css in course.html side  */
 
 .activity-feed {
   padding: 30px;
@@ -813,16 +815,18 @@
 
 /* Popup Styles */
 /* General Popup/Modal Styles */
+
 .popup {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 9999; /* Sit on top */
   left: 0;
-  top: 0;
+  top: 80px;
+  float: center;
   width: 100%; /* Full width */
   height: 100%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  
 }
 
 /* Popup/Modal Content */

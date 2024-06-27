@@ -1,6 +1,7 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
+// Fetch all discussions
 const getDiscussions = async (req, res) => {
     try {
         const category = req.query.category;
@@ -32,6 +33,24 @@ const getDiscussions = async (req, res) => {
     }
 };
 
+// Fetch a specific discussion by ID
+const getDiscussionById = async (req, res) => {
+    const discussionId = req.params.id;
+
+    try {
+        const result = await sql.query`SELECT d.*, u.name as username FROM Discussions d JOIN Users u ON d.user_id = u.id WHERE d.id = ${discussionId}`;
+        if (result.recordset.length > 0) {
+            res.json(result.recordset[0]);
+        } else {
+            res.status(404).json({ error: 'Discussion not found' });
+        }
+    } catch (err) {
+        console.error('Error fetching discussion details:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Create a new discussion
 const createDiscussion = async (req, res) => {
     try {
         if (!req.body.userId) {
@@ -80,6 +99,7 @@ const createDiscussion = async (req, res) => {
     }
 };
 
+// Increment likes for a discussion
 const incrementLikes = async (req, res) => {
     try {
         const { discussionId } = req.body;
@@ -100,6 +120,7 @@ const incrementLikes = async (req, res) => {
     }
 };
 
+// Increment dislikes for a discussion
 const incrementDislikes = async (req, res) => {
     try {
         const { discussionId } = req.body;
@@ -170,8 +191,6 @@ const updateDiscussion = async (req, res) => {
     }
 };
 
-
-
 // Delete discussion
 const deleteDiscussion = async (req, res) => {
     try {
@@ -193,6 +212,7 @@ const deleteDiscussion = async (req, res) => {
 
 module.exports = {
     getDiscussions,
+    getDiscussionById, // Ensure this is included in the exports
     getDiscussionsByUser,
     createDiscussion,
     incrementLikes,
