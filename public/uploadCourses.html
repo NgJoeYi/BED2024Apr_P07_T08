@@ -36,22 +36,19 @@
   </nav>
 </header>
 <div class="course-container">
-  <div class="course-name">
-      <span class = "upload-course-title">Course Name :</span>
-      <p>I LOVE BED</p>
-      <span class="edit-icon">
-        <i class="fa-solid fa-pencil" style="color: #030303;"></i>
+  <div class="course-name" id="course-name">
+      <span class = "upload-course-title" contenteditable="false">Course Name :</span>
+      <p id = "course-name" contenteditable="true">I LOVE BED</p>
+      <span class="edit-icon" contenteditable="false">
+        <i class="fa-solid fa-pencil" style="color: #030303;" onclick="enableEditing('course-name')"></i>
       </span>
   </div>
-  <div class="course-arrangement">
-    <span class = "upload-course-title">Course Arrangement :</span>
-    <div class="chapter">
-      <p>Chapter Name : Introduction</p>
+  <div class="course-arrangement" id = "course-arrangement">
+    <span class = "upload-course-title" contenteditable="false">Course Arrangement :</span>
+    <div class="chapter" contenteditable="false">
+      <p contenteditable="true">Chapter Name : Introduction</p>
       <span class="edit-icon">
         <i class="fa-solid fa-pencil" style="color: #030303;"></i>
-      </span>
-      <span class="delete-icon">
-        <i class="fa-solid fa-x" style="color: #ff3838;"></i>
       </span>
       <div class="files">
         <div>
@@ -74,9 +71,9 @@
       <button class="new-btn">New</button>
     </div>
   </div>
-  <div class="course-details">
-    <span class = "upload-course-title">Course Details :</span>
-    <p>
+  <div class="course-details" id = "course-details">
+    <span class = "upload-course-title" contenteditable="false">Course Details :</span>
+    <p contenteditable="true">
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
       labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
       Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
@@ -85,9 +82,9 @@
       <i class="fa-solid fa-pencil" style="color: #030303;"></i>
     </span>
   </div>
-  <div class="course-skills-covered">
-    <span class = "upload-course-title">Skills Covered :</span>
-    <p>
+  <div class="course-skills-covered" id = "course-skills-covered">
+    <span class = "upload-course-title" contenteditable="false">Skills Covered :</span>
+    <p contenteditable="true">
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
       labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
       Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
@@ -131,7 +128,7 @@
 
 
 <!--Linking js to html-->
+<script src="UploadCourses.js"></script>
 <script src="Script.js"></script>
-<script src="Link to API & Cart JS/api.js"></script>
 </body>
 </html>

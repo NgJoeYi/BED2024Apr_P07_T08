@@ -15,7 +15,7 @@ const updateValidation = require('./middleware/updateValidation');
 const deleteValidation = require('./middleware/deleteValidation');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001; // CHANGE TO 3000
 
 // Set up the view engine
 app.set('view engine', 'ejs');
