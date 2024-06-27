@@ -52,7 +52,6 @@ document.getElementById('register-form').addEventListener('submit', async functi
             return;
         }
 
-        const result = await response.json();
         alert('Registration successful!');        
         window.location.href = 'Login.html';
     } catch (error) {
