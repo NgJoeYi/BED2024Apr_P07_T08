@@ -41,17 +41,15 @@ const createUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const userLoginData = req.body; // user filled in email and password field
+    const { email, password } = req.body; // user filled in email and password field
     try {
-        // Check if user exists
-        const user = await User.userExists(userLoginData);
-        if (!user) {
-            return res.status(404).send('User does not exist');
-        }
-        const loginSuccess = await User.loginUser(userLoginData);
+        const loginSuccess = await User.loginUser({ email });
         if (!loginSuccess) {
-            console.log('Login failed: Invalid email or password');
             return res.status(404).send('Invalid email or password');
+        }
+        const matchPassword = await bcrypt.compare(password, loginSuccess.password);
+        if (!matchPassword) {
+            return res.status(404).send('Invalid password. Please try again.');
         }
         res.status(200).json(loginSuccess);
     } catch (error) {
@@ -90,7 +88,7 @@ const updateUser = async (req, res) => {
 };
 
 
-// after implementing the basics i want to prompt user to enter password before account is actually deleted
+// after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
 const deleteUser = async (req, res) => {
     const userId = parseInt(req.params.id);
     const passwordInput = req.body;
@@ -121,3 +119,13 @@ module.exports = {
     updateUser,
     deleteUser
 };
+
+// ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
+// 1. hashing the password so if even 2 users have the same password, the hash value is different
+
+// 2. bcrypt.hash(newUserData.newPassword, 10) the 10 in this is the level of security, 
+// the higher the value, the more secure it is because it is the number of times hashing algo is executed
+// it is known as salt rounds
+
+// 3. bcrypt.compare(userLoginData.password, user.password) this bcrypt.compare 
+// compares the plain text password and the hashed password, returns true if match, & false otherwise
