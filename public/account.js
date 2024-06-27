@@ -243,23 +243,27 @@ document.addEventListener('DOMContentLoaded', async function () {
           console.error('Error:', error);
       }
   } else {
-      console.error('No user is logged in');
+    console.error('No user is logged in');
   }
   
   // Toggle visibility for edit account details
   document.getElementById('edit-icon').addEventListener('click', function () {
-      const editAccountDetails = document.getElementById('edit-account-details');
-      if (editAccountDetails.style.display === 'block') {
-          editAccountDetails.style.display = 'none';
-      } else {
-          editAccountDetails.style.display = 'block';
-          
-          // Clear password fields 
-          document.getElementById('current-password').value = ''; 
-          document.getElementById('edit-password').value = '';
-          document.getElementById('edit-confirm-password').value = '';
-      }  
-  });
+    if (!userId) {
+      alert('Please log in first to edit your account details.');
+      return;
+    }
+    const editAccountDetails = document.getElementById('edit-account-details');
+    if (editAccountDetails.style.display === 'block') {
+      editAccountDetails.style.display = 'none';
+    } else {
+      editAccountDetails.style.display = 'block';
+      
+      // Clear password fields 
+      document.getElementById('current-password').value = ''; 
+      document.getElementById('edit-password').value = '';
+      document.getElementById('edit-confirm-password').value = '';
+  }  
+});
   
   // Handle form submission
   document.getElementById('save-changes').addEventListener('click', async function (event) {
