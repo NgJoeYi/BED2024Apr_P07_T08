@@ -45,11 +45,11 @@ const loginUser = async (req, res) => {
     try {
         const loginSuccess = await User.loginUser({ email });
         if (!loginSuccess) {
-            return res.status(404).send('Invalid email or password');
+            return res.status(404).send( { message: 'Invalid email. No user found'} );
         }
         const matchPassword = await bcrypt.compare(password, loginSuccess.password);
         if (!matchPassword) {
-            return res.status(404).send('Invalid password. Please try again.');
+            return res.status(404).json( { message: 'Invalid password. Please try again'} );
         }
         res.status(200).json(loginSuccess);
     } catch (error) {
