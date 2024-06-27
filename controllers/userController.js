@@ -120,13 +120,84 @@ const deleteUser = async (req, res) => {
     }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const uploadProfilePic = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    const { profilePic } = req.body;
+
+    try {
+        const updatedProfilePic = await User.updateProfilePic(userId, profilePic);
+        if (!updatedProfilePic) {
+            return res.status(400).send('Failed to update profile picture');
+        }
+        res.status(200).json(updatedProfilePic);
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).send('Server error');
+    }
+};
+
+
+
+
+const getUserProfile = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    try {
+        const user = await User.getUserById(userId);
+        if (!user) {
+            return res.status(404).send('User does not exist');
+        }
+
+        let profilePic = await User.getProfilePicByUserId(userId);
+        if (!profilePic) {
+            profilePic = 'images/profilePic.jpeg'; // Default profile picture 
+        }
+        res.status(200).json({ user, profilePic });
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).send('Server error');
+    }
+};
+
+
+
+
+
+
+
+
+
 module.exports = {
     getUserById,
     createUser,
     loginUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    uploadProfilePic,
+    getUserProfile
 };
+
 
 // ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
 // 1. hashing the password so if even 2 users have the same password, the hash value is different
