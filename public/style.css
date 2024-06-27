@@ -1,7 +1,6 @@
 /* EDUCATION */
 /* index page  */
 
-
 /* Hero section */
 .hero {
   display: flex;
@@ -194,7 +193,7 @@
   }
   
   form button {
-    background-color: #CD8D7A;
+    background-color: #224574;
     color: white;
     border: none;
     padding: 10px 15px;
@@ -207,6 +206,12 @@
     border-radius: 5px;
     width: 100%;
   }
+
+  form button:hover {
+    background-color: #1b2b40; /* Different shade for active state */
+    border: 2px solid #f0c674; /* Gold border for the active button */
+}
+
   
   .social-login {
     margin-bottom: 10px;
@@ -249,42 +254,45 @@
   }
 
   /* register */
+/* Role buttons */
+/* Role buttons */
+.role-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
 
-   /* Role buttons */
-   .role-buttons {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    width: 100%;
-  }
-  
-  .role-buttons .btn {
-    flex: 1;
-    margin: 0 5px; /* Adjust spacing between buttons */
-    padding: 12px 0;
-    font-size: 16px;
-    border-radius: 25px; /* Fully rounded corners */
-    border: none;
-    color: #fff;
-    background-color: #d88c6d; /* Adjust color as needed */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
-    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .role-buttons .btn:hover {
-    background-color: #bf7356; /* Darker shade for hover effect */
-    transform: translateY(-3px); /* Slight lift on hover */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
-  }
-  
-  /* Style for the active button */
-  .role-buttons .btn.active {
-    background-color: #bf7356; /* Darker shade for active state */
-    border: 2px solid #6c6c6c; /* Add a white border to the active button */
-  }
-  
+.role-buttons .btn {
+  flex: 1;
+  margin: 0 5px; /* Adjust spacing between buttons */
+  padding: 12px 0;
+  font-size: 16px;
+  border-radius: 25px; /* Fully rounded corners */
+  border: none;
+  color: #fff;
+  background-color: #1b2b40; /* Base color */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for elevation */
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.role-buttons .btn:hover {
+  background-color: #163b57; /* Darker shade for hover effect */
+  transform: translateY(-3px); /* Slight lift on hover */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
+}
+
+/* Style for the active button */
+.role-buttons .btn.active {
+  background-color: #224574; /* Different shade for active state */
+  border: 2px solid #f0c674; /* Gold border for the active button */
+}
+
+
+
+
   /* register */
   .reg-container {
     background: transparent;
@@ -328,6 +336,25 @@
   .reg-content form {
     margin-bottom: 20px;
   }
+
+  .reg-content form button {
+    background-color: #224574;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin-top: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .reg-content form button:hover {
+    background-color: #163b57; /* Different shade for active state */
+    border: 2px solid #f0c674; /* Gold border for the active button */
+}
   
   input[type=email], input[type=password], input[type=text] {
     width: 100%;
@@ -483,7 +510,7 @@
     color: white;
     font-size: 16px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: 0.3s ease;
   }
   
   .contact-form button:hover {
@@ -859,7 +886,7 @@
 
 /* Submit Button */
 .upload-button {
-  background-color: #CD8D7A; /* Button color */
+  background-color: #1b2b40; /* Button color */
   color: white;
   padding: 12px 20px;
   border: none;
@@ -871,7 +898,8 @@
 }
 
 .upload-button:hover {
-  background-color: #679996;
+  background-color: #224574;
+  border: 2px solid #f0c674; /* Gold border for the active button */
 }
 
 

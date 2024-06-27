@@ -15,7 +15,7 @@ body {
 header {
   width: 100%;
   height: auto;
-  background-color: #F6f5f2;
+  background-color: #ffffff;
 }
 
 header .navbar {
@@ -34,14 +34,13 @@ header .navbar {
 .navbar .logo {
   margin-left: 20px;
   display: flex;
-  color: white;
-  opacity: 1;
+  color: black;
   font-size: 30px;
   text-decoration: none;
 }
 
 .navbar .logo span {
-  color: #9E9D89;
+  color: black;
 }
 
 .navbar .menu-links {
@@ -52,13 +51,9 @@ header .navbar {
   gap: 30px;
 }
 
-#account-menu-links a {
-  color: black;
-}
-
 .navbar a {
   padding-top: 8px;
-  color: white;
+  color: black;
   font-size: small;
   text-decoration: none;
   transition: 0.2s ease;
@@ -73,7 +68,7 @@ header .navbar {
 }
 
 #hamburger-btn {
-  color: #c9beb4;
+  color: black;
   cursor: pointer;
   display: none;
 }
@@ -123,7 +118,7 @@ header .navbar {
   }
 
   .navbar a {
-    color: #D2B48C;
+    color: black;
   }
 
   .navbar a:hover {
@@ -176,7 +171,7 @@ header .navbar {
   }
 
   .navbar a {
-    color: #D2B48C;
+    color: black;
   }
 
   .navbar a:hover {
@@ -184,30 +179,7 @@ header .navbar {
   }
 }
 
-#account-page header, 
-#account-page .navbar {
-  background-color: #ffffff;
-}
 
-#account-page .navbar .logo {
-  color: black;
-}
-
-#account-page .navbar .logo span {
-  color: black;
-}
-
-#account-page .navbar .menu-links a {
-  color: black;
-}
-
-#account-page .navbar .menu-links a:hover {
-  color: black;
-}
-
-#account-page #hamburger-btn {
-  color: black;
-}
 
 .profile-card {
   position: relative;
@@ -229,7 +201,7 @@ header .navbar {
   display: flex;
   align-items: center;
   padding: 20px;
-  background: rgba(244, 217, 198, 0.7);
+  background: #1b2b40;
   border-radius: 10px;
 }
 /*   
@@ -406,7 +378,7 @@ input[type="text"] {
 
 .account-prev, .account-next {
   cursor: pointer;
-  color: #CD8D7A;
+  color: #1b2b40;
   border: none;
   font-size: 20px;
   font-weight: bolder;
@@ -425,8 +397,10 @@ input[type="text"] {
 }
 
 .user-name {
+  color: white;
   text-transform: capitalize;
   font-size: 30px;
+  margin-left: 30px;
 }
 
 .review-wrapper, .comments-wrapper {
@@ -511,7 +485,7 @@ input[type="text"] {
 }
 
 .logout-btn, .delete-btn, .edit-btn, .new-btn {
-  background-color: #d18f7b;
+  background-color: #1b2b40;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -525,7 +499,7 @@ input[type="text"] {
 }
 
 #delete-course:hover, #edit-course:hover {
-  background-color: #E8998D;
+  background-color: #1b2b40;
 }
 
 /* Edit Account Details */
@@ -570,7 +544,7 @@ input[type="text"] {
 }
 
 #edit-account-details .form-group .email-container button {
-  background-color: #d18f7b;
+  background-color: #1b2b40;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -579,11 +553,11 @@ input[type="text"] {
 }
 
 #edit-account-details .form-group .email-container button:hover {
-  background-color: #e8998d;
+  background-color: #1b2b40;
 }
 
 #save-changes {
-  background-color: #d18f7b;
+  background-color: #1b2b40;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -592,12 +566,12 @@ input[type="text"] {
 }
 
 #save-changes:hover {
-  background-color: #e8998d;
+  background-color: #1b2b40;
 }
 
 /* New footer trying out */
 .footer {
-  background: #F4D9C6;
+  background: #1b2b40;
   padding: 30px 0px;
   font-family: 'Play', sans-serif;
   text-align: center;
@@ -607,13 +581,13 @@ input[type="text"] {
   width: 100%;
   margin: 1% 0%;
   padding: 0.6% 0%;
-  color: gray;
+  color: #d9aa52;
   font-size: 0.8em;
 }
 
 .footer .row a {
   text-decoration: none;
-  color: #F09872;
+  color: #d9aa52;
   transition: 0.5s;
 }
 
@@ -651,6 +625,16 @@ input[type="text"] {
       margin: 0% 3%;
   }
 }
+
+
+
+
+
+
+
+
+  
+
 
 /* review  */
 
@@ -834,32 +818,6 @@ align-items: center;
 margin: 0;
 }
 
-/* Modal General Styles */
-.modal {
-display: none; /* Hidden by default */
-position: fixed; /* Stay in place */
-z-index: 1; /* Sit on top */
-left: 0;
-top: 0;
-width: 100%; /* Full width */
-height: 100%; /* Full height */
-overflow: auto; /* Enable scroll if needed */
-background-color: rgb(0,0,0); /* Fallback color */
-background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-padding-top: 60px;
-}
-
-.modal-content {
-background-color: #fefefe;
-margin: 5% auto; /* 5% from the top and centered */
-padding: 20px;
-border: 1px solid #888;
-width: 80%; /* Could be more or less, depending on screen size */
-max-width: 600px;
-box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.2);
-border-radius: 10px;
-}
-
 .close {
 color: #aaa;
 float: right;
@@ -915,7 +873,7 @@ background-color: #a36d58;
 }
 
 #confirmDelete {
-background-color: #c48c7e;
+background-color: #1b2b40;
 color: white;
 padding: 15px 20px;
 margin: 10px 0;
@@ -927,7 +885,7 @@ font-size: 16px;
 }
 
 #cancelDelete {
-background-color: #c48c7e;
+background-color: #1b2b40;
 color: white;
 padding: 15px 20px;
 margin: 10px 0;
