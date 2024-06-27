@@ -59,11 +59,13 @@ body {
     list-style: none; /* Remove default list styles */
     padding-top: 15px;
     margin-right: 20px;
+    font-size: 15px;
     gap: 30px; /* Set the gap between menu links */
   }
   
   .navbar a {
     padding-top: 8px;
+    font-size: 18px;
     color: #d9aa52; /* Default color for menu links */
     font-size: small; /* Set font size for menu links */
     text-decoration: none; /* Remove underline from menu links */

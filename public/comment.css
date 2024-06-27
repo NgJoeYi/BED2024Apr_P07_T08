@@ -17,7 +17,7 @@ body {
     border: none;
     box-shadow: none;
     transition: none;
-    background-color: #F6F5F2;
+    background-color: white;
 }
 
 .post {
@@ -160,7 +160,8 @@ textarea {
 }
 
 button {
-    color: white;
+    color: black;
+    background-color: #d9aa52;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -171,7 +172,7 @@ button {
 }
 
 button:hover {
-    background-color: #004d40;
+    background-color: #1b2b40;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -190,53 +191,62 @@ h3 {
 }
 
 .popup {
-    width: 50%;
-    height: 80%;
-    background-color: rgba(0, 0, 0, 0);
-    justify-content: center;
-    margin-left: 420px;
-    margin-top: 100px;
-}
-
-.popup-content {
-    background-color: #AE8381;
-    padding: 70px;
-    color: #fff;
-    width: 100%;
-    position: relative;
-    border: 8px solid #74676F; /* Add this line for border around the popup content */
-    border-radius: 30px;
-}
-
-.popup-content h2{
-    color: white;
+    display: none; 
+    position: fixed; 
+    z-index: 9999; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; /* enable scroll if needed */
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+  }
+  
+  .popup-content {
+    background-color: #fefefe;
+    margin: 10% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-radius: 10px;
+    text-align: center;
+    position: relative; /* Added to position the close button relative to this container */
+  }
+  
+  .popup-content h2 {
+    color: black;
     text-align: center;
     margin-bottom: 20px;
     font-size: 30px;
-}
-
-.popup-content button{
+  }
+  
+  .popup-content button {
     background-color: #74676F;
-    margin-left: 280px;
+    align-items: center;
     height: 50px;
     width: 140px;
     margin-top: 30px;
     font-size: 20px;
-}
-
-.close {
-    position: absolute;
+  }
+  
+  .close {
+    position: absolute; /* Position it absolutely within the popup-content */
     top: 10px;
     right: 10px;
     cursor: pointer;
     font-size: 24px;
-}
+  }
 
 .comment-date{
     color: #bbb9b9;
     margin-top: 10px;
     font-size: 18px;
 }
+
+
 
 .footer{
     margin-top: 60px;
@@ -287,5 +297,154 @@ h3 {
     color: black;
     text-decoration: none;
     cursor: pointer;
+  }
+  
+
+
+  /* footer */
+
+  /* New footer terying out */
+  .footer {
+    background: #1b2b40;
+    padding: 30px 0px;
+    font-family: 'Play', sans-serif;
+    text-align: center;
+  }
+  
+  .footer .row {
+    width: 100%;
+    margin: 1% 0%;
+    padding: 0.6% 0%;
+    color: #d9aa52;
+    font-size: 0.8em;
+  }
+  
+  .footer .row a {
+    text-decoration: none;
+    color: #d9aa52;
+    transition: 0.5s;
+  }
+  
+  .footer .row a:hover {
+    color: #fff;
+  }
+  
+  .footer .row ul {
+    width: 100%;
+  }
+  
+  .footer .row ul li {
+    display: inline-block;
+    margin: 0px 30px;
+  }
+  
+  .footer .row a i {
+    font-size: 2em;
+    margin: 0% 1%;
+  }
+  
+  @media (max-width: 600px) {
+    .footer {
+        text-align: left;
+        padding: 5%;
+    }
+  
+    .footer .row ul li {
+        display: block;
+        margin: 10px 0px;
+        text-align: left;
+    }
+  
+    .footer .row a i {
+        margin: 0% 3%;
+    }
+  }
+
+
+  /* for discussion css  */
+  .post {
+    border: 1px solid #E5E5E5;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header for the post */
+  .post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 10px;
+  }
+  
+  .profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .username {
+    font-size: 23px;
+    font-weight: bold;
+  }
+  
+  .post-meta {
+    display: flex;
+    flex-direction: column;
+    color: #666666;
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  
+  .category-discussion {
+    color: #888888;
+  }
+  
+  .posted-date-activity-dis {
+    color: #888888;
+    margin-top: 5px;
+    float: left;
+  }
+  
+  /* Content of the post */
+  .post-content-dis p{
+      margin-top: 10px;
+      color: #546e7a;
+      font-size: 20px;
+  }
+  
+  /* Footer for the post */
+  .post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  .likes-dislikes {
+    display: flex;
+    align-items: center;
+    color: black;
+  }
+  
+  .like-button, .dislike-button {
+    background: none;
+    border: none;
+    font-size: 1em;
+    margin-right: 15px;
+    cursor: pointer;
+  }
+  
+  .like-button:focus, .dislike-button:focus {
+    outline: none;
   }
   

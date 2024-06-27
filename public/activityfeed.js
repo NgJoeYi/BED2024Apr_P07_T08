@@ -112,23 +112,23 @@ function addDiscussionToFeed(discussion) {
     post.innerHTML = `
         <div class="post-header">
             <div class="profile-pic">
-                <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
+                <img src="${discussion.profilePic}" alt="Profile Picture">
             </div>
             <div class="username">${capitalizedUsername}</div>
         </div>
-        <div class="post-meta" >
-            <span class="category" style="font-size:15px >Category: ${discussion.category}</span>
-            <span class="posted-date-activity" style="font-size:15px">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+        <div class="post-meta">
+            <span class="category-discussion">Category: ${discussion.category}</span>
+            <span class="posted-date-activity-dis">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
         </div>
-        <div class="post-content">
-            <p style="font-size:20px">${discussion.description}</p>
+        <div class="post-content-dis">
+            <p>${discussion.description}</p>
         </div>
         <div class="post-footer">
             <div class="likes-dislikes">
                 <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
                 <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
             </div>
-            <button class="comment-button">Go to Comment</button>
+            <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
         </div>
     `;
 
@@ -137,6 +137,7 @@ function addDiscussionToFeed(discussion) {
     // Attach event listeners after appending to the feed to ensure they are correctly set up
     const likeButton = post.querySelector('.like-button');
     const dislikeButton = post.querySelector('.dislike-button');
+    const commentButton = post.querySelector('.comment-button');
 
     likeButton.addEventListener('click', function () {
         if (this.getAttribute('data-liked') === 'false') {
@@ -151,7 +152,14 @@ function addDiscussionToFeed(discussion) {
             incrementDislikes(discussion.id, likeButton, this);
         }
     });
+
+    commentButton.addEventListener('click', function () {
+        const discussionId = this.getAttribute('data-id');
+        window.location.href = `comment.html?discussionId=${discussionId}`;
+    });
 }
+
+
 
 
 // Define the popup functions
