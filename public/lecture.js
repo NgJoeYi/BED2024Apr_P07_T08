@@ -179,6 +179,11 @@ function postReview() {
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
     const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
 
+    if (!reviewText || !rating || !userId) {
+        alert('Please log in or sign up to add reviews.');
+        return;
+    }
+
     fetch('http://localhost:3000/reviews', {
         method: 'POST',
         headers: {

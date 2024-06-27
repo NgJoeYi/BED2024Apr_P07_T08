@@ -397,10 +397,10 @@ input[type="text"] {
 }
 
 .user-name {
-  color: white;
+  color:  black;
   text-transform: capitalize;
   font-size: 30px;
-  margin-left: 30px;
+  margin-left: 5px;
 }
 
 .review-wrapper, .comments-wrapper {
