@@ -21,6 +21,7 @@ document.getElementById('login-contact-form').addEventListener('submit', async f
         // on successful login, redirect to homepage aka index.html
         window.location.href = 'index.html';
     } else {
-        alert('Login failed!');
+        const errorData = await response.json();
+        alert(`${errorData.message}`);
     }
 });
