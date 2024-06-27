@@ -63,7 +63,7 @@ app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id' , courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
-app.post('/courses', courseController.createCourse); 
+app.post('/courses', upload.single('video'), courseController.createCourse);
 app.delete('/courses/:id', courseController.deleteCourse);
 
 
