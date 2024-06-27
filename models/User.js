@@ -77,7 +77,7 @@ class User {
             const request = connection.request();
             request.input('inputEmail', userLoginData.email);
             const result = await request.query(sqlQuery);
-            
+
             const user = result.recordset[0];
             if (!user){
                 return null;
@@ -111,7 +111,7 @@ class User {
     
             const result = await request.query(sqlQuery);
             if (result.rowsAffected[0] === 0) {
-                throw new Error("User not updated");
+                return null;
             }
             return await this.getUserById(userId);
         } catch (error) {
@@ -138,7 +138,7 @@ class User {
             request.input('userId', userId);
             const results = await request.query(sqlQuery);
             if (results.rowsAffected[0] === 0) {
-                throw new Error("User not deleted");
+                return null;
             }
             return results.rowsAffected[0] > 0; //returns true 
         } catch(error) {
