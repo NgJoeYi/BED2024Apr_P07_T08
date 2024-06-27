@@ -17,9 +17,9 @@ const getDiscussions = async (req, res) => {
         }
 
         if (sort === 'most-recent') {
-            query += ` ORDER BY d.posted_date DESC`;
-        } else if (sort === 'oldest') {
             query += ` ORDER BY d.posted_date ASC`;
+        } else if (sort === 'oldest') {
+            query += ` ORDER BY d.posted_date DESC`;
         }
 
         const pool = await sql.connect(dbConfig);
@@ -70,7 +70,7 @@ const createDiscussion = async (req, res) => {
             likes: 0,
             dislikes: 0,
             username: user.name,
-            profilePic: 'profilePic.jpeg' // or fetch the actual profile picture URL
+            profilePic: 'images/profilePic2.jpeg' // or fetch the actual profile picture URL
         };
 
         res.json({ success: true, discussion: newDiscussion });
@@ -149,17 +149,17 @@ const getDiscussionsByUser = async (req, res) => {
 const updateDiscussion = async (req, res) => {
     try {
         const discussionId = req.params.id;
-        const { description, rating, userId } = req.body;
+        const { description, category, userId } = req.body;
 
         const pool = await sql.connect(dbConfig);
         await pool.request()
             .input('discussionId', sql.Int, discussionId)
             .input('description', sql.NVarChar, description)
-            .input('rating', sql.Int, rating)
+            .input('category', sql.NVarChar, category)
             .input('userId', sql.Int, userId)
             .query(`
                 UPDATE Discussions
-                SET description = @description, rating = @rating
+                SET description = @description, category = @category
                 WHERE id = @discussionId AND user_id = @userId
             `);
 
@@ -169,6 +169,8 @@ const updateDiscussion = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
+
+
 
 // Delete discussion
 const deleteDiscussion = async (req, res) => {

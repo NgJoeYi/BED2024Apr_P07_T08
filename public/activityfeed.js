@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     fetchDiscussions();
+
     // Add event listeners for filter and sort options
     document.getElementById('filter-category').addEventListener('change', fetchDiscussions);
     document.getElementById('sort-date').addEventListener('change', fetchDiscussions);
+
     // Form submission handler to add a discussion
     document.getElementById('addDiscussionForm').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent the form from submitting the traditional way
@@ -10,7 +12,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const title = document.getElementById('title').value;
         const category = document.getElementById('category').value;
         const description = document.getElementById('description').value;
-        const userId = getCurrentUserId(); // Implement this function to get the current user's ID
+        const userId = getCurrentUserId(); // Function to get the current user's ID
+
+        if (!userId) {
+            alert('User must be logged in to submit a discussion.');
+            return;
+        }
 
         const data = {
             title: title,
@@ -19,6 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
             userId: userId
         };
 
+        console.log('Submitting form with data:', data);
+
         fetch('/discussions', {
             method: 'POST',
             headers: {
@@ -26,24 +35,35 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify(data)
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Server response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Server response data:', data);
             if (data.success) {
                 addDiscussionToFeed(data.discussion);
                 closePopup();
             } else {
+                console.error('Error adding discussion:', data);
                 alert('Error adding discussion.');
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error adding discussion.');
+        });
     });
-
-    function getCurrentUserId() {
-        // Implement the logic to get the current user's ID.
-        // This might be from a global variable set during login or from a cookie/session storage.
-        return sessionStorage.getItem('userId');
-    }
 });
+
+function getCurrentUserId() {
+    const userId = sessionStorage.getItem('userId');
+    if (!userId) {
+        alert('User is not logged in or session has expired');
+        return null;
+    }
+    return userId;
+}
 
 function fetchDiscussions() {
     const category = document.getElementById('filter-category').value;
@@ -69,33 +89,44 @@ function fetchDiscussions() {
         });
 }
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+
 function addDiscussionToFeed(discussion) {
     const feed = document.querySelector('.activity-feed');
     const post = document.createElement('div');
     post.classList.add('post');
     post.setAttribute('data-id', discussion.id);
 
+    const likedByUser = discussion.userLiked; // should be a boolean
+    const dislikedByUser = discussion.userDisliked; // should be a boolean
+
     const likesText = `👍 ${discussion.likes} Likes`;
     const dislikesText = `👎 ${discussion.dislikes} Dislikes`;
+
+    // Capitalize the first letter of the username
+    const capitalizedUsername = capitalizeFirstLetter(discussion.username);
 
     post.innerHTML = `
         <div class="post-header">
             <div class="profile-pic">
-                <img src="${discussion.profilePic || 'profilePic.jpeg'}" alt="Profile Picture">
+                <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
             </div>
-            <div class="username">${discussion.username}</div>
+            <div class="username">${capitalizedUsername}</div>
         </div>
-        <div class="post-meta">
-            <span class="category">Category: ${discussion.category}</span>
-            <span class="posted-date-activity">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+        <div class="post-meta" >
+            <span class="category" style="font-size:15px >Category: ${discussion.category}</span>
+            <span class="posted-date-activity" style="font-size:15px">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
         </div>
         <div class="post-content">
-            <p>${discussion.description}</p>
+            <p style="font-size:20px">${discussion.description}</p>
         </div>
         <div class="post-footer">
             <div class="likes-dislikes">
-                <button class="like-button" data-liked="false">${likesText}</button>
-                <button class="dislike-button" data-disliked="false">${dislikesText}</button>
+                <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
+                <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
             </div>
             <button class="comment-button">Go to Comment</button>
         </div>
@@ -103,65 +134,25 @@ function addDiscussionToFeed(discussion) {
 
     feed.prepend(post);
 
+    // Attach event listeners after appending to the feed to ensure they are correctly set up
     const likeButton = post.querySelector('.like-button');
     const dislikeButton = post.querySelector('.dislike-button');
 
-    likeButton.addEventListener('click', () => {
-        if (likeButton.getAttribute('data-liked') === 'false') {
-            incrementLikes(discussion.id, post, likeButton, dislikeButton);
+    likeButton.addEventListener('click', function () {
+        if (this.getAttribute('data-liked') === 'false') {
+            console.log('Like button clicked');
+            incrementLikes(discussion.id, this, dislikeButton);
         }
     });
 
-    dislikeButton.addEventListener('click', () => {
-        if (dislikeButton.getAttribute('data-disliked') === 'false') {
-            incrementDislikes(discussion.id, post, likeButton, dislikeButton);
+    dislikeButton.addEventListener('click', function () {
+        if (this.getAttribute('data-disliked') === 'false') {
+            console.log('Dislike button clicked');
+            incrementDislikes(discussion.id, likeButton, this);
         }
     });
 }
 
-function incrementLikes(discussionId, post, likeButton, dislikeButton) {
-    fetch('/discussions/like', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ discussionId: discussionId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const likesText = `👍 ${data.likes} Likes`;
-            likeButton.textContent = likesText;
-            likeButton.setAttribute('data-liked', 'true');
-            dislikeButton.setAttribute('data-disliked', 'true'); // Prevent disliking if liked
-        } else {
-            alert('Error liking discussion.');
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function incrementDislikes(discussionId, post, likeButton, dislikeButton) {
-    fetch('/discussions/dislike', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ discussionId: discussionId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const dislikesText = `👎 ${data.dislikes} Dislikes`;
-            dislikeButton.textContent = dislikesText;
-            dislikeButton.setAttribute('data-disliked', 'true');
-            likeButton.setAttribute('data-liked', 'true'); // Prevent liking if disliked
-        } else {
-            alert('Error disliking discussion.');
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
 
 // Define the popup functions
 function openPopup() {
