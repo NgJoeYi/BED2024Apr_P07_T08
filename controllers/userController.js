@@ -31,7 +31,7 @@ const createUser = async (req, res) => {
         const newUser = await User.createUser(newUserData); 
         if (!newUser) {
             console.error('Error: User creation failed');
-            return res.status(400).send('Error creating user');
+            return res.status(400).json({ message: 'Could not create an account' });
         }
         res.status(201).json({ userId: newUser.userId });
     } catch (error) {

@@ -43,8 +43,13 @@ document.getElementById('register-form').addEventListener('submit', async functi
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText);
+            const errorData = await response.json();
+            if (errorData.errors && errorData.errors.length > 0){
+                alert(`Validation errors:\n${errorData.errors.join('\n')}`);
+            } else {
+                alert(`${errorData.message}`);
+            }
+            return;
         }
 
         const result = await response.json();
