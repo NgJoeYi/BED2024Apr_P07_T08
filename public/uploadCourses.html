@@ -3,104 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./CSS/uploadCourses.css">
     <link rel="stylesheet" href="navbar.css">
-    <!--linking to another external to get images for ICON-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
-   
-
-    
     <title>EduHelper | Upload Courses</title>
     <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
 </head>
 <body>
 
-<!--Top Navigation Bar--> 
+<!-- Top Navigation Bar --> 
 <header>
-  <nav class="navbar" style="background-color: white;" >
+  <nav class="navbar" style="background-color: white;">
     <a class="logo" href="Index.html" style="color: black;"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
-    <ul class="menu-links" id = "account-menu-links">
+    <ul class="menu-links" id="account-menu-links">
       <span id="close-menu-btn" class="material-symbols-outlined">close</span>
       <li><a href="Index.html" style="color: black;">HOME</a></li>
       <li><a href="Courses.html" style="color: black;">COURSES</a></li>
       <li><a href="account.html" style="color: black;">ACCOUNT</a></li>
       <li><a href="activityfeed.html" style="color: black;">ACTIVITYFEED</a></li>
       <li><a href="ContactUs.html" style="color: black;">CONTACT US</a></li>
-      <li><a href="Login.html" style="color: black;" id="navbar-login">LOG IN </a></li>
-      <li><a href="Register.html" style="color: black;" id="navbar-signup">SIGN UP </a></li>
+      <li><a href="Login.html" style="color: black;" id="navbar-login">LOG IN</a></li>
+      <li><a href="Register.html" style="color: black;" id="navbar-signup">SIGN UP</a></li>
     </ul>
     <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
   </nav>
 </header>
+
 <div class="course-container">
   <div class="course-name" id="course-name">
-      <span class = "upload-course-title" contenteditable="false">Course Name :</span>
-      <p id = "course-name" contenteditable="true">I LOVE BED</p>
-      <span class="edit-icon" contenteditable="false">
-        <i class="fa-solid fa-pencil" style="color: #030303;" onclick="enableEditing('course-name')"></i>
-      </span>
+      <span class="upload-course-title" contenteditable="false">Course Title :</span>
+      <p id="course-name" contenteditable="true" class="editable-placeholder">Enter course name...</p>
   </div>
-  <div class="course-arrangement" id = "course-arrangement">
-    <span class = "upload-course-title" contenteditable="false">Course Arrangement :</span>
-    <div class="chapter" contenteditable="false">
-      <p contenteditable="true">Chapter Name : Introduction</p>
-      <span class="edit-icon">
-        <i class="fa-solid fa-pencil" style="color: #030303;"></i>
-      </span>
-      <div class="files">
-        <div>
-          <p>
-            ⇒ 
-            <i class="fa-solid fa-file" style="color: #000000;"></i>
-            Introduction.mp4
-          </p>
-        </div>
-        <div>
-          <p>
-            ⇒ 
-            <i class="fa-solid fa-file" style="color: #000000;"></i>
-            Introduction.mp4
-          </p>
-        </div>
+  <div class="course-arrangement" id="course-arrangement">
+    
+    <span class="upload-course-title" contenteditable="false">Lectures Arrangement :</span>
+    <!-- Empty initially, users will add new chapters -->
+
+    <div class="new-btn-container">
+        <button class="new-btn" onclick="triggerFileUpload()">New</button>
+    </div>
+</div>
+  <div class="course-details">
+    <span class="upload-course-title" contenteditable="false">Course Description :</span>
+    <p contenteditable="true" class="editable-placeholder"id="course-details">Enter course description...</p>
+  </div>
+  <div class="course-skills-covered" id="course-skills-covered">
+    <span class="upload-course-title" contenteditable="false">Course Meta Data :</span>
+    <form>
+      <div class="content">
+        <label for="meta-data">Level:</label>
+        <input type="text" id="meta-data" >
       </div>
+      <div class="content">
+        <label for="meta-data">Duration</label>
+        <input type="text" id="meta-data" value="">
+      </div>
+      <div class="content">
+        <label for="meta-data">Category</label>
+        <input type="text" id="meta-data" value="">
+      </div>
+    </form>
+    <div id="fileInputContainer">
+      <label for="imageFile">Upload Course Image:</label>
+      <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
     </div>
-    <div class = "new-btn-container">
-      <button class="new-btn">New</button>
-    </div>
   </div>
-  <div class="course-details" id = "course-details">
-    <span class = "upload-course-title" contenteditable="false">Course Details :</span>
-    <p contenteditable="true">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
-      labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
-      Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
-   </p>
-    <span class="edit-icon">
-      <i class="fa-solid fa-pencil" style="color: #030303;"></i>
-    </span>
-  </div>
-  <div class="course-skills-covered" id = "course-skills-covered">
-    <span class = "upload-course-title" contenteditable="false">Skills Covered :</span>
-    <p contenteditable="true">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
-      labore et dolore magna aliqua. Et ultrices neque ornare aenean euismod elementum. 
-      Semper risus in hendrerit gravida rutrum quisque non tellus orci. Ut etiam sit amet nisl purus in mollis nunc sed.
-   </p>
-    <span class="edit-icon">
-      <i class="fa-solid fa-pencil" style="color: #030303;"></i>
-    </span>
-  </div>
-  <div class="ending-buttons" >
-    <button class="ending-buttons save-btn" onclick="alert('Course saved!')">Save</button>
-    <button class="ending-buttons cancel-btn" onclick="confirmCancel()">Cancel</button>
+
+  <div class="ending-buttons">
+    <button class="ending-buttons save-btn" onclick="submitCourse()">Upload</button>
   </div>
 </div>
 
+<div id="newFileModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2>Add New Lecture</h2>
+    <label for="chapterName">Chapter Name:</label>
+    <input type="text" id="chapterName" placeholder="Enter chapter name" required>
+    <br>
+    <label for="lectureName">Lecture Name:</label>
+    <input type="text" id="lectureName" placeholder="Enter lecture name" required>
+    <br>
+    <div id="fileInputContainer">
+      <label for="videoFiles">Upload Video Files:</label>
+      <input type="file" id="videoFiles" accept="video/*" multiple required>
+    </div>
+    <div id="fileInputContainer">
+      <label for="videoFiles">Upload Lecture Image File:</label>
+      <input type="file" id="imageFiles"  accept="image/*" multiple required>
+    </div>
+    <br>
+    <label for="duration">Duration</label>
+    <input type="number" id="duration"placeholder="Enter duration: " required>
+    <br>
+    <label for="description">Description</label>
+    <input type="text" id="description"placeholder="Enter description: " required>
+    <!-- <button onclick="addMoreFileInput()" id = "add-more-button" >Add More Files</button> -->
+    <br><br>
+    <button onclick="addFiles()">Add</button>
+    <button onclick="closeModal()">Cancel</button>
+  </div>
+</div>
 
-<!--Footer-->
+<!-- Footer -->
 <footer>
   <div class="footer">
     <div class="row">
@@ -124,11 +132,7 @@
   </div>
 </footer>
 
-
-
-
-<!--Linking js to html-->
+<!-- Linking JS to HTML -->
 <script src="UploadCourses.js"></script>
-<script src="Script.js"></script>
 </body>
 </html>

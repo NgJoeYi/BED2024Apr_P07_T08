@@ -30,6 +30,11 @@ const getCoursesById = async (req, res) => {
 
 const createCourse = async (req, res) => {
   const newCourse = req.body;
+  if (req.file) {
+    newCourse.courseImage = fs.readFileSync(req.file.path);
+    fs.unlinkSync(req.file.path); // Clean up the temp file
+  }
+
   try {
     const createdCourse = await Courses.createCourse(newCourse);
     res.status(201).json(createdCourse);
@@ -38,6 +43,7 @@ const createCourse = async (req, res) => {
     res.status(500).send("Error creating course");
   }
 };
+
 const updateCourse = async (req, res) => {
   const courseID = parseInt(req.params.id);
   const newCourseData = req.body;

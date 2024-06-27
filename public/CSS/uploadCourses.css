@@ -1,0 +1,263 @@
+/*lectures arrangement modal */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+/* upload course page*/
+.course-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    padding-top: 150px;
+}
+
+.course-name, .course-arrangement, .course-details, .course-skills-covered {
+    background-color: #FCE4D8;
+    padding: 20px;
+    border-radius: 8px;
+    position: relative;
+}
+
+.upload-course-title {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 30px;
+}
+/* lecture arrangement*/
+.course-arrangement .chapter {
+    margin-top: 20px;
+}
+
+.course-arrangement .chapter .delete-icon {
+    float: right;
+    cursor: pointer;
+}
+  
+.course-arrangement .chapter .files {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.files p, .chapter p, .course-name p,
+.course-details p, .course-skills-covered p {
+    color: #000;
+    font-size: 20px;
+}
+
+.course-name p {
+    margin-top: 20px;
+}
+
+.course-details p, .course-skills-covered p {
+    margin-top: 20px;
+    margin-bottom: 100px;
+}
+
+.new-btn-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.new-btn {
+    display: flex;
+    justify-content: flex-end;
+    align-content: flex-end;
+    margin-top: 20px;
+}
+
+.new-btn:hover {
+    color: #000;
+    background-color: white;
+}
+
+.files .file-item {
+    position: relative;
+}
+
+.files .file-item .delete-icon {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.files .file-item p:hover .delete-icon {
+    display: inline-block;
+}
+
+.file-item {
+    position: relative;
+    padding: 10px;
+    margin: 10px 0;
+}
+input[type="file" i]{
+    display:flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+.delete-icon {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.file-item:hover .delete-icon {
+    display: inline-block;
+}
+  
+#add-more-button{
+    margin-top: 10px;
+}
+button{
+    padding:5px;
+}
+.chapter-name {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.chapter-name .delete-chapter-icon {
+    display: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.chapter-name:hover .delete-chapter-icon {
+    display: inline-block;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.file-item .delete-icon {
+    display: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.file-item:hover .delete-icon {
+    display: inline-block;
+}
+/* course meta data styles*/
+.content {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between label and input */
+    margin:10px;
+}
+
+.content label {
+    font-size: 20px;
+    white-space: nowrap;
+}
+
+.content input {
+    flex: 1; /* Take the remaining space */
+    padding: 5px;
+    font-size: 18px;
+}
+
+/* footer */
+
+/* New footer trying out */
+.footer {
+    background: #1b2b40;
+    padding: 30px 0px;
+    font-family: 'Play', sans-serif;
+    text-align: center;
+}
+
+.footer .row {
+    width: 100%;
+    margin: 1% 0%;
+    padding: 0.6% 0%;
+    color: #d9aa52;
+    font-size: 0.8em;
+}
+
+.footer .row a {
+    text-decoration: none;
+    color: #d9aa52;
+    transition: 0.5s;
+}
+
+.footer .row a:hover {
+    color: #fff;
+}
+
+.footer .row ul {
+    width: 100%;
+}
+
+.footer .row ul li {
+    display: inline-block;
+    margin: 0px 30px;
+}
+
+.footer .row a i {
+    font-size: 2em;
+    margin: 0% 1%;
+}
+
+@media (max-width: 600px) {
+    .footer {
+        text-align: left;
+        padding: 5%;
+    }
+
+    .footer .row ul li {
+        display: block;
+        margin: 10px 0px;
+        text-align: left;
+    }
+
+    .footer .row a i {
+        margin: 0% 3%;
+    }
+}

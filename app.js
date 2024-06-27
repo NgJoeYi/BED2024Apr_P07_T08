@@ -14,14 +14,18 @@ const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
 const deleteValidation = require('./middleware/deleteValidation');
 
+const multer = require('multer'); 
 const app = express();
-const port = process.env.PORT || 3000; // CHANGE TO 3000
+const port = process.env.PORT || 3000;
 
 // Set up the view engine
 app.set('view engine', 'ejs');
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Set up multer for file uploads
+const upload = multer({ dest: 'uploads/' });
 
 // Include body-parser middleware to handle JSON data
 // app.use(bodyParser.json());
@@ -68,7 +72,7 @@ app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id' , courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
-app.post('/courses', courseController.createCourse); 
+app.post('/courses', upload.single('courseImage'), courseController.createCourse);
 app.delete('/courses/:id', courseController.deleteCourse);
 
 
