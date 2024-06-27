@@ -20,23 +20,24 @@ const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
         // Check if user already exists
-        const existingUser = await User.loginUser(newUserData);
+        const existingUser = await User.loginUser({ email: newUserData.email });
         if (existingUser) {
-            return res.status(400).send('User already exists');
-        } 
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
         // Hash the password
         const hashedPassword = await bcrypt.hash(newUserData.password, 10);
         newUserData.password = hashedPassword; // Replace plain text password with hashed password  
-               
+
         const newUser = await User.createUser(newUserData); 
         if (!newUser) {
             console.error('Error: User creation failed');
             return res.status(400).json({ message: 'Could not create an account' });
         }
-        res.status(201).json({ userId: newUser.userId });
+        res.status(201).json({ userId: newUser.id });
     } catch (error) {
         console.error('Server error:', error); // Log error details
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 

@@ -55,8 +55,14 @@ class User {
                 throw new Error("User not created");
             }
             const row = result.recordset[0];
+
+            // Create lecturer entry if the role is 'lecturer'
+            if (newUserData.role === 'lecturer') {
+                await User.createLecturer(row.userId);
+            }
+
             return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
-        } catch(error) {
+        } catch (error) {
             console.error('Error creating user:', error);
             throw error;
         } finally {
@@ -66,6 +72,25 @@ class User {
         }
     }
 
+    static async createLecturer(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            INSERT INTO Lecturer (UserID) VALUES (@userId);
+            `;
+            const request = connection.request();
+            request.input('userId', sql.Int, userId);
+            await request.query(sqlQuery);
+        } catch (error) {
+            console.error('Error creating lecturer:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
     // userLoginData sent in req.body rmb to extract name and email
     static async loginUser(userLoginData) {
         let connection;
