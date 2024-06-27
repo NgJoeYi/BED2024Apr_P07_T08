@@ -200,17 +200,6 @@ function confirmLogout() {
   }
 }
 
-// function confirmDeleteAccount() {
-//   const userConfirmed = confirm('Are you sure you want to delete your account?');
-//   if (userConfirmed) {
-//     // User clicked "OK"
-//     alert('Your account is deleted.');
-//     // Add your account deletion logic here
-//   } else {
-//     // User clicked "Cancel"
-//     alert('Account deletion cancelled.');
-//   }
-// }
 function confirmCancel() {
   const userConfirmed = confirm('Are you sure you want to Cancel?');
   if (userConfirmed) {
@@ -229,27 +218,24 @@ function confirmCancel() {
 // Populate data to make it a prefilled form and ready to be edited but does not update in db yet
 document.addEventListener('DOMContentLoaded', async function () {
   const userId = sessionStorage.getItem('userId');
-
   if (userId) {
       try {
           const response = await fetch(`/account/${userId}`);
-
+          
           if (response.ok) {
               const user = await response.json();
-
               // Populate profile info
               document.querySelector('.profile-info .user-name').textContent = user.name;
-
+              
               // Prefill edit form fields
-              document.getElementById('edit-name').value = user.name;
+              document.getElementById('edit-name').value = user.name; 
               document.getElementById('edit-birth-date').value = user.dob.split('T')[0];
               document.getElementById('edit-email').value = user.email;
-
+              
               // Update other elements with the user's name
               document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
                   element.textContent = user.name;
               });
-
           } else {
               console.error('Failed to fetch user data');
           }
@@ -259,7 +245,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   } else {
       console.error('No user is logged in');
   }
-
+  
   // Toggle visibility for edit account details
   document.getElementById('edit-icon').addEventListener('click', function () {
       const editAccountDetails = document.getElementById('edit-account-details');
@@ -267,72 +253,77 @@ document.addEventListener('DOMContentLoaded', async function () {
           editAccountDetails.style.display = 'none';
       } else {
           editAccountDetails.style.display = 'block';
-      }
+      }  
   });
+  
+  // Handle form submission
+  document.getElementById('save-changes').addEventListener('click', async function (event) {
+      event.preventDefault();
+      
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('edit-password').value;
+      const confirmNewPassword = document.getElementById('edit-confirm-password').value;
 
-// Handle form submission
-document.getElementById('save-changes').addEventListener('click', async function (event) {
-  event.preventDefault();
-
-  const currentPassword = document.getElementById('current-password').value;
-  const newPassword = document.getElementById('edit-password').value;
-  const confirmNewPassword = document.getElementById('edit-confirm-password').value;
-
-  const updatedUserData = {
-      name: document.getElementById('edit-name').value,
-      dob: document.getElementById('edit-birth-date').value,
-      email: document.getElementById('edit-email').value,
-  };
-
-  if (currentPassword && (!newPassword || !confirmNewPassword)) {
-      alert('To update password, you must enter the new password and confirm new password');
-      return;
-  }
-
-  if (newPassword || confirmNewPassword) {
-      if (newPassword !== confirmNewPassword) {
-          alert('New passwords do not match');
+      const updatedUserData = {
+          name: document.getElementById('edit-name').value,
+          dob: document.getElementById('edit-birth-date').value,
+          email: document.getElementById('edit-email').value,
+      };
+      
+      if (currentPassword && (!newPassword || !confirmNewPassword)) {
+          alert('To update password, you must enter the new password and confirm new password');
           return;
       }
-      updatedUserData.currentPassword = currentPassword;
-      updatedUserData.newPassword = newPassword;
-      updatedUserData.confirmNewPassword = confirmNewPassword;
-  }
-
-  try {
-      const response = await fetch(`/account/${userId}`, {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(updatedUserData)
-      });
-
-      if (response.ok) {
-          const updatedUser = await response.json();
-          alert('User details updated successfully');
-
-          // Update displayed user info
-          document.querySelector('.profile-info .user-name').textContent = updatedUser.name;
-          document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
-              element.textContent = updatedUser.name;
-          });
-
-          // Close the edit fields
-          document.getElementById('edit-account-details').style.display = 'none';
-
-      } else {
-          const errorData = await response.json();
-          alert(`Error updating user details: ${errorData.message}`);
+      
+      if (newPassword || confirmNewPassword) {
+          if (newPassword !== confirmNewPassword) {
+              alert('New passwords do not match');
+              return;
+          }
+          updatedUserData.currentPassword = currentPassword;
+          updatedUserData.newPassword = newPassword;
+          updatedUserData.confirmNewPassword = confirmNewPassword;
       }
-  } catch (error) {
-      console.error('Error:', error);
-  }
+      
+      
+      try {
+          const response = await fetch(`/account/${userId}`, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(updatedUserData)
+          });
+          
+          if (response.ok) {
+              const updatedUser = await response.json();
+              alert('User details updated successfully');
+
+              // Update displayed user info
+              document.querySelector('.profile-info .user-name').textContent = updatedUser.name;
+              document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
+                  element.textContent = updatedUser.name;
+              });
+              
+              // Close the edit fields
+              document.getElementById('edit-account-details').style.display = 'none';
+          
+          } else {
+              const errorData = await response.json();
+              if (errorData.message.length > 0) {
+                  alert(`${errorData.errors.join('\n')}`);
+              } else {
+                  alert(`${errorData.message}`);
+              }
+          }
+      } catch (error) {
+          console.error('Error:', error);
+      }
+  });
 });
 
-});
-
-
+    
+    
 // ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
 // Function to confirm account deletion
 function confirmDeleteAccount() {
