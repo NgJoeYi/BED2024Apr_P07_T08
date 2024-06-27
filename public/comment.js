@@ -10,7 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Current User ID:', currentUserId); // Debug log
 
     closePopupBtn.addEventListener('click', closePopup);
-    addCommentBtn.addEventListener('click', () => showPopup('add')); // Show popup for adding a new comment
+    // addCommentBtn.addEventListener('click', () => showPopup('add')); // Show popup for adding a new comment
+
+    addCommentBtn.addEventListener('click', () => {
+        if (currentUserId) {
+            showPopup('add');
+        } else {
+            alert('Please log in or sign up to add comments.');
+        }
+    });
 
     function showPopup(type) {
         const popupTitle = popup.querySelector('h2');
@@ -108,6 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         body: JSON.stringify({ userId: currentUserId })
                     });
+
+                    console.log('Response status:', response.status) //To debug
+                    
                     if (response.ok) {
                         comment.remove();
                         alert('Comment deleted successfully!');

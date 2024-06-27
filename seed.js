@@ -72,7 +72,6 @@ async function run() {
             created_at DATETIME DEFAULT GETDATE(),
             parent_comment_id INT NULL,
             FOREIGN KEY (user_id) REFERENCES Users(id),
-            FOREIGN KEY (parent_comment_id) REFERENCES user_comments(id)
         );
 
         CREATE TABLE Lecturer (
@@ -148,7 +147,12 @@ async function run() {
         await connection.request().query(insertLecturers);
 
         // Path to courseImage file
-        const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
+
+        // WY, RAEANN, JOEYI's
+        // const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
+
+        // AMELIA'S
+        const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08-1/public/courseImage/course1.jpeg');
 
         // Read courseImage file 
         const courseImageBuffer = fs.readFileSync(courseImagePath);
@@ -165,8 +169,13 @@ async function run() {
         .query(insertCourses);
         
         // Path to external files 
-        const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
-        const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
+        // WY, RAEANN, JOEYI'S
+        // const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
+        // const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
+        
+        //AMELIA'S
+        const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureVideos/video1.mp4');
+        const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureImage/lecture1.jpeg');
         
         // Read external file
         const videoBuffer = fs.readFileSync(videoFilePath);
