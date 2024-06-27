@@ -43,7 +43,7 @@ async function run() {
         );
         `;
         await connection.request().query(createUsersTable);
-
+        
         // Create other tables
         const createTables = `
         CREATE TABLE ProfilePic (
