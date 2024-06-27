@@ -39,7 +39,7 @@ async function run() {
             dob DATE NOT NULL,
             email VARCHAR(100) NOT NULL UNIQUE,
             password VARCHAR(255) NOT NULL,
-            role VARCHAR(8) NOT NULL
+            role VARCHAR(8) CHECK (role IN ('student', 'lecturer'))
         );
         `;
         await connection.request().query(createUsersTable);

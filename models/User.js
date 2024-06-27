@@ -130,38 +130,62 @@ class User {
 
     static async updateUser(userId, newUserData) {
         let connection;
-        try {
+        try {    
+            // Fetch the existing user
+            const user = await this.getUserById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+
             connection = await sql.connect(dbConfig);
-            const sqlQuery = 
-            `
-            UPDATE Users SET 
-            name=@inputName, email=@inputEmail, password=@inputPassword
-            WHERE id=@inputUserId
+
+    
+            // Prepare the updated fields
+            const updatedFields = {
+                name: newUserData.name || user.name,
+                email: newUserData.email || user.email,
+                dob: newUserData.dob || user.dob,
+                password: user.password 
+            };
+            // If a new password is provided, hash it
+            if (newUserData.newPassword) {
+                updatedFields.password = await bcrypt.hash(newUserData.newPassword, 10);
+            }
+    
+            // Update the user in the database
+            const sqlQuery = `
+                UPDATE Users SET 
+                name=@inputName, email=@inputEmail, dob=@inputDob, password=@inputPassword
+                WHERE id=@inputUserId
             `;
             const request = connection.request();
-            request.input('inputName', newUserData.name);
-            request.input('inputEmail', newUserData.email);
-            if (newUserData.newPassword) {
-                const hashedPassword = await bcrypt.hash(newUserData.newPassword, 10);
-                request.input('inputPassword', hashedPassword);
-            } else {
-                request.input('inputPassword', newUserData.currentPassword);
-            }
-            request.input('inputUserId', userId);            
+            request.input('inputName', updatedFields.name);
+            request.input('inputEmail', updatedFields.email);
+            request.input('inputDob', updatedFields.dob);
+            request.input('inputPassword', updatedFields.password);
+            request.input('inputUserId', userId);
+    
             const result = await request.query(sqlQuery);
+    
             if (result.rowsAffected[0] === 0) {
                 throw new Error("User not updated");
             }
+    
+            // Return the updated user
             return await this.getUserById(userId);
-        } catch(error) {
+        } catch (error) {
             console.error('Error updating user:', error);
             throw error;
         } finally {
             if (connection) {
+                // Ensure the connection is properly closed
                 await connection.close();
             }
         }
     }
+    
+    
+    
 
     // add bcrypt  to compare password either here or controller -- did it in controller 
     //and app.js -- done but not tested
