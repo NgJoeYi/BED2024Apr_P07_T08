@@ -37,7 +37,7 @@ app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
-app.delete('/account/:id', deleteValidation, userController.deleteUser);
+app.delete('/account/:id', /*deleteValidation,*/ userController.deleteUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);

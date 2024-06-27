@@ -253,6 +253,11 @@ document.addEventListener('DOMContentLoaded', async function () {
           editAccountDetails.style.display = 'none';
       } else {
           editAccountDetails.style.display = 'block';
+          
+          // Clear password fields 
+          document.getElementById('current-password').value = ''; 
+          document.getElementById('edit-password').value = '';
+          document.getElementById('edit-confirm-password').value = '';
       }  
   });
   
@@ -372,7 +377,7 @@ async function deleteAccount() {
       window.location.href = 'Index.html';
     } else {
       const errorData = await response.json();
-      alert(`Error deleting account: ${errorData.message}`);
+      alert(`${errorData.message}`);
     }
   } catch (error) {
     console.error('Error:', error);
