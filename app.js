@@ -28,8 +28,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 const upload = multer({ dest: 'uploads/' });
 
 // Include body-parser middleware to handle JSON data
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Serve the HTML page
 app.get('/account', (req, res) => {
@@ -37,6 +39,9 @@ app.get('/account', (req, res) => {
 });
 
 // Add Routes for users
+app.post('/account/uploadProfilePic/:id', userController.uploadProfilePic);
+app.get('/account/profile/:id', userController.getUserProfile);
+
 app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
