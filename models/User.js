@@ -132,9 +132,11 @@ class User {
             connection = await sql.connect(dbConfig);
             const sqlQuery = 
             `
+            DELETE FROM ProfilePic WHERE user_id=@user_Id;
             DELETE FROM Users WHERE id=@userId
             `;
             const request = connection.request();
+            request.input('user_Id', userId);
             request.input('userId', userId);
             const results = await request.query(sqlQuery);
             if (results.rowsAffected[0] === 0) {
@@ -150,6 +152,102 @@ class User {
             }
         }
     }
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    static async updateProfilePic(userId, profilePic) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            
+            // Check if the profile picture exists
+            const checkQuery = `SELECT * FROM ProfilePic WHERE user_id = @userId`;
+            const checkRequest = connection.request();
+            checkRequest.input('userId', userId);
+            const checkResult = await checkRequest.query(checkQuery);
+
+            let sqlQuery;
+            if (checkResult.recordset.length > 0) {
+                // Update if exists
+                sqlQuery = `UPDATE ProfilePic SET img = @profilePic WHERE user_id = @userId`;
+            } else {
+                // Insert if not exists
+                sqlQuery = `INSERT INTO ProfilePic (user_id, img) VALUES (@userId, @profilePic)`;
+            }
+
+            const request = connection.request();
+            request.input('userId', userId);
+            request.input('profilePic', profilePic);
+            const result = await request.query(sqlQuery);
+
+            if (result.rowsAffected[0] === 0) {
+                return null;
+            }
+            return { userId, profilePic };
+        } catch (error) {
+            console.error('Error updating profile picture:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    static async getProfilePicByUserId(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+                SELECT img FROM ProfilePic WHERE user_id=@userId
+            `;
+            const request = connection.request();
+            request.input('userId', userId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0].img;
+        } catch (error) {
+            console.error('Error retrieving profile picture:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 module.exports = User;

@@ -243,23 +243,27 @@ document.addEventListener('DOMContentLoaded', async function () {
           console.error('Error:', error);
       }
   } else {
-      console.error('No user is logged in');
+    console.error('No user is logged in');
   }
   
   // Toggle visibility for edit account details
   document.getElementById('edit-icon').addEventListener('click', function () {
-      const editAccountDetails = document.getElementById('edit-account-details');
-      if (editAccountDetails.style.display === 'block') {
-          editAccountDetails.style.display = 'none';
-      } else {
-          editAccountDetails.style.display = 'block';
-          
-          // Clear password fields 
-          document.getElementById('current-password').value = ''; 
-          document.getElementById('edit-password').value = '';
-          document.getElementById('edit-confirm-password').value = '';
-      }  
-  });
+    if (!userId) {
+      alert('Please log in first to edit your account details.');
+      return;
+    }
+    const editAccountDetails = document.getElementById('edit-account-details');
+    if (editAccountDetails.style.display === 'block') {
+      editAccountDetails.style.display = 'none';
+    } else {
+      editAccountDetails.style.display = 'block';
+      
+      // Clear password fields 
+      document.getElementById('current-password').value = ''; 
+      document.getElementById('edit-password').value = '';
+      document.getElementById('edit-confirm-password').value = '';
+  }  
+});
   
   // Handle form submission
   document.getElementById('save-changes').addEventListener('click', async function (event) {
@@ -327,7 +331,67 @@ document.addEventListener('DOMContentLoaded', async function () {
   });
 });
 
-    
+  
+// ---------------------------------------------- UPLOAD PROFILE PICTURE ----------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  const userId = sessionStorage.getItem('userId');
+  fetchUserProfile(userId);
+});
+
+async function fetchUserProfile(userId) {
+  try {
+    const response = await fetch(`/account/profile/${userId}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.profilePic) {
+        document.getElementById('profile-pic').src = data.profilePic;
+      }
+    } else {
+      console.error('Failed to fetch user profile');
+    }
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+  }
+}
+
+function triggerFileInput() {
+  document.getElementById('file-input').click();
+}
+
+function previewImage(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64Image = e.target.result;
+      document.getElementById('profile-pic').src = base64Image;
+      uploadImageToServer(base64Image);
+    }
+    reader.readAsDataURL(file);
+  }
+}
+
+async function uploadImageToServer(base64Image) {
+  const userId = sessionStorage.getItem('userId');
+  try {
+    const response = await fetch(`/account/uploadProfilePic/${userId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ profilePic: base64Image })
+    });
+
+    if (response.ok) {
+      alert('Profile picture updated successfully');
+    } else {
+      alert('Failed to update profile picture');
+    }
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    alert('Error uploading image');
+  }
+}
     
 // ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
 // Function to confirm account deletion
