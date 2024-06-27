@@ -1,5 +1,4 @@
 const sql = require('mssql');
-const bcrypt = require('bcrypt');
 const dbConfig = require('../dbConfig');
 
 class User {
@@ -10,30 +9,6 @@ class User {
         this.email = email;
         this.password = password;
         this.role = role;
-    }
-
-    // check if user exists or not. verify email exists in users table
-    static async userExists(loginInput) {
-        let connection;
-        try{
-            connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT * FROM Users WHERE email=@inputEmail`;
-            const request = connection.request();
-            request.input('inputEmail', loginInput.email);
-            const result = await request.query(sqlQuery);
-            if (result.recordset.length === 0) {
-                return null;
-            }
-            // return only the first one because email is unique
-            return result.recordset[0]; 
-        } catch(error) {
-            console.error('Error checking if user exists:', error);
-            throw error;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
     }
 
     static async getUserById(userId) {
@@ -101,22 +76,12 @@ class User {
             `;
             const request = connection.request();
             request.input('inputEmail', userLoginData.email);
-
             const result = await request.query(sqlQuery);
 
             const user = result.recordset[0];
             if (!user){
-                throw new Error("User not found");
-            }
-            
-            // checking if password is valid or not
-            const matchPassword = await bcrypt.compare(userLoginData.password, user.password);
-
-            // if password dont match the one stored in the db
-            if (!matchPassword) {
-                throw new Error("Invalid Password");
-            }
-            
+                return null;
+            }            
             return new User(user.id, user.name, user.dob, user.email, user.password, user.role);
         } catch(error) {
             console.error('Error during login:', error);
@@ -132,28 +97,24 @@ class User {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
-            const sqlQuery = 
-            `
-            UPDATE Users SET 
-            name=@inputName, email=@inputEmail, password=@inputPassword
-            WHERE id=@inputUserId
+            const sqlQuery = `
+                UPDATE Users SET 
+                name=@inputName, email=@inputEmail, dob=@inputDob, password=@inputPassword
+                WHERE id=@inputUserId
             `;
             const request = connection.request();
             request.input('inputName', newUserData.name);
             request.input('inputEmail', newUserData.email);
-            if (newUserData.newPassword) {
-                const hashedPassword = await bcrypt.hash(newUserData.newPassword, 10);
-                request.input('inputPassword', hashedPassword);
-            } else {
-                request.input('inputPassword', newUserData.currentPassword);
-            }
-            request.input('inputUserId', userId);            
+            request.input('inputDob', newUserData.dob);
+            request.input('inputPassword', newUserData.password);
+            request.input('inputUserId', userId);
+    
             const result = await request.query(sqlQuery);
             if (result.rowsAffected[0] === 0) {
-                throw new Error("User not updated");
+                return null;
             }
             return await this.getUserById(userId);
-        } catch(error) {
+        } catch (error) {
             console.error('Error updating user:', error);
             throw error;
         } finally {
@@ -162,9 +123,9 @@ class User {
             }
         }
     }
-
-    // add bcrypt  to compare password either here or controller -- did it in controller 
-    //and app.js -- done but not tested
+    
+    
+    
     static async deleteUser(userId) {
         let connection;
         try {
@@ -177,7 +138,7 @@ class User {
             request.input('userId', userId);
             const results = await request.query(sqlQuery);
             if (results.rowsAffected[0] === 0) {
-                throw new Error("User not deleted");
+                return null;
             }
             return results.rowsAffected[0] > 0; //returns true 
         } catch(error) {
@@ -192,13 +153,3 @@ class User {
 }
 
 module.exports = User;
-
-// ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
-// 1. hashing the password so if even 2 users have the same password, the hash value is different
-
-// 2. bcrypt.hash(newUserData.newPassword, 10) the 10 in this is the level of security, 
-// the higher the value, the more secure it is because it is the number of times hashing algo is executed
-// it is known as salt rounds
-
-// 3. bcrypt.compare(userLoginData.password, user.password) this bcrypt.compare 
-// compares the plain text password and the hashed password, returns true if match, & false otherwise

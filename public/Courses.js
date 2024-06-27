@@ -38,10 +38,14 @@ function displayCourses(courses) {
                     <div class="course-meta">
                         <span>${course.duration} hr</span>
                     </div>
-                    <p class="posted-date">Posted on: ${new Date(course.createdAt).toLocaleDateString()}</p>
+                    <div>
+                        <p class="posted-date">Posted on: ${new Date(course.createdAt).toLocaleDateString()}</p>
+                        <p>${course.level} </p>
+                    </div>
                 </div>
             </a>
         `;
+        console.log(course.level);
 
         coursesGrid.appendChild(courseElement);
     });

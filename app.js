@@ -15,7 +15,7 @@ const updateValidation = require('./middleware/updateValidation');
 const deleteValidation = require('./middleware/deleteValidation');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001; // CHANGE TO 3000
 
 // Set up the view engine
 app.set('view engine', 'ejs');
@@ -37,7 +37,7 @@ app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
-app.delete('/account/:id', deleteValidation, userController.deleteUser);
+app.delete('/account/:id', /*deleteValidation,*/ userController.deleteUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
@@ -63,7 +63,7 @@ app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id' , courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
-app.post('/courses', courseController.createCourse); 
+app.post('/courses', upload.single('video'), courseController.createCourse);
 app.delete('/courses/:id', courseController.deleteCourse);
 
 

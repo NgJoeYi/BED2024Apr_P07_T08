@@ -43,11 +43,15 @@ document.getElementById('register-form').addEventListener('submit', async functi
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText);
+            const errorData = await response.json();
+            if (errorData.errors.length > 0){
+                alert(`Validation errors:\n${errorData.errors.join('\n')}`);
+            } else {
+                alert(`${errorData.message}`);
+            }
+            return;
         }
 
-        const result = await response.json();
         alert('Registration successful!');        
         window.location.href = 'Login.html';
     } catch (error) {
