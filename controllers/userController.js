@@ -20,10 +20,10 @@ const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
         // Check if user already exists
-        const existingUser = await User.userExists(newUserData);
+        const existingUser = await User.loginUser(newUserData);
         if (existingUser) {
             return res.status(400).send('User already exists');
-        }
+        } 
         // Hash the password
         const hashedPassword = await bcrypt.hash(newUserData.password, 10);
         newUserData.password = hashedPassword; // Replace plain text password with hashed password  
@@ -41,17 +41,15 @@ const createUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const userLoginData = req.body; // user filled in email and password field
+    const { email, password } = req.body; // user filled in email and password field
     try {
-        // Check if user exists
-        const user = await User.userExists(userLoginData);
-        if (!user) {
-            return res.status(404).send('User does not exist');
-        }
-        const loginSuccess = await User.loginUser(userLoginData);
+        const loginSuccess = await User.loginUser({ email });
         if (!loginSuccess) {
-            console.log('Login failed: Invalid email or password');
             return res.status(404).send('Invalid email or password');
+        }
+        const matchPassword = await bcrypt.compare(password, loginSuccess.password);
+        if (!matchPassword) {
+            return res.status(404).send('Invalid password. Please try again.');
         }
         res.status(200).json(loginSuccess);
     } catch (error) {
@@ -71,7 +69,6 @@ const updateUser = async (req, res) => {
         }
 
         if (newUserData.newPassword) {
-            // compare current password and the password in the database 
             if (!newUserData.currentPassword) {
                 return res.status(400).json({ message: 'Current password is required to set a new password' });
             }
@@ -79,9 +76,18 @@ const updateUser = async (req, res) => {
             if (!isPasswordMatch) {
                 return res.status(400).json({ message: 'Current password is incorrect' });
             }
+            newUserData.password = await bcrypt.hash(newUserData.newPassword, 10);
+        } else {
+            newUserData.password = user.password;
         }
 
-        const updatedUser = await User.updateUser(userId, newUserData);
+        const updatedUser = await User.updateUser(userId, {
+            name: newUserData.name || user.name,
+            email: newUserData.email || user.email,
+            dob: newUserData.dob || user.dob,
+            password: newUserData.password
+        });
+
         res.status(200).json(updatedUser);
     } catch (error) {
         console.error('Server error:', error); // Log error details
@@ -90,7 +96,7 @@ const updateUser = async (req, res) => {
 };
 
 
-// after implementing the basics i want to prompt user to enter password before account is actually deleted
+// after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
 const deleteUser = async (req, res) => {
     const userId = parseInt(req.params.id);
     const passwordInput = req.body;
@@ -121,3 +127,13 @@ module.exports = {
     updateUser,
     deleteUser
 };
+
+// ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
+// 1. hashing the password so if even 2 users have the same password, the hash value is different
+
+// 2. bcrypt.hash(newUserData.newPassword, 10) the 10 in this is the level of security, 
+// the higher the value, the more secure it is because it is the number of times hashing algo is executed
+// it is known as salt rounds
+
+// 3. bcrypt.compare(userLoginData.password, user.password) this bcrypt.compare 
+// compares the plain text password and the hashed password, returns true if match, & false otherwise
