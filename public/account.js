@@ -513,174 +513,251 @@ async function deleteReview(reviewId) {
   }
 }
 
-// Edit review function
+// Edit review function to open the modal
 function editReview(reviewId, currentText, currentRating) {
-  const newText = prompt('Enter new review text:', currentText);
-  const newRating = parseInt(prompt('Enter new rating (1-5):', currentRating), 10);
+  openEditReviewModal(reviewId, currentText, currentRating);
+}
+
+// Function to open the edit review modal
+function openEditReviewModal(reviewId, currentText, currentRating) {
+  const modal = document.getElementById('editReviewModal');
+  modal.style.display = 'block';
+
+  document.getElementById('editReviewText').value = currentText;
+
+  // Set the selected rating
+  const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
+  stars.forEach((star, index) => {
+    star.classList.remove('selected');
+    if (index < currentRating) {
+      star.classList.add('selected');
+    }
+  });
+
+  // Add event listener to save button
+  document.getElementById('submitEditedReview').onclick = function () {
+    submitEditedReview(reviewId);
+  };
+}
+
+// Function to close the edit review modal
+function closeEditReviewModal() {
+  const modal = document.getElementById('editReviewModal');
+  modal.style.display = 'none';
+}
+
+// Function to submit the edited review
+async function submitEditedReview(reviewId) {
+  const newText = document.getElementById('editReviewText').value;
+  const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
+
   if (newText && newRating >= 1 && newRating <= 5) {
-    updateReview(reviewId, newText, newRating);
+    try {
+      const response = await fetch(`/reviews/${reviewId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ review_text: newText, rating: newRating, userId: sessionStorage.getItem('userId') })
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update review');
+      }
+      alert('Review updated successfully');
+      closeEditReviewModal();
+      fetchAndDisplayReviews(); // Refresh the reviews
+    } catch (error) {
+      console.error('Error updating review:', error);
+    }
   } else {
     alert('Invalid input');
   }
 }
 
-async function updateReview(reviewId, reviewText, rating) {
+// Add click event listeners to stars for rating selection in modal
+document.querySelectorAll('#editReviewModal .stars .fa-star').forEach((star, index) => {
+  star.addEventListener('click', function () {
+    const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
+    stars.forEach((s, i) => {
+      if (i <= index) {
+        s.classList.add('selected');
+      } else {
+        s.classList.remove('selected');
+      }
+    });
+  });
+
+  star.addEventListener('mouseover', function () {
+    const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
+    stars.forEach((s, i) => {
+      if (i <= index) {
+        s.classList.add('hover');
+      } else {
+        s.classList.remove('hover');
+      }
+    });
+  });
+
+  star.addEventListener('mouseout', function () {
+    const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
+    stars.forEach(s => {
+      s.classList.remove('hover');
+    });
+  });
+});
+
+
+
+// ----------------------------------------------DISCUSSION--------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  fetchUserDiscussions();
+});
+
+async function fetchUserDiscussions() {
+  const userId = getCurrentUserId();
+  if (!userId) {
+    console.error('No user ID found');
+    return;
+  }
+
   try {
-    const response = await fetch(`/reviews/${reviewId}`, {
+    const response = await fetch(`/discussions/user/${userId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user discussions');
+    }
+
+    const data = await response.json();
+    const discussionsContainer = document.querySelector('.user-discussions');
+    const noDiscussionsMessage = document.querySelector('.no-discussions-message');
+    
+    discussionsContainer.innerHTML = '';
+
+    if (data.success) {
+      if (data.discussions.length === 0) {
+        noDiscussionsMessage.style.display = 'block';
+      } else {
+        noDiscussionsMessage.style.display = 'none';
+        data.discussions.forEach(discussion => {
+          addUserDiscussionToFeed(discussion);
+        });
+      }
+    } else {
+      alert('Error fetching user discussions.');
+    }
+  } catch (error) {
+    alert('Error fetching user discussions.');
+  }
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function addUserDiscussionToFeed(discussion) {
+  const feed = document.querySelector('.user-discussions');
+  const post = document.createElement('div');
+  post.classList.add('post');
+  post.setAttribute('data-id', discussion.id);
+
+  const capitalizedUsername = capitalizeFirstLetter(discussion.username);
+
+  post.innerHTML = `
+    <div class="post-header">
+      <div class="profile-pic">
+        <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
+      </div>
+      <div class="username">${capitalizedUsername}</div>
+    </div>
+    <div class="post-meta">
+      <span class="category">Category: ${discussion.category}</span>
+      <span class="posted-date-activity">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+    </div>
+    <div class="post-content">
+      <p>${discussion.description}</p>
+    </div>
+    <div class="post-footer">
+      <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
+      <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
+    </div>
+  `;
+
+  feed.appendChild(post);
+
+  post.querySelector('.edit-btn').addEventListener('click', () => openEditModal(discussion.id, discussion.description, discussion.category));
+  post.querySelector('.delete-btn').addEventListener('click', () => openDeleteModal(discussion.id));
+}
+
+function getCurrentUserId() {
+  return sessionStorage.getItem('userId');
+}
+
+// Edit Modal functions
+function openEditModal(discussionId, description, category) {
+  document.getElementById('editText').value = description;
+  document.getElementById('editCategory').value = category;
+  document.getElementById('editModal').style.display = 'block';
+
+  document.getElementById('saveEdit').onclick = function () {
+    saveEdit(discussionId);
+  };
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').style.display = 'none';
+}
+
+async function saveEdit(discussionId) {
+  const description = document.getElementById('editText').value;
+  const category = document.getElementById('editCategory').value;
+
+  try {
+    const response = await fetch(`/discussions/${discussionId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ review_text: reviewText, rating: rating, userId: sessionStorage.getItem('userId') })
+      body: JSON.stringify({ description, category, userId: getCurrentUserId() })
     });
     if (!response.ok) {
-      throw new Error('Failed to update review');
+      throw new Error('Failed to update discussion');
     }
-    alert('Review updated successfully');
-    fetchAndDisplayReviews(); // Refresh the reviews
+    alert('Discussion updated successfully');
+    fetchUserDiscussions();
+    closeEditModal();
   } catch (error) {
-    console.error('Error updating review:', error);
+    console.error('Error updating discussion:', error);
   }
 }
 
+// Delete Modal functions
+function openDeleteModal(discussionId) {
+  document.getElementById('deleteModal').style.display = 'block';
 
-// ----------------------------------------------DISCUSSION--------------------------------------------------------------
+  document.getElementById('confirmDelete').onclick = function () {
+    deleteDiscussion(discussionId);
+  };
+}
 
+function closeDeleteModal() {
+  document.getElementById('deleteModal').style.display = 'none';
+}
 
-document.addEventListener('DOMContentLoaded', () => {
+async function deleteDiscussion(discussionId) {
+  try {
+    const response = await fetch(`/discussions/${discussionId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId: getCurrentUserId() })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete discussion');
+    }
+    alert('Discussion deleted successfully');
     fetchUserDiscussions();
-});
-
-async function fetchUserDiscussions() {
-    const userId = getCurrentUserId(); // Function to get the current logged-in user's ID
-    if (!userId) {
-        console.error('No user ID found');
-        return;
-    }
-
-    try {
-        const response = await fetch(`/discussions/user/${userId}`);
-        console.log('Fetch response:', response); // Debugging
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch user discussions');
-        }
-
-        const data = await response.json();
-        console.log('Fetched data:', data); // Debugging
-
-        const discussionsContainer = document.querySelector('.user-discussions');
-        const noDiscussionsMessage = document.querySelector('.no-discussions-message');
-        
-        discussionsContainer.innerHTML = ''; // Clear previous discussions
-
-        if (data.success) {
-            if (data.discussions.length === 0) {
-                noDiscussionsMessage.style.display = 'block';
-            } else {
-                noDiscussionsMessage.style.display = 'none';
-                data.discussions.forEach(discussion => {
-                    addUserDiscussionToFeed(discussion);
-                });
-            }
-        } else {
-            console.error('Error response from server:', data.error);
-            alert('Error fetching user discussions.');
-        }
-    } catch (error) {
-        console.error('Error fetching user discussions:', error);
-        alert('Error fetching user discussions.');
-    }
-}
-
-function addUserDiscussionToFeed(discussion) {
-    const feed = document.querySelector('.user-discussions');
-    const post = document.createElement('div');
-    post.classList.add('post');
-    post.setAttribute('data-id', discussion.id);
-
-    post.innerHTML = `
-        <div class="post-header">
-            <div class="profile-pic">
-                <img src="${discussion.profilePic || 'profilePic2.jpeg'}" alt="Profile Picture">
-            </div>
-            <div class="username">${discussion.username}</div>
-        </div>
-        <div class="post-meta">
-            <span class="category">Category: ${discussion.category}</span>
-            <span class="posted-date-activity">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
-        </div>
-        <div class="post-content">
-            <p>${discussion.description}</p>
-        </div>
-        <div class="post-footer">
-            <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
-            <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
-        </div>
-    `;
-
-    feed.appendChild(post);
-
-    // Add event listeners for edit and delete buttons
-    post.querySelector('.edit-btn').addEventListener('click', () => editUserDiscussion(discussion.id));
-    post.querySelector('.delete-btn').addEventListener('click', () => deleteUserDiscussion(discussion.id));
-}
-
-function getCurrentUserId() {
-    // Implement the logic to get the current user's ID.
-    return sessionStorage.getItem('userId');
-}
-
-// Edit discussion function
-function editUserDiscussion(discussionId) {
-    const currentText = prompt('Enter new discussion text:');
-    const currentCategory = prompt('Enter new category:', 'General'); // Add more fields if needed
-    if (currentText && currentCategory) {
-        updateDiscussion(discussionId, currentText, currentCategory);
-    } else {
-        alert('Invalid input');
-    }
-}
-
-// Update discussion function
-async function updateDiscussion(discussionId, description, category) {
-    try {
-        const response = await fetch(`/discussions/${discussionId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ description, category, userId: getCurrentUserId() })
-        });
-        if (!response.ok) {
-            throw new Error('Failed to update discussion');
-        }
-        alert('Discussion updated successfully');
-        fetchUserDiscussions(); // Refresh the discussions
-    } catch (error) {
-        console.error('Error updating discussion:', error);
-    }
-}
-
-
-
-
-// Delete discussion function
-async function deleteUserDiscussion(discussionId) {
-    try {
-        const response = await fetch(`/discussions/${discussionId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: getCurrentUserId() })
-        });
-        if (!response.ok) {
-            throw new Error('Failed to delete discussion');
-        }
-        alert('Discussion deleted successfully');
-        fetchUserDiscussions(); // Refresh the discussions
-    } catch (error) {
-        console.error('Error deleting discussion:', error);
-    }
+    closeDeleteModal();
+  } catch (error) {
+    console.error('Error deleting discussion:', error);
+  }
 }
