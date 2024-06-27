@@ -66,7 +66,6 @@ class User {
         }
     }
 
-    // --------------------------------------------------------------------------------------------------------- move bcrypt to controller
     // userLoginData sent in req.body rmb to extract name and email
     static async loginUser(userLoginData) {
         let connection;
@@ -78,9 +77,10 @@ class User {
             const request = connection.request();
             request.input('inputEmail', userLoginData.email);
             const result = await request.query(sqlQuery);
+            
             const user = result.recordset[0];
             if (!user){
-                throw new Error("User not found");
+                return null;
             }            
             return new User(user.id, user.name, user.dob, user.email, user.password, user.role);
         } catch(error) {
@@ -93,76 +93,32 @@ class User {
         }
     }
 
-
-    /*
-    // since password need to be compared in controller
-    static async loginUser(loginData) {
+    static async updateUser(userId, newUserData) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
-            const request = connection.request();
-            const result = await request.query(sqlQuery);
-            const user = result.recordset[0]; // since only need 1 user
-            if (!user) {
-                throw new
-            }
-        }
-    }
-    */
-
-    // --------------------------------------------------------------------------------------------------------- move bcrypt to controller
-    static async updateUser(userId, newUserData) {
-        let connection;
-        try {    
-            // Fetch the existing user
-            const user = await this.getUserById(userId);
-            if (!user) {
-                throw new Error('User not found');
-            }
-
-            connection = await sql.connect(dbConfig);
-
-    
-            // Prepare the updated fields
-            const updatedFields = {
-                name: newUserData.name || user.name,
-                email: newUserData.email || user.email,
-                dob: newUserData.dob || user.dob,
-                password: user.password 
-            };
-            // If a new password is provided, hash it
-            if (newUserData.newPassword) {
-                updatedFields.password = await bcrypt.hash(newUserData.newPassword, 10);
-            }
-    
-            // Update the user in the database
             const sqlQuery = `
                 UPDATE Users SET 
                 name=@inputName, email=@inputEmail, dob=@inputDob, password=@inputPassword
                 WHERE id=@inputUserId
             `;
             const request = connection.request();
-            request.input('inputName', updatedFields.name);
-            request.input('inputEmail', updatedFields.email);
-            request.input('inputDob', updatedFields.dob);
-            request.input('inputPassword', updatedFields.password);
+            request.input('inputName', newUserData.name);
+            request.input('inputEmail', newUserData.email);
+            request.input('inputDob', newUserData.dob);
+            request.input('inputPassword', newUserData.password);
             request.input('inputUserId', userId);
     
             const result = await request.query(sqlQuery);
-    
             if (result.rowsAffected[0] === 0) {
                 throw new Error("User not updated");
             }
-    
-            // Return the updated user
             return await this.getUserById(userId);
         } catch (error) {
             console.error('Error updating user:', error);
             throw error;
         } finally {
             if (connection) {
-                // Ensure the connection is properly closed
                 await connection.close();
             }
         }

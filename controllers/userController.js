@@ -20,10 +20,10 @@ const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
         // Check if user already exists
-        const existingUser = await User.userExists(newUserData);
+        const existingUser = await User.loginUser(newUserData);
         if (existingUser) {
             return res.status(400).send('User already exists');
-        }
+        } 
         // Hash the password
         const hashedPassword = await bcrypt.hash(newUserData.password, 10);
         newUserData.password = hashedPassword; // Replace plain text password with hashed password  
@@ -69,7 +69,6 @@ const updateUser = async (req, res) => {
         }
 
         if (newUserData.newPassword) {
-            // compare current password and the password in the database 
             if (!newUserData.currentPassword) {
                 return res.status(400).json({ message: 'Current password is required to set a new password' });
             }
@@ -77,9 +76,18 @@ const updateUser = async (req, res) => {
             if (!isPasswordMatch) {
                 return res.status(400).json({ message: 'Current password is incorrect' });
             }
+            newUserData.password = await bcrypt.hash(newUserData.newPassword, 10);
+        } else {
+            newUserData.password = user.password;
         }
 
-        const updatedUser = await User.updateUser(userId, newUserData);
+        const updatedUser = await User.updateUser(userId, {
+            name: newUserData.name || user.name,
+            email: newUserData.email || user.email,
+            dob: newUserData.dob || user.dob,
+            password: newUserData.password
+        });
+
         res.status(200).json(updatedUser);
     } catch (error) {
         console.error('Server error:', error); // Log error details
