@@ -3,6 +3,8 @@ const sql = require('mssql');
 const bodyParser = require('body-parser');
 const path = require('path');
 const dbConfig = require('./dbConfig');
+const session = require('express-session');
+
 const userController = require('./controllers/userController');
 const discussionController = require('./controllers/discussionController');
 const commentController = require('./controllers/commentController');
@@ -10,6 +12,7 @@ const reviewController = require('./controllers/reviewController');
 const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
 const lecturerController = require('./controllers/lecturerController');
+
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
 const deleteValidation = require('./middleware/deleteValidation');
@@ -17,6 +20,14 @@ const deleteValidation = require('./middleware/deleteValidation');
 const multer = require('multer'); 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Set up session middleware
+app.use(session({
+    secret: 'your_secret_key', // Replace with your secret key
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // Set to true if using HTTPS
+}));
 
 // Set up the view engine
 app.set('view engine', 'ejs');
@@ -41,7 +52,7 @@ app.get('/account', (req, res) => {
 // Add Routes for users
 app.post('/account/uploadProfilePic/:id', userController.uploadProfilePic);
 app.get('/account/profile/:id', userController.getUserProfile);
-
+app.get('/current-user', userController.getCurrentUser);
 app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);

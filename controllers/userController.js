@@ -41,23 +41,43 @@ const createUser = async (req, res) => {
     }
 };
 
+// const loginUser = async (req, res) => {
+//     const { email, password } = req.body; // user filled in email and password field
+//     try {
+//         const loginSuccess = await User.loginUser({ email });
+//         if (!loginSuccess) {
+//             return res.status(404).send( { message: 'Invalid email. No user found'} );
+//         }
+//         const matchPassword = await bcrypt.compare(password, loginSuccess.password);
+//         if (!matchPassword) {
+//             return res.status(404).json( { message: 'Invalid password. Please try again'} );
+//         }
+//         res.status(200).json(loginSuccess);
+//     } catch (error) {
+//         console.error('Server error:', error); // Log error details
+//         res.status(500).send('Server error');
+//     }
+// };
+
 const loginUser = async (req, res) => {
-    const { email, password } = req.body; // user filled in email and password field
     try {
-        const loginSuccess = await User.loginUser({ email });
-        if (!loginSuccess) {
-            return res.status(404).send( { message: 'Invalid email. No user found'} );
+        const { email, password } = req.body;
+        const user = await User.loginUser({ email, password });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
-        const matchPassword = await bcrypt.compare(password, loginSuccess.password);
-        if (!matchPassword) {
-            return res.status(404).json( { message: 'Invalid password. Please try again'} );
-        }
-        res.status(200).json(loginSuccess);
+
+        // Save user ID in session
+        req.session.userId = user.id;
+
+        res.json(user);
     } catch (error) {
-        console.error('Server error:', error); // Log error details
-        res.status(500).send('Server error');
+        console.error('Error during login:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 const updateUser = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -181,12 +201,19 @@ const getUserProfile = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
+const getCurrentUser = async (req, res) => {
+    try {
+        const userId = req.session.userId; // using session
+        const user = await User.getUserById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error('Error fetching current user:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
 
 module.exports = {
@@ -196,7 +223,8 @@ module.exports = {
     updateUser,
     deleteUser,
     uploadProfilePic,
-    getUserProfile
+    getUserProfile,
+    getCurrentUser
 };
 
 
