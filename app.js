@@ -39,8 +39,8 @@ app.get('/account', (req, res) => {
 });
 
 // Add Routes for users
-app.post('/account/uploadProfilePic/:id', userController.uploadProfilePic);
-app.get('/account/profile/:id', userController.getUserProfile);
+app.post('/account/uploadProfilePic/:id', userController.updateProfilePic);
+app.get('/account/profile/:id', userController.getProfilePicByUserId);
 
 app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
