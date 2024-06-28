@@ -105,7 +105,8 @@ async function run() {
             LectureImage VARBINARY(MAX),
             Duration INT, -- Duration in minutes
             Position INT, -- Position in the course sequence
-            CreatedAt DATETIME DEFAULT GETDATE()
+            CreatedAt DATETIME DEFAULT GETDATE(),
+            ChapterName NVARCHAR(256)
         );
 
         CREATE TABLE user_reviews (
@@ -174,32 +175,31 @@ async function run() {
 
         // Insert data into Lectures table
         const insertLectures = `
-        INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Video, LectureImage, Duration, Position) VALUES
+        INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Video, LectureImage, Duration, Position, ChapterName) VALUES
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
-         (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Python Basics', 'Introduction to Python programming basics.', 'http://example.com/python_basics', @Video, @Image, 60, 1),
+        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
+        'Python Basics', 'Introduction to Python programming basics.', 'http://example.com/python_basics', @video, @lectureImage, 60, 1, 'Introduction'),
 
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
-         (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Data Types in Python', 'Understanding different data types in Python.', 'http://example.com/data_types',@Video,@Image, 90, 2),
+        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
+        'Data Types in Python', 'Understanding different data types in Python.', 'http://example.com/data_types', @video, @lectureImage, 90, 2, 'Chapter Two'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
-         (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
-         'Algebraic Structures', 'Exploring advanced algebraic structures.', 'http://example.com/algebraic_structures',@Video,@Image, 120, 1),
+        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
+        'Algebraic Structures', 'Exploring advanced algebraic structures.', 'http://example.com/algebraic_structures', @video, @lectureImage, 120, 1, 'Introduction'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
-         (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
-         'Polynomial Equations', 'Solving polynomial equations in algebra.', 'http://example.com/polynomial_equations', @Video,@Image,100, 2),
+        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
+        'Polynomial Equations', 'Solving polynomial equations in algebra.', 'http://example.com/polynomial_equations', @video, @lectureImage, 100, 2, 'Chapter Two'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
-         (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'SEO Basics', 'Introduction to Search Engine Optimization.', 'http://example.com/seo_basics', @Video,@Image,75, 1),
+        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
+        'SEO Basics', 'Introduction to Search Engine Optimization.', 'http://example.com/seo_basics', @video, @lectureImage, 75, 1, 'Introduction'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
-         (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
-         'Content Marketing', 'Strategies for effective content marketing.', 'http://example.com/content_marketing',@Video,@Image, 85, 2);
+        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
+        'Content Marketing', 'Strategies for effective content marketing.', 'http://example.com/content_marketing', @video, @lectureImage, 85, 2, 'Chapter Two');
         `;
         await connection.request()
-        .input('Video', sql.VarBinary, videoBuffer)
-        .input('Image',sql.VarBinary,imageBuffer)
+        .input('video', sql.VarBinary, videoBuffer)
+        .input('lectureImage', sql.VarBinary, imageBuffer)
         .query(insertLectures);
-
         // Insert data into user_reviews table
         const insertUserReviews = `
         INSERT INTO user_reviews (user_id, review_text, rating, review_date) VALUES 

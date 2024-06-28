@@ -91,7 +91,8 @@ app.delete('/courses/:id', courseController.deleteCourse);
 app.get('/lectures', lectureController.getAllLectures);
 app.get('/lectures/:id' , lectureController.getLectureByID);
 app.put('/lectures/:id', lectureController.updateLecture);
-app.post('/lectures', lectureController.createLecture); 
+app.post('/lectures', upload.any(),lectureController.createLecture); 
+// app.post('/lectures', upload.fields([{ name: 'videoFiles', maxCount: 1 }, { name: 'lectureImage', maxCount: 1 }]), lectureController.createLecture);
 app.delete('/lectures/:id', lectureController.deleteLecture);
 
 // Add Routes for lecturer

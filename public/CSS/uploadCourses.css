@@ -57,6 +57,11 @@
     font-size: 30px;
 }
 /* lecture arrangement*/
+.lecture-details p {
+    margin: 5px 0;
+    font-size: 18px;
+}
+
 .course-arrangement .chapter {
     margin-top: 20px;
 }

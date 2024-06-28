@@ -1,15 +1,22 @@
 const Lectures = require("../models/Lectures");
-const sql = require("mssql");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-const getAllLectures = async(req,res) =>{
-    try{
+// Multer setup for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+const getAllLectures = async (req, res) => {
+    try {
         const getAllLectures = await Lectures.getAllLectures();
         res.json(getAllLectures);
-    }catch(error){
+    } catch (error) {
         console.error(error);
         res.status(500).send('Error retrieving lectures');
     }
 };
+
 const getLectureByID = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -24,48 +31,73 @@ const getLectureByID = async (req, res) => {
     }
 };
 
-const updateLecture = async(req,res)=>{
+const updateLecture = async (req, res) => {
     const id = parseInt(req.params.id);
     const newLectureData = req.body;
-    try{
-        const updateLecture = await Lectures.updateLecture(id,newLectureData);
-        if(!updateLecture){
-            return res.status(404).send('Lecture not found !');
+    try {
+        const updateLecture = await Lectures.updateLecture(id, newLectureData);
+        if (!updateLecture) {
+            return res.status(404).send('Lecture not found!');
         }
         res.json(updateLecture);
-    }catch (error) {
+    } catch (error) {
         console.error(error);
         res.status(500).send("Error updating lecture");
     }
 };
-const createLecture = async(req,res)=>{
-    const newLectureData = req.body;
-    try{
-        const createLecture = await Lectures.CreateLecture(newLectureData);
-        res.status(201).json(createLecture);
-    }catch (error) {
-        console.error(error);
+
+const createLecture = async (req, res) => {
+    const { ChapterName, Title, Duration, Description } = req.body;
+    console.log('Request Body:', req.body); // Log the request body
+    const videoFile = req.files.find(file => file.fieldname === 'videoFiles');
+    const lectureImage = req.files.find(file => file.fieldname === 'lectureImage');
+
+    try {
+        // Validate required fields
+        if (!Title) {
+            throw new Error('Title is required');
+        }
+
+        const newLectureData = {
+            ChapterName,
+            Title,
+            Duration: parseInt(Duration),
+            Description,
+            VideoURL: '',
+            Video: videoFile ? videoFile.buffer : null,
+            LectureImage: lectureImage ? lectureImage.buffer : null,
+            Position: 1
+        };
+
+        console.log('New Lecture Data:', newLectureData); // Log the new lecture data
+
+        const newLectureID = await Lectures.createLecture(newLectureData);
+        res.status(201).json({ newLectureID, ...newLectureData });
+    } catch (error) {
+        console.error("Error creating lecture:", error);
         res.status(500).send("Error creating lecture");
     }
 };
 
-const deleteLecture = async(req,res)=>{
+const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
-    try{
+    try {
         const success = await Lectures.deleteLecture(lectureID);
-        if (!success){
+        if (!success) {
             return res.status(404).send("Lecture not found");
         }
         res.status(204).send("Lecture successfully deleted");
-    }catch (error) {
+    } catch (error) {
         console.error(error);
-        res.status(500).send("Error creating lecture");
+        res.status(500).send("Error deleting lecture");
     }
 };
-module.exports ={
+
+module.exports = {
     getAllLectures,
     getLectureByID,
     updateLecture,
     createLecture,
-    deleteLecture
-}
+    deleteLecture,
+    upload
+};
