@@ -19,11 +19,11 @@ async function getComments(req, res) {
 }
 
 async function createComment(req, res) {
-    const { content, userId, parent_comment_id } = req.body;
+    const { content, userId, discussionId } = req.body;
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const result = await commentModel.createComment(connection, content, userId, parent_comment_id);
+        const result = await commentModel.createComment(connection, content, userId, discussionId);
         res.status(201).json(result);
     } catch (err) {
         console.error(err);
