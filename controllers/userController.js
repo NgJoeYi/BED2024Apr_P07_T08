@@ -169,7 +169,7 @@ const getProfilePicByUserId = async (req, res) => {
             return res.status(404).send('User does not exist');
         }
 
-        const profilePic = await User.getProfilePicByUserId(userId);
+        let profilePic = await User.getProfilePicByUserId(userId);
         if (!profilePic) {
            profilePic = 'images/profilePic.jpeg'; // Default profile picture 
         }
