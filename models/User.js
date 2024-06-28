@@ -221,7 +221,7 @@ class User {
             const request = connection.request();
             request.input('userId', userId);
             const result = await request.query(sqlQuery);
-            if (result.recordset[0] === 0) {
+            if (result.recordset.length === 0) {
                 return null;
             }
             return result.recordset[0].img;

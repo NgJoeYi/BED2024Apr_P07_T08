@@ -335,7 +335,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 // ---------------------------------------------- UPLOAD PROFILE PICTURE ----------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const userId = sessionStorage.getItem('userId');
-  fetchUserProfile(userId);
+  if (userId) {
+    fetchUserProfile(userId);
+  } else {
+    alert('Please log in first to upload your profile picture.');
+    return;
+  }
 });
 
 async function fetchUserProfile(userId) {
