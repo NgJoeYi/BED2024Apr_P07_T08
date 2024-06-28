@@ -36,11 +36,10 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set up multer for file uploads
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Include body-parser middleware to handle JSON data
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
@@ -86,13 +85,20 @@ app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', upload.single('courseImage'), courseController.createCourse);
 app.delete('/courses/:id', courseController.deleteCourse);
 
-
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures);
 app.get('/lectures/:id' , lectureController.getLectureByID);
 app.put('/lectures/:id', lectureController.updateLecture);
-app.post('/lectures', upload.any(),lectureController.createLecture); 
-// app.post('/lectures', upload.fields([{ name: 'videoFiles', maxCount: 1 }, { name: 'lectureImage', maxCount: 1 }]), lectureController.createLecture);
+
+app.post('/lectures', upload.fields([
+    { name: 'Video', maxCount: 1 },
+    { name: 'LectureImage', maxCount: 1 }
+]), (req, res, next) => {
+    console.log('Request Body:', req.body); // Log the request body
+    console.log('Files:', req.files); // Log the files to debug
+    next();
+}, lectureController.createLecture);
+
 app.delete('/lectures/:id', lectureController.deleteLecture);
 
 // Add Routes for lecturer
@@ -101,7 +107,6 @@ app.get('/lecturer/:id' , lecturerController.getLecturerByID);
 app.put('/lecturer/:id', lecturerController.updateLecturer);
 app.post('/lecturer', lecturerController.createLecturer); 
 app.delete('/lecturer/:id', lecturerController.deleteLecturer);
-
 
 app.listen(port, async () => {
     try {

@@ -2,6 +2,8 @@ const Lectures = require("../models/Lectures");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const sql = require("mssql");
+const dbConfig = require('../dbConfig');
 
 // Multer setup for file uploads
 const storage = multer.memoryStorage();
@@ -46,11 +48,67 @@ const updateLecture = async (req, res) => {
     }
 };
 
+// Function to get the last chapter name
+const getLastChapterName = async () => {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures ORDER BY CreatedAt DESC`;
+        const result = await connection.request().query(sqlQuery);
+        return result.recordset.length ? result.recordset[0].ChapterName : null;
+    } catch (error) {
+        console.error('Error getting last chapter name:', error);
+        throw error;
+    } finally {
+        if (connection) await connection.close();
+    }
+};
+
+// Function to get the current position in the chapter
+const getCurrentPositionInChapter = async (ChapterName) => {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        const sqlQuery = `SELECT MAX(Position) as Position FROM Lectures WHERE ChapterName = @ChapterName`;
+        const result = await connection.request()
+            .input('ChapterName', sql.NVarChar, ChapterName)
+            .query(sqlQuery);
+        const currentPosition = result.recordset[0].Position;
+        return currentPosition ? currentPosition + 1 : 1;
+    } catch (error) {
+        console.error('Error getting current position:', error);
+        throw error;
+    } finally {
+        if (connection) await connection.close();
+    }
+};
+
 const createLecture = async (req, res) => {
     const { ChapterName, Title, Duration, Description } = req.body;
     console.log('Request Body:', req.body); // Log the request body
-    const videoFile = req.files.find(file => file.fieldname === 'videoFiles');
-    const lectureImage = req.files.find(file => file.fieldname === 'lectureImage');
+    console.log('Files:', req.files); // Log the files to debug
+
+    // Ensure videoFile and lectureImage are being extracted correctly
+    const videoFile = req.files['Video'] ? req.files['Video'][0] : null;
+    const lectureImage = req.files['LectureImage'] ? req.files['LectureImage'][0] : null;
+
+    let videoBuffer = null;
+    let imageBuffer = null;
+
+    if (videoFile) {
+        const videoFilePath = path.join(__dirname, '../uploads', videoFile.originalname);
+        fs.writeFileSync(videoFilePath, videoFile.buffer);
+        videoBuffer = fs.readFileSync(videoFilePath);
+    }
+
+    if (lectureImage) {
+        const lectureImagePath = path.join(__dirname, '../uploads', lectureImage.originalname);
+        fs.writeFileSync(lectureImagePath, lectureImage.buffer);
+        imageBuffer = fs.readFileSync(lectureImagePath);
+    }
+
+    console.log('Video Buffer:', videoBuffer); // Log the video buffer to debug
+    console.log('Image Buffer:', imageBuffer); // Log the image buffer to debug
 
     try {
         // Validate required fields
@@ -58,15 +116,22 @@ const createLecture = async (req, res) => {
             throw new Error('Title is required');
         }
 
+        // Get the current position in the chapter, using the last chapter name if necessary
+        let chapterNameToUse = ChapterName;
+        if (!ChapterName) {
+            chapterNameToUse = await getLastChapterName();
+        }
+        const position = await getCurrentPositionInChapter(chapterNameToUse);
+
         const newLectureData = {
-            ChapterName,
+            ChapterName: chapterNameToUse,
             Title,
             Duration: parseInt(Duration),
             Description,
-            VideoURL: '',
-            Video: videoFile ? videoFile.buffer : null,
-            LectureImage: lectureImage ? lectureImage.buffer : null,
-            Position: 1
+            VideoURL: '', // Assuming this is part of your logic to add video URL
+            Video: videoBuffer,
+            LectureImage: imageBuffer,
+            Position: position
         };
 
         console.log('New Lecture Data:', newLectureData); // Log the new lecture data
@@ -78,6 +143,7 @@ const createLecture = async (req, res) => {
         res.status(500).send("Error creating lecture");
     }
 };
+
 
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);

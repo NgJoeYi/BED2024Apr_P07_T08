@@ -14,20 +14,27 @@ async function addFiles() {
     const title = document.getElementById('lectureName').value.trim(); // Match key name to backend
     const duration = document.getElementById('duration').value.trim();
     const description = document.getElementById('description').value.trim();
-    const fileInputs = document.querySelectorAll('#fileInputContainer input[type="file"]');
+    const videoFileInput = document.getElementById('videoFiles'); // Ensure the ID matches
+    const imageFileInput = document.getElementById('lectureImage'); // Ensure the ID matches
 
-    if (chapterName && title && duration && description && fileInputs.length > 0) {
+    if (chapterName && title && duration && description && videoFileInput.files.length > 0 && imageFileInput.files.length > 0) {
         const formData = new FormData();
         formData.append('ChapterName', chapterName);
         formData.append('Title', title); // Ensure this key matches the backend
         formData.append('Duration', duration);
         formData.append('Description', description);
 
-        fileInputs.forEach(input => {
-            Array.from(input.files).forEach(file => {
-                formData.append(file.name, file);
-            });
+        Array.from(videoFileInput.files).forEach(file => {
+            console.log('Appending video file:', file.name);
+            formData.append('Video', file); // Ensure this matches the field name expected by multer
         });
+
+        Array.from(imageFileInput.files).forEach(file => {
+            console.log('Appending image file:', file.name);
+            formData.append('LectureImage', file); // Ensure this matches the field name expected by multer
+        });
+
+        console.log('Form Data:', Array.from(formData.entries())); // Log form data
 
         try {
             const response = await fetch('/lectures', {
@@ -50,6 +57,7 @@ async function addFiles() {
         alert('Please fill in all fields and select at least one file.');
     }
 }
+
 
 // Function to display the new lecture in the UI
 function displayNewLecture(newLecture) {
