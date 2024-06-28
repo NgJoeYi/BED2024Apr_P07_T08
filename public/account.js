@@ -335,12 +335,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 // ---------------------------------------------- UPLOAD PROFILE PICTURE ----------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const userId = sessionStorage.getItem('userId');
-  if (userId) {
     fetchUserProfile(userId);
-  } else {
-    alert('Please log in first to upload your profile picture.');
-    return;
-  }
+    //alert('Please log in first to upload your profile picture.');
 });
 
 async function fetchUserProfile(userId) {
@@ -360,6 +356,11 @@ async function fetchUserProfile(userId) {
 }
 
 function triggerFileInput() {
+  const userId = sessionStorage.getItem('userId');
+  if (!userId) {
+    alert('Please log in first to upload your profile picture.');
+    return;
+  }
   document.getElementById('file-input').click();
 }
 
