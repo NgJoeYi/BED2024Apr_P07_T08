@@ -64,24 +64,6 @@ const getLastChapterName = async () => {
     }
 };
 
-// Function to get the current position in the chapter
-const getCurrentPositionInChapter = async (ChapterName) => {
-    let connection;
-    try {
-        connection = await sql.connect(dbConfig);
-        const sqlQuery = `SELECT MAX(Position) as Position FROM Lectures WHERE ChapterName = @ChapterName`;
-        const result = await connection.request()
-            .input('ChapterName', sql.NVarChar, ChapterName)
-            .query(sqlQuery);
-        const currentPosition = result.recordset[0].Position;
-        return currentPosition ? currentPosition + 1 : 1;
-    } catch (error) {
-        console.error('Error getting current position:', error);
-        throw error;
-    } finally {
-        if (connection) await connection.close();
-    }
-};
 
 const createLecture = async (req, res) => {
     const { ChapterName, Title, Duration, Description } = req.body;
@@ -121,9 +103,17 @@ const createLecture = async (req, res) => {
         if (!ChapterName) {
             chapterNameToUse = await getLastChapterName();
         }
-        const position = await getCurrentPositionInChapter(chapterNameToUse);
+        const position = await Lectures.getCurrentPositionInChapter(chapterNameToUse);
 
+        // Get the LecturerID from the session
+        const lecturerID = req.session.lecturerID;
+        if (!lecturerID) {
+            throw new Error('Lecturer not logged in');
+        }
+  
         const newLectureData = {
+            CourseID: 1, // Default value for demonstration
+            LecturerID: lecturerID,
             ChapterName: chapterNameToUse,
             Title,
             Duration: parseInt(Duration),
@@ -143,8 +133,6 @@ const createLecture = async (req, res) => {
         res.status(500).send("Error creating lecture");
     }
 };
-
-
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
     try {

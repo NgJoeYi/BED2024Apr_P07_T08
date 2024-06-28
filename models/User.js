@@ -177,26 +177,26 @@ class User {
             }
         }
     }
-
-
-
-
-
-
-
-
+    static async getLecturerByUserId(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `SELECT LecturerID FROM Lecturer WHERE UserID = @UserID`;
+            const result = await connection.request()
+                .input('UserID', sql.Int, userId)
+                .query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0];
+        } catch (error) {
+            console.error('Error retrieving lecturer by user ID:', error);
+            throw error;
+        } finally {
+            if (connection) await connection.close();
+        }
+    }
     
-
-
-
-
-
-
-
-
-
-
-
     static async updateProfilePic(userId, profilePic) {
         let connection;
         try {

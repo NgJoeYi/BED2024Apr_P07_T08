@@ -95,7 +95,6 @@ async function run() {
         );
 
         CREATE TABLE Lectures (
-            LectureID INT PRIMARY KEY IDENTITY(1,1),
             CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
             LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
             Title NVARCHAR(200) NOT NULL,
