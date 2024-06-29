@@ -27,6 +27,8 @@ async function fetchLastChapterName() {
 }
 
 
+
+
 // Function to add files to the course
 async function addFiles() {
     let previousChapterName = await fetchLastChapterName();

@@ -2,7 +2,8 @@ const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
 class Lectures {
-    constructor(courseID, lecturerID, title, description, videoURL, video, lectureImage, duration, position, createdAt, chapterName) {
+    constructor(lectureID, courseID, lecturerID, title, description, videoURL, video, lectureImage, duration, position, createdAt, chapterName) {
+        this.lectureID = lectureID;
         this.courseID = courseID;
         this.lecturerID = lecturerID;
         this.title = title;
@@ -22,6 +23,7 @@ class Lectures {
             const sqlQuery = `SELECT * FROM Lectures;`;
             const result = await connection.request().query(sqlQuery);
             return result.recordset.map(row => new Lectures(
+                row.LectureID,
                 row.CourseID,
                 row.LecturerID,
                 row.Title,
@@ -165,8 +167,8 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
-   // Function to get the last chapter name
-   static async getLastChapterName() {
+  
+    static async getLastChapterName() {
         let connection;
         try {
             console.log("Connecting to the database to fetch the last chapter name...");
@@ -174,6 +176,11 @@ class Lectures {
             const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures ORDER BY CreatedAt DESC`;
             const result = await connection.request().query(sqlQuery);
             console.log("Database query executed. Result:", result.recordset);
+            if (result.recordset.length === 0) {
+                console.log("No chapters found in the database.");
+            } else {
+                console.log("Last chapter name found:", result.recordset[0].ChapterName);
+            }
             return result.recordset.length ? result.recordset[0].ChapterName : null;
         } catch (error) {
             console.error('Error getting last chapter name:', error);
@@ -182,6 +189,8 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
+    
+    
 
 
 }
