@@ -25,6 +25,7 @@ const deleteValidation = require('./middleware/deleteValidation');
 const app = express();
 const port = process.env.PORT || 3000;
 
+
 // Set up session middleware
 app.use(session({
     secret: process.env.JWT_SECRET, // Use the secret key from the .env file
