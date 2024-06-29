@@ -18,8 +18,8 @@ document.getElementById('login-contact-form').addEventListener('submit', async f
         const user = await response.json();
         alert('Login successful!');
         sessionStorage.setItem('userId', user.id);
-        sessionStorage.setItem('role', user.role); // Store the user role in sessionStorage
-        window.location.href = 'Courses.html'; // Redirect to the courses page
+        sessionStorage.setItem('LecturerID', user.LecturerID); // Store LecturerID in sessionStorage
+        window.location.href = 'Courses.html'; // Redirect to courses page
     } else {
         const errorData = await response.json();
         alert(`${errorData.message}`);

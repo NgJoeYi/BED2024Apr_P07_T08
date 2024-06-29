@@ -27,9 +27,6 @@ async function fetchLastChapterName() {
 }
 
 
-
-
-// Function to add files to the course
 async function addFiles() {
     let previousChapterName = await fetchLastChapterName();
 
@@ -40,12 +37,21 @@ async function addFiles() {
     const videoFileInput = document.getElementById('videoFiles');
     const imageFileInput = document.getElementById('lectureImage');
 
+    const lecturerID = sessionStorage.getItem('LecturerID'); // Retrieve LecturerID from sessionStorage
+    console.log('LecturerID from sessionStorage:', lecturerID); // Log the LecturerID
+
+    if (!lecturerID) {
+        alert('LecturerID not found. Please log in again.');
+        return;
+    }
+
     if (!title || !duration || !description || videoFileInput.files.length === 0 || imageFileInput.files.length === 0) {
         alert('Please fill in all fields and select at least one file.');
         return;
     }
 
     const formData = new FormData();
+    formData.append('LecturerID', lecturerID); // Add LecturerID to formData
     if (chapterName) {
         formData.append('ChapterName', chapterName);
         previousChapterName = chapterName;
@@ -68,7 +74,7 @@ async function addFiles() {
         formData.append('LectureImage', file);
     });
 
-    console.log('Form Data:', Array.from(formData.entries()));
+    console.log('Form Data:', Array.from(formData.entries())); // Log the form data
 
     try {
         const response = await fetch('/lectures', {
@@ -89,7 +95,6 @@ async function addFiles() {
     }
 }
 
-// Function to display the new lecture in the UI
 function displayNewLecture(newLecture) {
     const courseArrangement = document.getElementById('course-arrangement');
 
@@ -150,12 +155,10 @@ function displayNewLecture(newLecture) {
     `;
 }
 
-// Function to remove a chapter
 function removeChapter(element) {
     element.closest('.chapter').remove();
 }
 
-// Function to remove a file item
 function removeFile(element) {
     element.closest('.file-item').remove();
 }
