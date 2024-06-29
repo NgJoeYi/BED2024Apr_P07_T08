@@ -3,10 +3,11 @@ const dbConfig = require('../dbConfig');
 const commentModel = require('../models/Comment');
 
 async function getComments(req, res) {
+    const { discussionId } = req.query;
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const comments = await commentModel.getAllComments(connection);
+        const comments = await commentModel.getCommentsByDiscussionId(connection, discussionId);
         res.json(comments);
     } catch (err) {
         console.error(err);
@@ -19,11 +20,11 @@ async function getComments(req, res) {
 }
 
 async function createComment(req, res) {
-    const { content, userId, parent_comment_id } = req.body;
+    const { content, userId, discussionId } = req.body;
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const result = await commentModel.createComment(connection, content, userId, parent_comment_id);
+        const result = await commentModel.createComment(connection, content, userId, discussionId);
         res.status(201).json(result);
     } catch (err) {
         console.error(err);

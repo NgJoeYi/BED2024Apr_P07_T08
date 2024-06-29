@@ -49,9 +49,15 @@ app.get('/account', (req, res) => {
 });
 
 // Add Routes for users
+<<<<<<< HEAD
 app.post('/account/uploadProfilePic/:id', userController.uploadProfilePic);
 app.get('/account/profile/:id', userController.getUserProfile);
 app.get('/current-user', userController.getCurrentUser);
+=======
+app.post('/account/uploadProfilePic/:id', userController.updateProfilePic);
+app.get('/account/profile/:id', userController.getProfilePicByUserId);
+
+>>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
 app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
@@ -61,12 +67,14 @@ app.delete('/account/:id', /*deleteValidation,*/ userController.deleteUser);
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
 app.get('/discussions/user/:userId', discussionController.getDiscussionsByUser);
+app.get('/discussions/:id', discussionController.getDiscussionById);
 app.post('/discussions', discussionController.createDiscussion);
 app.put('/discussions/:id', discussionController.updateDiscussion);
 app.delete('/discussions/:id', discussionController.deleteDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
+app.get('/comments?discussionId=:discussionId', commentController.getComments);app.get('/comments?discussionId=:discussionId', commentController.getComments); // <-- To handle comments based on discussionId
 app.put('/comments/:id', commentController.updateComment);
 app.post('/comments', commentController.createComment); 
 app.delete('/comments/:id', commentController.deleteComment);

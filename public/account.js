@@ -212,247 +212,6 @@ function confirmCancel() {
   }
 }
 
-
-// ---------------------------------------------- EDIT ACCOUNT ----------------------------------------------
-
-// Populate data to make it a prefilled form and ready to be edited but does not update in db yet
-document.addEventListener('DOMContentLoaded', async function () {
-  const userId = sessionStorage.getItem('userId');
-  if (userId) {
-      try {
-          const response = await fetch(`/account/${userId}`);
-          
-          if (response.ok) {
-              const user = await response.json();
-              // Populate profile info
-              document.querySelector('.profile-info .user-name').textContent = user.name;
-              
-              // Prefill edit form fields
-              document.getElementById('edit-name').value = user.name; 
-              document.getElementById('edit-birth-date').value = user.dob.split('T')[0];
-              document.getElementById('edit-email').value = user.email;
-              
-              // Update other elements with the user's name
-              document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
-                  element.textContent = user.name;
-              });
-          } else {
-              console.error('Failed to fetch user data');
-          }
-      } catch (error) {
-          console.error('Error:', error);
-      }
-  } else {
-    console.error('No user is logged in');
-  }
-  
-  // Toggle visibility for edit account details
-  document.getElementById('edit-icon').addEventListener('click', function () {
-    if (!userId) {
-      alert('Please log in first to edit your account details.');
-      return;
-    }
-    const editAccountDetails = document.getElementById('edit-account-details');
-    if (editAccountDetails.style.display === 'block') {
-      editAccountDetails.style.display = 'none';
-    } else {
-      editAccountDetails.style.display = 'block';
-      
-      // Clear password fields 
-      document.getElementById('current-password').value = ''; 
-      document.getElementById('edit-password').value = '';
-      document.getElementById('edit-confirm-password').value = '';
-  }  
-});
-  
-  // Handle form submission
-  document.getElementById('save-changes').addEventListener('click', async function (event) {
-      event.preventDefault();
-      
-      const currentPassword = document.getElementById('current-password').value;
-      const newPassword = document.getElementById('edit-password').value;
-      const confirmNewPassword = document.getElementById('edit-confirm-password').value;
-
-      const updatedUserData = {
-          name: document.getElementById('edit-name').value,
-          dob: document.getElementById('edit-birth-date').value,
-          email: document.getElementById('edit-email').value,
-      };
-      
-      if (currentPassword && (!newPassword || !confirmNewPassword)) {
-          alert('To update password, you must enter the new password and confirm new password');
-          return;
-      }
-      
-      if (newPassword || confirmNewPassword) {
-          if (newPassword !== confirmNewPassword) {
-              alert('New passwords do not match');
-              return;
-          }
-          updatedUserData.currentPassword = currentPassword;
-          updatedUserData.newPassword = newPassword;
-          updatedUserData.confirmNewPassword = confirmNewPassword;
-      }
-      
-      
-      try {
-          const response = await fetch(`/account/${userId}`, {
-              method: 'PUT',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(updatedUserData)
-          });
-          
-          if (response.ok) {
-              const updatedUser = await response.json();
-              alert('User details updated successfully');
-
-              // Update displayed user info
-              document.querySelector('.profile-info .user-name').textContent = updatedUser.name;
-              document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
-                  element.textContent = updatedUser.name;
-              });
-              
-              // Close the edit fields
-              document.getElementById('edit-account-details').style.display = 'none';
-          
-          } else {
-              const errorData = await response.json();
-              if (errorData.message.length > 0) {
-                  alert(`${errorData.errors.join('\n')}`);
-              } else {
-                  alert(`${errorData.message}`);
-              }
-          }
-      } catch (error) {
-          console.error('Error:', error);
-      }
-  });
-});
-
-  
-// ---------------------------------------------- UPLOAD PROFILE PICTURE ----------------------------------------------
-document.addEventListener('DOMContentLoaded', () => {
-  const userId = sessionStorage.getItem('userId');
-  fetchUserProfile(userId);
-});
-
-async function fetchUserProfile(userId) {
-  try {
-    const response = await fetch(`/account/profile/${userId}`);
-    if (response.ok) {
-      const data = await response.json();
-      if (data.profilePic) {
-        document.getElementById('profile-pic').src = data.profilePic;
-      }
-    } else {
-      console.error('Failed to fetch user profile');
-    }
-  } catch (error) {
-    console.error('Error fetching user profile:', error);
-  }
-}
-
-function triggerFileInput() {
-  document.getElementById('file-input').click();
-}
-
-function previewImage(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const base64Image = e.target.result;
-      document.getElementById('profile-pic').src = base64Image;
-      uploadImageToServer(base64Image);
-    }
-    reader.readAsDataURL(file);
-  }
-}
-
-async function uploadImageToServer(base64Image) {
-  const userId = sessionStorage.getItem('userId');
-  try {
-    const response = await fetch(`/account/uploadProfilePic/${userId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ profilePic: base64Image })
-    });
-
-    if (response.ok) {
-      alert('Profile picture updated successfully');
-    } else {
-      alert('Failed to update profile picture');
-    }
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    alert('Error uploading image');
-  }
-}
-    
-// ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
-// Function to confirm account deletion
-function confirmDeleteAccount() {
-  const userId = sessionStorage.getItem('userId');
-  
-  if (!userId) {
-    alert('No user is logged in');
-    return;
-  }
-
-  document.getElementById('deleteModal').style.display = 'block';
-}
-
-// Function to close the delete modal
-function closeDeleteModal() {
-  document.getElementById('deleteModal').style.display = 'none';
-}
-
-// Function to delete account with password authorization
-async function deleteAccount() {
-  const userId = sessionStorage.getItem('userId');
-  const password = document.getElementById('delete-password').value;
-
-  if (!userId) {
-    alert('No user is logged in');
-    return;
-  }
-
-  if (!password) {
-    alert('Please enter your password');
-    return;
-  }
-
-  try {
-    const response = await fetch(`/account/${userId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ password: password })
-    });
-
-    if (response.ok) {
-      alert('Account deleted successfully');
-      sessionStorage.removeItem('userId');
-      window.location.href = 'Index.html';
-    } else {
-      const errorData = await response.json();
-      alert(`${errorData.message}`);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  } finally {
-    closeDeleteModal();
-  }
-}
-
-
-
-
 // ---------------------------------------------- EDIT AND DELETE REVIEWS ----------------------------------------------
 
 // Fetch and display reviews
@@ -528,8 +287,8 @@ async function fetchAndDisplayReviews() {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn delete-btn';
       deleteBtn.textContent = 'Delete';
-      deleteBtn.addEventListener('click', () => deleteReview(review.review_id)); // Add event listener
-
+      deleteBtn.addEventListener('click', () => openDeleteModal(review.review_id)); // Add event listener
+      
       const editBtn = document.createElement('button');
       editBtn.className = 'btn edit-btn';
       editBtn.textContent = 'Edit';
@@ -561,9 +320,25 @@ async function fetchAndDisplayReviews() {
 // Call the function to fetch and display reviews
 fetchAndDisplayReviews();
 
-// Delete review function
+
+function openDeleteModal(reviewId) {
+  console.log('Opening delete modal for review:', reviewId); // Debugging
+  document.getElementById('deleteReviewModal').style.display = 'block';
+
+  // Ensure we set the correct onclick handler each time the modal is opened
+  document.getElementById('confirmReviewDelete').onclick = function () {
+    deleteReview(reviewId);
+  };
+}
+
+function closeDeleteModal() {
+  console.log('Closing delete modal'); // Debugging
+  document.getElementById('deleteReviewModal').style.display = 'none';
+}
+
 async function deleteReview(reviewId) {
   try {
+    console.log(`Attempting to delete review with ID: ${reviewId}`); // Debugging
     const response = await fetch(`/reviews/${reviewId}`, {
       method: 'DELETE',
       headers: {
@@ -571,15 +346,25 @@ async function deleteReview(reviewId) {
       },
       body: JSON.stringify({ userId: sessionStorage.getItem('userId') })
     });
+    
     if (!response.ok) {
       throw new Error('Failed to delete review');
     }
+    
+    const result = await response.json();
+    console.log('Server response:', result); // Debugging
+
     alert('Review deleted successfully');
+    closeDeleteModal(); // Close the modal after deletion
     fetchAndDisplayReviews(); // Refresh the reviews
   } catch (error) {
     console.error('Error deleting review:', error);
+    alert('Error deleting review: ' + error.message);
   }
 }
+
+
+
 
 // Edit review function to open the modal
 function editReview(reviewId, currentText, currentRating) {
@@ -744,8 +529,8 @@ function addUserDiscussionToFeed(discussion) {
       <p>${discussion.description}</p>
     </div>
     <div class="post-footer">
-      <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
       <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
+      <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
     </div>
   `;
 
@@ -799,33 +584,45 @@ async function saveEdit(discussionId) {
 
 // Delete Modal functions
 function openDeleteModal(discussionId) {
-  document.getElementById('deleteModal').style.display = 'block';
+  console.log('Opening delete modal for discussion ID:', discussionId);
+  document.getElementById('deleteDiscussionModal').style.display = 'block';
 
-  document.getElementById('confirmDelete').onclick = function () {
+  // Attach the onclick event to the confirm delete button
+  const confirmButton = document.getElementById('confirmDelete');
+  confirmButton.onclick = function () {
+    console.log('Confirm delete clicked for discussion ID:', discussionId);
     deleteDiscussion(discussionId);
   };
 }
 
 function closeDeleteModal() {
-  document.getElementById('deleteModal').style.display = 'none';
+  console.log('Closing delete modal');
+  document.getElementById('deleteDiscussionModal').style.display = 'none';
 }
 
 async function deleteDiscussion(discussionId) {
   try {
+    const userId = getCurrentUserId();
+    console.log('Deleting discussion with ID:', discussionId, 'for user ID:', userId);
+
     const response = await fetch(`/discussions/${discussionId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userId: getCurrentUserId() })
+      body: JSON.stringify({ userId: userId })
     });
+
     if (!response.ok) {
-      throw new Error('Failed to delete discussion');
+      const errorText = await response.text();
+      throw new Error(`Failed to delete discussion: ${errorText}`);
     }
+
     alert('Discussion deleted successfully');
     fetchUserDiscussions();
     closeDeleteModal();
   } catch (error) {
     console.error('Error deleting discussion:', error);
+    alert('Error deleting discussion: ' + error.message);
   }
 }

@@ -36,18 +36,19 @@ module.exports = {
 
 
 
+
 //RAEANN
-//    module.exports = {
-//   user: "activityFeed", // Replace with your SQL Server login username
-//    password: "activityfeed", // Replace with your SQL Server login password
-//    server: "localhost",
-//    database: "ActivityFeeddb",
-//  trustServerCertificate: true,
-//   options: {
-//     port: 1433, // Default SQL Server port
-//     connectionTimeout: 60000, // Connection timeout in milliseconds
-//    },
-//    };
+  //   module.exports = {
+  //  user: "activityFeed", // Replace with your SQL Server login username
+  //   password: "activityfeed", // Replace with your SQL Server login password
+  //   server: "localhost",
+  //   database: "ActivityFeeddb",
+  // trustServerCertificate: true,
+  //  options: {
+  //    port: 1433, // Default SQL Server port
+  //    connectionTimeout: 60000, // Connection timeout in milliseconds
+  //   },
+  //   };
 
 // WEIYING 
 

@@ -126,7 +126,33 @@ const deleteUser = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 const uploadProfilePic = async (req, res) => {
+=======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const updateProfilePic = async (req, res) => {
+>>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
     const userId = parseInt(req.params.id);
     const { profilePic } = req.body;
 
@@ -142,7 +168,14 @@ const uploadProfilePic = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
 const getUserProfile = async (req, res) => {
+=======
+
+
+
+const getProfilePicByUserId = async (req, res) => {
+>>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
     const userId = parseInt(req.params.id);
     try {
         const user = await User.getUserById(userId);
@@ -152,7 +185,7 @@ const getUserProfile = async (req, res) => {
 
         let profilePic = await User.getProfilePicByUserId(userId);
         if (!profilePic) {
-            profilePic = 'images/profilePic.jpeg'; // Default profile picture 
+           profilePic = 'images/profilePic.jpeg'; // Default profile picture 
         }
         res.status(200).json({ user, profilePic });
     } catch (error) {
@@ -181,7 +214,12 @@ module.exports = {
     loginUser,
     updateUser,
     deleteUser,
+<<<<<<< HEAD
     uploadProfilePic,
     getUserProfile,
     getCurrentUser
+=======
+    updateProfilePic,
+    getProfilePicByUserId
+>>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
 };
