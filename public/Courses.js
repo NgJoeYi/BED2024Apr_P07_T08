@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     fetchCourses();
+    checkUserRoleAndFetchCourses();
 });
 
 async function fetchCourses() {
@@ -49,4 +50,23 @@ function displayCourses(courses) {
 
         coursesGrid.appendChild(courseElement);
     });
+}
+async function checkUserRoleAndFetchCourses() {
+    try {
+        const userResponse = await fetch('/current-user');
+        if (!userResponse.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const user = await userResponse.json();
+        console.log('Fetched user:', user); // Log the fetched user
+
+        // Conditionally display the add button
+        if (user.role === 'lecturer') {
+            document.querySelector('.add-button').style.display = 'block';
+        } else {
+            document.querySelector('.add-button').style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error fetching user or courses:', error);
+    }
 }

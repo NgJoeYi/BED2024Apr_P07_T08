@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const Lectures = require("../models/Lectures");
 
 const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -15,46 +16,52 @@ const getUserById = async (req, res) => {
     }
 };
 
-
 const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
         // Check if user already exists
-        const existingUser = await User.loginUser(newUserData);
+        const existingUser = await User.loginUser({ email: newUserData.email });
         if (existingUser) {
-            return res.status(400).send('User already exists');
-        } 
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
         // Hash the password
         const hashedPassword = await bcrypt.hash(newUserData.password, 10);
         newUserData.password = hashedPassword; // Replace plain text password with hashed password  
-               
+
         const newUser = await User.createUser(newUserData); 
         if (!newUser) {
             console.error('Error: User creation failed');
             return res.status(400).json({ message: 'Could not create an account' });
         }
-        res.status(201).json({ userId: newUser.userId });
+        res.status(201).json({ userId: newUser.id });
     } catch (error) {
         console.error('Server error:', error); // Log error details
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 const loginUser = async (req, res) => {
-    const { email, password } = req.body; // user filled in email and password field
     try {
-        const loginSuccess = await User.loginUser({ email });
-        if (!loginSuccess) {
-            return res.status(404).send( { message: 'Invalid email. No user found'} );
+        const { email, password } = req.body;
+        const user = await User.loginUser({ email, password });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
-        const matchPassword = await bcrypt.compare(password, loginSuccess.password);
-        if (!matchPassword) {
-            return res.status(404).json( { message: 'Invalid password. Please try again'} );
+
+        // Save user ID in session
+        req.session.userId = user.id;
+
+        if (user.role === 'lecturer') {
+            const lecturer = await User.getLecturerByUserId(user.id);
+            req.session.lecturerID = lecturer.LecturerID;
         }
-        res.status(200).json(loginSuccess);
+
+        res.json(user);
     } catch (error) {
-        console.error('Server error:', error); // Log error details
-        res.status(500).send('Server error');
+        console.error('Error during login:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -95,7 +102,6 @@ const updateUser = async (req, res) => {
     }
 };
 
-
 // after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
 const deleteUser = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -116,10 +122,13 @@ const deleteUser = async (req, res) => {
         res.status(200).send('User successfully deleted');
     } catch (error) {
         console.error('Server error:', error);
-        res.status(500).send('Server error');
+        res.status500.send('Server error');
     }
 };
 
+<<<<<<< HEAD
+const uploadProfilePic = async (req, res) => {
+=======
 
 
 
@@ -143,6 +152,7 @@ const deleteUser = async (req, res) => {
 
 
 const updateProfilePic = async (req, res) => {
+>>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
     const userId = parseInt(req.params.id);
     const { profilePic } = req.body;
 
@@ -158,10 +168,14 @@ const updateProfilePic = async (req, res) => {
     }
 };
 
+<<<<<<< HEAD
+const getUserProfile = async (req, res) => {
+=======
 
 
 
 const getProfilePicByUserId = async (req, res) => {
+>>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
     const userId = parseInt(req.params.id);
     try {
         const user = await User.getUserById(userId);
@@ -180,13 +194,19 @@ const getProfilePicByUserId = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
+const getCurrentUser = async (req, res) => {
+    try {
+        const userId = req.session.userId; // using session
+        const user = await User.getUserById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error('Error fetching current user:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
 module.exports = {
     getUserById,
@@ -194,17 +214,12 @@ module.exports = {
     loginUser,
     updateUser,
     deleteUser,
+<<<<<<< HEAD
+    uploadProfilePic,
+    getUserProfile,
+    getCurrentUser
+=======
     updateProfilePic,
     getProfilePicByUserId
+>>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
 };
-
-
-// ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
-// 1. hashing the password so if even 2 users have the same password, the hash value is different
-
-// 2. bcrypt.hash(newUserData.newPassword, 10) the 10 in this is the level of security, 
-// the higher the value, the more secure it is because it is the number of times hashing algo is executed
-// it is known as salt rounds
-
-// 3. bcrypt.compare(userLoginData.password, user.password) this bcrypt.compare 
-// compares the plain text password and the hashed password, returns true if match, & false otherwise
