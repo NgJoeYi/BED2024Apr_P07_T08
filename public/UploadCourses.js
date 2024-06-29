@@ -1,3 +1,5 @@
+const Lecture = require("../models/Lectures");
+
 // Function to open the modal
 function triggerFileUpload() {
     document.getElementById('newFileModal').style.display = 'block';
@@ -9,7 +11,7 @@ function closeModal() {
 }
 
 // Variables to track the previous chapter name
-let previousChapterName = null;
+let previousChapterName = Lecture.getLastChapterName;
 
 // Function to add files to the course
 async function addFiles() {
@@ -26,11 +28,13 @@ async function addFiles() {
     }
 
     const formData = new FormData();
-
-    if (chapterName || previousChapterName) {
-        formData.append('ChapterName', chapterName || previousChapterName);
-        previousChapterName = chapterName || previousChapterName; // Update previous chapter name
+    if (previousChapterName!= null){
+        formData.append('ChapterName',previousChapterName);
+    }else{
+        formData.append('ChapterName',chapterName);
+        previousChapterName = chapterName;
     }
+
 
     formData.append('Title', title);
     formData.append('Duration', duration);
