@@ -3,7 +3,6 @@ const sql = require('mssql');
 const bodyParser = require('body-parser');
 const path = require('path');
 const dbConfig = require('./dbConfig');
-const session = require('express-session');
 const dotenv = require('dotenv');
 const multer = require('multer');
 
@@ -25,23 +24,6 @@ const deleteValidation = require('./middleware/deleteValidation');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Set up session middleware
-app.use(session({
-    secret: process.env.JWT_SECRET, // Use the secret key from the .env file
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
-}));
-
-// WILL REMOVE AFTER USING JWT
-// Middleware to ensure user is logged in
-function ensureLoggedIn(req, res, next) {
-    if (req.session.user) {
-        next();
-    } else {
-        res.status(401).send('User not logged in');
-    }
-}
 // Set up the view engine
 app.set('view engine', 'ejs');
 
@@ -105,7 +87,7 @@ app.delete('/courses/:id', courseController.deleteCourse);
 app.get('/lectures', lectureController.getAllLectures);
 app.get('/lectures/:id', lectureController.getLectureByID);
 app.put('/lectures/:id', lectureController.updateLecture);
-app.post('/lectures', ensureLoggedIn, multiUpload, lectureController.createLecture);
+app.post('/lectures', multiUpload, lectureController.createLecture); // Removed ensureLoggedIn
 app.delete('/lectures/:id', lectureController.deleteLecture);
 app.get('/lectures/last-chapter', lectureController.getLastChapterName); // Ensure this route is defined
 

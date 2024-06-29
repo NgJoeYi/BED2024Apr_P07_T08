@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    fetchCourses();
     checkUserRoleAndFetchCourses();
 });
 
@@ -41,37 +40,22 @@ function displayCourses(courses) {
                     </div>
                     <div>
                         <p class="posted-date">Posted on: ${new Date(course.createdAt).toLocaleDateString()}</p>
-                        <p>${course.level} </p>
+                        <p>${course.level}</p>
                     </div>
                 </div>
             </a>
         `;
-        console.log(course.level);
-
         coursesGrid.appendChild(courseElement);
     });
 }
 
-async function checkUserRoleAndFetchCourses() {
-    try {
-        const userResponse = await fetch('/current-user');
-        if (!userResponse.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const user = await userResponse.json();
-        console.log('Fetched user:', user); // Log the fetched user
-
-        // Conditionally display the add button
-        if (user.role === 'lecturer') {
-            document.querySelector('.add-button').style.display = 'block';
-        } else {
-            document.querySelector('.add-button').style.display = 'none';
-        }
-
-        fetchCourses(); // Fetch courses after checking user role
-    } catch (error) {
-        console.error('Error fetching user or courses:', error);
-        throw(error);
+function checkUserRoleAndFetchCourses() {
+    const userRole = sessionStorage.getItem('role');
+    if (userRole === 'lecturer') {
+        document.querySelector('.add-button').style.display = 'block';
+    } else {
+        document.querySelector('.add-button').style.display = 'none';
     }
-}
 
+    fetchCourses(); // Fetch courses after checking user role
+}

@@ -159,3 +159,11 @@ function removeChapter(element) {
 function removeFile(element) {
     element.closest('.file-item').remove();
 }
+
+async function addCourse(){
+    
+    const title = document.getElementById('course-name').value.trim();
+    const description = document.getElementById('course-details').value.trim();
+    const videoFileInput = document.getElementById('videoFiles');
+    const imageFileInput = document.getElementById('lectureImage');
+}

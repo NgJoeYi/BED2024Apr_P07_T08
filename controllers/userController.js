@@ -18,11 +18,7 @@ const getUserById = async (req, res) => {
 };
 
 const getCurrentUser = async (req, res) => {
-    if (!req.session || !req.session.user) {
-        return res.status(401).send('User not logged in');
-    }
-    
-    const userId = req.session.user.id;
+    const userId = req.headers['user-id'];
     try {
         const user = await User.getUserById(userId);
         if (!user) {
@@ -81,24 +77,18 @@ const loginUser = async (req, res) => {
         const result = await request.query(lecturerQuery);
         const LecturerID = result.recordset[0]?.LecturerID;
 
-        // Set user details and LecturerID in session
-        req.session.user = { ...user, LecturerID };
-        console.log('User logged in:', req.session.user); // Log session details
-
-        res.status(200).json(req.session.user);
+        // Send user details and LecturerID to client
+        res.status(200).json({ ...user, LecturerID });
     } catch (error) {
         console.error('Server error:', error);
         res.status(500).send('Server error');
     }
 };
 
-
-
 const updateUser = async (req, res) => {
     const userId = parseInt(req.params.id);
     const newUserData = req.body;
     try {
-        // get the current user 
         const user = await User.getUserById(userId);
         if (!user) {
             return res.status(404).send('User does not exist');
@@ -131,8 +121,6 @@ const updateUser = async (req, res) => {
     }
 };
 
-
-// after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
 const deleteUser = async (req, res) => {
     const userId = parseInt(req.params.id);
     const passwordInput = req.body;
@@ -142,7 +130,6 @@ const deleteUser = async (req, res) => {
             return res.status(404).send('User does not exist');
         }
 
-        // compare current password and the password in the database 
         const isPasswordMatch = await bcrypt.compare(passwordInput.password, checkUser.password);
         if (!isPasswordMatch) {
             return res.status(400).json({ message: 'Password is incorrect' });
@@ -155,28 +142,6 @@ const deleteUser = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const updateProfilePic = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -194,9 +159,6 @@ const updateProfilePic = async (req, res) => {
     }
 };
 
-
-
-
 const getProfilePicByUserId = async (req, res) => {
     const userId = parseInt(req.params.id);
     try {
@@ -207,7 +169,7 @@ const getProfilePicByUserId = async (req, res) => {
 
         let profilePic = await User.getProfilePicByUserId(userId);
         if (!profilePic) {
-           profilePic = 'images/profilePic.jpeg'; // Default profile picture 
+           profilePic = 'images/profilePic.jpeg';
         }
         res.status(200).json({ user, profilePic });
     } catch (error) {
@@ -215,14 +177,6 @@ const getProfilePicByUserId = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
-
-
-
-
-
-
-
-
 
 module.exports = {
     getUserById,
@@ -234,14 +188,3 @@ module.exports = {
     getProfilePicByUserId,
     getCurrentUser
 };
-
-
-// ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
-// 1. hashing the password so if even 2 users have the same password, the hash value is different
-
-// 2. bcrypt.hash(newUserData.newPassword, 10) the 10 in this is the level of security, 
-// the higher the value, the more secure it is because it is the number of times hashing algo is executed
-// it is known as salt rounds
-
-// 3. bcrypt.compare(userLoginData.password, user.password) this bcrypt.compare 
-// compares the plain text password and the hashed password, returns true if match, & false otherwise
