@@ -13,6 +13,7 @@ const getAllLectures = async (req, res) => {
     try {
         const getAllLectures = await Lectures.getAllLectures();
         res.json(getAllLectures);
+        console.log('done');
     } catch (error) {
         console.error(error);
         res.status(500).send('Error retrieving lectures');
@@ -53,8 +54,6 @@ const createLecture = async (req, res) => {
     const video = req.files.Video[0].buffer;
     const lectureImage = req.files.LectureImage[0].buffer;
     const LecturerID = req.session.user?.LecturerID;
-
-    console.log('Session user:', req.session.user); // Log session user details
 
     if (!LecturerID) {
         console.error("LecturerID not found in session");
@@ -112,20 +111,29 @@ const deleteLecture = async (req, res) => {
 };
 
 const getLastChapterName = async (req, res) => {
+    let connection;
     try {
-        console.log("Received request for /lectures/last-chapter");
-        const lastChapterName = await Lectures.getLastChapterName();
-        if (!lastChapterName) {
-            console.log("No last chapter name found");
+        console.log("Connecting to the database to fetch the last chapter name...");
+        connection = await sql.connect(dbConfig);
+        const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures ORDER BY CreatedAt DESC`;
+        const result = await connection.request().query(sqlQuery);
+        console.log("Database query executed. Result:", result.recordset);
+        if (result.recordset.length === 0) {
+            console.log("No chapters found in the database.");
             return res.status(404).send('No last chapter name found');
         }
-        console.log("Last chapter name retrieved:", lastChapterName);
+        const lastChapterName = result.recordset[0].ChapterName;
+        console.log("Last chapter name found:", lastChapterName);
         res.status(200).json({ chapterName: lastChapterName });
     } catch (error) {
-        console.error('Error fetching last chapter name:', error);
+        console.error('Error getting last chapter name:', error);
         res.status(500).send('Error fetching last chapter name');
+    } finally {
+        if (connection) await connection.close();
     }
 };
+
+
 
 module.exports = {
     getAllLectures,
@@ -134,5 +142,5 @@ module.exports = {
     createLecture,
     deleteLecture,
     getLastChapterName,
-    upload
+    upload 
 };
