@@ -3,10 +3,11 @@ const dbConfig = require('../dbConfig');
 const commentModel = require('../models/Comment');
 
 async function getComments(req, res) {
+    const { discussionId } = req.query;
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const comments = await commentModel.getAllComments(connection);
+        const comments = await commentModel.getCommentsByDiscussionId(connection, discussionId);
         res.json(comments);
     } catch (err) {
         console.error(err);

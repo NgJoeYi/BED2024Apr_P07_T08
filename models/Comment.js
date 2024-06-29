@@ -32,6 +32,23 @@ async function getCommentById(connection, id) {
     }
 }
 
+async function getCommentsByDiscussionId(connection, discussionId) {
+    const query = `
+        SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, u.id AS user_id, u.name AS username 
+        FROM user_comments uc
+        JOIN Users u ON uc.user_id = u.id
+        WHERE uc.discussion_id = @discussionId
+    `;
+    try {
+        const request = new sql.Request(connection);
+        request.input('discussionId', sql.Int, discussionId);
+        const result = await request.query(query);
+        return result.recordset;
+    } catch (err) {
+        throw new Error('Error fetching comments: ' + err.message);
+    }
+}
+
 async function createComment(connection, content, userId, discussion_id) {
     const query = `
         INSERT INTO user_comments (content, user_id, discussion_id, created_at)
@@ -85,6 +102,7 @@ async function deleteComment(connection, id) {
 module.exports = {
     getAllComments,
     getCommentById,
+    getCommentsByDiscussionId,
     createComment,
     updateComment,
     deleteComment
