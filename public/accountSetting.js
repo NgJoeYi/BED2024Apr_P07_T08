@@ -81,6 +81,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 alert('New passwords do not match');
                 return;
             }
+
+            if (newPassword === currentPassword) {
+              alert('New Password cannot be the same as the current password');
+              return;
+            }
             updatedUserData.currentPassword = currentPassword;
             updatedUserData.newPassword = newPassword;
             updatedUserData.confirmNewPassword = confirmNewPassword;
