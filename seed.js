@@ -147,7 +147,6 @@ async function run() {
         `;
         await connection.request().query(insertLecturers);
 
-        /*   --------------------------- NOT JOE YI'S ---------------------------
         // Path to courseImage file
 
         // WY, RAEANN
@@ -240,7 +239,6 @@ async function run() {
         `;
         await connection.request().query(insertDiscussionComments);
 
-        */
         connection.close();
         console.log("Seeding completed");
     } catch (err) {
