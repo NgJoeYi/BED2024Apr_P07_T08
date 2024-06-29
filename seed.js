@@ -150,10 +150,10 @@ async function run() {
         // Path to courseImage file
 
         // WY, RAEANN, JOEYI's
-        // const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
+        const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
 
         // AMELIA'S
-        const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08-1/public/courseImage/course1.jpeg');
+        // const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08-1/public/courseImage/course1.jpeg');
 
         // Read courseImage file 
         const courseImageBuffer = fs.readFileSync(courseImagePath);
@@ -171,12 +171,12 @@ async function run() {
         
         // Path to external files 
         // WY, RAEANN, JOEYI'S
-        // const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
-        // const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
+        const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
+        const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
         
         //AMELIA'S
-        const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureVideos/video1.mp4');
-        const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureImage/lecture1.jpeg');
+        // const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureVideos/video1.mp4');
+        // const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureImage/lecture1.jpeg');
         
         // Read external file
         const videoBuffer = fs.readFileSync(videoFilePath);

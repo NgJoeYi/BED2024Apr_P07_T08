@@ -51,6 +51,7 @@ function displayCourses(courses) {
         coursesGrid.appendChild(courseElement);
     });
 }
+
 async function checkUserRoleAndFetchCourses() {
     try {
         const userResponse = await fetch('/current-user');
@@ -66,7 +67,11 @@ async function checkUserRoleAndFetchCourses() {
         } else {
             document.querySelector('.add-button').style.display = 'none';
         }
+
+        fetchCourses(); // Fetch courses after checking user role
     } catch (error) {
         console.error('Error fetching user or courses:', error);
+        throw(error);
     }
 }
+

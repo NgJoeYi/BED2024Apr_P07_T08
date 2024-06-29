@@ -4,6 +4,10 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const dbConfig = require('./dbConfig');
 const session = require('express-session');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+dotenv.config();
 
 const userController = require('./controllers/userController');
 const discussionController = require('./controllers/discussionController');
@@ -23,7 +27,7 @@ const port = process.env.PORT || 3000;
 
 // Set up session middleware
 app.use(session({
-    secret: 'your_secret_key', // Replace with your secret key
+    secret: process.env.JWT_SECRET, // Use the secret key from the .env file
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false } // Set to true if using HTTPS
@@ -43,21 +47,11 @@ const upload = multer({ storage: storage });
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
-// Serve the HTML page
-app.get('/account', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'account.html'));
-});
-
 // Add Routes for users
-<<<<<<< HEAD
-app.post('/account/uploadProfilePic/:id', userController.uploadProfilePic);
-app.get('/account/profile/:id', userController.getUserProfile);
-app.get('/current-user', userController.getCurrentUser);
-=======
 app.post('/account/uploadProfilePic/:id', userController.updateProfilePic);
 app.get('/account/profile/:id', userController.getProfilePicByUserId);
 
->>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
+app.get('/current-user', userController.getCurrentUser);
 app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
@@ -74,7 +68,7 @@ app.delete('/discussions/:id', discussionController.deleteDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
-app.get('/comments?discussionId=:discussionId', commentController.getComments);app.get('/comments?discussionId=:discussionId', commentController.getComments); // <-- To handle comments based on discussionId
+app.get('/comments?discussionId=:discussionId', commentController.getComments);
 app.put('/comments/:id', commentController.updateComment);
 app.post('/comments', commentController.createComment); 
 app.delete('/comments/:id', commentController.deleteComment);
