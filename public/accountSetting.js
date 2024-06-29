@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 document.getElementById('edit-name').value = user.name; 
                 document.getElementById('edit-birth-date').value = user.dob.split('T')[0];
                 document.getElementById('edit-email').value = user.email;
-<<<<<<< HEAD
-=======
 
                 // Store original user data
                 originalUserData = {
@@ -25,7 +23,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                   dob: user.dob.split('T')[0],
                   email: user.email
                 };
->>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
                 
                 // Update other elements with the user's name
                 document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
@@ -88,15 +85,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             updatedUserData.newPassword = newPassword;
             updatedUserData.confirmNewPassword = confirmNewPassword;
         }
-<<<<<<< HEAD
-=======
 
         // Check if no changes were made
         if (updatedUserData.name === originalUserData.name && updatedUserData.dob === originalUserData.dob && updatedUserData.email === originalUserData.email && !newPassword && !confirmNewPassword) {
           alert('No changes were detected. Click on the edit icon to close.');
           return;
         }
->>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
         
         
         try {
@@ -121,17 +115,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Close the edit fields
                 document.getElementById('edit-account-details').style.display = 'none';
             
-<<<<<<< HEAD
-            } else {
-                const errorData = await response.json();
-                if (errorData.message.length > 0) {
-=======
               } else {
                 const errorData = await response.json();
                 if (errorData.message === 'Current password is incorrect') {
                     alert('Current password is incorrect');
                 } else if (errorData.message.length > 0) {
->>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
                     alert(`${errorData.errors.join('\n')}`);
                 } else {
                     alert(`${errorData.message}`);

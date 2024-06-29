@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const sql = require("mssql");
+const dbConfig = require('../dbConfig');
 
 const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -58,26 +60,38 @@ const createUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const { email, password } = req.body; // user filled in email and password field
+    const { email, password } = req.body;
     try {
-        const loginSuccess = await User.loginUser({ email });
-        if (!loginSuccess) {
+        const user = await User.loginUser({ email });
+        if (!user) {
             return res.status(404).send({ message: 'Invalid email. No user found' });
         }
-        const matchPassword = await bcrypt.compare(password, loginSuccess.password);
+        const matchPassword = await bcrypt.compare(password, user.password);
         if (!matchPassword) {
             return res.status(404).json({ message: 'Invalid password. Please try again' });
         }
 
-        // Set user details in session
-        req.session.user = loginSuccess;
+        // Fetch the LecturerID for the logged-in user
+        const lecturerQuery = `
+            SELECT LecturerID FROM Lecturer WHERE UserID = @userID
+        `;
+        const connection = await sql.connect(dbConfig);
+        const request = connection.request();
+        request.input('userID', sql.Int, user.id);
+        const result = await request.query(lecturerQuery);
+        const LecturerID = result.recordset[0]?.LecturerID;
 
-        res.status(200).json(loginSuccess);
+        // Set user details and LecturerID in session
+        req.session.user = { ...user, LecturerID };
+        console.log('User logged in:', req.session.user); // Log session details
+
+        res.status(200).json(req.session.user);
     } catch (error) {
-        console.error('Server error:', error); // Log error details
+        console.error('Server error:', error);
         res.status(500).send('Server error');
     }
 };
+
 
 
 const updateUser = async (req, res) => {

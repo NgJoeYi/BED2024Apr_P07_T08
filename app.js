@@ -5,6 +5,7 @@ const path = require('path');
 const dbConfig = require('./dbConfig');
 const session = require('express-session');
 const dotenv = require('dotenv');
+const multer = require('multer');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -21,7 +22,6 @@ const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
 const deleteValidation = require('./middleware/deleteValidation');
 
-const multer = require('multer'); 
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -33,6 +33,15 @@ app.use(session({
     cookie: { secure: false } // Set to true if using HTTPS
 }));
 
+// WILL REMOVE AFTER USING JWT
+// Middleware to ensure user is logged in
+function ensureLoggedIn(req, res, next) {
+    if (req.session.user) {
+        next();
+    } else {
+        res.status(401).send('User not logged in');
+    }
+}
 // Set up the view engine
 app.set('view engine', 'ejs');
 
@@ -42,6 +51,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Set up multer for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+const multiUpload = upload.fields([
+    { name: 'Video', maxCount: 1 },
+    { name: 'LectureImage', maxCount: 1 }
+]);
 
 // Include body-parser middleware to handle JSON data
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -89,19 +103,11 @@ app.delete('/courses/:id', courseController.deleteCourse);
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures);
-app.get('/lectures/:id' , lectureController.getLectureByID);
+app.get('/lectures/:id', lectureController.getLectureByID);
 app.put('/lectures/:id', lectureController.updateLecture);
-
-app.post('/lectures', upload.fields([
-    { name: 'Video', maxCount: 1 },
-    { name: 'LectureImage', maxCount: 1 }
-]), (req, res, next) => {
-    console.log('Request Body:', req.body); // Log the request body
-    console.log('Files:', req.files); // Log the files to debug
-    next();
-}, lectureController.createLecture);
-
+app.post('/lectures', ensureLoggedIn, multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', lectureController.deleteLecture);
+app.get('/lectures/last-chapter', lectureController.getLastChapterName); // Ensure this route is defined
 
 // Add Routes for lecturer
 app.get('/lecturer', lecturerController.getAllLecturers);

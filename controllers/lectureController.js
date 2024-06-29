@@ -49,73 +49,54 @@ const updateLecture = async (req, res) => {
 };
 
 const createLecture = async (req, res) => {
-    const { ChapterName, Title, Duration, Description } = req.body;
-    console.log('Request Body:', req.body); // Log the request body
-    console.log('Files:', req.files); // Log the files to debug
+    const { Title, Duration, Description, Position, ChapterName } = req.body;
+    const video = req.files.Video[0].buffer;
+    const lectureImage = req.files.LectureImage[0].buffer;
+    const LecturerID = req.session.user?.LecturerID;
 
-    // Ensure videoFile and lectureImage are being extracted correctly
-    const videoFile = req.files['Video'] ? req.files['Video'][0] : null;
-    const lectureImage = req.files['LectureImage'] ? req.files['LectureImage'][0] : null;
+    console.log('Session user:', req.session.user); // Log session user details
 
-    let videoBuffer = null;
-    let imageBuffer = null;
-
-    if (videoFile) {
-        const videoFilePath = path.join(__dirname, '../uploads', videoFile.originalname);
-        fs.writeFileSync(videoFilePath, videoFile.buffer);
-        videoBuffer = fs.readFileSync(videoFilePath);
+    if (!LecturerID) {
+        console.error("LecturerID not found in session");
+        return res.status(400).send("LecturerID not found in session");
     }
 
-    if (lectureImage) {
-        const lectureImagePath = path.join(__dirname, '../uploads', lectureImage.originalname);
-        fs.writeFileSync(lectureImagePath, lectureImage.buffer);
-        imageBuffer = fs.readFileSync(lectureImagePath);
-    }
+    const CourseID = 1; // Placeholder for CourseID
 
-    console.log('Video Buffer:', videoBuffer); // Log the video buffer to debug
-    console.log('Image Buffer:', imageBuffer); // Log the image buffer to debug
+    const sqlQuery = `
+        INSERT INTO Lectures (CourseID, LecturerID, Title, Duration, Description, Position, ChapterName, Video, LectureImage)
+        VALUES (@CourseID, @LecturerID, @Title, @Duration, @Description, @Position, @ChapterName, @Video, @LectureImage);
+        SELECT SCOPE_IDENTITY() AS LectureID;
+    `;
 
+    let connection;
     try {
-        // Validate required fields
-        if (!Title) {
-            throw new Error('Title is required');
-        }
+        connection = await sql.connect(dbConfig);
+        const request = connection.request();
+        request.input('CourseID', sql.Int, CourseID);
+        request.input('LecturerID', sql.Int, LecturerID);
+        request.input('Title', sql.NVarChar, Title);
+        request.input('Duration', sql.Int, Duration);
+        request.input('Description', sql.NVarChar, Description);
+        request.input('Position', sql.Int, Position);
+        request.input('ChapterName', sql.NVarChar, ChapterName);
+        request.input('Video', sql.VarBinary, video);
+        request.input('LectureImage', sql.VarBinary, lectureImage);
 
-        // Get the current position in the chapter, using the last chapter name if necessary
-        let chapterNameToUse = ChapterName;
-        if (!ChapterName) {
-            chapterNameToUse = await Lectures.getLastChapterName();
-        }
-        const position = await Lectures.getCurrentPositionInChapter(chapterNameToUse);
+        const result = await request.query(sqlQuery);
+        const newLectureID = result.recordset[0].LectureID;
 
-        // Get the LecturerID from the session
-        const lecturerID = req.session.lecturerID;
-        if (!lecturerID) {
-            throw new Error('Lecturer not logged in');
-        }
-  
-        const newLectureData = {
-            CourseID: 1, // Default value for demonstration
-            LecturerID: lecturerID,
-            ChapterName: chapterNameToUse,
-            Title,
-            Duration: parseInt(Duration),
-            Description,
-            VideoURL: '', // Assuming this is part of your logic to add video URL
-            Video: videoBuffer,
-            LectureImage: imageBuffer,
-            Position: position
-        };
-
-        console.log('New Lecture Data:', newLectureData); // Log the new lecture data
-
-        const newLectureID = await Lectures.createLecture(newLectureData);
-        res.status(201).json({ newLectureID, ...newLectureData });
+        res.status(201).json({ LectureID: newLectureID, CourseID, LecturerID, Title, Duration, Description, Position, ChapterName });
     } catch (error) {
-        console.error("Error creating lecture:", error);
-        res.status(500).send("Error creating lecture");
+        console.error('Error creating lecture:', error);
+        res.status(500).send('Error creating lecture');
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
     }
 };
+
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
     try {
@@ -130,11 +111,28 @@ const deleteLecture = async (req, res) => {
     }
 };
 
+const getLastChapterName = async (req, res) => {
+    try {
+        console.log("Received request for /lectures/last-chapter");
+        const lastChapterName = await Lectures.getLastChapterName();
+        if (!lastChapterName) {
+            console.log("No last chapter name found");
+            return res.status(404).send('No last chapter name found');
+        }
+        console.log("Last chapter name retrieved:", lastChapterName);
+        res.status(200).json({ chapterName: lastChapterName });
+    } catch (error) {
+        console.error('Error fetching last chapter name:', error);
+        res.status(500).send('Error fetching last chapter name');
+    }
+};
+
 module.exports = {
     getAllLectures,
     getLectureByID,
     updateLecture,
     createLecture,
     deleteLecture,
+    getLastChapterName,
     upload
 };
