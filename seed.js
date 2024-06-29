@@ -94,19 +94,21 @@ async function run() {
             CourseImage VARBINARY(MAX)
         );
 
-        CREATE TABLE Lectures (
-            CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
-            LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
-            Title NVARCHAR(200) NOT NULL,
-            Description NVARCHAR(2000),
-            VideoURL NVARCHAR(256),
-            Video VARBINARY(MAX),
-            LectureImage VARBINARY(MAX),
-            Duration INT, -- Duration in minutes
-            Position INT, -- Position in the course sequence
-            CreatedAt DATETIME DEFAULT GETDATE(),
-            ChapterName NVARCHAR(256)
-        );
+      CREATE TABLE Lectures (
+        LectureID INT PRIMARY KEY IDENTITY(1,1),
+        CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
+        LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
+        Title NVARCHAR(200) NOT NULL,
+        Description NVARCHAR(2000),
+        VideoURL NVARCHAR(256),
+        Video VARBINARY(MAX),
+        LectureImage VARBINARY(MAX),
+        Duration INT, -- Duration in minutes
+        Position INT, -- Position in the course sequence
+        CreatedAt DATETIME DEFAULT GETDATE(),
+        ChapterName NVARCHAR(256)
+    );
+
 
         CREATE TABLE user_reviews (
             review_id INT PRIMARY KEY IDENTITY,
