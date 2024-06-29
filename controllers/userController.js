@@ -126,33 +126,7 @@ const deleteUser = async (req, res) => {
     }
 };
 
-<<<<<<< HEAD
-const uploadProfilePic = async (req, res) => {
-=======
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const updateProfilePic = async (req, res) => {
->>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
+const updateProfilePic = async (req, res) => {  
     const userId = parseInt(req.params.id);
     const { profilePic } = req.body;
 
@@ -168,14 +142,8 @@ const updateProfilePic = async (req, res) => {
     }
 };
 
-<<<<<<< HEAD
-const getUserProfile = async (req, res) => {
-=======
-
-
 
 const getProfilePicByUserId = async (req, res) => {
->>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
     const userId = parseInt(req.params.id);
     try {
         const user = await User.getUserById(userId);
@@ -214,12 +182,6 @@ module.exports = {
     loginUser,
     updateUser,
     deleteUser,
-<<<<<<< HEAD
-    uploadProfilePic,
-    getUserProfile,
-    getCurrentUser
-=======
     updateProfilePic,
     getProfilePicByUserId
->>>>>>> a2b2bf08983f234cf3d5980c969c88725018f0d1
 };

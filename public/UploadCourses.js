@@ -8,53 +8,62 @@ function closeModal() {
     document.getElementById('newFileModal').style.display = 'none';
 }
 
+// Variables to track the previous chapter name
+let previousChapterName = null;
+
 // Function to add files to the course
 async function addFiles() {
     const chapterName = document.getElementById('chapterName').value.trim();
-    const title = document.getElementById('lectureName').value.trim(); // Match key name to backend
+    const title = document.getElementById('lectureName').value.trim();
     const duration = document.getElementById('duration').value.trim();
     const description = document.getElementById('description').value.trim();
-    const videoFileInput = document.getElementById('videoFiles'); // Ensure the ID matches
-    const imageFileInput = document.getElementById('lectureImage'); // Ensure the ID matches
+    const videoFileInput = document.getElementById('videoFiles');
+    const imageFileInput = document.getElementById('lectureImage');
 
-    if (chapterName && title && duration && description && videoFileInput.files.length > 0 && imageFileInput.files.length > 0) {
-        const formData = new FormData();
-        formData.append('ChapterName', chapterName);
-        formData.append('Title', title); // Ensure this key matches the backend
-        formData.append('Duration', duration);
-        formData.append('Description', description);
-
-        Array.from(videoFileInput.files).forEach(file => {
-            console.log('Appending video file:', file.name);
-            formData.append('Video', file); // Ensure this matches the field name expected by multer
-        });
-
-        Array.from(imageFileInput.files).forEach(file => {
-            console.log('Appending image file:', file.name);
-            formData.append('LectureImage', file); // Ensure this matches the field name expected by multer
-        });
-
-        console.log('Form Data:', Array.from(formData.entries())); // Log form data
-
-        try {
-            const response = await fetch('/lectures', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-                const newLecture = await response.json();
-                displayNewLecture(newLecture);
-                closeModal();
-            } else {
-                throw new Error('Failed to save the lecture');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error saving the lecture.');
-        }
-    } else {
+    if (!title || !duration || !description || videoFileInput.files.length === 0 || imageFileInput.files.length === 0) {
         alert('Please fill in all fields and select at least one file.');
+        return;
+    }
+
+    const formData = new FormData();
+
+    if (chapterName || previousChapterName) {
+        formData.append('ChapterName', chapterName || previousChapterName);
+        previousChapterName = chapterName || previousChapterName; // Update previous chapter name
+    }
+
+    formData.append('Title', title);
+    formData.append('Duration', duration);
+    formData.append('Description', description);
+
+    Array.from(videoFileInput.files).forEach(file => {
+        console.log('Appending video file:', file.name);
+        formData.append('Video', file);
+    });
+
+    Array.from(imageFileInput.files).forEach(file => {
+        console.log('Appending image file:', file.name);
+        formData.append('LectureImage', file);
+    });
+
+    console.log('Form Data:', Array.from(formData.entries()));
+
+    try {
+        const response = await fetch('/lectures', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const newLecture = await response.json();
+            displayNewLecture(newLecture);
+            closeModal();
+        } else {
+            throw new Error('Failed to save the lecture');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving the lecture.');
     }
 }
 

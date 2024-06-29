@@ -165,6 +165,21 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
+    // Function to get the last chapter name
+    static async getLastChapterName(){
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures ORDER BY CreatedAt DESC`;
+            const result = await connection.request().query(sqlQuery);
+            return result.recordset.length ? result.recordset[0].ChapterName : null;
+        } catch (error) {
+            console.error('Error getting last chapter name:', error);
+            throw error;
+        } finally {
+            if (connection) await connection.close();
+        }
+    };
 }
 
 module.exports = Lectures;
