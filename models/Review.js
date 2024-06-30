@@ -4,9 +4,10 @@ const dbConfig = require('../dbConfig');
 async function getAllReviews(connection) {
     try {
         const result = await connection.request().query(`
-            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name
+            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
             FROM user_reviews ur
             JOIN Users u ON ur.user_id = u.id
+            LEFT JOIN ProfilePic p ON u.id = p.user_id
         `);
         return result.recordset;
     } catch (err) {
@@ -19,9 +20,10 @@ async function getReviewById(connection, id) {
         const result = await connection.request()
             .input('review_id', sql.Int, id)
             .query(`
-                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name
+                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
                 FROM user_reviews ur
                 JOIN Users u ON ur.user_id = u.id
+                LEFT JOIN ProfilePic p ON u.id = p.user_id
                 WHERE ur.review_id = @review_id
             `);
         return result.recordset[0];
