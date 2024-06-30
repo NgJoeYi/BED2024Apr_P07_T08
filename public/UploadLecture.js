@@ -10,11 +10,9 @@ function closeModal() {
 
 async function fetchLastChapterName() {
     try {
-        console.log("Sending request to /lectures/last-chapter");
         const response = await fetch('/lectures/last-chapter');
         if (response.ok) {
             const data = await response.json();
-            console.log("Response from /lectures/last-chapter:", data);
             return data.chapterName;
         } else {
             console.error("Failed to fetch last chapter name. Status:", response.status);
@@ -26,10 +24,8 @@ async function fetchLastChapterName() {
     }
 }
 
-
 async function addFiles() {
     let previousChapterName = await fetchLastChapterName();
-
     const chapterName = document.getElementById('chapterName').value.trim();
     const title = document.getElementById('lectureName').value.trim();
     const duration = document.getElementById('duration').value.trim();
@@ -37,8 +33,7 @@ async function addFiles() {
     const videoFileInput = document.getElementById('videoFiles');
     const imageFileInput = document.getElementById('lectureImage');
 
-    const lecturerID = sessionStorage.getItem('LecturerID'); // Retrieve LecturerID from sessionStorage
-    console.log('LecturerID from sessionStorage:', lecturerID); // Log the LecturerID
+    const lecturerID = sessionStorage.getItem('LecturerID');
 
     if (!lecturerID) {
         alert('LecturerID not found. Please log in again.');
@@ -51,7 +46,7 @@ async function addFiles() {
     }
 
     const formData = new FormData();
-    formData.append('LecturerID', lecturerID); // Add LecturerID to formData
+    formData.append('LecturerID', lecturerID);
     if (chapterName) {
         formData.append('ChapterName', chapterName);
         previousChapterName = chapterName;
@@ -74,8 +69,6 @@ async function addFiles() {
         formData.append('LectureImage', file);
     });
 
-    console.log('Form Data:', Array.from(formData.entries())); // Log the form data
-
     try {
         const response = await fetch('/lectures', {
             method: 'POST',
@@ -84,7 +77,7 @@ async function addFiles() {
 
         if (response.ok) {
             const newLecture = await response.json();
-            displayNewLecture(newLecture);
+            displayNewLecture(newLecture, videoFileInput.files, imageFileInput.files);
             closeModal();
         } else {
             throw new Error('Failed to save the lecture');
@@ -95,7 +88,7 @@ async function addFiles() {
     }
 }
 
-function displayNewLecture(newLecture) {
+function displayNewLecture(newLecture, videoFiles, imageFiles) {
     const courseArrangement = document.getElementById('course-arrangement');
 
     const newChapterDiv = document.createElement('div');
@@ -118,6 +111,22 @@ function displayNewLecture(newLecture) {
         <p>Duration: ${newLecture.Duration} minutes</p>
         <p>Description: ${newLecture.Description}</p>
     `;
+
+    // Display the image
+    const imageFile = imageFiles[0];
+    const imageURL = URL.createObjectURL(imageFile);
+    const imageElement = document.createElement('img');
+    imageElement.src = imageURL;
+    imageElement.alt = 'Lecture Image';
+    imageElement.width = 200; // Set width
+    imageElement.height = 200; // Set height
+    lectureDetails.appendChild(imageElement);
+
+    // Display the video file names
+    const videoFileNames = Array.from(videoFiles).map(file => file.name).join(', ');
+    const videoElement = document.createElement('p');
+    videoElement.textContent = `Lecture Video: ${videoFileNames}`;
+    lectureDetails.appendChild(videoElement);
 
     newChapterDiv.appendChild(chapterNameElement);
     newChapterDiv.appendChild(lectureDetails);
@@ -163,8 +172,7 @@ function removeFile(element) {
     element.closest('.file-item').remove();
 }
 
-async function addCourse(){
-    
+async function addCourse() {
     const title = document.getElementById('course-name').value.trim();
     const description = document.getElementById('course-details').value.trim();
     const videoFileInput = document.getElementById('videoFiles');
