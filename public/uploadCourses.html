@@ -41,39 +41,36 @@
       <button class="new-btn" onclick="triggerFileUpload()">New</button>
     </div>
   </div>
-  <div class="course-name" id="course-name">
-    <span class="upload-course-title" contenteditable="false">Course Title :</span>
-    <p id="course-name" contenteditable="true" class="editable-placeholder">Enter course name...</p>
-  </div>
-  <div class="course-details">
-    <span class="upload-course-title" contenteditable="false">Course Description :</span>
-    <p contenteditable="true" class="editable-placeholder"id="course-details">Enter course description...</p>
-  </div>
-  <div class="course-skills-covered" id="course-skills-covered">
-    <span class="upload-course-title" contenteditable="false">Course Meta Data :</span>
-    <form>
-      <div class="content">
-        <label for="meta-data">Level:</label>
-        <input type="text" id="meta-data" >
-      </div>
-      <div class="content">
-        <label for="meta-data">Total Duration: </label>
-        <input type="text" id="meta-data" value="">
-      </div>
-      <div class="content">
-        <label for="meta-data">Category: </label>
-        <input type="text" id="meta-data" value="">
-      </div>
-    </form>
-    <div id="fileInputContainer">
-      <label for="imageFile">Upload Course Image:</label>
-      <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+  <form id="courseForm">
+    <div class="course-name">
+        <span class="upload-course-title">Course Title:</span>
+        <p id="course-name-text" contenteditable="true" class="editable-placeholder">Enter course name...</p>
     </div>
-  </div>
-
-  <div class="ending-buttons">
-    <button class="ending-buttons save-btn" onclick="submitCourse()">Upload</button>
-  </div>
+    <div class="course-details">
+        <span class="upload-course-title" contenteditable="false">Course Description :</span>
+        <p contenteditable="true" class="editable-placeholder" id="course-details">Enter course description...</p>
+    </div>
+    <div class="course-skills-covered" id="course-skills-covered">
+        <span class="upload-course-title" contenteditable="false">Course Meta Data :</span>
+        <div class="content">
+            <label for="meta-data">Level:</label>
+            <input type="text" id="level">
+        </div>
+        <div class="content">
+            <label for="meta-data">Total Duration: </label>
+            <input type="number" id="duration" value="">
+        </div>
+        <div class="content">
+            <label for="meta-data">Category: </label>
+            <input type="text" id="category" value="">
+        </div>
+        <div id="fileInputContainer">
+            <label for="imageFile">Upload Course Image:</label>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+        </div>
+    </div>
+    <button type="button" onclick="addCourses()">Submit</button>
+</form>
 
 </div>
 

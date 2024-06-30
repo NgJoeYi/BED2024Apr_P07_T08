@@ -151,6 +151,45 @@ function resetForm() {
     console.log("Form reset completed");
 }
 
-async function addCourses(){
-    
+async function addCourses() {
+    const lecturerID = sessionStorage.getItem('LecturerID');
+    const title = document.getElementById('course-name-text').textContent.trim();
+    const description = document.getElementById('course-details').textContent.trim();
+    const category = document.getElementById('category').value.trim();
+    const level = document.getElementById('level').value.trim();
+    const duration = document.getElementById('duration').value.trim();
+    const courseImageInput = document.getElementById('imageFile');
+
+    if (!lecturerID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
+        alert('Please complete entering course information and select an image.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('lecturerID', lecturerID);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('level', level);
+    formData.append('duration', duration);
+    formData.append('imageFile', courseImageInput.files[0]); // Ensure this matches the form field name
+
+    try {
+        const response = await fetch('/courses', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const newCourse = await response.json();
+            alert('Course saved successfully');
+            window.location.href = 'Courses.html'; // Redirect on successful creation
+        } else {
+            const errorData = await response.json();
+            alert(`Failed to save the course: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error('Error saving the course:', error);
+        alert('Error saving the course.');
+    }
 }

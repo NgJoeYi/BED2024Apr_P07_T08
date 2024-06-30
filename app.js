@@ -37,7 +37,8 @@ const upload = multer({ storage: storage });
 
 const multiUpload = upload.fields([
     { name: 'Video', maxCount: 1 },
-    { name: 'LectureImage', maxCount: 1 }
+    { name: 'LectureImage', maxCount: 1 },
+    {name : 'courseImage', maxCount : 1}
 ]);
 
 
@@ -79,10 +80,10 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 
 // Add Routes for courses
 app.get('/courses', courseController.getAllCourses);
-app.get('/courses/:id' , courseController.getCoursesById);
+app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
-app.post('/courses', upload.single('courseImage'), courseController.createCourse);
+app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
 
 // Add Routes for lectures

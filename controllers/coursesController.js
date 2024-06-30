@@ -1,5 +1,10 @@
 const Courses = require("../models/courses");
 const sql = require("mssql");
+const multer = require("multer");
+
+// Multer setup for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const getAllCourses = async (req, res) => {
     try {
@@ -28,19 +33,25 @@ const getCoursesById = async (req, res) => {
 };
 
 
+
 const createCourse = async (req, res) => {
   const newCourse = req.body;
+  console.log('Request Body:', newCourse); // Log the request body
+
   if (req.file) {
-    newCourse.courseImage = fs.readFileSync(req.file.path);
-    fs.unlinkSync(req.file.path); // Clean up the temp file
+      console.log('Course Image:', req.file); // Log the file details
+      newCourse.courseImage = req.file.buffer; // Directly use the buffer from multer
+  } else {
+      console.log('Course Image not provided');
+      return res.status(400).send("courseImage file not provided");
   }
 
   try {
-    const createdCourse = await Courses.createCourse(newCourse);
-    res.status(201).json(createdCourse);
+      const createdCourse = await Courses.createCourse(newCourse);
+      res.status(201).json(createdCourse);
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error creating course");
+      console.error('Error creating course:', error);
+      res.status(500).send("Error creating course");
   }
 };
 

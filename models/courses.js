@@ -125,10 +125,10 @@ class Courses {
             request.input("Duration", sql.Int, newCourseData.duration);
             request.input("CreatedAt", sql.DateTime, new Date());
             request.input("CourseImage", sql.VarBinary, newCourseData.courseImage);
-    
+
             const result = await request.query(sqlQuery);
             const newCourseID = result.recordset[0].CourseID;
-    
+
             return newCourseID;
         } catch (error) {
             console.error('Error creating course:', error);
@@ -136,7 +136,7 @@ class Courses {
         } finally {
             await connection.close();
         }
-    }
+    }    
     static async getCourseImage(id){
         const connection = await sql.connect(dbConfig);
         try{
