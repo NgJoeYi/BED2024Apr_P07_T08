@@ -15,7 +15,7 @@ const getUserById = async (req, res) => {
     }
 };
 
-/*
+
 const checkUserExist = async (req, res) => {
     const { email } = req.body;
     try {
@@ -23,13 +23,13 @@ const checkUserExist = async (req, res) => {
         if (!checkUser) {
             return res.status(404).send('User does not exist');
         }
-        res.status(200).send();
+        res.status(200).send(user);
     } catch (error) {
         console.error('Server error:', error); // Log error details
         res.status(500).send('Server error');
     }
 };
-*/
+
 
 const createUser = async (req, res) => {
     const newUserData = req.body;
@@ -213,7 +213,7 @@ const getProfilePicByUserId = async (req, res) => {
 
 module.exports = {
     getUserById,
-    //checkUserExist,
+    checkUserExist,
     createUser,
     loginUser,
     updateUser,
