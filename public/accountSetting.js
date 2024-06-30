@@ -135,6 +135,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         } catch (error) {
             console.error('Error:', error);
         }
+        window.location.reload();
     });
   });
   
