@@ -37,7 +37,7 @@ const createUser = async (req, res) => {
         // Check if user already exists
         const existingUser = await User.checkUserExist(newUserData.email);
         if (existingUser) {
-            return res.status(400).send('User already exists');
+            return res.status(400).json({ message: 'Email is already in use' });
         } 
         // Hash the password
         const hashedPassword = await bcrypt.hash(newUserData.password, 10);

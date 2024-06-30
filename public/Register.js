@@ -42,12 +42,13 @@ document.getElementById('register-form').addEventListener('submit', async functi
             body: JSON.stringify(data)
         });
 
+        const responseData = await response.json();
+
         if (!response.ok) {
-            const errorData = await response.json();
-            if (errorData.errors.length > 0){
-                alert(`Validation errors:\n${errorData.errors.join('\n')}`);
+            if (responseData.errors && responseData.errors.length > 0) {
+                alert(`Validation errors:\n${responseData.errors.join('\n')}`);
             } else {
-                alert(`${errorData.message}`);
+                alert(`${responseData.message}`);
             }
             return;
         }
@@ -56,6 +57,6 @@ document.getElementById('register-form').addEventListener('submit', async functi
         window.location.href = 'Login.html';
     } catch (error) {
         // Display the error message
-        alert(`Registration failed: ${error.message}`);
+        alert('Registration failed. Please try again later');
     }
 });
