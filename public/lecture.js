@@ -266,7 +266,7 @@ function fetchReviews() {
                 reviewElement.innerHTML = `
                     <div class="review-content">
                         <div class="review-author">
-                            <img src="images/profilePic2" alt="Author Avatar" class="author-avatar">
+                            <img src="${review.profilePic || 'images/profilePic.jpeg'}" alt="Author Avatar" class="author-avatar">
                             <div class="review-details">
                                 <div class="author-name">${review.user_name}</div>
                                 <div class="rating">
@@ -282,8 +282,8 @@ function fetchReviews() {
                         <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
                         <button class="helpful">👍 Helpful</button>
                     </div>
-                `;
-                reviewsContainer.appendChild(reviewElement);
+            `;
+            reviewsContainer.appendChild(reviewElement);
             });
         })
         .catch(error => console.error('Error fetching reviews:', error));

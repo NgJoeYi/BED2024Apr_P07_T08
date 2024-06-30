@@ -7,10 +7,15 @@ async function getComments(req, res) {
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const comments = await commentModel.getCommentsByDiscussionId(connection, discussionId);
+        let comments;
+        if (discussionId) {
+            comments = await commentModel.getCommentsByDiscussionId(connection, discussionId);
+        } else {
+            comments = await commentModel.getAllComments(connection);
+        }
         res.json(comments);
     } catch (err) {
-        console.error('Error fetching comments:', err);
+        console.error(err);
         res.status(500).send("Error fetching comments");
     } finally {
         if (connection) {
