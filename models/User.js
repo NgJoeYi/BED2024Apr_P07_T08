@@ -71,7 +71,26 @@ class User {
             }
         }
     }
-
+    // just want to check if user exist, hence returns true or false
+    static async checkUserExist(emailInput) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
+            const request = connection.request();
+            request.input('emailInput', emailInput);
+            const result = await request.query(sqlQuery);
+            return result.recordset.length > 0;
+        } catch(error) {
+            console.error('Error retrieving a user:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
     static async createLecturer(userId) {
         let connection;
         try {
@@ -259,6 +278,30 @@ class User {
             }
         }
     }
+    static async getLecturerIDthroughLogin(userID) {
+        const connection = await sql.connect(dbConfig);
+        try {
+            const lecturerQuery = `
+                SELECT LecturerID FROM Lecturer WHERE UserID = @userID;
+            `;
+            const request = connection.request();
+            request.input('userID', sql.Int, userID);
+            const result = await request.query(lecturerQuery);
+            if (result.recordset.length === 0) {
+                return null; // No lecturer found
+            }
+            const LecturerID = result.recordset[0].LecturerID;
+            return LecturerID;
+        } catch (error) {
+            console.error('Error retrieving LecturerID from User:', error);
+            throw error; // Rethrowing the error for the API layer to handle
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
 
 }
 

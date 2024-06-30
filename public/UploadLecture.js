@@ -150,3 +150,7 @@ function resetForm() {
     document.getElementById('lectureImage').value = '';
     console.log("Form reset completed");
 }
+
+async function addCourses(){
+    
+}

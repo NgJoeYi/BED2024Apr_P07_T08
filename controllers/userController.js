@@ -1,7 +1,5 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
-const sql = require("mssql");
-const dbConfig = require('../dbConfig');
 
 const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -17,27 +15,29 @@ const getUserById = async (req, res) => {
     }
 };
 
-const getCurrentUser = async (req, res) => {
-    const userId = req.headers['user-id'];
+
+const checkUserExist = async (req, res) => {
+    const { email } = req.body;
     try {
-        const user = await User.getUserById(userId);
-        if (!user) {
-            return res.status(404).send('User not found');
+        const checkUser = await User.checkUserExist(email);
+        if (!checkUser) {
+            return res.status(404).send('User does not exist');
         }
-        res.status(200).json(user);
+        res.status(200).send(checkUser);
     } catch (error) {
-        console.error('Error fetching current user:', error);
+        console.error('Server error:', error); // Log error details
         res.status(500).send('Server error');
     }
 };
+
 
 const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
         // Check if user already exists
-        const existingUser = await User.loginUser(newUserData);
+        const existingUser = await User.checkUserExist(newUserData.email);
         if (existingUser) {
-            return res.status(400).send('User already exists');
+            return res.status(400).json({ message: 'Email is already in use' });
         } 
         // Hash the password
         const hashedPassword = await bcrypt.hash(newUserData.password, 10);
@@ -48,7 +48,7 @@ const createUser = async (req, res) => {
             console.error('Error: User creation failed');
             return res.status(400).json({ message: 'Could not create an account' });
         }
-        res.status(201).json({ userId: newUser.userId });
+        res.status(201).json({ userId: newUser.id });
     } catch (error) {
         console.error('Server error:', error); // Log error details
         res.status(500).send('Server error');
@@ -56,31 +56,19 @@ const createUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password } = req.body; // user filled in email and password field
     try {
-        const user = await User.loginUser({ email });
-        if (!user) {
-            return res.status(404).send({ message: 'Invalid email. No user found' });
+        const loginSuccess = await User.loginUser({ email });
+        if (!loginSuccess) {
+            return res.status(404).send( { message: 'Invalid email. No user found'} );
         }
-        const matchPassword = await bcrypt.compare(password, user.password);
+        const matchPassword = await bcrypt.compare(password, loginSuccess.password);
         if (!matchPassword) {
-            return res.status(404).json({ message: 'Invalid password. Please try again' });
+            return res.status(404).json( { message: 'Invalid password. Please try again'} );
         }
-
-        // Fetch the LecturerID for the logged-in user
-        const lecturerQuery = `
-            SELECT LecturerID FROM Lecturer WHERE UserID = @userID
-        `;
-        const connection = await sql.connect(dbConfig);
-        const request = connection.request();
-        request.input('userID', sql.Int, user.id);
-        const result = await request.query(lecturerQuery);
-        const LecturerID = result.recordset[0]?.LecturerID;
-
-        // Send user details and LecturerID to client
-        res.status(200).json({ ...user, LecturerID });
+        res.status(200).json(loginSuccess);
     } catch (error) {
-        console.error('Server error:', error);
+        console.error('Server error:', error); // Log error details
         res.status(500).send('Server error');
     }
 };
@@ -89,9 +77,18 @@ const updateUser = async (req, res) => {
     const userId = parseInt(req.params.id);
     const newUserData = req.body;
     try {
+        // get the current user 
         const user = await User.getUserById(userId);
         if (!user) {
             return res.status(404).send('User does not exist');
+        }
+
+        // if there were changes made to the email, check if the email alr exists
+        if (newUserData.email !== user.email) {
+            const checkEmailExist = await User.checkUserExist(newUserData.email);
+            if (checkEmailExist) {
+                return res.status(400).json({ message: 'Email is already in use' });
+            }
         }
 
         if (newUserData.newPassword) {
@@ -121,6 +118,8 @@ const updateUser = async (req, res) => {
     }
 };
 
+
+// after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
 const deleteUser = async (req, res) => {
     const userId = parseInt(req.params.id);
     const passwordInput = req.body;
@@ -130,6 +129,7 @@ const deleteUser = async (req, res) => {
             return res.status(404).send('User does not exist');
         }
 
+        // compare current password and the password in the database 
         const isPasswordMatch = await bcrypt.compare(passwordInput.password, checkUser.password);
         if (!isPasswordMatch) {
             return res.status(400).json({ message: 'Password is incorrect' });
@@ -142,6 +142,28 @@ const deleteUser = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const updateProfilePic = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -159,6 +181,9 @@ const updateProfilePic = async (req, res) => {
     }
 };
 
+
+
+
 const getProfilePicByUserId = async (req, res) => {
     const userId = parseInt(req.params.id);
     try {
@@ -169,7 +194,7 @@ const getProfilePicByUserId = async (req, res) => {
 
         let profilePic = await User.getProfilePicByUserId(userId);
         if (!profilePic) {
-           profilePic = 'images/profilePic.jpeg';
+           profilePic = 'images/profilePic.jpeg'; // Default profile picture 
         }
         res.status(200).json({ user, profilePic });
     } catch (error) {
@@ -178,13 +203,42 @@ const getProfilePicByUserId = async (req, res) => {
     }
 };
 
+
+
+const getLecturerIDthroughLogin = async (req, res) => {
+    const userID = parseInt(req.params.id);
+    try {
+        const lecturerID = await User.getLecturerIDthroughLogin(userID);
+        if (!lecturerID) {
+            return res.status(404).json({ message: 'LecturerID does not exist for this user.' });
+        }
+        res.status(200).json({ lecturerID: lecturerID });
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).send('Server error');
+    }
+};
+
+
 module.exports = {
     getUserById,
+    checkUserExist,
     createUser,
     loginUser,
     updateUser,
     deleteUser,
     updateProfilePic,
     getProfilePicByUserId,
-    getCurrentUser
+    getLecturerIDthroughLogin
 };
+
+
+// ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
+// 1. hashing the password so if even 2 users have the same password, the hash value is different
+
+// 2. bcrypt.hash(newUserData.newPassword, 10) the 10 in this is the level of security, 
+// the higher the value, the more secure it is because it is the number of times hashing algo is executed
+// it is known as salt rounds
+
+// 3. bcrypt.compare(userLoginData.password, user.password) this bcrypt.compare 
+// compares the plain text password and the hashed password, returns true if match, & false otherwise

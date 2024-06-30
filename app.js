@@ -40,10 +40,6 @@ const multiUpload = upload.fields([
     { name: 'LectureImage', maxCount: 1 }
 ]);
 
-// MAY DELETE 
-const cors = require('cors');
-app.use(cors()); // This will open up all routes to all origins. For production, configure appropriately.
-
 
 // Include body-parser middleware to handle JSON data
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -53,12 +49,12 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.post('/account/uploadProfilePic/:id', userController.updateProfilePic);
 app.get('/account/profile/:id', userController.getProfilePicByUserId);
 
-app.get('/current-user', userController.getCurrentUser);
 app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
 app.delete('/account/:id', /*deleteValidation,*/ userController.deleteUser);
+app.get('/current-user/lecturerID/:id',userController.getLecturerIDthroughLogin);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);

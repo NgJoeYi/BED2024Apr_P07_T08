@@ -1,28 +1,57 @@
 document.getElementById('login-contact-form').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Prevents the page to reload automatically
+    event.preventDefault(); // Prevents the page from reloading automatically
     const formData = new FormData(this);
     const data = {};
     formData.forEach((value, key) => {
         data[key] = value;
     });
 
-    const response = await fetch('/users/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
+    // Function to fetch lecturer ID
+    const fetchLecturerID = async () => {
+        try {
+            const response = await fetch('/current-user/lecturerID/' + sessionStorage.getItem('userId'));
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return await response.json(); // Assuming the API returns JSON with { lecturerID: 'someID' }
+        } catch (error) {
+            console.error('Error fetching lecturerID: ', error);
+            return null;
+        }
+    };
 
-    if (response.ok) {
-        const user = await response.json();
-        alert('Login successful!');
-        sessionStorage.setItem('userId', user.id);
-        sessionStorage.setItem('role', user.role); // Store role in sessionStorage
-        sessionStorage.setItem('LecturerID', user.LecturerID); // Store LecturerID in sessionStorage if needed
-        window.location.href = 'index.html'; 
-    } else {
-        const errorData = await response.json();
-        alert(`${errorData.message}`);
+    try {
+        const loginResponse = await fetch('/users/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (loginResponse.ok) {
+            const user = await loginResponse.json();
+            alert('Login successful!');
+            sessionStorage.setItem('userId', user.id);
+            sessionStorage.setItem('role', user.role); // Store role in sessionStorage
+
+            // Fetch and store LecturerID only if the role matches
+            if (user.role === 'lecturer') {
+                const lecturerInfo = await fetchLecturerID();
+                if (lecturerInfo && lecturerInfo.lecturerID) {
+                    sessionStorage.setItem('LecturerID', lecturerInfo.lecturerID);
+                } else {
+                    console.log('Failed to retrieve lecturer ID');
+                }
+            }
+
+            window.location.href = 'index.html'; // Redirect on successful login
+        } else {
+            const errorData = await loginResponse.json();
+            alert(errorData.message || 'Login failed');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('An error occurred during login.');
     }
 });
