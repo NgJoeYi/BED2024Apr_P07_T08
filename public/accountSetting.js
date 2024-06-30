@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
                     element.textContent = updatedUser.name;
                 });
+                window.location.reload();
                 
                 // Close the edit fields
                 document.getElementById('edit-account-details').style.display = 'none';
@@ -135,7 +136,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         } catch (error) {
             console.error('Error:', error);
         }
-        window.location.reload();
     });
   });
   
