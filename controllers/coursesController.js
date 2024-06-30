@@ -88,23 +88,37 @@ const deleteCourse = async (req, res) => {
 const getCourseImage = async (req, res) => {
   const courseID = parseInt(req.params.id);
   try {
-      const imageBuffer = await Courses.getCourseImage(courseID);
-      if (!imageBuffer) {
-          return res.status(404).send('Image not found');
-      }
-      res.setHeader('Content-Type', 'image/jpeg');
-      res.send(imageBuffer);
+    const imageBuffer = await Courses.getCourseImage(courseID);
+    if (!imageBuffer) {
+      return res.status(404).send('Image not found');
+    }
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.send(imageBuffer);
   } catch (error) {
-      console.error('Error fetching course image:', error);
-      res.status(500).send('Server error');
+    console.error('Error fetching course image:', error);
+    res.status(500).send('Server error');
   }
 };
+const getCourseID = async(req,res)=>{
+  const lecturerID = parseInt(req.params.lecturerID);
+  try{
+    const courseID = await Courses.getCourseID(lecturerID);
+    if(!courseID){
+      return res.status(404).send('course ID not found');
+    }
+    res.json(courseID);
+  }catch (error) {
+    console.error('Error fetching course ID:', error);
+    res.status(500).send('Server error');
+  }
 
+}
 module.exports = {
   getAllCourses,
   getCoursesById,
   createCourse,
   updateCourse,
   deleteCourse,
-  getCourseImage
+  getCourseImage,
+  getCourseID
   }
