@@ -40,6 +40,11 @@ const multiUpload = upload.fields([
     { name: 'LectureImage', maxCount: 1 }
 ]);
 
+// MAY DELETE 
+const cors = require('cors');
+app.use(cors()); // This will open up all routes to all origins. For production, configure appropriately.
+
+
 // Include body-parser middleware to handle JSON data
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
