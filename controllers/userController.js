@@ -15,12 +15,27 @@ const getUserById = async (req, res) => {
     }
 };
 
+/*
+const checkUserExist = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const checkUser = await User.checkUserExist(email);
+        if (!checkUser) {
+            return res.status(404).send('User does not exist');
+        }
+        res.status(200).send();
+    } catch (error) {
+        console.error('Server error:', error); // Log error details
+        res.status(500).send('Server error');
+    }
+};
+*/
 
 const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
         // Check if user already exists
-        const existingUser = await User.loginUser(newUserData);
+        const existingUser = await User.checkUserExist(newUserData.email);
         if (existingUser) {
             return res.status(400).send('User already exists');
         } 
@@ -66,6 +81,14 @@ const updateUser = async (req, res) => {
         const user = await User.getUserById(userId);
         if (!user) {
             return res.status(404).send('User does not exist');
+        }
+
+        // if there were changes made to the email, check if the email alr exists
+        if (newUserData.email !== user.email) {
+            const checkEmailExist = await User.checkUserExist(newUserData.email);
+            if (checkEmailExist) {
+                return res.status(400).json({ message: 'Email is already in use' });
+            }
         }
 
         if (newUserData.newPassword) {
@@ -190,6 +213,7 @@ const getProfilePicByUserId = async (req, res) => {
 
 module.exports = {
     getUserById,
+    //checkUserExist,
     createUser,
     loginUser,
     updateUser,
