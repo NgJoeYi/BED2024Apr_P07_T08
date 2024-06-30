@@ -15,22 +15,24 @@ const getUserById = async (req, res) => {
       }
     }
 
-const createUser = async (req, res) => {
-    const newUserData = req.body;
-    try {
-        const checkUser = await User.getUserByUsername(newUserData.username);
-        if (!checkUser) {
-            return res.status(400).send('User already exists');
+    const createUser = async (req, res) => {
+        const newUserData = req.body;
+        try {
+            const checkUser = await User.getUserByUsername(newUserData.username);
+            if (checkUser) {
+                return res.status(400).send('User already exists');
+            }
+            const hashPassword = await bcrypt.hash(newUserData.password, 10);
+            newUserData.passwordHash = hashPassword;
+            const user = await User.createUser(newUserData);
+            res.status(201).json({ message: "User created successfully" });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Internal server error" });
+            }
         }
-        const hashPassword = await bcrypt.hash(password, 10);
-        newUserData.password = hashPassword;
-        const user = await User.createUser(newUserData);
-        res.status(201).json({ message: "User created successfully" });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Internal server error" });
-      }
-    }
+    
+
 
 
 module.exports = { getUserById, createUser }

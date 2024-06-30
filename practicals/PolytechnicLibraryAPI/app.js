@@ -1,7 +1,10 @@
 require('dotenv').config();
 const express = require('express');
+const sql = require('mssql');
+const bodyParser = require('body-parser');
+const dbConfig = require('./dbConfig');
 const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
+const userRoutes = require('./routes/userRoute');
 const bookRoutes = require('./routes/bookRoutes');
 
 const app = express();

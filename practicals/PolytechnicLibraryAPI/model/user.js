@@ -53,23 +53,27 @@ class User{
         }
     }
 
+    
+
+
     static async createUser(newUserData) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            INSERT INTO Users username=usernameInput, passwordHash=@hashedPassword, role=@roleInput
-            `;
+            INSERT INTO Users (username, passwordHash, role)
+            VALUES (@usernameInput, @hashedPassword, @roleInput)
+          `;
             const request = connection.request();
             request.input('usernameInput', newUserData.username);
-
-            request.input('hashedPassword', newUserData.hashedPasword);
+            request.input('hashedPassword', newUserData.passwordHash);
             request.input('roleInput', newUserData.role);
             const result = await request.query(sqlQuery);
-            if (result.rowsAffected[0] === 0) {
+
+            if (!result.recordset || result.recordset.length === 0) {
                 return null;
             }
-            return await this.getUserById(newUserData.user_id);
+            return await this.getUserById(result.recordset[0].user_id);
         } catch (error) {
             console.error(error);
         } finally {
@@ -78,6 +82,8 @@ class User{
             }
         }
     }
+    
+    
 }
 
 module.exports = User;

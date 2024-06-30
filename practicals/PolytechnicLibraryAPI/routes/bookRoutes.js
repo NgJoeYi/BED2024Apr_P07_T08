@@ -1,10 +1,10 @@
-// routes/bookRoutes.js
 const express = require('express');
-const { fetchAllBooks, changeBookAvailability } = require('../controllers/bookController');
-const { verifyJWT, authorizeRoles } = require('../middlewares/authMiddleware');
+const { fetchAllBooks, changeBookAvailability, getAllBooks } = require('../controller/bookController');
+const { verifyJWT, authorizeRoles } = require('../middleware/authMiddleware');
+const { updateBookAvailability } = require('../model/book');
 const router = express.Router();
 
-router.get('/books', verifyJWT, fetchAllBooks);
-router.put('/books/:bookId/availability', verifyJWT, authorizeRoles('librarian'), changeBookAvailability);
+router.get('/books', verifyJWT, getAllBooks);
+router.put('/books/:bookId/availability', verifyJWT, authorizeRoles('librarian'), updateBookAvailability);
 
 module.exports = router;

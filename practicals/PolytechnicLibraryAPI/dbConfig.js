@@ -11,3 +11,5 @@ const dbConfig = {
       connectionTimeout: 60000,
   },
 };
+
+module.exports = dbConfig;
