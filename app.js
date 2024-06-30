@@ -58,7 +58,6 @@ app.delete('/discussions/:id', discussionController.deleteDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
-app.get('/comments?discussionId=:discussionId', commentController.getComments);app.get('/comments?discussionId=:discussionId', commentController.getComments); // <-- To handle comments based on discussionId
 app.put('/comments/:id', commentController.updateComment);
 app.post('/comments', commentController.createComment); 
 app.delete('/comments/:id', commentController.deleteComment);
