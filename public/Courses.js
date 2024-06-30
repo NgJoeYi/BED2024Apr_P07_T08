@@ -51,6 +51,7 @@ function displayCourses(courses) {
 
 function checkUserRoleAndFetchCourses() {
     const userRole = sessionStorage.getItem('role');
+    console.log(userRole);
     if (userRole === 'lecturer') {
         document.querySelector('.add-button').style.display = 'block';
     } else {
