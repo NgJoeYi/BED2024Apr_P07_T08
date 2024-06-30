@@ -149,7 +149,7 @@ async function run() {
 
         // Path to courseImage file
 
-        // WY, RAEANN, JOEYI's
+        // WY, RAEANN
         // const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
 
         // AMELIA'S

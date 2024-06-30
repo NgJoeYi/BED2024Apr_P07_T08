@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function postComment(text, discussionId) {
         console.log('Posting Comment:', text); // Debug log
         console.log('Discussion ID:', discussionId); // Debug log
-
+    
         try {
             const response = await fetch('/comments', {
                 method: 'POST',
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error:', error);
         }
     }
-
+    
     window.deleteComment = async function(button) {
         const comment = button.closest('.comment');
         const commentId = comment.dataset.id;
@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching discussion details:', error);
         }
     }
+    
 
     function displayDiscussionDetails(discussion) {
         const mainPost = document.getElementById('main-post');
@@ -202,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
-    }
+    }    
 
     function displayComments(comments) {
         const commentsSection = document.querySelector('.comments-section');
@@ -245,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
     fetchDiscussionDetails(discussionId); // Fetch discussion details
     fetchComments(discussionId); // Fetch comments for the specific discussion
+
 
     window.saveComment = saveComment;
     window.closePopup = closePopup;

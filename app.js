@@ -51,14 +51,14 @@ app.delete('/account/:id', /*deleteValidation,*/ userController.deleteUser);
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
 app.get('/discussions/user/:userId', discussionController.getDiscussionsByUser);
-app.get('/discussions/:id', discussionController.getDiscussionById); // <-- Add this line
+app.get('/discussions/:id', discussionController.getDiscussionById);
 app.post('/discussions', discussionController.createDiscussion);
 app.put('/discussions/:id', discussionController.updateDiscussion);
 app.delete('/discussions/:id', discussionController.deleteDiscussion);
 
-
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
+app.get('/comments?discussionId=:discussionId', commentController.getComments);app.get('/comments?discussionId=:discussionId', commentController.getComments); // <-- To handle comments based on discussionId
 app.put('/comments/:id', commentController.updateComment);
 app.post('/comments', commentController.createComment); 
 app.delete('/comments/:id', commentController.deleteComment);
