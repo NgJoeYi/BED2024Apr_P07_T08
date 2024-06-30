@@ -8,9 +8,11 @@ const getDiscussions = async (req, res) => {
         const sort = req.query.sort;
 
         let query = `
-            SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username
+            SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username, 
+                   ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
             FROM Discussions d
             LEFT JOIN Users u ON d.user_id = u.id
+            LEFT JOIN ProfilePic p ON u.id = p.user_id
         `;
 
         if (category && category !== 'all') {
@@ -32,6 +34,8 @@ const getDiscussions = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
+
+
 
 // Fetch a specific discussion by ID
 const getDiscussionById = async (req, res) => {
@@ -76,7 +80,12 @@ const createDiscussion = async (req, res) => {
 
         const userResult = await pool.request()
             .input('userId', sql.Int, userId)
-            .query('SELECT name FROM Users WHERE id = @userId');
+            .query(`
+                SELECT u.name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
+                FROM Users u
+                LEFT JOIN ProfilePic p ON u.id = p.user_id
+                WHERE u.id = @userId
+            `);
 
         const user = userResult.recordset[0];
 
@@ -89,7 +98,7 @@ const createDiscussion = async (req, res) => {
             likes: 0,
             dislikes: 0,
             username: user.name,
-            profilePic: 'images/profilePic2.jpeg' // or fetch the actual profile picture URL
+            profilePic: user.profilePic
         };
 
         res.json({ success: true, discussion: newDiscussion });
@@ -98,6 +107,7 @@ const createDiscussion = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
+
 
 // Increment likes for a discussion
 const incrementLikes = async (req, res) => {

@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Current User ID:', currentUserId); // Debug log
 
     closePopupBtn.addEventListener('click', closePopup);
-    // addCommentBtn.addEventListener('click', () => showPopup('add')); // Show popup for adding a new comment
 
     addCommentBtn.addEventListener('click', () => {
         if (currentUserId) {
@@ -155,23 +154,42 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchDiscussionDetails(discussionId) {
         try {
             const response = await fetch(`/discussions/${discussionId}`);
+            if (!response.ok) {
+                throw new Error(`Error fetching discussion: ${response.statusText}`);
+            }
             const discussion = await response.json();
+            console.log('Discussion details:', discussion); // Debug log
+            if (!discussion) {
+                throw new Error('Discussion not found');
+            }
             displayDiscussionDetails(discussion);
         } catch (error) {
             console.error('Error fetching discussion details:', error);
         }
     }
     
+    
 
     function displayDiscussionDetails(discussion) {
+        if (!discussion) {
+            console.error('No discussion details to display');
+            return;
+        }
+    
         const mainPost = document.getElementById('main-post');
+        if (!mainPost) {
+            console.error('main-post element not found');
+            return;
+        }
+    
         const capitalizedUsername = capitalizeFirstLetter(discussion.username);
         const likedByUser = discussion.userLiked; // should be a boolean
         const dislikedByUser = discussion.userDisliked; // should be a boolean
-
+    
         const likesText = `👍 ${discussion.likes} Likes`;
         const dislikesText = `👎 ${discussion.dislikes} Dislikes`;
-
+    
+        // hi i change this 
         mainPost.innerHTML = `
             <div class="post-header">
                 <div class="profile-pic">
@@ -194,16 +212,21 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     }
+    
+    
 
     async function fetchComments(discussionId) {
         try {
             const response = await fetch(`/comments?discussionId=${discussionId}`);
+            if (!response.ok) {
+                throw new Error(`Error fetching comments: ${response.statusText}`);
+            }
             const comments = await response.json();
             displayComments(comments);
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
-    }    
+    }
 
     function displayComments(comments) {
         const commentsSection = document.querySelector('.comments-section');
@@ -217,10 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
             commentElement.dataset.id = comment.id;
             commentElement.dataset.userId = comment.user_id; // Add user ID to comment element
             console.log(`Comment ID: ${comment.id}, User ID: ${comment.user_id}`); // Debug log for each comment
+            // hi i change this 
             commentElement.innerHTML = `
                 <div class="user-info">
                     <div class="avatar">
-                        <img src="images/profilePic2" alt="User Avatar">
+                        <img src="${comment.profilePic || 'images/profilePic.jpeg'}" alt="User Avatar">
                     </div>
                     <div class="username">${formattedUsername}</div>
                 </div>
@@ -240,13 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function capitalizeFirstLetter(string) {
+        if (!string) return '';
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
     fetchDiscussionDetails(discussionId); // Fetch discussion details
     fetchComments(discussionId); // Fetch comments for the specific discussion
-
 
     window.saveComment = saveComment;
     window.closePopup = closePopup;
