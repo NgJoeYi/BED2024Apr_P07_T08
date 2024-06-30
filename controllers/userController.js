@@ -23,7 +23,7 @@ const checkUserExist = async (req, res) => {
         if (!checkUser) {
             return res.status(404).send('User does not exist');
         }
-        res.status(200).send(user);
+        res.status(200).send(checkUser);
     } catch (error) {
         console.error('Server error:', error); // Log error details
         res.status(500).send('Server error');
