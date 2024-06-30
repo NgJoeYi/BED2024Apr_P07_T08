@@ -19,6 +19,8 @@ function fetchDiscussions() {
     .catch(error => console.error('Error:', error));
 }
 
+
+
 function addDiscussionToFeed(discussion) {
     const feed = document.querySelector('.activity-feed');
     const post = document.createElement('div');
