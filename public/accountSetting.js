@@ -123,11 +123,13 @@ document.addEventListener('DOMContentLoaded', async function () {
               } else {
                 const errorData = await response.json();
                 if (errorData.message === 'Current password is incorrect') {
-                    alert('Current password is incorrect');
+                  alert(`${errorData.message}`);
+                } else if (errorData.message === 'Email is already in use') {
+                  alert(`${errorData.message}`);
                 } else if (errorData.message.length > 0) {
-                    alert(`${errorData.errors.join('\n')}`);
+                  alert(`${errorData.errors.join('\n')}`);
                 } else {
-                    alert(`${errorData.message}`);
+                  alert(`${errorData.message}`);
                 }
             }
         } catch (error) {
