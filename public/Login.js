@@ -1,5 +1,5 @@
 document.getElementById('login-contact-form').addEventListener('submit', async function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevents the page to reload automatically
     const formData = new FormData(this);
     const data = {};
     formData.forEach((value, key) => {
