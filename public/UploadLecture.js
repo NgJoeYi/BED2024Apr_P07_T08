@@ -36,7 +36,7 @@ async function addFiles() {
     const previousChapterName = await fetchLastChapterName();
     const chapterNameInput = document.getElementById('chapterName').value.trim();
     const title = document.getElementById('lectureName').value.trim();
-    const duration = document.getElementById('duration').value.trim();
+    const duration = document.getElementById('duration-lecture').value.trim();
     const description = document.getElementById('description').value.trim();
     const videoFileInput = document.getElementById('videoFiles');
     const imageFileInput = document.getElementById('lectureImage');
@@ -58,7 +58,7 @@ async function addFiles() {
         alert('Please fill in all fields and select at least one file.');
         return;
     }
-
+    
     let chapterName = chapterNameInput || previousChapterName;  
     console.log('Final Chapter Name to Use:', chapterName);
     if (!chapterName) {
