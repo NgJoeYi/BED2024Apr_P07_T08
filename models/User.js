@@ -62,7 +62,7 @@ class User {
             const sqlQuery = `
             INSERT INTO Users (name, dob, email, password, role) 
             VALUES (@inputName, @inputDob, @inputEmail, @inputPassword, @inputRole);
-            SELECT SCOPE_IDENTITY() AS userId;
+            SELECT SCOPE_IDENTITY() AS id;
             `;
             const request = connection.request();
             request.input('inputName', newUserData.name);
