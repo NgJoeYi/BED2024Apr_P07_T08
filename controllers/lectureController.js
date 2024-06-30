@@ -64,27 +64,20 @@ const deleteLecture = async (req, res) => {
 };
 
 const getLastChapterName = async (req, res) => {
-    let connection;
+    const lecturerID = parseInt(req.params.id);
     try {
-        console.log("Connecting to the database to fetch the last chapter name...");
-        connection = await sql.connect(dbConfig);
-        const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures ORDER BY CreatedAt DESC`;
-        const result = await connection.request().query(sqlQuery);
-        console.log("Database query executed. Result:", result.recordset);
-        if (result.recordset.length === 0) {
-            console.log("No chapters found in the database.");
-            return res.status(404).send('No last chapter name found');
+        const chapterName = await Lectures.getLastChapterName(lecturerID);
+        if (!chapterName) {
+            return res.status(404).send('Chapter name not found');
         }
-        const lastChapterName = result.recordset[0].ChapterName;
-        console.log("Last chapter name found:", lastChapterName);
-        res.status(200).json({ chapterName: lastChapterName });
+        res.status(200).json({ chapterName: chapterName });
+
     } catch (error) {
-        console.error('Error getting last chapter name:', error);
-        res.status(500).send('Error fetching last chapter name');
-    } finally {
-        if (connection) await connection.close();
+        console.error(error);
+        res.status(500).send('Error getting chapter name');
     }
 };
+
 
 const createLecture = async (req, res) => {
     const { Title, Duration, Description, Position, ChapterName, LecturerID } = req.body;

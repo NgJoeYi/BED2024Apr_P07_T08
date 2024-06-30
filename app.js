@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const dbConfig = require('./dbConfig');
 const dotenv = require('dotenv');
+// multer is for file uploading 
 const multer = require('multer');
 
 // Load environment variables from .env file
@@ -89,7 +90,7 @@ app.get('/lectures/:id', lectureController.getLectureByID);
 app.put('/lectures/:id', lectureController.updateLecture);
 app.post('/lectures', multiUpload, lectureController.createLecture); // Removed ensureLoggedIn
 app.delete('/lectures/:id', lectureController.deleteLecture);
-app.get('/lectures/last-chapter', lectureController.getLastChapterName); // Ensure this route is defined
+app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); 
 
 // Add Routes for lecturer
 app.get('/lecturer', lecturerController.getAllLecturers);

@@ -151,9 +151,8 @@ class Lectures {
     }
 
     static async getCurrentPositionInChapter(chapterName) {
-        let connection;
+        let connection = await sql.connect(dbConfig);
         try {
-            connection = await sql.connect(dbConfig);
             const sqlQuery = `SELECT MAX(Position) as Position FROM Lectures WHERE ChapterName = @ChapterName`;
             const result = await connection.request()
                 .input('ChapterName', sql.NVarChar, chapterName)
@@ -168,25 +167,27 @@ class Lectures {
         }
     }
   
-    static async getLastChapterName() {
+    static async getLastChapterName(lecturerID) {
         let connection;
         try {
-            console.log("Connecting to the database to fetch the last chapter name...");
             connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures ORDER BY CreatedAt DESC`;
-            const result = await connection.request().query(sqlQuery);
-            console.log("Database query executed. Result:", result.recordset);
+            const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures WHERE LecturerID =  @lecturerID  ORDER BY CreatedAt DESC `;
+            const result = await connection.request()
+            .input('lecturerID', sql.Int, lecturerID)
+            .query(sqlQuery);
+
             if (result.recordset.length === 0) {
                 console.log("No chapters found in the database.");
+                return null;
             } else {
                 console.log("Last chapter name found:", result.recordset[0].ChapterName);
+                return result.recordset[0].ChapterName;
             }
-            return result.recordset.length ? result.recordset[0].ChapterName : null;
         } catch (error) {
             console.error('Error getting last chapter name:', error);
             throw error;
         } finally {
-            if (connection) await connection.close();
+            await connection.close();
         }
     }
     

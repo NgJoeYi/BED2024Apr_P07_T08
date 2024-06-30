@@ -9,8 +9,15 @@ function closeModal() {
 }
 
 async function fetchLastChapterName() {
+    const lecturerID = sessionStorage.getItem('LecturerID'); // Retrieve LecturerID from sessionStorage
+    if (!lecturerID) {
+        console.error("Lecturer ID not found in sessionStorage.");
+        return null; // Exit the function if no lecturer ID is found
+    }
+
     try {
-        const response = await fetch('/lectures/last-chapter');
+        console.log('lecturerID', lecturerID);
+        const response = await fetch(`/lectures/last-chapter/${lecturerID}`);
         if (response.ok) {
             const data = await response.json();
             return data.chapterName;
@@ -23,6 +30,7 @@ async function fetchLastChapterName() {
         return null;
     }
 }
+
 
 async function addFiles() {
     let previousChapterName = await fetchLastChapterName();
@@ -47,6 +55,7 @@ async function addFiles() {
 
     const formData = new FormData();
     formData.append('LecturerID', lecturerID);
+
     if (chapterName) {
         formData.append('ChapterName', chapterName);
         previousChapterName = chapterName;
