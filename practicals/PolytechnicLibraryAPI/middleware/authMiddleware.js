@@ -32,7 +32,7 @@ function verifyJWT(req, res, next) {
       
       req.user = decoded;
       next();
-  });
+    });
 }
 
 

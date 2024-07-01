@@ -32,6 +32,9 @@ document.getElementById('login-contact-form').addEventListener('submit', async f
         if (loginResponse.ok) {
             const user = await loginResponse.json();
             alert('Login successful!');
+// --------------------------------------- JWT ---------------------------------------
+            //sessionStorage.setItem('token', data.token);
+// --------------------------------------- JWT ---------------------------------------
             sessionStorage.setItem('userId', user.id);
             sessionStorage.setItem('role', user.role); // Store role in sessionStorage
 

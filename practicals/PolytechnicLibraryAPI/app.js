@@ -14,16 +14,17 @@ const port = process.env.PORT || 3000; //Use environment variable/default port
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-// Sutdents (library members)
+// Members (library members)
 app.post('/register', userController.createUser);
 app.post('/login', userController.login);
-app.get('/books', jwtAuthorization, bookController.getAllBooks);
 
 // Librarians 
 app.post('/register', userController.createUser);
 app.post('/login', userController.login);
-app.get('/books', bookController.getAllBooks);
-app.put('/books/:bookdId/availability', bookController.updateBookAvailability);
+app.put('/books/:bookdId/availability', jwtAuthorization, bookController.updateBookAvailability);
+
+// for both member and librarians
+app.get('/books', jwtAuthorization, bookController.getAllBooks);
 
 
 app.listen(port, async () => {
