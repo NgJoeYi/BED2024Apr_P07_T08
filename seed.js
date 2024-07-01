@@ -3,6 +3,7 @@ const dbConfig = require("./dbConfig");
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
+
 async function run() {
     try {
         // Connect to the database
@@ -43,7 +44,7 @@ async function run() {
         );
         `;
         await connection.request().query(createUsersTable);
-        
+
         // Create other tables
         const createTables = `
         CREATE TABLE ProfilePic (
@@ -75,39 +76,35 @@ async function run() {
             FOREIGN KEY (discussion_id) REFERENCES Discussions(id)
         );
 
-        CREATE TABLE Lecturer (
-            LecturerID INT PRIMARY KEY IDENTITY(1,1),
-            UserID INT FOREIGN KEY REFERENCES Users(id),
-            CreatedAt DATETIME DEFAULT GETDATE()
-        );
-
         CREATE TABLE Courses (
             CourseID INT PRIMARY KEY IDENTITY(1,1),
-            LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
+            UserID INT NOT NULL,
             Title NVARCHAR(200) NOT NULL,
             Description NVARCHAR(2000),
             Category NVARCHAR(100),
             Level NVARCHAR(50),
             Duration INT, -- Duration in minutes
             CreatedAt DATETIME DEFAULT GETDATE(),
-            CourseImage VARBINARY(MAX)
+            CourseImage VARBINARY(MAX),
+            FOREIGN KEY (UserID) REFERENCES Users(id)
         );
 
-      CREATE TABLE Lectures (
-        LectureID INT PRIMARY KEY IDENTITY(1,1),
-        CourseID INT FOREIGN KEY REFERENCES Courses(CourseID),
-        LecturerID INT FOREIGN KEY REFERENCES Lecturer(LecturerID),
-        Title NVARCHAR(200) NOT NULL,
-        Description NVARCHAR(2000),
-        VideoURL NVARCHAR(256),
-        Video VARBINARY(MAX),
-        LectureImage VARBINARY(MAX),
-        Duration INT, -- Duration in minutes
-        Position INT, -- Position in the course sequence
-        CreatedAt DATETIME DEFAULT GETDATE(),
-        ChapterName NVARCHAR(256)
-    );
-
+        CREATE TABLE Lectures (
+            LectureID INT PRIMARY KEY IDENTITY(1,1),
+            CourseID INT NOT NULL,
+            UserID INT NOT NULL,
+            Title NVARCHAR(200) NOT NULL,
+            Description NVARCHAR(2000),
+            VideoURL NVARCHAR(256),
+            Video VARBINARY(MAX),
+            LectureImage VARBINARY(MAX),
+            Duration INT, -- Duration in minutes
+            Position INT, -- Position in the course sequence
+            CreatedAt DATETIME DEFAULT GETDATE(),
+            ChapterName NVARCHAR(256),
+            FOREIGN KEY (CourseID) REFERENCES Courses(CourseID),
+            FOREIGN KEY (UserID) REFERENCES Users(id)
+        );
 
         CREATE TABLE user_reviews (
             review_id INT PRIMARY KEY IDENTITY,
@@ -140,13 +137,6 @@ async function run() {
                 VALUES ('${user.name}', '${user.dob}', '${user.email}', '${hashedPassword}', '${user.role}')
             `);
         }
-        // Insert data into Lecturer table
-        const insertLecturers = `
-        INSERT INTO Lecturer (UserID) VALUES
-        ((SELECT id FROM Users WHERE email = 'jane_smith@example.com')),
-        ((SELECT id FROM Users WHERE email = 'bob_brown@example.com'));
-        `;
-        await connection.request().query(insertLecturers);
 
         // Path to courseImage file
         // WY, RAEANN
@@ -161,10 +151,10 @@ async function run() {
 
         // Insert data into Courses table
         const insertCourses = `
-        INSERT INTO Courses (LecturerID, Title, Description, Category, Level, Duration, CourseImage) VALUES 
-        (1,'Introduction to Python', 'Learn the basics of Python programming, including syntax, data types, and functions.', 'Programming', 'Beginner', 360, @image),
-        (2,'Advanced Algebra', 'Dive deep into algebraic concepts and techniques used in advanced mathematics.', 'Mathematics', 'Advanced', 480, @image),
-        (2,'Digital Marketing', 'Explore the strategies and tools used in digital marketing to reach and engage audiences.', 'Marketing', 'Intermediate', 300, @image);
+        INSERT INTO Courses (UserID, Title, Description, Category, Level, Duration, CourseImage) VALUES 
+        (2, 'Introduction to Python', 'Learn the basics of Python programming, including syntax, data types, and functions.', 'Programming', 'Beginner', 360, @image),
+        (2, 'Advanced Algebra', 'Dive deep into algebraic concepts and techniques used in advanced mathematics.', 'Mathematics', 'Advanced', 480, @image),
+        (2, 'Digital Marketing', 'Explore the strategies and tools used in digital marketing to reach and engage audiences.', 'Marketing', 'Intermediate', 300, @image);
         `;
         await connection.request()
         .input('image',courseImageBuffer)
@@ -185,31 +175,32 @@ async function run() {
 
         // Insert data into Lectures table
         const insertLectures = `
-        INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Video, LectureImage, Duration, Position, ChapterName) VALUES
+        INSERT INTO Lectures (CourseID, UserID, Title, Description, VideoURL, Video, LectureImage, Duration, Position, ChapterName) VALUES
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
-        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
+        (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
         'Python Basics', 'Introduction to Python programming basics.', 'http://example.com/python_basics', @video, @lectureImage, 60, 1, 'Introduction'),
 
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
-        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
+        (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
         'Data Types in Python', 'Understanding different data types in Python.', 'http://example.com/data_types', @video, @lectureImage, 90, 2, 'Chapter Two'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
-        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
+        (SELECT id FROM Users WHERE email = 'bob_brown@example.com'), 
         'Algebraic Structures', 'Exploring advanced algebraic structures.', 'http://example.com/algebraic_structures', @video, @lectureImage, 120, 1, 'Introduction'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
-        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'bob_brown@example.com')), 
+        (SELECT id FROM Users WHERE email = 'bob_brown@example.com'), 
         'Polynomial Equations', 'Solving polynomial equations in algebra.', 'http://example.com/polynomial_equations', @video, @lectureImage, 100, 2, 'Chapter Two'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
-        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
+        (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
         'SEO Basics', 'Introduction to Search Engine Optimization.', 'http://example.com/seo_basics', @video, @lectureImage, 75, 1, 'Introduction'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
-        (SELECT LecturerID FROM Lecturer WHERE UserID = (SELECT id FROM Users WHERE email = 'jane_smith@example.com')), 
+        (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
         'Content Marketing', 'Strategies for effective content marketing.', 'http://example.com/content_marketing', @video, @lectureImage, 85, 2, 'Chapter Two');
         `;
         await connection.request()
         .input('video', sql.VarBinary, videoBuffer)
         .input('lectureImage', sql.VarBinary, imageBuffer)
         .query(insertLectures);
+
         // Insert data into user_reviews table
         const insertUserReviews = `
         INSERT INTO user_reviews (user_id, review_text, rating, review_date) VALUES 
