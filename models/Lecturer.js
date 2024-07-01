@@ -83,5 +83,37 @@ class Lecturers{
             await connection.close();
         }
     }
+     // connect user and lecturer table
+     static async createLecturer(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+                INSERT INTO Lecturer (UserID) VALUES (@userId);
+                SELECT SCOPE_IDENTITY() AS LecturerID;
+            `;
+            const request = connection.request();
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(sqlQuery);
+    
+            // Log the result object
+            console.log(result);
+    
+            // No need to check recordset, INSERT query does not return rows
+            if (result.rowsAffected[0] > 0) {
+                return { userId };
+            } else {
+                throw new Error('Lecturer creation failed');
+            }
+        } catch (error) {
+            console.error('Error creating lecturer:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
 }
 module.exports = Lecturers;

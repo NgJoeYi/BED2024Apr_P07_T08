@@ -53,6 +53,7 @@ const deleteLecturer = async (req,res)=>{
         res.status(500).send("Error deleting lecturer");
       }
 }
+
 module.exports = {
     getAllLecturers,
     getLecturerByID,

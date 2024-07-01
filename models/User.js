@@ -1,5 +1,6 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
+const Lecturer = require('../models/Lecturer');
 
 class User {
     constructor(id, name, dob, email, password, role) {
@@ -77,6 +78,13 @@ class User {
                 throw new Error("User not created");
             }
             const row = result.recordset[0];
+            const userRole = row.role;
+            const userID = row.id;
+            console.log('ROW:',row);
+            console.log(userRole);
+            if (newUserData.role === 'lecturer'){
+                await Lecturer.createLecturer(userID);
+            }
             return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
         } catch(error) {
             console.error('Error creating user:', error);
@@ -251,49 +259,6 @@ class User {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // connect user and lecturer table
-    static async createLecturer(userId) {
-        let connection;
-        try {
-            connection = await sql.connect(dbConfig);
-            const sqlQuery = `
-                INSERT INTO Lecturer (UserID) VALUES (@userId);
-            `;
-            const request = connection.request();
-            request.input('userId', sql.Int, userId);
-            const result = await request.query(sqlQuery);
-    
-            // Log the result object
-            console.log(result);
-    
-            // No need to check recordset, INSERT query does not return rows
-            if (result.rowsAffected[0] > 0) {
-                return { userId };
-            } else {
-                throw new Error('Lecturer creation failed');
-            }
-        } catch (error) {
-            console.error('Error creating lecturer:', error);
-            throw error;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
 
     static async getLecturerIDthroughLogin(userID) {
         const connection = await sql.connect(dbConfig);
