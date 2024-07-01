@@ -53,7 +53,7 @@ document.getElementById('register-form').addEventListener('submit', async functi
         }
 
         alert('User registered successfully!');
-
+        window.location.href = 'login.html'; // Redirect on successful login
     } catch (error) {
         alert('Registration failed. Please try again later');
     }
