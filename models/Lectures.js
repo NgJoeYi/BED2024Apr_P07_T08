@@ -57,6 +57,7 @@ class Lectures {
             }
             const lecture = result.recordset[0];
             return new Lectures(
+                lecture.LectureID,
                 lecture.CourseID,
                 lecture.UserID,
                 lecture.Title,
@@ -166,15 +167,15 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
-  
-    static async getLastChapterName(lecturerID) {
+
+    static async getLastChapterName(userID) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures WHERE UserID =  @userID  ORDER BY CreatedAt DESC `;
             const result = await connection.request()
-            .input('userID', sql.Int, userID)
-            .query(sqlQuery);
+                .input('userID', sql.Int, userID)
+                .query(sqlQuery);
 
             if (result.recordset.length === 0) {
                 console.log("No chapters found in the database.");
@@ -190,10 +191,6 @@ class Lectures {
             await connection.close();
         }
     }
-    
-    
-
-
 }
 
 module.exports = Lectures;

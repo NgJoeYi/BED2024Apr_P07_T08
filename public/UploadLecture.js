@@ -9,15 +9,15 @@ function closeModal() {
 }
 
 async function fetchLastChapterName() {
-    const lecturerID = sessionStorage.getItem('LecturerID'); 
-    console.log("Fetching chapter for Lecturer ID:", lecturerID);
-    if (!lecturerID) {
-        console.error("Lecturer ID not found in sessionStorage.");
+    const userID = sessionStorage.getItem('userId'); 
+    console.log("Fetching chapter for user ID:", userID);
+    if (!userID) {
+        console.error("User ID not found in sessionStorage.");
         return null; 
     }
-
+    console.log('USER ID: ',userID);
     try {
-        const response = await fetch(`/lectures/last-chapter/${lecturerID}`);
+        const response = await fetch(`/lectures/last-chapter/${userID}`);
         if (response.ok) {
             const data = await response.json();
             console.log("Fetched last chapter name:", data.chapterName);
@@ -46,11 +46,11 @@ async function addFiles() {
     console.log("Duration:", duration);
     console.log("Description:", description);
 
-    const lecturerID = sessionStorage.getItem('LecturerID');
-    console.log("LecturerID from Session:", lecturerID);
+    const userID = sessionStorage.getItem('userId');
+    console.log("userID from Session:", userID);
 
-    if (!lecturerID) {
-        alert('LecturerID not found. Please log in again.');
+    if (!userID) {
+        alert('user id not found. Please log in again.');
         return;
     }
 
@@ -67,7 +67,7 @@ async function addFiles() {
     }
 
     const formData = new FormData();
-    formData.append('LecturerID', lecturerID);
+    formData.append('UserID', userID);
     formData.append('ChapterName', chapterName);
     formData.append('Title', title);
     formData.append('Duration', duration);
