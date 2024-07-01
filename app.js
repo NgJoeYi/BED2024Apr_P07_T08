@@ -78,7 +78,6 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
-app.get('/courses/courseID/:lecturerID',courseController.getCourseID);
 app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);

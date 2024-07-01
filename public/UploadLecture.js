@@ -152,7 +152,7 @@ function resetForm() {
 }
 
 async function addCourses() {
-    const lecturerID = sessionStorage.getItem('LecturerID');
+    const userID = sessionStorage.getItem('userId');
     const title = document.getElementById('course-name-text').textContent.trim();
     const description = document.getElementById('course-details').textContent.trim();
     const category = document.getElementById('category').value.trim();
@@ -160,13 +160,13 @@ async function addCourses() {
     const duration = document.getElementById('duration').value.trim();
     const courseImageInput = document.getElementById('imageFile');
 
-    if (!lecturerID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
+    if (!userID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
         alert('Please complete entering course information and select an image.');
         return;
     }
-
+    console.log('COURSE USER ID :',userID);
     const formData = new FormData();
-    formData.append('lecturerID', lecturerID);
+    formData.append('userID', userID);
     formData.append('title', title);
     formData.append('description', description);
     formData.append('category', category);
