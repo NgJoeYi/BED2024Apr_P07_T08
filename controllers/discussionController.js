@@ -32,11 +32,12 @@ const getDiscussionById = async (req, res) => {
 // Create a new discussion
 const createDiscussion = async (req, res) => {
     try {
-        if (!req.body.userId) {
+        const userId = req.user.id; // -- jwt implementation
+        if (!userId) { // -- jwt implementation
             return res.status(401).json({ success: false, error: 'Unauthorized' });
         }
-        const { title, category, description, userId } = req.body;
-        const newDiscussion = await discussionModel.createDiscussion(title, category, description, userId);
+        const { title, category, description } = req.body;
+        const newDiscussion = await discussionModel.createDiscussion(title, category, description, userId); // -- jwt implementation
         res.json({ success: true, discussion: newDiscussion });
     } catch (err) {
         console.error('Error creating discussion:', err);
@@ -71,9 +72,9 @@ const incrementDislikes = async (req, res) => {
 // Fetch discussions by user ID
 const getDiscussionsByUser = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const discussions = await discussionModel.getDiscussionsByUser(userId);
-        res.json({ success: true, discussions });
+        const userId = req.user.id; // -- jwt implementation
+        const discussions = await discussionModel.getDiscussionsByUser(userId); // -- jwt implementation
+        res.status(200).json({ success: true, discussions });
     } catch (err) {
         console.error('Error getting user discussions:', err);
         res.status(500).json({ success: false, error: err.message });
@@ -84,8 +85,9 @@ const getDiscussionsByUser = async (req, res) => {
 const updateDiscussion = async (req, res) => {
     try {
         const discussionId = req.params.id;
-        const { description, category, userId } = req.body;
-        const success = await discussionModel.updateDiscussion(discussionId, description, category, userId);
+        const { description, category } = req.body;
+        const userId = req.user.id; // -- jwt implementation
+        const success = await discussionModel.updateDiscussion(discussionId, description, category, userId); // -- jwt implementation
         if (success) {
             res.json({ success: true });
         } else {
@@ -101,8 +103,8 @@ const updateDiscussion = async (req, res) => {
 const deleteDiscussion = async (req, res) => {
     try {
         const discussionId = req.params.id;
-        const { userId } = req.body;
-        const success = await discussionModel.deleteDiscussion(discussionId, userId);
+        const userId = req.user.id; // -- jwt implementation
+        const success = await discussionModel.deleteDiscussion(discussionId, userId); // -- jwt implementation
         if (success) {
             res.json({ success: true });
         } else {

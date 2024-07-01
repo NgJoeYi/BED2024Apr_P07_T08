@@ -56,13 +56,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function getCurrentUserId() {
-    const userId = sessionStorage.getItem('userId');
-    if (!userId) {
+function getCurrentUserId() { // -- jwt implementation
+    const token = sessionStorage.getItem('token');  // -- jwt implementation
+    if (!token) { // -- jwt implementation
         alert('User is not logged in or session has expired');
         return null;
     }
-    return userId;
+    return token;
 }
 
 function fetchDiscussions() {
