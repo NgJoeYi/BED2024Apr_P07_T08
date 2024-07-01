@@ -3,9 +3,9 @@ const express = require('express');
 const sql = require('mssql');
 const bodyParser = require('body-parser');
 const dbConfig = require('./dbConfig');
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoute');
-const bookRoutes = require('./routes/bookRoutes');
+const userController = require('./controller/userController');
+const bookController = require('./controller/bookController');
+const jwtAuthorization = require('./middleware/authMiddleware');
 
 const app = express();
 const port = process.env.PORT || 3000; //Use environment variable/default port
@@ -14,9 +14,17 @@ const port = process.env.PORT || 3000; //Use environment variable/default port
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-app.use('/api', authRoutes);
-app.use('/api', userRoutes);
-app.use('/api', bookRoutes);
+// Sutdents (library members)
+app.post('/register', userController.createUser);
+app.post('/login', userController.login);
+app.get('/books', jwtAuthorization, bookController.getAllBooks);
+
+// Librarians 
+app.post('/register', userController.createUser);
+app.post('/login', userController.login);
+app.get('/books', bookController.getAllBooks);
+app.put('/books/:bookdId/availability', bookController.updateBookAvailability);
+
 
 app.listen(port, async () => {
     try {
