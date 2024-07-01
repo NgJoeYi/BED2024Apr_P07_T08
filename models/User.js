@@ -78,7 +78,7 @@ class User {
 
             // Create lecturer entry if the role is 'lecturer'
             if (newUserData.role === 'lecturer') {
-                await User.createLecturer(row.userId);
+                await User.createLecturer(row.id);
             }
 
             return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
@@ -111,16 +111,27 @@ class User {
         }
     }
     
+    // connect user and lecturer table
     static async createLecturer(userId) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            INSERT INTO Lecturer (UserID) VALUES (@userId);
+                INSERT INTO Lecturer (UserID) VALUES (@userId);
             `;
             const request = connection.request();
             request.input('userId', sql.Int, userId);
-            await request.query(sqlQuery);
+            const result = await request.query(sqlQuery);
+    
+            // Log the result object
+            console.log(result);
+    
+            // No need to check recordset, INSERT query does not return rows
+            if (result.rowsAffected[0] > 0) {
+                return { userId };
+            } else {
+                throw new Error('Lecturer creation failed');
+            }
         } catch (error) {
             console.error('Error creating lecturer:', error);
             throw error;
@@ -130,6 +141,7 @@ class User {
             }
         }
     }
+
     // userLoginData sent in req.body rmb to extract name and email
     static async loginUser(userLoginData) {
         let connection;
