@@ -98,7 +98,6 @@ app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName);
 app.get('/lecturer', lecturerController.getAllLecturers);
 app.get('/lecturer/:id' , lecturerController.getLecturerByID);
 app.put('/lecturer/:id', lecturerController.updateLecturer);
-app.post('/lecturer', lecturerController.createLecturer); 
 app.delete('/lecturer/:id', lecturerController.deleteLecturer);
 
 app.listen(port, async () => {

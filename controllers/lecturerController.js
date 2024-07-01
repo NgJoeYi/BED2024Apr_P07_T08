@@ -25,17 +25,6 @@ const getLecturerByID = async(req,res)=>{
     }
 }
 
-const createLecturer = async(req,res)=>{
-    const newLecturer = req.body;
-    try{
-        const createLecturer = await Lecturers.createLecturer(newLecturer);
-        res.status(201).json(createLecturer);
-    }catch (error) {
-        console.error(error);
-        res.status(500).send("Error creating lecturer");
-    }
-
-}
 const updateLecturer = async (req,res)=>{
     const id = parseInt(req.params.id);
     const newLecturerData = req.body;
@@ -67,7 +56,6 @@ const deleteLecturer = async (req,res)=>{
 module.exports = {
     getAllLecturers,
     getLecturerByID,
-    createLecturer,
     updateLecturer,
     deleteLecturer
 }

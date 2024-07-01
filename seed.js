@@ -78,7 +78,6 @@ async function run() {
         CREATE TABLE Lecturer (
             LecturerID INT PRIMARY KEY IDENTITY(1,1),
             UserID INT FOREIGN KEY REFERENCES Users(id),
-            ProfilePicture VARBINARY(MAX),
             CreatedAt DATETIME DEFAULT GETDATE()
         );
 
@@ -143,9 +142,9 @@ async function run() {
         }
         // Insert data into Lecturer table
         const insertLecturers = `
-        INSERT INTO Lecturer (UserID, ProfilePicture) VALUES
-        ((SELECT id FROM Users WHERE email = 'jane_smith@example.com'), NULL),
-        ((SELECT id FROM Users WHERE email = 'bob_brown@example.com'), NULL);
+        INSERT INTO Lecturer (UserID) VALUES
+        ((SELECT id FROM Users WHERE email = 'jane_smith@example.com')),
+        ((SELECT id FROM Users WHERE email = 'bob_brown@example.com'));
         `;
         await connection.request().query(insertLecturers);
 

@@ -55,27 +55,7 @@ class Lecturers{
             await connection.close();
         }
     }
-    static async createLecturer(newLecturerData){
-        const connection = await sql.connect(dbConfig);
-        try{
-            const sqlQuery = `
-            INSERT INTO Lecturer (ProfilePicture)
-            VALUES ( @profilePicture);
-            SELECT SCOPE_IDENTITY() AS LecturerID;
-            `
-            const request = await connection.request();
-            request.input('profilePicture', sql.VarBinary,newLecturerData.profilePicture);
-            
-            const result = await request.query(sqlQuery);
-            
-            return await this.getLecturerByID(result.recordset[0].LecturerID);
-        }catch(error){
-            console.error("Error creating lecturers:", error);
-            throw error;
-        }finally{
-            await connection.close();
-        }
-    }
+    
     static async deleteLecturer(id){
         const connection = await sql.connect(dbConfig);
         try{
