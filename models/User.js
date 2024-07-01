@@ -89,6 +89,7 @@ class User {
     }
 
     // userLoginData sent in req.body rmb to extract name and email
+    // FOR LOG IN AND ALSO CAN CHECK IF THE EMAIL IS ALREADY IN USE
     static async getUserByEmail(userLoginData) {
         let connection;
         try{

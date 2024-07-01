@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken'); 
 
 const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -67,6 +68,13 @@ const loginUser = async (req, res) => {
         if (!matchPassword) {
             return res.status(404).json( { message: 'Invalid password. Please try again'} );
         }
+
+        const payload = {
+            id: loginSuccess.id,
+            role: loginSuccess.role,
+        };
+        const token = jwt.sign(payload, "your_secret_key", { expiresIn: '60s' });
+//        res.status(200).json({ token });
         res.status(200).json(loginSuccess);
     } catch (error) {
         console.error('Server error:', error); // Log error details
