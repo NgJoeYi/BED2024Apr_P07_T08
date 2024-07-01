@@ -5,7 +5,7 @@ const updateValidation = (req, res, next) => {
         name: Joi.string().min(3).max(50),
         dob: Joi.date(),
         email: Joi.string().email().max(100),
-        currentPassword: Joi.string().min(8).max(255),
+        //currentPassword: Joi.string().min(8).max(255), // do i put it here? since log in user has already been validated to have atleast 8 characters long
         newPassword: Joi.string().min(8).max(255),
         confirmNewPassword: Joi.string().valid(Joi.ref('newPassword')).messages({ 'any.only': 'Passwords do not match' })
     });

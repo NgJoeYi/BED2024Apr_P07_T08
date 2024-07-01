@@ -55,6 +55,7 @@ const createUser = async (req, res) => {
     }
 };
 
+// --------------------------------------- JWT ---------------------------------------
 const loginUser = async (req, res) => {
     const { email, password } = req.body; // user filled in email and password field
     try {
@@ -72,6 +73,7 @@ const loginUser = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+// --------------------------------------- JWT ---------------------------------------
 
 const updateUser = async (req, res) => {
     const userId = parseInt(req.params.id);
