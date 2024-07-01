@@ -95,7 +95,6 @@ async function run() {
             UserID INT NOT NULL,
             Title NVARCHAR(200) NOT NULL,
             Description NVARCHAR(2000),
-            VideoURL NVARCHAR(256),
             Video VARBINARY(MAX),
             LectureImage VARBINARY(MAX),
             Duration INT, -- Duration in minutes
@@ -175,26 +174,26 @@ async function run() {
 
         // Insert data into Lectures table
         const insertLectures = `
-        INSERT INTO Lectures (CourseID, UserID, Title, Description, VideoURL, Video, LectureImage, Duration, Position, ChapterName) VALUES
+        INSERT INTO Lectures (CourseID, UserID, Title, Description, Video, LectureImage, Duration, Position, ChapterName) VALUES
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
-        'Python Basics', 'Introduction to Python programming basics.', 'http://example.com/python_basics', @video, @lectureImage, 60, 1, 'Introduction'),
+        'Python Basics', 'Introduction to Python programming basics.', @video, @lectureImage, 60, 1, 'Introduction'),
 
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
-        'Data Types in Python', 'Understanding different data types in Python.', 'http://example.com/data_types', @video, @lectureImage, 90, 2, 'Chapter Two'),
+        'Data Types in Python', 'Understanding different data types in Python.', @video, @lectureImage, 90, 2, 'Chapter Two'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
         (SELECT id FROM Users WHERE email = 'bob_brown@example.com'), 
-        'Algebraic Structures', 'Exploring advanced algebraic structures.', 'http://example.com/algebraic_structures', @video, @lectureImage, 120, 1, 'Introduction'),
+        'Algebraic Structures', 'Exploring advanced algebraic structures.', @video, @lectureImage, 120, 1, 'Introduction'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
         (SELECT id FROM Users WHERE email = 'bob_brown@example.com'), 
-        'Polynomial Equations', 'Solving polynomial equations in algebra.', 'http://example.com/polynomial_equations', @video, @lectureImage, 100, 2, 'Chapter Two'),
+        'Polynomial Equations', 'Solving polynomial equations in algebra.',  @video, @lectureImage, 100, 2, 'Chapter Two'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
-        'SEO Basics', 'Introduction to Search Engine Optimization.', 'http://example.com/seo_basics', @video, @lectureImage, 75, 1, 'Introduction'),
+        'SEO Basics', 'Introduction to Search Engine Optimization.',  @video, @lectureImage, 75, 1, 'Introduction'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
-        'Content Marketing', 'Strategies for effective content marketing.', 'http://example.com/content_marketing', @video, @lectureImage, 85, 2, 'Chapter Two');
+        'Content Marketing', 'Strategies for effective content marketing.', @video, @lectureImage, 85, 2, 'Chapter Two');
         `;
         await connection.request()
         .input('video', sql.VarBinary, videoBuffer)
