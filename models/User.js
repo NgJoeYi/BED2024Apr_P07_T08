@@ -75,8 +75,14 @@ class User {
                 throw new Error("User not created");
             }
             const row = result.recordset[0];
+
+            // Create lecturer entry if the role is 'lecturer'
+            if (newUserData.role === 'lecturer') {
+                await User.createLecturer(row.userId);
+            }
+
             return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
-        } catch(error) {
+        } catch (error) {
             console.error('Error creating user:', error);
             throw error;
         } finally {
@@ -85,7 +91,45 @@ class User {
             }
         }
     }
-
+    // just want to check if user exist, hence returns true or false
+    static async checkUserExist(emailInput) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
+            const request = connection.request();
+            request.input('emailInput', emailInput);
+            const result = await request.query(sqlQuery);
+            return result.recordset.length > 0;
+        } catch(error) {
+            console.error('Error retrieving a user:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
+    static async createLecturer(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            INSERT INTO Lecturer (UserID) VALUES (@userId);
+            `;
+            const request = connection.request();
+            request.input('userId', sql.Int, userId);
+            await request.query(sqlQuery);
+        } catch (error) {
+            console.error('Error creating lecturer:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
     // userLoginData sent in req.body rmb to extract name and email
     static async loginUser(userLoginData) {
         let connection;
@@ -173,11 +217,6 @@ class User {
         }
     }
 
-
-
-
-
-
     static async updateProfilePic(userId, profilePic) {
         let connection;
         try {
@@ -241,6 +280,29 @@ class User {
         }
     }
 
+    static async getLecturerIDthroughLogin(userID) {
+        const connection = await sql.connect(dbConfig);
+        try {
+            const lecturerQuery = `
+                SELECT LecturerID FROM Lecturer WHERE UserID = @userID;
+            `;
+            const request = connection.request();
+            request.input('userID', sql.Int, userID);
+            const result = await request.query(lecturerQuery);
+            if (result.recordset.length === 0) {
+                return null; // No lecturer found
+            }
+            const LecturerID = result.recordset[0].LecturerID;
+            return LecturerID;
+        } catch (error) {
+            console.error('Error retrieving LecturerID from User:', error);
+            throw error; // Rethrowing the error for the API layer to handle
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 
 }
 

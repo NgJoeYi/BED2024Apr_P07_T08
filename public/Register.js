@@ -22,8 +22,9 @@ document.getElementById('student-btn').addEventListener('click', function() {
 });
 
 // Add event listener to register form submission
-document.getElementById('register-form').addEventListener('submit', async function(event) {
+document.getElementById('register-form').addEventListener('submit', async function (event) {
     event.preventDefault();
+
     const formData = new FormData(this);
     // Add selected role to form data
     formData.append('role', selectedRole);
@@ -42,7 +43,7 @@ document.getElementById('register-form').addEventListener('submit', async functi
             body: JSON.stringify(data)
         });
 
-        const responseData = await response.json();
+ const responseData = await response.json();
 
         if (!response.ok) {
             if (responseData.errors && responseData.errors.length > 0) {
@@ -50,13 +51,10 @@ document.getElementById('register-form').addEventListener('submit', async functi
             } else {
                 alert(`${responseData.message}`);
             }
-            return;
+            alert('Registration failed: ' + errorMessage);
         }
-
-        alert('Registration successful!');        
-        window.location.href = 'Login.html';
     } catch (error) {
         // Display the error message
-        alert('Registration failed. Please try again later');
+      alert('Registration failed. Please try again later');
     }
 });

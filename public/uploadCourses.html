@@ -33,48 +33,45 @@
 </header>
 
 <div class="course-container">
-  <div class="course-name" id="course-name">
-      <span class="upload-course-title" contenteditable="false">Course Title :</span>
-      <p id="course-name" contenteditable="true" class="editable-placeholder">Enter course name...</p>
-  </div>
   <div class="course-arrangement" id="course-arrangement">
-    
     <span class="upload-course-title" contenteditable="false">Lectures Arrangement :</span>
     <!-- Empty initially, users will add new chapters -->
 
     <div class="new-btn-container">
-        <button class="new-btn" onclick="triggerFileUpload()">New</button>
+      <button class="new-btn" onclick="triggerFileUpload()">New</button>
+    </div>
+  </div>
+  <div class="course-name">
+    <span class="upload-course-title">Course Title:</span>
+    <p id="course-name-text" contenteditable="true" class="editable-placeholder">Enter course name...</p>
+</div>
+
+<div class="course-details">
+    <span class="upload-course-title" contenteditable="false">Course Description :</span>
+    <p contenteditable="true" class="editable-placeholder" id="course-details">Enter course description...</p>
+</div>
+
+<div class="course-skills-covered" id="course-skills-covered">
+    <span class="upload-course-title" contenteditable="false">Course Meta Data :</span>
+    <div class="content">
+        <label for="meta-data">Level:</label>
+        <input type="text" id="level">
+    </div>
+    <div class="content">
+        <label for="meta-data">Total Duration: </label>
+        <input type="number" id="duration" value="">
+    </div>
+    <div class="content">
+        <label for="meta-data">Category: </label>
+        <input type="text" id="category" value="">
+    </div>
+    <div id="fileInputContainer">
+        <label for="imageFile">Upload Course Image:</label>
+        <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
     </div>
 </div>
-  <div class="course-details">
-    <span class="upload-course-title" contenteditable="false">Course Description :</span>
-    <p contenteditable="true" class="editable-placeholder"id="course-details">Enter course description...</p>
-  </div>
-  <div class="course-skills-covered" id="course-skills-covered">
-    <span class="upload-course-title" contenteditable="false">Course Meta Data :</span>
-    <form>
-      <div class="content">
-        <label for="meta-data">Level:</label>
-        <input type="text" id="meta-data" >
-      </div>
-      <div class="content">
-        <label for="meta-data">Duration</label>
-        <input type="text" id="meta-data" value="">
-      </div>
-      <div class="content">
-        <label for="meta-data">Category</label>
-        <input type="text" id="meta-data" value="">
-      </div>
-    </form>
-    <div id="fileInputContainer">
-      <label for="imageFile">Upload Course Image:</label>
-      <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
-    </div>
-  </div>
+<button type="button" onclick="addCourses()">Submit</button>
 
-  <div class="ending-buttons">
-    <button class="ending-buttons save-btn" onclick="submitCourse()">Upload</button>
-  </div>
 </div>
 
 <div id="newFileModal" class="modal">
@@ -82,26 +79,25 @@
     <span class="close" onclick="closeModal()">&times;</span>
     <h2>Add New Lecture</h2>
     <label for="chapterName">Chapter Name:</label>
-    <input type="text" id="chapterName" placeholder="Enter chapter name" required>
+    <input type="text" id="chapterName" placeholder="Enter chapter name" >
     <br>
     <label for="lectureName">Lecture Name:</label>
     <input type="text" id="lectureName" placeholder="Enter lecture name" required>
     <br>
     <div id="fileInputContainer">
       <label for="videoFiles">Upload Video Files:</label>
-      <input type="file" id="videoFiles" accept="video/*" multiple required>
+      <input type="file" id="videoFiles" name="videoFiles" accept="video/*" multiple required>
     </div>
     <div id="fileInputContainer">
-      <label for="videoFiles">Upload Lecture Image File:</label>
-      <input type="file" id="imageFiles"  accept="image/*" multiple required>
+      <label for="lectureImage">Upload Lecture Image File:</label>
+      <input type="file" id="lectureImage" name="lectureImage" accept="image/*" multiple required>
     </div>
     <br>
     <label for="duration">Duration</label>
-    <input type="number" id="duration"placeholder="Enter duration: " required>
+    <input type="number" id="duration-lecture" placeholder="Enter duration: " required>
     <br>
     <label for="description">Description</label>
-    <input type="text" id="description"placeholder="Enter description: " required>
-    <!-- <button onclick="addMoreFileInput()" id = "add-more-button" >Add More Files</button> -->
+    <input type="text" id="description" placeholder="Enter description: " required>
     <br><br>
     <button onclick="addFiles()">Add</button>
     <button onclick="closeModal()">Cancel</button>
@@ -133,6 +129,6 @@
 </footer>
 
 <!-- Linking JS to HTML -->
-<script src="UploadCourses.js"></script>
+<script src="UploadLecture.js"></script>
 </body>
 </html>
