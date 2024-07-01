@@ -53,9 +53,6 @@ class User{
         }
     }
 
-    
-
-
     static async createUser(newUserData) {
         let connection;
         try {
@@ -70,7 +67,7 @@ class User{
             request.input('roleInput', newUserData.role);
             const result = await request.query(sqlQuery);
 
-            if (!result.recordset || result.recordset.length === 0) {
+            if (result.recordset.length === 0) {
                 return null;
             }
             return await this.getUserById(result.recordset[0].user_id);
@@ -82,8 +79,6 @@ class User{
             }
         }
     }
-    
-    
 }
 
 module.exports = User;
