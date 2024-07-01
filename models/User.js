@@ -75,13 +75,14 @@ class User {
                 throw new Error("User not created");
             }
             const row = result.recordset[0];
+            const userId = row.id;
 
             // Create lecturer entry if the role is 'lecturer'
             if (newUserData.role === 'lecturer') {
-                await User.createLecturer(row.userId);
+                await User.createLecturer(userId);
             }
 
-            return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
+            return new User(userId, newUserData.name, newUserData.dob, newUserData.email, newUserData.password, newUserData.role);
         } catch (error) {
             console.error('Error creating user:', error);
             throw error;
@@ -293,6 +294,7 @@ class User {
                 return null; // No lecturer found
             }
             const LecturerID = result.recordset[0].LecturerID;
+            console.log('LECTURER ID: ', LecturerID);
             return LecturerID;
         } catch (error) {
             console.error('Error retrieving LecturerID from User:', error);
