@@ -81,6 +81,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 alert('New passwords do not match');
                 return;
             }
+
+            if (newPassword === currentPassword) {
+              alert('New Password cannot be the same as the current password');
+              return;
+            }
             updatedUserData.currentPassword = currentPassword;
             updatedUserData.newPassword = newPassword;
             updatedUserData.confirmNewPassword = confirmNewPassword;
@@ -111,6 +116,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
                     element.textContent = updatedUser.name;
                 });
+                window.location.reload();
                 
                 // Close the edit fields
                 document.getElementById('edit-account-details').style.display = 'none';
@@ -118,11 +124,13 @@ document.addEventListener('DOMContentLoaded', async function () {
               } else {
                 const errorData = await response.json();
                 if (errorData.message === 'Current password is incorrect') {
-                    alert('Current password is incorrect');
+                  alert(`${errorData.message}`);
+                } else if (errorData.message === 'Email is already in use') {
+                  alert(`${errorData.message}`);
                 } else if (errorData.message.length > 0) {
-                    alert(`${errorData.errors.join('\n')}`);
+                  alert(`${errorData.errors.join('\n')}`);
                 } else {
-                    alert(`${errorData.message}`);
+                  alert(`${errorData.message}`);
                 }
             }
         } catch (error) {

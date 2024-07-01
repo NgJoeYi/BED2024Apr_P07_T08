@@ -1,4 +1,5 @@
 
+
 //AMELIA'S
 //  module.exports = {
 //    user: "booksapi_user", // Replace with your SQL Server login username aka the security login thingy
@@ -25,25 +26,25 @@
 //   options: {
 //     port: 1433, // Default SQL Server port
 //     connectionTimeout: 60000, // Connection timeout in milliseconds
-//   }
+//   },
 // };
 
 
 
 
 
-//RAEANN
-  //   module.exports = {
-  //  user: "activityFeed", // Replace with your SQL Server login username
-  //   password: "activityfeed", // Replace with your SQL Server login password
-  //   server: "localhost",
-  //   database: "ActivityFeeddb",
-  // trustServerCertificate: true,
-  //  options: {
-  //    port: 1433, // Default SQL Server port
-  //    connectionTimeout: 60000, // Connection timeout in milliseconds
-  //   },
-  //   };
+// //RAEANN
+//     module.exports = {
+//    user: "activityFeed", // Replace with your SQL Server login username
+//     password: "activityfeed", // Replace with your SQL Server login password
+//     server: "localhost",
+//     database: "ActivityFeeddb",
+//   trustServerCertificate: true,
+//    options: {
+//      port: 1433, // Default SQL Server port
+//      connectionTimeout: 60000, // Connection timeout in milliseconds
+//     },
+//     };
 
 // WEIYING 
 
@@ -57,10 +58,8 @@ module.exports = {
     port: 1433, // Default SQL Server port
     connectionTimeout: 60000, // Connection timeout in milliseconds
   },
-  pool: {
-    max: 20, // Increase the maximum number of connections
-    min: 0,
-    idleTimeoutMillis: 30000
-  }
 };
+
+
+
 

@@ -34,6 +34,26 @@ class User {
         }
     }
 
+    // just want to check if user exist, hence returns true or false
+    static async checkUserExist(emailInput) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
+            const request = connection.request();
+            request.input('emailInput', emailInput);
+            const result = await request.query(sqlQuery);
+            return result.recordset.length > 0;
+        } catch(error) {
+            console.error('Error retrieving a user:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
     // newUserData sent in req.body rmb to extract
     static async createUser(newUserData) {
         let connection;
@@ -42,7 +62,7 @@ class User {
             const sqlQuery = `
             INSERT INTO Users (name, dob, email, password, role) 
             VALUES (@inputName, @inputDob, @inputEmail, @inputPassword, @inputRole);
-            SELECT SCOPE_IDENTITY() AS userId;
+            SELECT SCOPE_IDENTITY() AS id;
             `;
             const request = connection.request();
             request.input('inputName', newUserData.name);
@@ -196,26 +216,7 @@ class User {
             }
         }
     }
-    static async getLecturerByUserId(userId) {
-        let connection;
-        try {
-            connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT LecturerID FROM Lecturer WHERE UserID = @UserID`;
-            const result = await connection.request()
-                .input('UserID', sql.Int, userId)
-                .query(sqlQuery);
-            if (result.recordset.length === 0) {
-                return null;
-            }
-            return result.recordset[0];
-        } catch (error) {
-            console.error('Error retrieving lecturer by user ID:', error);
-            throw error;
-        } finally {
-            if (connection) await connection.close();
-        }
-    }
-    
+
     static async updateProfilePic(userId, profilePic) {
         let connection;
         try {
@@ -278,6 +279,7 @@ class User {
             }
         }
     }
+
     static async getLecturerIDthroughLogin(userID) {
         const connection = await sql.connect(dbConfig);
         try {
@@ -301,7 +303,6 @@ class User {
             }
         }
     }
-    
 
 }
 

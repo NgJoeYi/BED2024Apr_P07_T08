@@ -43,24 +43,18 @@ document.getElementById('register-form').addEventListener('submit', async functi
             body: JSON.stringify(data)
         });
 
-        if (response.ok) {
-            const responseData = await response.json();
-            alert('Registration successful!');
-            window.location.href = 'Login.html';
-        } else {
-            const errorText = await response.text();
-            let errorMessage;
-            try {
-                const errorData = JSON.parse(errorText);
-                errorMessage = errorData.message;
-            } catch (e) {
-                errorMessage = errorText;
+ const responseData = await response.json();
+
+        if (!response.ok) {
+            if (responseData.errors && responseData.errors.length > 0) {
+                alert(`Validation errors:\n${responseData.errors.join('\n')}`);
+            } else {
+                alert(`${responseData.message}`);
             }
             alert('Registration failed: ' + errorMessage);
         }
     } catch (error) {
         // Display the error message
-        alert(`Registration failed: ${error.message}`);
-        console.error(error);
+      alert('Registration failed. Please try again later');
     }
 });

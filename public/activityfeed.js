@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 addDiscussionToFeed(data.discussion);
                 closePopup();
             } else {
-                console.error('Error adding discussion:', data);
-                alert('Error adding discussion.');
+                console.error('User must be logged in to submit a discussion.', data);
+                alert('User must be logged in to submit a discussion.');
             }
         })
         .catch(error => {
@@ -93,7 +93,6 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-
 function addDiscussionToFeed(discussion) {
     const feed = document.querySelector('.activity-feed');
     const post = document.createElement('div');
@@ -109,10 +108,13 @@ function addDiscussionToFeed(discussion) {
     // Capitalize the first letter of the username
     const capitalizedUsername = capitalizeFirstLetter(discussion.username);
 
+    // Check if profilePic is available, otherwise use default profile picture
+    const profilePicUrl = discussion.profilePic || 'images/profilePic.jpeg';
+
     post.innerHTML = `
         <div class="post-header">
             <div class="profile-pic">
-                <img src="${discussion.profilePic}" alt="Profile Picture">
+                <img src="${profilePicUrl}" alt="Profile Picture">
             </div>
             <div class="username">${capitalizedUsername}</div>
         </div>
@@ -159,6 +161,53 @@ function addDiscussionToFeed(discussion) {
     });
 }
 
+function incrementLikes(discussionId, likeButton, dislikeButton) {
+    fetch(`/discussions/${discussionId}/like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Like added successfully!');
+            likeButton.textContent = `👍 ${data.likes} Likes`;
+            likeButton.setAttribute('data-liked', 'true');
+            dislikeButton.setAttribute('data-disliked', 'false');
+        } else {
+            alert('Error adding like.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding like.');
+    });
+}
+
+function incrementDislikes(discussionId, likeButton, dislikeButton) {
+    fetch(`/discussions/${discussionId}/dislike`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Dislike added successfully!');
+            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
+            dislikeButton.setAttribute('data-disliked', 'true');
+            likeButton.setAttribute('data-liked', 'false');
+        } else {
+            alert('Error adding dislike.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding dislike.');
+    });
+}
 
 
 

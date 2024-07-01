@@ -582,7 +582,6 @@ async function saveEdit(discussionId) {
   }
 }
 
-// Delete Modal functions
 function openDeleteModal(discussionId) {
   console.log('Opening delete modal for discussion ID:', discussionId);
   document.getElementById('deleteDiscussionModal').style.display = 'block';
@@ -593,6 +592,12 @@ function openDeleteModal(discussionId) {
     console.log('Confirm delete clicked for discussion ID:', discussionId);
     deleteDiscussion(discussionId);
   };
+
+  // Attach the onclick event to the close and cancel buttons
+  const closeButton = document.getElementById('closeDeleteModal');
+  const cancelButton = document.getElementById('cancelDeleteModal');
+  closeButton.onclick = closeDeleteModal;
+  cancelButton.onclick = closeDeleteModal;
 }
 
 function closeDeleteModal() {
@@ -620,7 +625,8 @@ async function deleteDiscussion(discussionId) {
 
     alert('Discussion deleted successfully');
     fetchUserDiscussions();
-    closeDeleteModal();
+    closeDeleteModal(); // Ensure the modal is closed first
+     // Fetch user discussions after closing the modal
   } catch (error) {
     console.error('Error deleting discussion:', error);
     alert('Error deleting discussion: ' + error.message);
