@@ -77,7 +77,7 @@ const getLastChapterName = async (req, res) => {
 };
 
 const createLecture = async (req, res) => {
-    const { Title, Duration, Description, Position, ChapterName, UserID } = req.body;
+    const { Title, Duration, Description, ChapterName, UserID } = req.body;
     console.log('UserID from request body:', UserID); // Log the UserID from the request body
 
     if (!UserID) {
@@ -89,19 +89,21 @@ const createLecture = async (req, res) => {
     const lectureImage = req.files.LectureImage[0].buffer;
     const CourseID = 1; // Placeholder for CourseID
 
-    const newLectureData = {
-        CourseID,
-        UserID,
-        Title,
-        Duration,
-        Description,
-        Position,
-        ChapterName,
-        Video: video,
-        LectureImage: lectureImage
-    };
-
     try {
+        const Position = await Lectures.getCurrentPositionInChapter(ChapterName);
+
+        const newLectureData = {
+            CourseID,
+            UserID,
+            Title,
+            Duration,
+            Description,
+            Position,
+            ChapterName,
+            Video: video,
+            LectureImage: lectureImage
+        };
+
         const newLectureID = await Lectures.createLecture(newLectureData);
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
