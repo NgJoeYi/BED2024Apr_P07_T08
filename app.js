@@ -16,7 +16,6 @@ const commentController = require('./controllers/commentController');
 const reviewController = require('./controllers/reviewController');
 const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
-const lecturerController = require('./controllers/lecturerController');
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
 // const jwtAuthorization = require('./middleware/authMiddleware');
@@ -54,7 +53,6 @@ app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
 app.delete('/account/:id', userController.deleteUser);
-app.get('/current-user/lecturerID/:id',userController.getLecturerIDthroughLogin);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
@@ -93,11 +91,6 @@ app.post('/lectures', multiUpload, lectureController.createLecture); // Removed 
 app.delete('/lectures/:id', lectureController.deleteLecture);
 app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); 
 
-// Add Routes for lecturer
-app.get('/lecturer', lecturerController.getAllLecturers);
-app.get('/lecturer/:id' , lecturerController.getLecturerByID);
-app.put('/lecturer/:id', lecturerController.updateLecturer);
-app.delete('/lecturer/:id', lecturerController.deleteLecturer);
 
 app.listen(port, async () => {
     try {

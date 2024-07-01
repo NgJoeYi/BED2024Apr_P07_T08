@@ -1,6 +1,6 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
-const Lecturer = require('../models/Lecturer');
+
 
 class User {
     constructor(id, name, dob, email, password, role) {
@@ -78,13 +78,6 @@ class User {
                 throw new Error("User not created");
             }
             const row = result.recordset[0];
-            const userRole = row.role;
-            const userID = row.id;
-            console.log('ROW:',row);
-            console.log(userRole);
-            if (newUserData.role === 'lecturer'){
-                await Lecturer.createLecturer(userID);
-            }
             return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
         } catch(error) {
             console.error('Error creating user:', error);
@@ -252,38 +245,6 @@ class User {
         }
     }
 
-
-
-
-
-
-
-
-
-    static async getLecturerIDthroughLogin(userID) {
-        const connection = await sql.connect(dbConfig);
-        try {
-            const lecturerQuery = `
-                SELECT LecturerID FROM Lecturer WHERE UserID = @userID;
-            `;
-            const request = connection.request();
-            request.input('userID', sql.Int, userID);
-            const result = await request.query(lecturerQuery);
-            if (result.recordset.length === 0) {
-                return null; // No lecturer found
-            }
-            const LecturerID = result.recordset[0].LecturerID;
-            console.log('LECTURER ID: ', LecturerID);
-            return LecturerID;
-        } catch (error) {
-            console.error('Error retrieving LecturerID from User:', error);
-            throw error; // Rethrowing the error for the API layer to handle
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
 
 }
 
