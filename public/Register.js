@@ -1,6 +1,6 @@
 // Initialize the selected role as 'student' and set the button active
 let selectedRole = 'student';
-document.getElementById('student-btn').classList.add('active'); 
+document.getElementById('student-btn').classList.add('active');
 
 // Function to handle role button click
 function handleRoleButtonClick(role) {
@@ -21,12 +21,10 @@ document.getElementById('student-btn').addEventListener('click', function() {
     handleRoleButtonClick('student');
 });
 
-// Add event listener to register form submission
 document.getElementById('register-form').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const formData = new FormData(this);
-    // Add selected role to form data
     formData.append('role', selectedRole);
 
     const data = {};
@@ -43,7 +41,7 @@ document.getElementById('register-form').addEventListener('submit', async functi
             body: JSON.stringify(data)
         });
 
- const responseData = await response.json();
+        const responseData = await response.json();
 
         if (!response.ok) {
             if (responseData.errors && responseData.errors.length > 0) {
@@ -51,10 +49,12 @@ document.getElementById('register-form').addEventListener('submit', async functi
             } else {
                 alert(`${responseData.message}`);
             }
-            alert('Registration failed: ' + errorMessage);
+            return;
         }
+
+        alert('User registered successfully!');
+
     } catch (error) {
-        // Display the error message
-      alert('Registration failed. Please try again later');
+        alert('Registration failed. Please try again later');
     }
 });
