@@ -2,13 +2,12 @@ const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
 class Lectures {
-    constructor(lectureID, courseID, userID, title, description, videoURL, video, lectureImage, duration, position, createdAt, chapterName) {
+    constructor(lectureID, courseID, userID, title, description, video, lectureImage, duration, position, createdAt, chapterName) {
         this.lectureID = lectureID;
         this.courseID = courseID;
         this.userID = userID;
         this.title = title;
         this.description = description;
-        this.videoURL = videoURL;
         this.video = video;
         this.lectureImage = lectureImage;
         this.duration = duration;
@@ -28,7 +27,6 @@ class Lectures {
                 row.UserID,
                 row.Title,
                 row.Description,
-                row.VideoURL,
                 row.Video,
                 row.LectureImage,
                 row.Duration,
@@ -62,7 +60,6 @@ class Lectures {
                 lecture.UserID,
                 lecture.Title,
                 lecture.Description,
-                lecture.VideoURL,
                 lecture.Video,
                 lecture.LectureImage,
                 lecture.Duration,
@@ -87,7 +84,6 @@ class Lectures {
                 UserID = @userID,
                 Title = @title,
                 Description = @description,
-                VideoURL = @videoURL,
                 Video = @video,
                 LectureImage = @lectureImage,
                 Duration = @duration,
@@ -101,7 +97,6 @@ class Lectures {
             request.input('userID', sql.Int, newLectureData.UserID);
             request.input('title', sql.NVarChar, newLectureData.Title);
             request.input('description', sql.NVarChar, newLectureData.Description);
-            request.input('videoURL', sql.NVarChar, newLectureData.VideoURL);
             request.input('video', sql.VarBinary, newLectureData.Video);
             request.input('lectureImage', sql.VarBinary, newLectureData.LectureImage);
             request.input('duration', sql.Int, newLectureData.Duration);
@@ -124,8 +119,8 @@ class Lectures {
         try {
             pool = await sql.connect(dbConfig);
             const sqlQuery = `
-                INSERT INTO Lectures (CourseID, UserID, Title, Description, VideoURL, Video, LectureImage, Duration, Position, ChapterName)
-                VALUES (@CourseID, @UserID, @Title, @Description, @VideoURL, @Video, @LectureImage, @Duration, @Position, @ChapterName);
+                INSERT INTO Lectures (CourseID, UserID, Title, Description, Video, LectureImage, Duration, Position, ChapterName)
+                VALUES (@CourseID, @UserID, @Title, @Description, @Video, @LectureImage, @Duration, @Position, @ChapterName);
                 SELECT SCOPE_IDENTITY() AS LectureID;
             `;
             const request = pool.request();
@@ -133,7 +128,6 @@ class Lectures {
             request.input('UserID', sql.Int, newLectureData.UserID);
             request.input('Title', sql.NVarChar, newLectureData.Title);
             request.input('Description', sql.NVarChar, newLectureData.Description);
-            request.input('VideoURL', sql.NVarChar, newLectureData.VideoURL);
             request.input('Video', sql.VarBinary, newLectureData.Video);
             request.input('LectureImage', sql.VarBinary, newLectureData.LectureImage);
             request.input('Duration', sql.Int, newLectureData.Duration);
