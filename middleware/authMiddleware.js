@@ -19,10 +19,10 @@ function verifyJWT(req, res, next) {
         // ************************************** ADD ROUTES HERE **************************************
         const authorizedRoles = {
             '/account': ['student', 'lecturer'],
-            '/account/profile': ['student', 'lecturer'], // CHANGED
-            '/account/uploadProfilePic': ['student', 'lecturer'], // CHANGED
-            '/discussions/user': ['student', 'lecturer'], // CHANGED
-            '/discussions': ['student', 'lecturer'] // CHANGED
+            '/account/profile': ['student', 'lecturer'],
+            '/account/uploadProfilePic': ['student', 'lecturer'],
+            '/discussions/user': ['student', 'lecturer'],
+            '/discussions': ['student', 'lecturer']
         };
         // ************************************** ADD ROUTES HERE **************************************
 

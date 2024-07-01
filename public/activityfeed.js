@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/discussions', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userId}`
             },
             body: JSON.stringify(data)
         })
@@ -68,6 +69,11 @@ function getCurrentUserId() { // -- jwt implementation
 function fetchDiscussions() {
     const category = document.getElementById('filter-category').value;
     const sort = document.getElementById('sort-date').value;
+
+    const token = getCurrentUserId();  // -- jwt implementation
+    if (!token) {  // -- jwt implementation
+        return;  // -- jwt implementation
+    }  // -- jwt implementation
 
     fetch(`/discussions?category=${category}&sort=${sort}`)
         .then(response => response.json())
@@ -162,10 +168,15 @@ function addDiscussionToFeed(discussion) {
 }
 
 function incrementLikes(discussionId, likeButton, dislikeButton) {
+    const token = getCurrentUserId();  // -- jwt implementation
+    if (!token) {  // -- jwt implementation
+        return;  // -- jwt implementation
+    }  // -- jwt implementation
     fetch(`/discussions/${discussionId}/like`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         }
     })
     .then(response => response.json())
@@ -186,10 +197,15 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
 }
 
 function incrementDislikes(discussionId, likeButton, dislikeButton) {
+    const token = getCurrentUserId(); // -- jwt implementation
+    if (!token) { // -- jwt ijmplementation
+        return; // -- jwt implementation
+    } // -- jwt implementation
     fetch(`/discussions/${discussionId}/dislike`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         }
     })
     .then(response => response.json())
