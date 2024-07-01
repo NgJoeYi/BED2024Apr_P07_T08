@@ -2,9 +2,9 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 class Courses {
-    constructor(courseID, lecturerID, title, description, category, level, duration, createdAt, courseImage) {
+    constructor(courseID, userID, title, description, category, level, duration, createdAt, courseImage) {
         this.courseID = courseID;
-        this.lecturerID = lecturerID;
+        this.userID = userID;
         this.title = title;
         this.description = description;
         this.category = category;
@@ -20,7 +20,7 @@ class Courses {
             pool = await sql.connect(dbConfig);
             const sqlQuery = `SELECT * FROM Courses`;
             const result = await pool.request().query(sqlQuery);
-            return result.recordset.map(row => new Courses(row.CourseID, row.LecturerID, row.Title, row.Description, row.Category, row.Level, row.Duration, row.CreatedAt, row.CourseImage));
+            return result.recordset.map(row => new Courses(row.CourseID, row.UserID, row.Title, row.Description, row.Category, row.Level, row.Duration, row.CreatedAt, row.CourseImage));
         } catch (error) {
             console.error('Error retrieving courses:', error);
             throw error;
@@ -42,7 +42,7 @@ class Courses {
             const courseData = result.recordset[0];
             return new Courses(
                 courseData.CourseID, 
-                courseData.LecturerID, 
+                courseData.UserID, 
                 courseData.Title, 
                 courseData.Description, 
                 courseData.Category, 
@@ -64,7 +64,7 @@ class Courses {
         try {
             const sqlQuery = `
                 UPDATE Courses SET 
-                    LecturerID = @lecturerID,
+                    UserID = @userID,
                     Title = @title, 
                     Description = @description,
                     Category = @category,
@@ -75,7 +75,7 @@ class Courses {
             `;
             const request = connection.request();
             request.input('id', sql.Int, id);
-            request.input('lecturerID', sql.Int, newCourseData.lecturerID);
+            request.input('userID', sql.Int, newCourseData.userID);
             request.input('title', sql.NVarChar, newCourseData.title);
             request.input('description', sql.NVarChar, newCourseData.description);
             request.input('category', sql.NVarChar, newCourseData.category);
@@ -112,12 +112,12 @@ class Courses {
         const connection = await sql.connect(dbConfig);
         try {
             const sqlQuery = `
-                INSERT INTO Courses (LecturerID, Title, Description, Category, Level, Duration, CreatedAt, CourseImage)
-                VALUES (@LecturerID, @Title, @Description, @Category, @Level, @Duration, @CreatedAt, @CourseImage);
+                INSERT INTO Courses (UserID, Title, Description, Category, Level, Duration, CreatedAt, CourseImage)
+                VALUES (@UserID, @Title, @Description, @Category, @Level, @Duration, @CreatedAt, @CourseImage);
                 SELECT SCOPE_IDENTITY() AS CourseID;
             `;
             const request = connection.request();
-            request.input("LecturerID", sql.Int, newCourseData.lecturerID);
+            request.input("UserID", sql.Int, newCourseData.userID);
             request.input("Title", sql.NVarChar, newCourseData.title);
             request.input("Description", sql.NVarChar, newCourseData.description);
             request.input("Category", sql.NVarChar, newCourseData.category);
@@ -156,30 +156,5 @@ class Courses {
         }
           
     }
-    static async getCourseID(lecturerID){
-        const connection = await sql.connect(dbConfig);
-        try{
-            const sqlQuery = `
-            SELECT TOP 1 CourseID 
-            FROM Courses 
-            WHERE LecturerID = @lecturerID
-            ORDER BY CourseID DESC;
-            `;
-            const request = connection.request();
-            request.input("lecturerID", sql.Int, lecturerID);
-            const result = await request.query(sqlQuery);
-            if (result.recordset.length === 0) {
-                return null;
-            }
-            return result.recordset[0];
-        }catch (error) {
-            console.error('Error fetching course ID:', error);
-            throw error;
-        } finally {
-            await connection.close();
-        }
-    }
-    
 }
-
 module.exports = Courses;

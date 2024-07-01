@@ -48,7 +48,6 @@ const updateLecture = async (req, res) => {
     }
 };
 
-
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
     try {
@@ -71,61 +70,45 @@ const getLastChapterName = async (req, res) => {
             return res.status(404).send('Chapter name not found');
         }
         res.status(200).json({ chapterName: chapterName });
-
     } catch (error) {
         console.error(error);
         res.status(500).send('Error getting chapter name');
     }
 };
 
-
 const createLecture = async (req, res) => {
-    const { Title, Duration, Description, Position, ChapterName, LecturerID } = req.body;
-    console.log('LecturerID from request body:', LecturerID); // Log the LecturerID from the request body
+    const { Title, Duration, Description, Position, ChapterName, UserID } = req.body;
+    console.log('UserID from request body:', UserID); // Log the UserID from the request body
 
-    if (!LecturerID) {
-        console.error("LecturerID not provided");
-        return res.status(400).send("LecturerID not provided");
+    if (!UserID) {
+        console.error("UserID not provided");
+        return res.status(400).send("UserID not provided");
     }
 
     const video = req.files.Video[0].buffer;
     const lectureImage = req.files.LectureImage[0].buffer;
     const CourseID = 1; // Placeholder for CourseID
 
-    const sqlQuery = `
-        INSERT INTO Lectures (CourseID, LecturerID, Title, Duration, Description, Position, ChapterName, Video, LectureImage)
-        VALUES (@CourseID, @LecturerID, @Title, @Duration, @Description, @Position, @ChapterName, @Video, @LectureImage);
-        SELECT SCOPE_IDENTITY() AS LectureID;
-    `;
+    const newLectureData = {
+        CourseID,
+        UserID,
+        Title,
+        Duration,
+        Description,
+        Position,
+        ChapterName,
+        Video: video,
+        LectureImage: lectureImage
+    };
 
-    let connection;
     try {
-        connection = await sql.connect(dbConfig);
-        const request = connection.request();
-        request.input('CourseID', sql.Int, CourseID);
-        request.input('LecturerID', sql.Int, LecturerID);
-        request.input('Title', sql.NVarChar, Title);
-        request.input('Duration', sql.Int, Duration);
-        request.input('Description', sql.NVarChar, Description);
-        request.input('Position', sql.Int, Position);
-        request.input('ChapterName', sql.NVarChar, ChapterName);
-        request.input('Video', sql.VarBinary, video);
-        request.input('LectureImage', sql.VarBinary, lectureImage);
-
-        const result = await request.query(sqlQuery);
-        const newLectureID = result.recordset[0].LectureID;
-
-        res.status(201).json({ LectureID: newLectureID, CourseID, LecturerID, Title, Duration, Description, Position, ChapterName });
+        const newLectureID = await Lectures.createLecture(newLectureData);
+        res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
         console.error('Error creating lecture:', error);
         res.status(500).send('Error creating lecture');
-    } finally {
-        if (connection) {
-            await connection.close();
-        }
     }
 };
-
 
 module.exports = {
     getAllLectures,
@@ -134,5 +117,5 @@ module.exports = {
     createLecture,
     deleteLecture,
     getLastChapterName,
-    upload 
+    upload
 };

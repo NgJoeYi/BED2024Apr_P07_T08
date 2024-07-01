@@ -238,25 +238,6 @@ const getProfilePicByUserId = async (req, res) => {
 
 
 
-
-
-
-
-const getLecturerIDthroughLogin = async (req, res) => {
-    const userID = parseInt(req.params.id);
-    try {
-        const lecturerID = await User.getLecturerIDthroughLogin(userID);
-        if (!lecturerID) {
-            return res.status(404).json({ message: 'LecturerID does not exist for this user.' });
-        }
-        res.status(200).json({ lecturerID: lecturerID });
-    } catch (error) {
-        console.error('Server error:', error);
-        res.status(500).send('Server error');
-    }
-};
-
-
 module.exports = {
     getUserById,
     createUser,
@@ -264,8 +245,7 @@ module.exports = {
     updateUser,
     deleteUser,
     updateProfilePic,
-    getProfilePicByUserId,
-    getLecturerIDthroughLogin
+    getProfilePicByUserId
 };
 
 
