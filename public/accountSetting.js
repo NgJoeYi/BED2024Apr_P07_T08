@@ -2,11 +2,14 @@
 
 // Populate data to make it a prefilled form and ready to be edited but does not update in db yet
 document.addEventListener('DOMContentLoaded', async function () {
-    const userId = sessionStorage.getItem('userId');
-    if (userId) {
+    const token = sessionStorage.getItem('token');
+    if (token) {
         try {
-            const response = await fetch(`/account/${userId}`);
-            
+          const response = await fetch('/account', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+        });            
             if (response.ok) {
                 const user = await response.json();
                 // Populate profile info
@@ -40,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     
     // Toggle visibility for edit account details
     document.getElementById('edit-icon').addEventListener('click', function () {
-      if (!userId) {
+      if (!token) {
         alert('Please log in first to edit your account details.');
         return;
       }
@@ -99,11 +102,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         
         
         try {
-            const response = await fetch(`/account/${userId}`, {
+            const response = await fetch(`/account`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
-                },
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
                 body: JSON.stringify(updatedUserData)
             });
             
@@ -142,14 +146,22 @@ document.addEventListener('DOMContentLoaded', async function () {
     
   // ---------------------------------------------- UPLOAD PROFILE PICTURE ----------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    const userId = sessionStorage.getItem('userId');
-      fetchUserProfile(userId);
-      //alert('Please log in first to upload your profile picture.');
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      fetchUserProfile(token);
+    }
+    else {
+      alert('Please log in first to upload your profile picture.');
+    }
   });
   
-  async function fetchUserProfile(userId) {
+  async function fetchUserProfile(token) {
     try {
-      const response = await fetch(`/account/profile/${userId}`);
+      const response = await fetch(`/account/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         if (data.profilePic) {
@@ -164,8 +176,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   
   function triggerFileInput() {
-    const userId = sessionStorage.getItem('userId');
-    if (!userId) {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
       alert('Please log in first to upload your profile picture.');
       return;
     }
@@ -186,12 +198,13 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   
   async function uploadImageToServer(base64Image) {
-    const userId = sessionStorage.getItem('userId');
+    const token = sessionStorage.getItem('token');
     try {
-      const response = await fetch(`/account/uploadProfilePic/${userId}`, {
+      const response = await fetch(`/account/uploadProfilePic`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ profilePic: base64Image })
       });
@@ -210,9 +223,9 @@ document.addEventListener('DOMContentLoaded', async function () {
   // ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
   // Function to confirm account deletion
   function confirmDeleteAccount() {
-    const userId = sessionStorage.getItem('userId');
+    const token = sessionStorage.getItem('token');
     
-    if (!userId) {
+    if (!token) {
       alert('No user is logged in');
       return;
     }
@@ -227,10 +240,10 @@ document.addEventListener('DOMContentLoaded', async function () {
   
   // Function to delete account with password authorization
   async function deleteAccount() {
-    const userId = sessionStorage.getItem('userId');
+    const token = sessionStorage.getItem('token');
     const password = document.getElementById('delete-password').value;
   
-    if (!userId) {
+    if (!token) {
       alert('No user is logged in');
       return;
     }
@@ -241,17 +254,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   
     try {
-      const response = await fetch(`/account/${userId}`, {
+      const response = await fetch(`/account`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ password: password })
       });
   
       if (response.ok) {
         alert('Account deleted successfully');
-        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('token');
         window.location.href = 'Index.html';
       } else {
         const errorData = await response.json();
