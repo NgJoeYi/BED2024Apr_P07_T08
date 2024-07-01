@@ -35,6 +35,7 @@ class User {
     }
 
     // just want to check if user exist, hence returns true or false
+    /*
     static async checkUserExist(emailInput) {
         let connection;
         try {
@@ -53,6 +54,7 @@ class User {
             }
         }
     }
+    */
 
     // newUserData sent in req.body rmb to extract
     static async createUser(newUserData) {
@@ -75,65 +77,9 @@ class User {
                 throw new Error("User not created");
             }
             const row = result.recordset[0];
-
-            // Create lecturer entry if the role is 'lecturer'
-            if (newUserData.role === 'lecturer') {
-                await User.createLecturer(row.id);
-            }
-
             return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
-        } catch (error) {
-            console.error('Error creating user:', error);
-            throw error;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
-    // just want to check if user exist, hence returns true or false
-    static async checkUserExist(emailInput) {
-        let connection;
-        try {
-            connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
-            const request = connection.request();
-            request.input('emailInput', emailInput);
-            const result = await request.query(sqlQuery);
-            return result.recordset.length > 0;
         } catch(error) {
-            console.error('Error retrieving a user:', error);
-            throw error;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
-    
-    // connect user and lecturer table
-    static async createLecturer(userId) {
-        let connection;
-        try {
-            connection = await sql.connect(dbConfig);
-            const sqlQuery = `
-                INSERT INTO Lecturer (UserID) VALUES (@userId);
-            `;
-            const request = connection.request();
-            request.input('userId', sql.Int, userId);
-            const result = await request.query(sqlQuery);
-    
-            // Log the result object
-            console.log(result);
-    
-            // No need to check recordset, INSERT query does not return rows
-            if (result.rowsAffected[0] > 0) {
-                return { userId };
-            } else {
-                throw new Error('Lecturer creation failed');
-            }
-        } catch (error) {
-            console.error('Error creating lecturer:', error);
+            console.error('Error creating user:', error);
             throw error;
         } finally {
             if (connection) {
@@ -143,7 +89,7 @@ class User {
     }
 
     // userLoginData sent in req.body rmb to extract name and email
-    static async loginUser(userLoginData) {
+    static async getUserByEmail(userLoginData) {
         let connection;
         try{
             connection = await sql.connect(dbConfig);
@@ -229,6 +175,11 @@ class User {
         }
     }
 
+
+
+
+
+
     static async updateProfilePic(userId, profilePic) {
         let connection;
         try {
@@ -284,6 +235,57 @@ class User {
             return result.recordset[0].img;
         } catch (error) {
             console.error('Error retrieving profile picture:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // connect user and lecturer table
+    static async createLecturer(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+                INSERT INTO Lecturer (UserID) VALUES (@userId);
+            `;
+            const request = connection.request();
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(sqlQuery);
+    
+            // Log the result object
+            console.log(result);
+    
+            // No need to check recordset, INSERT query does not return rows
+            if (result.rowsAffected[0] > 0) {
+                return { userId };
+            } else {
+                throw new Error('Lecturer creation failed');
+            }
+        } catch (error) {
+            console.error('Error creating lecturer:', error);
             throw error;
         } finally {
             if (connection) {
