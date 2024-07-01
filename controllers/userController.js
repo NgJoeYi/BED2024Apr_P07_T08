@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken'); 
 
 const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -15,7 +16,7 @@ const getUserById = async (req, res) => {
     }
 };
 
-
+/*
 const checkUserExist = async (req, res) => {
     const { email } = req.body;
     try {
@@ -29,13 +30,13 @@ const checkUserExist = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
-
+*/
 
 const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
         // Check if user already exists
-        const existingUser = await User.checkUserExist(newUserData.email);
+        const existingUser = await User.getUserByEmail(newUserData);
         if (existingUser) {
             return res.status(400).json({ message: 'Email is already in use' });
         } 
@@ -55,10 +56,11 @@ const createUser = async (req, res) => {
     }
 };
 
+// --------------------------------------- JWT ---------------------------------------
 const loginUser = async (req, res) => {
     const { email, password } = req.body; // user filled in email and password field
     try {
-        const loginSuccess = await User.loginUser({ email });
+        const loginSuccess = await User.getUserByEmail({ email });
         if (!loginSuccess) {
             return res.status(404).send( { message: 'Invalid email. No user found'} );
         }
@@ -66,12 +68,20 @@ const loginUser = async (req, res) => {
         if (!matchPassword) {
             return res.status(404).json( { message: 'Invalid password. Please try again'} );
         }
+
+        const payload = {
+            id: loginSuccess.id,
+            role: loginSuccess.role,
+        };
+        const token = jwt.sign(payload, "your_secret_key", { expiresIn: '60s' });
+//        res.status(200).json({ token });
         res.status(200).json(loginSuccess);
     } catch (error) {
         console.error('Server error:', error); // Log error details
         res.status(500).send('Server error');
     }
 };
+// --------------------------------------- JWT ---------------------------------------
 
 const updateUser = async (req, res) => {
     const userId = parseInt(req.params.id);
@@ -85,7 +95,7 @@ const updateUser = async (req, res) => {
 
         // if there were changes made to the email, check if the email alr exists
         if (newUserData.email !== user.email) {
-            const checkEmailExist = await User.checkUserExist(newUserData.email);
+            const checkEmailExist = await User.getUserByEmail(newUserData);
             if (checkEmailExist) {
                 return res.status(400).json({ message: 'Email is already in use' });
             }
@@ -211,15 +221,51 @@ const getProfilePicByUserId = async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const getLecturerIDthroughLogin = async (req, res) => {
+    const userID = parseInt(req.params.id);
+    try {
+        const lecturerID = await User.getLecturerIDthroughLogin(userID);
+        if (!lecturerID) {
+            return res.status(404).json({ message: 'LecturerID does not exist for this user.' });
+        }
+        res.status(200).json({ lecturerID: lecturerID });
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).send('Server error');
+    }
+};
+
+
 module.exports = {
     getUserById,
-    checkUserExist,
     createUser,
     loginUser,
     updateUser,
     deleteUser,
     updateProfilePic,
-    getProfilePicByUserId
+    getProfilePicByUserId,
+    getLecturerIDthroughLogin
 };
 
 

@@ -125,10 +125,10 @@ class Courses {
             request.input("Duration", sql.Int, newCourseData.duration);
             request.input("CreatedAt", sql.DateTime, new Date());
             request.input("CourseImage", sql.VarBinary, newCourseData.courseImage);
-    
+
             const result = await request.query(sqlQuery);
             const newCourseID = result.recordset[0].CourseID;
-    
+
             return newCourseID;
         } catch (error) {
             console.error('Error creating course:', error);
@@ -136,7 +136,7 @@ class Courses {
         } finally {
             await connection.close();
         }
-    }
+    }    
     static async getCourseImage(id){
         const connection = await sql.connect(dbConfig);
         try{
@@ -156,7 +156,29 @@ class Courses {
         }
           
     }
-    
+    static async getCourseID(lecturerID){
+        const connection = await sql.connect(dbConfig);
+        try{
+            const sqlQuery = `
+            SELECT TOP 1 CourseID 
+            FROM Courses 
+            WHERE LecturerID = @lecturerID
+            ORDER BY CourseID DESC;
+            `;
+            const request = connection.request();
+            request.input("lecturerID", sql.Int, lecturerID);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0];
+        }catch (error) {
+            console.error('Error fetching course ID:', error);
+            throw error;
+        } finally {
+            await connection.close();
+        }
+    }
     
 }
 

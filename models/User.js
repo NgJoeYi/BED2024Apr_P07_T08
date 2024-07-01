@@ -35,6 +35,7 @@ class User {
     }
 
     // just want to check if user exist, hence returns true or false
+    /*
     static async checkUserExist(emailInput) {
         let connection;
         try {
@@ -53,6 +54,7 @@ class User {
             }
         }
     }
+    */
 
     // newUserData sent in req.body rmb to extract
     static async createUser(newUserData) {
@@ -87,7 +89,8 @@ class User {
     }
 
     // userLoginData sent in req.body rmb to extract name and email
-    static async loginUser(userLoginData) {
+    // FOR LOG IN AND ALSO CAN CHECK IF THE EMAIL IS ALREADY IN USE
+    static async getUserByEmail(userLoginData) {
         let connection;
         try{
             connection = await sql.connect(dbConfig);
@@ -241,6 +244,80 @@ class User {
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // connect user and lecturer table
+    static async createLecturer(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+                INSERT INTO Lecturer (UserID) VALUES (@userId);
+            `;
+            const request = connection.request();
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(sqlQuery);
+    
+            // Log the result object
+            console.log(result);
+    
+            // No need to check recordset, INSERT query does not return rows
+            if (result.rowsAffected[0] > 0) {
+                return { userId };
+            } else {
+                throw new Error('Lecturer creation failed');
+            }
+        } catch (error) {
+            console.error('Error creating lecturer:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    static async getLecturerIDthroughLogin(userID) {
+        const connection = await sql.connect(dbConfig);
+        try {
+            const lecturerQuery = `
+                SELECT LecturerID FROM Lecturer WHERE UserID = @userID;
+            `;
+            const request = connection.request();
+            request.input('userID', sql.Int, userID);
+            const result = await request.query(lecturerQuery);
+            if (result.recordset.length === 0) {
+                return null; // No lecturer found
+            }
+            const LecturerID = result.recordset[0].LecturerID;
+            return LecturerID;
+        } catch (error) {
+            console.error('Error retrieving LecturerID from User:', error);
+            throw error; // Rethrowing the error for the API layer to handle
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 
 }
 

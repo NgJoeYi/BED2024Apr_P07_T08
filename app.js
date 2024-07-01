@@ -3,6 +3,13 @@ const sql = require('mssql');
 const bodyParser = require('body-parser');
 const path = require('path');
 const dbConfig = require('./dbConfig');
+const dotenv = require('dotenv');
+// multer is for file uploading 
+const multer = require('multer');
+
+// Load environment variables from .env file
+dotenv.config();
+
 const userController = require('./controllers/userController');
 const discussionController = require('./controllers/discussionController');
 const commentController = require('./controllers/commentController');
@@ -12,9 +19,8 @@ const lectureController = require('./controllers/lectureController');
 const lecturerController = require('./controllers/lecturerController');
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
-const deleteValidation = require('./middleware/deleteValidation');
+// const jwtAuthorization = require('./middleware/authMiddleware');
 
-const multer = require('multer'); 
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -25,28 +31,30 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set up multer for file uploads
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+const multiUpload = upload.fields([
+    { name: 'Video', maxCount: 1 },
+    { name: 'LectureImage', maxCount: 1 },
+    {name : 'courseImage', maxCount : 1}
+]);
+
 
 // Include body-parser middleware to handle JSON data
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
-// Serve the HTML page
-app.get('/account', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'account.html'));
-});
-
 // Add Routes for users
-app.post('/account/uploadProfilePic/:id', userController.updateProfilePic);
+app.post('/account/uploadProfilePic/:id', /*jwtAuthorization.verifyJWT,*/ userController.updateProfilePic);
 app.get('/account/profile/:id', userController.getProfilePicByUserId);
 
 app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
-app.delete('/account/:id', /*deleteValidation,*/ userController.deleteUser);
+app.delete('/account/:id', userController.deleteUser);
+app.get('/current-user/lecturerID/:id',userController.getLecturerIDthroughLogin);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
@@ -70,19 +78,20 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 
 // Add Routes for courses
 app.get('/courses', courseController.getAllCourses);
-app.get('/courses/:id' , courseController.getCoursesById);
+app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
+app.get('/courses/courseID/:lecturerID',courseController.getCourseID);
 app.put('/courses/:id', courseController.updateCourse);
-app.post('/courses', upload.single('courseImage'), courseController.createCourse);
+app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
-
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures);
-app.get('/lectures/:id' , lectureController.getLectureByID);
+app.get('/lectures/:id', lectureController.getLectureByID);
 app.put('/lectures/:id', lectureController.updateLecture);
-app.post('/lectures', lectureController.createLecture); 
+app.post('/lectures', multiUpload, lectureController.createLecture); // Removed ensureLoggedIn
 app.delete('/lectures/:id', lectureController.deleteLecture);
+app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); 
 
 // Add Routes for lecturer
 app.get('/lecturer', lecturerController.getAllLecturers);
@@ -90,7 +99,6 @@ app.get('/lecturer/:id' , lecturerController.getLecturerByID);
 app.put('/lecturer/:id', lecturerController.updateLecturer);
 app.post('/lecturer', lecturerController.createLecturer); 
 app.delete('/lecturer/:id', lecturerController.deleteLecturer);
-
 
 app.listen(port, async () => {
     try {

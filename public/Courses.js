@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    fetchCourses();
+    checkUserRoleAndFetchCourses();
 });
 
 async function fetchCourses() {
@@ -40,13 +40,23 @@ function displayCourses(courses) {
                     </div>
                     <div>
                         <p class="posted-date">Posted on: ${new Date(course.createdAt).toLocaleDateString()}</p>
-                        <p>${course.level} </p>
+                        <p>${course.level}</p>
                     </div>
                 </div>
             </a>
         `;
-        console.log(course.level);
-
         coursesGrid.appendChild(courseElement);
     });
+}
+
+function checkUserRoleAndFetchCourses() {
+    const userRole = sessionStorage.getItem('role');
+    console.log(userRole);
+    if (userRole === 'lecturer') {
+        document.querySelector('.add-button').style.display = 'block';
+    } else {
+        document.querySelector('.add-button').style.display = 'none';
+    }
+
+    fetchCourses(); // Fetch courses after checking user role
 }
