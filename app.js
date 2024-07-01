@@ -17,10 +17,9 @@ const reviewController = require('./controllers/reviewController');
 const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
 const lecturerController = require('./controllers/lecturerController');
-
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
-const deleteValidation = require('./middleware/deleteValidation');
+// const jwtAuthorization = require('./middleware/authMiddleware');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -47,14 +46,14 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Add Routes for users
-app.post('/account/uploadProfilePic/:id', userController.updateProfilePic);
+app.post('/account/uploadProfilePic/:id', /*jwtAuthorization.verifyJWT,*/ userController.updateProfilePic);
 app.get('/account/profile/:id', userController.getProfilePicByUserId);
 
 app.put('/account/:id', updateValidation, userController.updateUser);
 app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
-app.delete('/account/:id', /*deleteValidation,*/ userController.deleteUser);
+app.delete('/account/:id', userController.deleteUser);
 app.get('/current-user/lecturerID/:id',userController.getLecturerIDthroughLogin);
 
 // Add Routes for discussions
