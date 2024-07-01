@@ -35,6 +35,7 @@ class User {
     }
 
     // just want to check if user exist, hence returns true or false
+    /*
     static async checkUserExist(emailInput) {
         let connection;
         try {
@@ -53,6 +54,7 @@ class User {
             }
         }
     }
+    */
 
     // newUserData sent in req.body rmb to extract
     static async createUser(newUserData) {
@@ -75,15 +77,8 @@ class User {
                 throw new Error("User not created");
             }
             const row = result.recordset[0];
-            const userId = row.id;
-
-            // Create lecturer entry if the role is 'lecturer'
-            if (newUserData.role === 'lecturer') {
-                await User.createLecturer(userId);
-            }
-
-            return new User(userId, newUserData.name, newUserData.dob, newUserData.email, newUserData.password, newUserData.role);
-        } catch (error) {
+            return new User(row.id, row.name, row.dob, row.email, row.password, row.role);
+        } catch(error) {
             console.error('Error creating user:', error);
             throw error;
         } finally {
@@ -92,47 +87,10 @@ class User {
             }
         }
     }
-    // just want to check if user exist, hence returns true or false
-    static async checkUserExist(emailInput) {
-        let connection;
-        try {
-            connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
-            const request = connection.request();
-            request.input('emailInput', emailInput);
-            const result = await request.query(sqlQuery);
-            return result.recordset.length > 0;
-        } catch(error) {
-            console.error('Error retrieving a user:', error);
-            throw error;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
-    
-    static async createLecturer(userId) {
-        let connection;
-        try {
-            connection = await sql.connect(dbConfig);
-            const sqlQuery = `
-            INSERT INTO Lecturer (UserID) VALUES (@userId);
-            `;
-            const request = connection.request();
-            request.input('userId', sql.Int, userId);
-            await request.query(sqlQuery);
-        } catch (error) {
-            console.error('Error creating lecturer:', error);
-            throw error;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
+
     // userLoginData sent in req.body rmb to extract name and email
-    static async loginUser(userLoginData) {
+    // FOR LOG IN AND ALSO CAN CHECK IF THE EMAIL IS ALREADY IN USE
+    static async getUserByEmail(userLoginData) {
         let connection;
         try{
             connection = await sql.connect(dbConfig);
@@ -218,6 +176,11 @@ class User {
         }
     }
 
+
+
+
+
+
     static async updateProfilePic(userId, profilePic) {
         let connection;
         try {
@@ -273,6 +236,57 @@ class User {
             return result.recordset[0].img;
         } catch (error) {
             console.error('Error retrieving profile picture:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // connect user and lecturer table
+    static async createLecturer(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+                INSERT INTO Lecturer (UserID) VALUES (@userId);
+            `;
+            const request = connection.request();
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(sqlQuery);
+    
+            // Log the result object
+            console.log(result);
+    
+            // No need to check recordset, INSERT query does not return rows
+            if (result.rowsAffected[0] > 0) {
+                return { userId };
+            } else {
+                throw new Error('Lecturer creation failed');
+            }
+        } catch (error) {
+            console.error('Error creating lecturer:', error);
             throw error;
         } finally {
             if (connection) {
