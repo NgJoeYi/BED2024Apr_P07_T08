@@ -1,8 +1,8 @@
 CREATE TABLE Users (
-    user_id INT PRIMARY KEY NOT NULL IDENTITY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    passwordHash VARCHAR(255) NOT NULL,
-    role VARCHAR(20) CHECK (role IN ('member', 'librarian'))
+user_id INT PRIMARY KEY NOT NULL IDENTITY,
+username VARCHAR(255) NOT NULL UNIQUE,
+passwordHash VARCHAR(255) NOT NULL,
+role VARCHAR(20) CHECK (role IN ('member', 'librarian'))
 );
 
 CREATE TABLE Books(
