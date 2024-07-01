@@ -2,10 +2,10 @@ const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
 class Lectures {
-    constructor(lectureID, courseID, lecturerID, title, description, videoURL, video, lectureImage, duration, position, createdAt, chapterName) {
+    constructor(lectureID, courseID, userID, title, description, videoURL, video, lectureImage, duration, position, createdAt, chapterName) {
         this.lectureID = lectureID;
         this.courseID = courseID;
-        this.lecturerID = lecturerID;
+        this.userID = userID;
         this.title = title;
         this.description = description;
         this.videoURL = videoURL;
@@ -25,7 +25,7 @@ class Lectures {
             return result.recordset.map(row => new Lectures(
                 row.LectureID,
                 row.CourseID,
-                row.LecturerID,
+                row.UserID,
                 row.Title,
                 row.Description,
                 row.VideoURL,
@@ -57,8 +57,9 @@ class Lectures {
             }
             const lecture = result.recordset[0];
             return new Lectures(
+                lecture.LectureID,
                 lecture.CourseID,
-                lecture.LecturerID,
+                lecture.UserID,
                 lecture.Title,
                 lecture.Description,
                 lecture.VideoURL,
@@ -83,7 +84,7 @@ class Lectures {
             const sqlQuery = `
                 UPDATE Lectures SET 
                 CourseID = @courseID,
-                LecturerID = @lecturerID,
+                UserID = @userID,
                 Title = @title,
                 Description = @description,
                 VideoURL = @videoURL,
@@ -97,7 +98,7 @@ class Lectures {
             const request = connection.request();
             request.input('id', sql.Int, id);
             request.input('courseID', sql.Int, newLectureData.CourseID);
-            request.input('lecturerID', sql.Int, newLectureData.LecturerID);
+            request.input('userID', sql.Int, newLectureData.UserID);
             request.input('title', sql.NVarChar, newLectureData.Title);
             request.input('description', sql.NVarChar, newLectureData.Description);
             request.input('videoURL', sql.NVarChar, newLectureData.VideoURL);
@@ -123,13 +124,13 @@ class Lectures {
         try {
             pool = await sql.connect(dbConfig);
             const sqlQuery = `
-                INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Video, LectureImage, Duration, Position, ChapterName)
-                VALUES (@CourseID, @LecturerID, @Title, @Description, @VideoURL, @Video, @LectureImage, @Duration, @Position, @ChapterName);
+                INSERT INTO Lectures (CourseID, UserID, Title, Description, VideoURL, Video, LectureImage, Duration, Position, ChapterName)
+                VALUES (@CourseID, @UserID, @Title, @Description, @VideoURL, @Video, @LectureImage, @Duration, @Position, @ChapterName);
                 SELECT SCOPE_IDENTITY() AS LectureID;
             `;
             const request = pool.request();
             request.input('CourseID', sql.Int, newLectureData.CourseID || 1); // Assuming 1 as a default value for demonstration
-            request.input('LecturerID', sql.Int, newLectureData.LecturerID);
+            request.input('UserID', sql.Int, newLectureData.UserID);
             request.input('Title', sql.NVarChar, newLectureData.Title);
             request.input('Description', sql.NVarChar, newLectureData.Description);
             request.input('VideoURL', sql.NVarChar, newLectureData.VideoURL);
@@ -166,15 +167,15 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
-  
-    static async getLastChapterName(lecturerID) {
+
+    static async getLastChapterName(userID) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures WHERE LecturerID =  @lecturerID  ORDER BY CreatedAt DESC `;
+            const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures WHERE UserID =  @userID  ORDER BY CreatedAt DESC `;
             const result = await connection.request()
-            .input('lecturerID', sql.Int, lecturerID)
-            .query(sqlQuery);
+                .input('userID', sql.Int, userID)
+                .query(sqlQuery);
 
             if (result.recordset.length === 0) {
                 console.log("No chapters found in the database.");
@@ -190,10 +191,6 @@ class Lectures {
             await connection.close();
         }
     }
-    
-    
-
-
 }
 
 module.exports = Lectures;

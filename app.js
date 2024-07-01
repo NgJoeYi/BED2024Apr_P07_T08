@@ -16,7 +16,6 @@ const commentController = require('./controllers/commentController');
 const reviewController = require('./controllers/reviewController');
 const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
-const lecturerController = require('./controllers/lecturerController');
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
 // const jwtAuthorization = require('./middleware/authMiddleware');
@@ -54,7 +53,6 @@ app.post('/users/register', userValidation, userController.createUser);
 app.post('/users/login', userController.loginUser);
 app.get('/account/:id', userController.getUserById);
 app.delete('/account/:id', userController.deleteUser);
-app.get('/current-user/lecturerID/:id',userController.getLecturerIDthroughLogin);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
@@ -80,7 +78,6 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
-app.get('/courses/courseID/:lecturerID',courseController.getCourseID);
 app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
@@ -93,12 +90,6 @@ app.post('/lectures', multiUpload, lectureController.createLecture); // Removed 
 app.delete('/lectures/:id', lectureController.deleteLecture);
 app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); 
 
-// Add Routes for lecturer
-app.get('/lecturer', lecturerController.getAllLecturers);
-app.get('/lecturer/:id' , lecturerController.getLecturerByID);
-app.put('/lecturer/:id', lecturerController.updateLecturer);
-app.post('/lecturer', lecturerController.createLecturer); 
-app.delete('/lecturer/:id', lecturerController.deleteLecturer);
 
 app.listen(port, async () => {
     try {
