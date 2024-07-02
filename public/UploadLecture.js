@@ -207,6 +207,8 @@ async function addCourses() {
 }
 
 function cancelCourse() {
-    // Add your cancel course logic here
-    // For example, you could clear the form fields or redirect the user to another page
+    if (confirm(`Are you sure you want to stop creating course?`)) {
+        window.location.href = 'courses.html';
+        return;
+    }
 }
