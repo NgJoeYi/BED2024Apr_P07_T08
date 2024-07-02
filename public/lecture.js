@@ -1,95 +1,165 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Fetch and display reviews
     fetchReviews();
     getLecturesByCourse();
 
-    const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+    const currentUserId = sessionStorage.getItem('userId');
     console.log('Current User ID:', currentUserId); // Debug log
 
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
         title.addEventListener('click', () => {
             const subNav = title.nextElementSibling;
-            if (subNav.style.display === "none" || subNav.style.display === "") {
-                subNav.style.display = "block";
-            } else {
-                subNav.style.display = "none";
-            }
+            subNav.style.display = subNav.style.display === "none" || subNav.style.display === "" ? "block" : "none";
         });
     });
 
     const hamburger = document.querySelector('.hamburger');
     const sidebar = document.querySelector('.sidebar');
     hamburger.addEventListener('click', () => {
-        if (sidebar.style.width === "250px" || sidebar.style.width === "") {
-            sidebar.style.width = "60px";
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.style.display = 'none';
-            });
-        } else {
-            sidebar.style.width = "250px";
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.style.display = 'block';
-            });
-        }
-    });
-
-    const reviewStars = document.querySelectorAll('.review .fa-star');
-    reviewStars.forEach(star => {
-        star.addEventListener('click', () => {
-            const value = star.getAttribute('data-value');
-            const parent = star.closest('.rating');
-            const stars = parent.querySelectorAll('.fa-star');
-            if (star.classList.contains('selected') && value === '1') {
-                stars.forEach(s => s.classList.remove('selected'));
-            } else {
-                stars.forEach(s => {
-                    if (s.getAttribute('data-value') <= value) {
-                        s.classList.add('selected');
-                    } else {
-                        s.classList.remove('selected');
-                    }
-                });
-            }
+        sidebar.style.width = sidebar.style.width === "250px" || sidebar.style.width === "" ? "60px" : "250px";
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.style.display = sidebar.style.width === "250px" ? 'block' : 'none';
         });
     });
-
-    const popupStars = document.querySelectorAll('.popup .fa-star');
-    popupStars.forEach(star => {
-        star.addEventListener('mouseover', () => {
-            const value = star.getAttribute('data-value');
-            popupStars.forEach(s => {
-                if (s.getAttribute('data-value') <= value) {
-                    s.classList.add('hover');
-                } else {
-                    s.classList.remove('hover');
-                }
-            });
-        });
-
-        star.addEventListener('mouseout', () => {
-            popupStars.forEach(s => s.classList.remove('hover'));
-        });
-
-        star.addEventListener('click', () => {
-            const value = star.getAttribute('data-value');
-            if (star.classList.contains('selected') && value === '1') {
-                popupStars.forEach(s => s.classList.remove('selected'));
-            } else {
-                popupStars.forEach(s => {
-                    if (s.getAttribute('data-value') <= value) {
-                        s.classList.add('selected');
-                    } else {
-                        s.classList.remove('selected');
-                    }
-                });
-            }
-        });
-    });
-
-    document.getElementById('sort').value = 'mostRecent'; // Set default value
-    sortReviews(); // Sort reviews by most recent on page load
 });
+
+async function deleteLecture(button) {
+    // Get the lecture ID from the button's data attribute
+    const lectureID = button.dataset.lectureId;
+
+    // Confirm before deletion
+    if (!confirm('Are you sure you want to delete this lecture?')) {
+        return;
+    }
+
+    try {
+        // Send DELETE request to the server
+        const response = await fetch(`/lectures/${lectureID}`, { method: 'DELETE' });
+
+        if (response.ok) {
+            alert('Lecture deleted successfully!');
+            // Remove the lecture element from the DOM
+            button.closest('.sub-nav-item').remove();
+        } else {
+            console.error('Failed to delete lecture. Status:', response.status);
+            alert('Failed to delete the lecture.');
+        }
+    } catch (error) {
+        console.error('Error deleting lecture:', error);
+        alert('Error deleting lecture.');
+    }
+}
+
+async function getLecturesByCourse() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseID = urlParams.get('courseID');
+
+    if (!courseID) {
+        console.error('No course ID found in URL.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/lectures/course/${courseID}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const lectures = await response.json();
+        console.log('Fetched lectures:', lectures);
+        displayLectures(lectures);
+    } catch (error) {
+        console.error('Error fetching lectures:', error);
+    }
+}
+
+function displayLectures(lectures) {
+    const sidebar = document.querySelector('.sidebar .nav');
+    sidebar.innerHTML = ''; // Clear existing content
+
+    // GROUPING LECTURES ACCORDING TO CHAPTER NAME 
+    const groupedLectures = {};
+
+    lectures.forEach(lecture => {
+        if (!groupedLectures[lecture.ChapterName]) {
+            groupedLectures[lecture.ChapterName] = [];
+        }
+        groupedLectures[lecture.ChapterName].push(lecture);
+    });
+
+    console.log('Grouped Lectures:', groupedLectures);
+
+    const userRole = sessionStorage.getItem('role'); // Get user role
+    console.log('USER ROLE:', userRole);
+    for (const chapterName in groupedLectures) {
+        const navItem = document.createElement('div');
+        navItem.className = 'nav-item';
+
+        const subNavItems = groupedLectures[chapterName]
+            .map(lecture => {
+                const deleteButton = 
+                    userRole === 'lecturer'
+                    ? `<button class="delete-lecture" style = "display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>` 
+                    : '';
+    
+                return  `
+                    <div class="sub-nav-item" data-lecture-id="${lecture.LectureID}">
+                        ${lecture.Title}
+                        ${deleteButton}
+                    </div>
+                `;
+            }).join('');
+
+        navItem.innerHTML = `
+            <div class="nav-title">
+                ${chapterName} 
+                <span>&#9660;</span>
+            </div>
+            <div class="sub-nav" style="display: none;">
+                ${subNavItems}
+            </div>
+        `;
+        console.log('Generated HTML:', subNavItems); 
+        sidebar.appendChild(navItem);
+    }
+
+    const navTitles = document.querySelectorAll('.nav-title');
+    navTitles.forEach(title => {
+        title.addEventListener('click', () => {
+            const subNav = title.nextElementSibling;
+            subNav.style.display = subNav.style.display === "none" ? "block" : "none";
+        });
+    });
+
+    const subNavItems = document.querySelectorAll('.sub-nav-item');
+    subNavItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const lectureID = this.getAttribute('data-lecture-id');
+            console.log(`Fetching video for lecture ID: ${lectureID}`);
+            setVideo(lectureID);
+            subNavItems.forEach(item => item.style.fontWeight = 'normal');
+            this.style.fontWeight = 'bold';
+        });
+    });
+
+    if (lectures.length > 0) {
+        const firstLectureID = lectures[0].LectureID;
+        console.log(`Setting video for the first lecture: ${firstLectureID}`);
+        setVideo(firstLectureID);
+    }
+}
+
+
+async function setVideo(lectureID) {
+    const videoIframe = document.querySelector('.main-content iframe');
+
+    try {
+        const response = await fetch(`/video/${lectureID}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const videoBlob = await response.blob();
+        const videoUrl = URL.createObjectURL(videoBlob);
+        videoIframe.src = videoUrl;
+    } catch (error) {
+        console.error('Error setting video:', error);
+    }
+}
 
 function showPopup(type) {
     const popup = document.getElementById('popup');
@@ -171,7 +241,7 @@ async function deleteReview(button) {
         }
     } catch (error) {
         console.error('Error deleting review:', error);
-        alert('Error deleting review');
+        alert('Error deleting review.');
     }
 }
 
@@ -288,321 +358,4 @@ function fetchReviews() {
             });
         })
         .catch(error => console.error('Error fetching reviews:', error));
-}
-
-async function getLecturesByCourse() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const courseID = urlParams.get('courseID');
-    
-    if (!courseID) {
-        console.error('No course ID found in URL.');
-        return;
-    }
-
-    try {
-        const response = await fetch(`/lectures/course/${courseID}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const lectures = await response.json();
-        console.log('Fetched lectures:', lectures);
-        displayLectures(lectures);
-    } catch (error) {
-        console.error('Error fetching lectures:', error);
-    }
-}
-
-function displayLectures(lectures) {
-    const sidebar = document.querySelector('.sidebar .nav');
-    sidebar.innerHTML = ''; 
-
-    const groupedLectures = lectures.reduce((acc, lecture) => {
-        if (!acc[lecture.ChapterName]) {
-            acc[lecture.ChapterName] = [];
-        }
-        acc[lecture.ChapterName].push(lecture);
-        return acc;
-    }, {});
-
-    for (const chapterName in groupedLectures) {
-        const navItem = document.createElement('div');
-        navItem.className = 'nav-item';
-
-        const subNavItems = groupedLectures[chapterName]
-            .map(lecture => `<div class="sub-nav-item" data-lecture-id="${lecture.LectureID}">${lecture.Title}</div>`)
-            .join('');
-
-        navItem.innerHTML = `
-            <div class="nav-title">${chapterName} <span>&#9660;</span></div>
-            <div class="sub-nav" style="display: none;">
-                ${subNavItems}
-            </div>
-        `;
-
-        sidebar.appendChild(navItem);
-    }
-
-    const navTitles = document.querySelectorAll('.nav-title');
-    navTitles.forEach(title => {
-        title.addEventListener('click', () => {
-            const subNav = title.nextElementSibling;
-            subNav.style.display = subNav.style.display === "none" ? "block" : "none";
-        });
-    });
-
-    const subNavItems = document.querySelectorAll('.sub-nav-item');
-    subNavItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const lectureID = this.getAttribute('data-lecture-id');
-            console.log(`Fetching video for lecture ID: ${lectureID}`);
-            setVideo(lectureID);
-            subNavItems.forEach(item => item.style.fontWeight = 'normal');
-            this.style.fontWeight = 'bold';
-        });
-    });
-
-    if (lectures.length > 0) {
-        const firstLectureID = lectures[0].LectureID;
-        console.log(`Setting video for the first lecture: ${firstLectureID}`);
-        setVideo(firstLectureID);
-    }
-}
-
-async function setVideo(lectureID) {
-    const videoIframe = document.querySelector('.main-content iframe');
-
-    try {
-        const response = await fetch(`/video/${lectureID}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const videoBlob = await response.blob();
-        const videoUrl = URL.createObjectURL(videoBlob);
-        videoIframe.src = videoUrl;
-    } catch (error) {
-        console.error('Error setting video:', error);
-    }
-}
-
-// Fetch the last chapter name for a specific user
-async function fetchLastChapterName() {
-    const userID = sessionStorage.getItem('userId'); 
-    console.log("Fetching chapter for user ID:", userID);
-    if (!userID) {
-        console.error("User ID not found in sessionStorage.");
-        return null; 
-    }
-    console.log('USER ID: ',userID);
-    try {
-        const response = await fetch(`/lectures/last-chapter/${userID}`);
-        if (response.ok) {
-            const data = await response.json();
-            console.log("Fetched last chapter name:", data.chapterName);
-            return data.chapterName;
-        } else {
-            console.error("Failed to fetch last chapter name. Status:", response.status);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error fetching last chapter name:', error);
-        return null;
-    }
-}
-
-// Fetch the max course ID from the server
-async function fetchMaxCourseID() {
-    try {
-        const response = await fetch('/lectures/max-course-id');
-        if (response.ok) {
-            const data = await response.json();
-            return data.maxCourseID;
-        } else {
-            console.error("Failed to fetch max course ID. Status:", response.status);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error fetching max course ID:', error);
-        return null;
-    }
-}
-
-// Function to add files
-async function addFiles() {
-    const previousChapterName = await fetchLastChapterName();
-    const chapterNameInput = document.getElementById('chapterName').value.trim();
-    const title = document.getElementById('lectureName').value.trim();
-    const duration = document.getElementById('duration-lecture').value.trim();
-    const description = document.getElementById('description').value.trim();
-    const videoFileInput = document.getElementById('videoFiles');
-    const imageFileInput = document.getElementById('lectureImage');
-
-    console.log("Chapter Name Input:", chapterNameInput);
-    console.log("Title:", title);
-    console.log("Duration:", duration);
-    console.log("Description:", description);
-
-    const userID = sessionStorage.getItem('userId');
-    const courseID = await fetchMaxCourseID();
-
-    console.log("userID from Session:", userID);
-    console.log("courseID from Input:", courseID);
-
-    if (!userID) {
-        alert('User ID not found. Please log in again.');
-        return;
-    }
-
-    if (!courseID) {
-        alert('Course ID not found. Please select a course.');
-        return;
-    }
-
-    if (!title || !duration || !description || videoFileInput.files.length === 0 || imageFileInput.files.length === 0) {
-        alert('Please fill in all fields and select at least one file.');
-        return;
-    }
-
-    let chapterName = chapterNameInput || previousChapterName;
-    console.log('Final Chapter Name to Use:', chapterName);
-    if (!chapterName) {
-        alert('Please enter a chapter name.');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('UserID', userID);
-    formData.append('CourseID', courseID);
-    formData.append('ChapterName', chapterName);
-    formData.append('Title', title);
-    formData.append('Duration', duration);
-    formData.append('Description', description);
-    Array.from(videoFileInput.files).forEach(file => formData.append('Video', file));
-    Array.from(imageFileInput.files).forEach(file => formData.append('LectureImage', file));
-
-    try {
-        const response = await fetch('/lectures', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            const newLecture = await response.json();
-            displayNewLecture(newLecture, videoFileInput.files, imageFileInput.files);
-            closeModal();
-            console.log("Lecture added successfully");
-        } else {
-            throw new Error('Failed to save the lecture');
-        }
-    } catch (error) {
-        console.error('Error saving the lecture:', error);
-        alert('Error saving the lecture.');
-    }
-}
-
-function displayNewLecture(newLecture, videoFiles, imageFiles) {
-    const courseArrangement = document.getElementById('course-arrangement');
-
-    const newChapterDiv = document.createElement('div');
-    newChapterDiv.className = 'chapter';
-    newChapterDiv.contentEditable = 'false';
-
-    const chapterNameElement = document.createElement('div');
-    chapterNameElement.className = 'chapter-name';
-    chapterNameElement.innerHTML = `
-        <p contenteditable="true" class="editable-placeholder">Chapter Name: ${newLecture.ChapterName}</p>
-        <span class="delete-chapter-icon" onclick="removeChapter(this)">
-            <i class="fa-solid fa-x" style="color: #ff3838;"></i>
-        </span>
-    `;
-
-    const lectureDetails = document.createElement('div');
-    lectureDetails.className = 'lecture-details';
-    lectureDetails.innerHTML = `
-        <p>Lecture Name: ${newLecture.Title}</p>
-        <p>Duration: ${newLecture.Duration} minutes</p>
-        <p>Description: ${newLecture.Description}</p>
-    `;
-
-    const imageFile = imageFiles[0];
-    const imageURL = URL.createObjectURL(imageFile);
-    const imageElement = document.createElement('img');
-    imageElement.src = imageURL;
-    imageElement.alt = 'Lecture Image';
-    imageElement.width = 200;
-    imageElement.height = 200;
-    lectureDetails.appendChild(imageElement);
-
-    const videoFileNames = Array.from(videoFiles).map(file => file.name).join(', ');
-    const videoElement = document.createElement('p');
-    videoElement.textContent = `Lecture Video: ${videoFileNames}`;
-    lectureDetails.appendChild(videoElement);
-
-    newChapterDiv.appendChild(chapterNameElement);
-    newChapterDiv.appendChild(lectureDetails);
-
-    courseArrangement.insertBefore(newChapterDiv, courseArrangement.querySelector('.new-btn-container'));
-
-    resetForm();
-}
-
-function resetForm() {
-    document.getElementById('chapterName').value = '';
-    document.getElementById('lectureName').value = '';
-    document.getElementById('duration').value = '';
-    document.getElementById('description').value = '';
-    document.getElementById('videoFiles').value = '';
-    document.getElementById('lectureImage').value = '';
-    console.log("Form reset completed");
-}
-
-async function addCourses() {
-    const userID = sessionStorage.getItem('userId');
-    const title = document.getElementById('course-name-text').textContent.trim();
-    const description = document.getElementById('course-details').textContent.trim();
-    const category = document.getElementById('category').value.trim();
-    const level = document.getElementById('level').value.trim();
-    const duration = document.getElementById('duration').value.trim();
-    const courseImageInput = document.getElementById('imageFile');
-    const courseArrangement = document.getElementById('course-arrangement');
-
-    if (!userID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
-        alert('Please complete entering course information and select an image.');
-        return;
-    }
-
-    const chapters = courseArrangement.querySelectorAll('.chapter');
-    if (chapters.length === 0) {
-        alert('Please add at least one lecture before submitting the course.');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('userID', userID);
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('category', category);
-    formData.append('level', level);
-    formData.append('duration', duration);
-    formData.append('imageFile', courseImageInput.files[0]); // Ensure this matches the form field name
-
-    try {
-        const response = await fetch('/courses', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            const newCourse = await response.json();
-            alert('Course saved successfully');
-            window.location.href = 'Courses.html'; // Redirect on successful creation
-        } else {
-            const errorData = await response.json();
-            alert(`Failed to save the course: ${errorData.message}`);
-        }
-    } catch (error) {
-        console.error('Error saving the course:', error);
-        alert('Error saving the course.');
-    }
-
-    // Show the lectures arrangement section and hide submit and cancel buttons
-    document.getElementById('course-arrangement').style.display = 'block';
-    document.querySelector('.button-container').style.display = 'none';
 }

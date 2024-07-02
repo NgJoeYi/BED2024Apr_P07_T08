@@ -261,5 +261,7 @@ class Lectures {
             if (pool) await pool.close();
         }
     }
+    
+        
 }
 module.exports = Lectures;

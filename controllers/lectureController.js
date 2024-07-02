@@ -1,6 +1,4 @@
 const Lectures = require("../models/Lectures");
-const jwt = require('jsonwebtoken'); 
-
 
 const getAllLectures = async (req, res) => {
     try {
