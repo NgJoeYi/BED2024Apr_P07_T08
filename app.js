@@ -39,6 +39,8 @@ const multiUpload = upload.fields([
     {name : 'courseImage', maxCount : 1}
 ]);
 
+// Middleware to ignore favicon requests
+app.get('/favicon.ico', (req, res) => res.status(204));
 
 // Include body-parser middleware to handle JSON data
 app.use(bodyParser.json({ limit: '50mb' }));

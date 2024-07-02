@@ -151,9 +151,18 @@ input[type="file" i]{
 #add-more-button{
     margin-top: 10px;
 }
-button{
-    padding:5px;
+/* course submit and cancel buttons*/
+.button-container{
+    display: flex;
+    justify-content: space-around;
 }
+
+/* buttons in general */
+button{
+    padding:10px;
+    cursor: pointer;
+}
+
 .chapter-name {
     display: flex;
     justify-content: space-between;

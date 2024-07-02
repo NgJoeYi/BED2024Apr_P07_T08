@@ -1,12 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Fetch and display reviews
     fetchReviews();
     getLecturesByCourse();
 
-    const currentUserId = sessionStorage.getItem('userId'); 
-    console.log('Current User ID:', currentUserId);
-
-    document.getElementById('sort').value = 'mostRecent';
-    sortReviews();
+    const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+    console.log('Current User ID:', currentUserId); // Debug log
 
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
@@ -88,7 +86,209 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    document.getElementById('sort').value = 'mostRecent'; // Set default value
+    sortReviews(); // Sort reviews by most recent on page load
 });
+
+function showPopup(type) {
+    const popup = document.getElementById('popup');
+    const popupContent = popup.querySelector('.popup-content h2');
+    popupContent.textContent = type === 'add' ? 'Leave a Review' : 'Edit Review';
+    popup.style.display = 'flex';
+
+    if (type === 'add') {
+        document.getElementById('review-text').value = '';
+        document.querySelectorAll('.popup .fa-star').forEach(star => {
+            star.classList.remove('selected');
+        });
+
+        const postButton = document.querySelector('.popup-content button');
+        postButton.onclick = postReview;
+    }
+}
+
+function closePopup() {
+    const popup = document.getElementById('popup');
+    popup.style.display = 'none';
+}
+
+function filterReviews() {
+    const filter = document.getElementById('filter').value;
+    const reviews = document.querySelectorAll('.review');
+    reviews.forEach(review => {
+        const rating = review.querySelectorAll('.fa-star.selected').length;
+        review.style.display = filter === 'all' || filter == rating ? 'flex' : 'none';
+    });
+}
+
+function sortReviews() {
+    const sort = document.getElementById('sort').value;
+    const reviewsContainer = document.getElementById('reviews');
+    const reviews = Array.from(reviewsContainer.children);
+
+    reviews.sort((a, b) => {
+        const ratingA = a.querySelectorAll('.fa-star.selected').length;
+        const ratingB = b.querySelectorAll('.fa-star.selected').length;
+        const dateA = new Date(a.getAttribute('data-date'));
+        const dateB = new Date(b.getAttribute('data-date'));
+
+        if (sort === 'mostRecent') {
+            return dateB - dateA;
+        } else if (sort === 'highestRating') {
+            return ratingB - ratingA;
+        } else if (sort === 'lowestRating') {
+            return ratingA - ratingB;
+        }
+    });
+
+    reviews.forEach(review => reviewsContainer.appendChild(review));
+}
+
+async function deleteReview(button) {
+    const review = button.closest('.review');
+    const reviewId = review.getAttribute('data-id');
+    const userId = sessionStorage.getItem('userId');
+
+    console.log(`Attempting to delete review with ID: ${reviewId} by user ID: ${userId}`);
+
+    try {
+        const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId }) // Include userId in the body
+        });
+
+        if (response.ok) {
+            alert('Review deleted successfully!');
+            review.remove();
+        } else {
+            const errorMessage = await response.text();
+            console.error('Failed to delete review:', errorMessage);
+            alert('You can only delete your own reviews');
+        }
+    } catch (error) {
+        console.error('Error deleting review:', error);
+        alert('Error deleting review');
+    }
+}
+
+function postReview() {
+    const reviewText = document.getElementById('review-text').value;
+    const rating = document.querySelectorAll('.popup .fa-star.selected').length;
+    const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+
+    if (!reviewText || !rating || !userId) {
+        alert('Please log in or sign up to add reviews.');
+        return;
+    }
+
+    fetch('http://localhost:3000/reviews', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ review_text: reviewText, rating: rating, userId: userId }) // Include userId
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        closePopup();
+        fetchReviews();
+    })
+    .catch(error => console.error('Error posting review:', error));
+}
+
+function editReview(button) {
+    const review = button.closest('.review');
+    const reviewUserId = parseInt(review.dataset.userId, 10); // Get the user ID from the review
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage
+
+    if (reviewUserId !== currentUserId) {
+        alert('You can only edit your own reviews.');
+        return;
+    }
+
+    const reviewText = review.querySelector('.review-details p').textContent;
+    const reviewStars = review.querySelectorAll('.fa-star');
+    const popupStars = document.querySelectorAll('.popup .fa-star');
+
+    document.getElementById('review-text').value = reviewText;
+
+    const rating = Array.from(reviewStars).filter(star => star.classList.contains('selected')).length;
+
+    popupStars.forEach(star => {
+        if (star.getAttribute('data-value') <= rating) {
+            star.classList.add('selected');
+        } else {
+            star.classList.remove('selected');
+        }
+    });
+
+    showPopup('edit');
+
+    const postButton = document.querySelector('.popup-content button');
+    postButton.onclick = () => {
+        const updatedText = document.getElementById('review-text').value;
+        const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
+
+        fetch(`http://localhost:3000/reviews/${review.getAttribute('data-id')}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, userId: currentUserId }) // Include userId
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            closePopup();
+            fetchReviews();
+        })
+        .catch(error => console.error('Error updating review:', error));
+    };
+}
+
+function fetchReviews() {
+    fetch('http://localhost:3000/reviews')
+        .then(response => response.json())
+        .then(reviews => {
+            const reviewsContainer = document.getElementById('reviews');
+            reviewsContainer.innerHTML = ''; // Clear existing reviews
+
+            reviews.forEach(review => {
+                const reviewElement = document.createElement('div');
+                reviewElement.classList.add('review');
+                reviewElement.setAttribute('data-id', review.review_id); // Add this line
+                reviewElement.setAttribute('data-user-id', review.user_id); // Add this line
+                reviewElement.setAttribute('data-date', review.review_date);
+                reviewElement.innerHTML = `
+                    <div class="review-content">
+                        <div class="review-author">
+                            <img src="${review.profilePic || 'images/profilePic.jpeg'}" alt="Author Avatar" class="author-avatar">
+                            <div class="review-details">
+                                <div class="author-name">${review.user_name}</div>
+                                <div class="rating">
+                                    ${[...Array(5)].map((_, i) => `<i class="fa fa-star ${i < review.rating ? 'selected' : ''}" data-value="${i + 1}"></i>`).join('')}
+                                </div>
+                                <p>${review.review_text}</p>
+                                <p class="review-date">Posted on: ${new Date(review.review_date).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-actions">
+                        <button onclick="editReview(this)">Edit</button>
+                        <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
+                        <button class="helpful">👍 Helpful</button>
+                    </div>
+            `;
+            reviewsContainer.appendChild(reviewElement);
+            });
+        })
+        .catch(error => console.error('Error fetching reviews:', error));
+}
 
 async function getLecturesByCourse() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -180,203 +380,4 @@ async function setVideo(lectureID) {
     } catch (error) {
         console.error('Error setting video:', error);
     }
-}
-
-function showPopup(type) {
-    const popup = document.getElementById('popup');
-    const popupContent = popup.querySelector('.popup-content h2');
-    popupContent.textContent = type === 'add' ? 'Leave a Review' : 'Edit Review';
-    popup.style.display = 'flex';
-
-    if (type === 'add') {
-        document.getElementById('review-text').value = '';
-        document.querySelectorAll('.popup .fa-star').forEach(star => {
-            star.classList.remove('selected');
-        });
-
-        const postButton = document.querySelector('.popup-content button');
-        postButton.onclick = postReview;
-    }
-}
-
-function closePopup() {
-    const popup = document.getElementById('popup');
-    popup.style.display = 'none';
-}
-
-function filterReviews() {
-    const filter = document.getElementById('filter').value;
-    const reviews = document.querySelectorAll('.review');
-    reviews.forEach(review => {
-        const rating = review.querySelectorAll('.fa-star.selected').length;
-        review.style.display = filter === 'all' || filter == rating ? 'flex' : 'none';
-    });
-}
-
-function sortReviews() {
-    const sort = document.getElementById('sort').value;
-    const reviewsContainer = document.getElementById('reviews');
-    const reviews = Array.from(reviewsContainer.children);
-
-    reviews.sort((a, b) => {
-        const ratingA = a.querySelectorAll('.fa-star.selected').length;
-        const ratingB = b.querySelectorAll('.fa-star.selected').length;
-        const dateA = new Date(a.getAttribute('data-date'));
-        const dateB = new Date(b.getAttribute('data-date'));
-
-        if (sort === 'mostRecent') {
-            return dateB - dateA;
-        } else if (sort === 'highestRating') {
-            return ratingB - ratingA;
-        } else if (sort === 'lowestRating') {
-            return ratingA - ratingB;
-        }
-    });
-
-    reviews.forEach(review => reviewsContainer.appendChild(review));
-}
-
-async function deleteReview(button) {
-    const review = button.closest('.review');
-    const reviewId = review.getAttribute('data-id');
-    const userId = sessionStorage.getItem('userId');
-
-    console.log(`Attempting to delete review with ID: ${reviewId} by user ID: ${userId}`);
-
-    try {
-        const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId }) // Include userId in the body
-        });
-
-        if (response.ok) {
-            alert('Review deleted successfully!');
-            review.remove();
-        } else {
-            const errorMessage = await response.text();
-            console.error('Failed to delete review:', errorMessage);
-            alert('You can only delete your own reviews');
-        }
-    } catch (error) {
-        console.error('Error deleting review:', error);
-        alert('Error deleting review');
-    }
-}
-
-function postReview() {
-    const reviewText = document.getElementById('review-text').value;
-    const rating = document.querySelectorAll('.popup .fa-star.selected').length;
-    const userId = sessionStorage.getItem('userId'); 
-
-    if (!reviewText || !rating || !userId) {
-        alert('Please log in or sign up to add reviews.');
-        return;
-    }
-
-    fetch('http://localhost:3000/reviews', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ review_text: reviewText, rating: rating, userId: userId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        closePopup();
-        fetchReviews();
-    })
-    .catch(error => console.error('Error posting review:', error));
-}
-
-function editReview(button) {
-    const review = button.closest('.review');
-    const reviewUserId = parseInt(review.dataset.userId, 10);
-    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10);
-
-    if (reviewUserId !== currentUserId) {
-        alert('You can only edit your own reviews.');
-        return;
-    }
-
-    const reviewText = review.querySelector('.review-details p').textContent;
-    const reviewStars = review.querySelectorAll('.fa-star');
-    const popupStars = document.querySelectorAll('.popup .fa-star');
-
-    document.getElementById('review-text').value = reviewText;
-
-    const rating = Array.from(reviewStars).filter(star => star.classList.contains('selected')).length;
-
-    popupStars.forEach(star => {
-        if (star.getAttribute('data-value') <= rating) {
-            star.classList.add('selected');
-        } else {
-            star.classList.remove('selected');
-        }
-    });
-
-    showPopup('edit');
-
-    const postButton = document.querySelector('.popup-content button');
-    postButton.onclick = () => {
-        const updatedText = document.getElementById('review-text').value;
-        const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
-
-        fetch(`http://localhost:3000/reviews/${review.getAttribute('data-id')}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, userId: currentUserId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            closePopup();
-            fetchReviews();
-        })
-        .catch(error => console.error('Error updating review:', error));
-    };
-}
-
-function fetchReviews() {
-    fetch('http://localhost:3000/reviews')
-        .then(response => response.json())
-        .then(reviews => {
-            const reviewsContainer = document.getElementById('reviews');
-            reviewsContainer.innerHTML = '';
-
-            reviews.forEach(review => {
-                const reviewElement = document.createElement('div');
-                reviewElement.classList.add('review');
-                reviewElement.setAttribute('data-id', review.review_id);
-                reviewElement.setAttribute('data-user-id', review.user_id);
-                reviewElement.setAttribute('data-date', review.review_date);
-                reviewElement.innerHTML = `
-                    <div class="review-content">
-                        <div class="review-author">
-                            <img src="${review.profilePic || 'images/profilePic.jpeg'}" alt="Author Avatar" class="author-avatar">
-                            <div class="review-details">
-                                <div class="author-name">${review.user_name}</div>
-                                <div class="rating">
-                                    ${[...Array(5)].map((_, i) => `<i class="fa fa-star ${i < review.rating ? 'selected' : ''}" data-value="${i + 1}"></i>`).join('')}
-                                </div>
-                                <p>${review.review_text}</p>
-                                <p class="review-date">Posted on: ${new Date(review.review_date).toLocaleDateString()}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="review-actions">
-                        <button onclick="editReview(this)">Edit</button>
-                        <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
-                        <button class="helpful">👍 Helpful</button>
-                    </div>
-            `;
-            reviewsContainer.appendChild(reviewElement);
-            });
-        })
-        .catch(error => console.error('Error fetching reviews:', error));
 }
