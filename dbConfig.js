@@ -17,34 +17,34 @@
 
 //JOEYI'S
 
-// module.exports = {
-//   user: "BED2024Apr_login", // Replace with your SQL Server login username aka the security login thingy
-//   password: "28D685372b05", // Replace with your SQL Server login password
-//   server: "localhost",
-//   database: "BED2024Apr_db", //Your database name!
-//   trustServerCertificate: true,
-//   options: {
-//     port: 1433, // Default SQL Server port
-//     connectionTimeout: 60000, // Connection timeout in milliseconds
-//   },
-// };
+module.exports = {
+  user: "BED2024Apr_login", // Replace with your SQL Server login username aka the security login thingy
+  password: "28D685372b05", // Replace with your SQL Server login password
+  server: "localhost",
+  database: "BED2024Apr_db", //Your database name!
+  trustServerCertificate: true,
+  options: {
+    port: 1433, // Default SQL Server port
+    connectionTimeout: 60000, // Connection timeout in milliseconds
+  },
+};
 
 
 
 
 
 // //RAEANN
-    module.exports = {
-   user: "activityFeed", // Replace with your SQL Server login username
-    password: "activityfeed", // Replace with your SQL Server login password
-    server: "localhost",
-    database: "ActivityFeeddb",
-  trustServerCertificate: true,
-   options: {
-     port: 1433, // Default SQL Server port
-     connectionTimeout: 60000, // Connection timeout in milliseconds
-    },
-    };
+  //   module.exports = {
+  //  user: "activityFeed", // Replace with your SQL Server login username
+  //   password: "activityfeed", // Replace with your SQL Server login password
+  //   server: "localhost",
+  //   database: "ActivityFeeddb",
+  // trustServerCertificate: true,
+  //  options: {
+  //    port: 1433, // Default SQL Server port
+  //    connectionTimeout: 60000, // Connection timeout in milliseconds
+  //   },
+  //   };
 
 // WEIYING 
 
@@ -61,5 +61,21 @@
 // };
 
 
-
+// WEIYING JUST IN CASE
+// module.exports = {
+//   user: "BED2024Apr_login", // Replace with your SQL Server login username aka the security login thingy
+//   password: "28D685372b05", // Replace with your SQL Server login password
+//   server: "localhost",
+//   database: "BED2024Apr_db", //Your database name!
+//   trustServerCertificate: true,
+//   options: {
+//     port: 1433, // Default SQL Server port
+//     connectionTimeout: 60000, // Connection timeout in milliseconds
+//   },
+//   pool: {
+//     max: 20, // Increase the maximum number of connections
+//     min: 0,
+//     idleTimeoutMillis: 30000
+//   }
+// };
 

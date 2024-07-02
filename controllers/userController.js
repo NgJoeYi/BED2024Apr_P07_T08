@@ -3,7 +3,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken'); 
 
 const getUserById = async (req, res) => {
-    const userId = parseInt(req.params.id);
+    //const userId = parseInt(req.params.id);
+    const userId = req.user.id;
     try {
         const user = await User.getUserById(userId);
         if (!user) {
@@ -73,9 +74,9 @@ const loginUser = async (req, res) => {
             id: loginSuccess.id,
             role: loginSuccess.role,
         };
-        const token = jwt.sign(payload, "your_secret_key", { expiresIn: '60s' });
-//        res.status(200).json({ token });
-        res.status(200).json(loginSuccess);
+        const token = jwt.sign(payload, "your_secret_key", { expiresIn: '120s' });
+        res.status(200).json({ token });
+        //res.status(200).json(loginSuccess);
     } catch (error) {
         console.error('Server error:', error); // Log error details
         res.status(500).send('Server error');
@@ -84,7 +85,7 @@ const loginUser = async (req, res) => {
 // --------------------------------------- JWT ---------------------------------------
 
 const updateUser = async (req, res) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.user.id;
     const newUserData = req.body;
     try {
         // get the current user 
@@ -131,7 +132,7 @@ const updateUser = async (req, res) => {
 
 // after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
 const deleteUser = async (req, res) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.user.id;
     const passwordInput = req.body;
     try {
         const checkUser = await User.getUserById(userId);
@@ -176,7 +177,7 @@ const deleteUser = async (req, res) => {
 
 
 const updateProfilePic = async (req, res) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.user.id;
     const { profilePic } = req.body;
 
     try {
@@ -195,7 +196,7 @@ const updateProfilePic = async (req, res) => {
 
 
 const getProfilePicByUserId = async (req, res) => {
-    const userId = parseInt(req.params.id);
+    const userId = req.user.id;
     try {
         const user = await User.getUserById(userId);
         if (!user) {
@@ -206,7 +207,7 @@ const getProfilePicByUserId = async (req, res) => {
         if (!profilePic) {
            profilePic = 'images/profilePic.jpeg'; // Default profile picture 
         }
-        res.status(200).json({ user, profilePic });
+        res.status(200).json({ profilePic });
     } catch (error) {
         console.error('Server error:', error);
         res.status(500).send('Server error');
@@ -236,25 +237,6 @@ const getProfilePicByUserId = async (req, res) => {
 
 
 
-
-
-
-
-
-
-const getLecturerIDthroughLogin = async (req, res) => {
-    const userID = parseInt(req.params.id);
-    try {
-        const lecturerID = await User.getLecturerIDthroughLogin(userID);
-        if (!lecturerID) {
-            return res.status(404).json({ message: 'LecturerID does not exist for this user.' });
-        }
-        res.status(200).json({ lecturerID: lecturerID });
-    } catch (error) {
-        console.error('Server error:', error);
-        res.status(500).send('Server error');
-    }
-};
 
 
 module.exports = {
@@ -264,8 +246,7 @@ module.exports = {
     updateUser,
     deleteUser,
     updateProfilePic,
-    getProfilePicByUserId,
-    getLecturerIDthroughLogin
+    getProfilePicByUserId
 };
 
 

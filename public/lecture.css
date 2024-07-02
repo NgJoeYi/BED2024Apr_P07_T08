@@ -66,6 +66,7 @@ body {
 .sub-nav-item {
     padding: 5px 0;
     background-color: #AE8381;
+    cursor: pointer;
 
 }
 

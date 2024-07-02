@@ -1,13 +1,6 @@
 const Lectures = require("../models/Lectures");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-const sql = require("mssql");
-const dbConfig = require('../dbConfig');
+const jwt = require('jsonwebtoken'); 
 
-// Multer setup for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 const getAllLectures = async (req, res) => {
     try {
@@ -18,7 +11,7 @@ const getAllLectures = async (req, res) => {
         res.status(500).send('Error retrieving lectures');
     }
 };
-
+// get lecture by courseID
 const getLectureByID = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -48,7 +41,6 @@ const updateLecture = async (req, res) => {
     }
 };
 
-
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
     try {
@@ -71,58 +63,92 @@ const getLastChapterName = async (req, res) => {
             return res.status(404).send('Chapter name not found');
         }
         res.status(200).json({ chapterName: chapterName });
-
     } catch (error) {
         console.error(error);
         res.status(500).send('Error getting chapter name');
     }
 };
 
-
 const createLecture = async (req, res) => {
-    const { Title, Duration, Description, Position, ChapterName, LecturerID } = req.body;
-    console.log('LecturerID from request body:', LecturerID); // Log the LecturerID from the request body
+    const { Title, Duration, Description, ChapterName, UserID } = req.body;
+    console.log('UserID from request body:', UserID); // Log the UserID from the request body
 
-    if (!LecturerID) {
-        console.error("LecturerID not provided");
-        return res.status(400).send("LecturerID not provided");
+    if (!UserID) {
+        console.error("UserID not provided");
+        return res.status(400).send("UserID not provided");
     }
 
     const video = req.files.Video[0].buffer;
     const lectureImage = req.files.LectureImage[0].buffer;
     const CourseID = 1; // Placeholder for CourseID
 
-    const sqlQuery = `
-        INSERT INTO Lectures (CourseID, LecturerID, Title, Duration, Description, Position, ChapterName, Video, LectureImage)
-        VALUES (@CourseID, @LecturerID, @Title, @Duration, @Description, @Position, @ChapterName, @Video, @LectureImage);
-        SELECT SCOPE_IDENTITY() AS LectureID;
-    `;
-
-    let connection;
     try {
-        connection = await sql.connect(dbConfig);
-        const request = connection.request();
-        request.input('CourseID', sql.Int, CourseID);
-        request.input('LecturerID', sql.Int, LecturerID);
-        request.input('Title', sql.NVarChar, Title);
-        request.input('Duration', sql.Int, Duration);
-        request.input('Description', sql.NVarChar, Description);
-        request.input('Position', sql.Int, Position);
-        request.input('ChapterName', sql.NVarChar, ChapterName);
-        request.input('Video', sql.VarBinary, video);
-        request.input('LectureImage', sql.VarBinary, lectureImage);
+        const Position = await Lectures.getCurrentPositionInChapter(ChapterName);
 
-        const result = await request.query(sqlQuery);
-        const newLectureID = result.recordset[0].LectureID;
+        const newLectureData = {
+            CourseID,
+            UserID,
+            Title,
+            Duration,
+            Description,
+            Position,
+            ChapterName,
+            Video: video,
+            LectureImage: lectureImage
+        };
 
-        res.status(201).json({ LectureID: newLectureID, CourseID, LecturerID, Title, Duration, Description, Position, ChapterName });
+        const newLectureID = await Lectures.createLecture(newLectureData);
+        res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
         console.error('Error creating lecture:', error);
         res.status(500).send('Error creating lecture');
-    } finally {
-        if (connection) {
-            await connection.close();
+    }
+}
+ 
+const getLectureVideoByID = async (req, res) => {
+    const lectureID = parseInt(req.params.lectureID, 10);
+    console.log(`Received lectureID: ${req.params.lectureID}`);
+    console.log(`Parsed lectureID: ${lectureID}`);
+
+    if (isNaN(lectureID)) {
+        console.error('Invalid lectureID:', req.params.lectureID);
+        return res.status(400).send('Invalid lecture ID');
+    }
+
+    try {
+        console.log(`Fetching video for lecture ID: ${lectureID}`);
+        const videoData = await Lectures.getLectureVideoByID(lectureID);
+        if (videoData) {
+            res.writeHead(200, {
+                'Content-Type': 'video/mp4', // Adjust MIME type as needed
+                'Content-Length': videoData.length
+            });
+            res.end(videoData);
+        } else {
+            res.status(404).send('Video not found');
         }
+    } catch (error) {
+        console.error('Error serving video:', error);
+        res.status(500).send('Internal server error');
+    }
+};
+
+const getLecturesByCourseID = async (req, res) => {
+    const courseID = parseInt(req.params.courseID);
+    console.log(`Received courseID: ${courseID}`);
+
+    if (isNaN(courseID)) {
+        console.error('Invalid courseID:', courseID);
+        return res.status(400).send('Invalid course ID');
+    }
+
+    try {
+        console.log(`Fetching lectures for course ID: ${courseID}`);
+        const lectures = await Lectures.getLecturesByCourseID(courseID);
+        res.json(lectures);
+    } catch (error) {
+        console.error('Error fetching lectures:', error);
+        res.status(500).send('Internal server error');
     }
 };
 
@@ -134,5 +160,6 @@ module.exports = {
     createLecture,
     deleteLecture,
     getLastChapterName,
-    upload 
+    getLectureVideoByID,
+    getLecturesByCourseID
 };

@@ -2,13 +2,12 @@ const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
 class Lectures {
-    constructor(lectureID, courseID, lecturerID, title, description, videoURL, video, lectureImage, duration, position, createdAt, chapterName) {
+    constructor(lectureID, courseID, userID, title, description, video, lectureImage, duration, position, createdAt, chapterName) {
         this.lectureID = lectureID;
         this.courseID = courseID;
-        this.lecturerID = lecturerID;
+        this.userID = userID;
         this.title = title;
         this.description = description;
-        this.videoURL = videoURL;
         this.video = video;
         this.lectureImage = lectureImage;
         this.duration = duration;
@@ -25,10 +24,9 @@ class Lectures {
             return result.recordset.map(row => new Lectures(
                 row.LectureID,
                 row.CourseID,
-                row.LecturerID,
+                row.UserID,
                 row.Title,
                 row.Description,
-                row.VideoURL,
                 row.Video,
                 row.LectureImage,
                 row.Duration,
@@ -44,38 +42,39 @@ class Lectures {
         }
     }
 
-    static async getLectureByID(id) {
-        let connection = await sql.connect(dbConfig);
-        try {
-            const sqlQuery = `SELECT * FROM Lectures WHERE LectureID = @id`;
-            const request = connection.request();
-            request.input('id', sql.Int, id);
-            const result = await request.query(sqlQuery);
+// getting lectures by course ID
+static async getLectureByID(id) {
+    let connection = await sql.connect(dbConfig);
+    try {
+        const sqlQuery = `SELECT * FROM Lectures WHERE CourseID = @courseID`;
+        const request = connection.request();
+        request.input('courseID', sql.Int, id);
+        const result = await request.query(sqlQuery);
 
-            if (result.recordset.length === 0) {
-                return null;
-            }
-            const lecture = result.recordset[0];
-            return new Lectures(
-                lecture.CourseID,
-                lecture.LecturerID,
-                lecture.Title,
-                lecture.Description,
-                lecture.VideoURL,
-                lecture.Video,
-                lecture.LectureImage,
-                lecture.Duration,
-                lecture.Position,
-                lecture.CreatedAt,
-                lecture.ChapterName
-            );
-        } catch (error) {
-            console.error('Error retrieving lecture: ', error);
-            throw error;
-        } finally {
-            await connection.close();
+        if (result.recordset.length === 0) {
+            return null;
         }
+
+        return result.recordset.map(lecture => new Lectures(
+            lecture.LectureID,
+            lecture.CourseID,
+            lecture.UserID,
+            lecture.Title,
+            lecture.Description,
+            lecture.Video,
+            lecture.LectureImage,
+            lecture.Duration,
+            lecture.Position,
+            lecture.CreatedAt,
+            lecture.ChapterName
+        ));
+    } catch (error) {
+        console.error('Error retrieving lectures: ', error);
+        throw error;
+    } finally {
+        await connection.close();
     }
+}
 
     static async updateLecture(id, newLectureData) {
         let connection = await sql.connect(dbConfig);
@@ -83,10 +82,9 @@ class Lectures {
             const sqlQuery = `
                 UPDATE Lectures SET 
                 CourseID = @courseID,
-                LecturerID = @lecturerID,
+                UserID = @userID,
                 Title = @title,
                 Description = @description,
-                VideoURL = @videoURL,
                 Video = @video,
                 LectureImage = @lectureImage,
                 Duration = @duration,
@@ -97,10 +95,9 @@ class Lectures {
             const request = connection.request();
             request.input('id', sql.Int, id);
             request.input('courseID', sql.Int, newLectureData.CourseID);
-            request.input('lecturerID', sql.Int, newLectureData.LecturerID);
+            request.input('userID', sql.Int, newLectureData.UserID);
             request.input('title', sql.NVarChar, newLectureData.Title);
             request.input('description', sql.NVarChar, newLectureData.Description);
-            request.input('videoURL', sql.NVarChar, newLectureData.VideoURL);
             request.input('video', sql.VarBinary, newLectureData.Video);
             request.input('lectureImage', sql.VarBinary, newLectureData.LectureImage);
             request.input('duration', sql.Int, newLectureData.Duration);
@@ -123,16 +120,15 @@ class Lectures {
         try {
             pool = await sql.connect(dbConfig);
             const sqlQuery = `
-                INSERT INTO Lectures (CourseID, LecturerID, Title, Description, VideoURL, Video, LectureImage, Duration, Position, ChapterName)
-                VALUES (@CourseID, @LecturerID, @Title, @Description, @VideoURL, @Video, @LectureImage, @Duration, @Position, @ChapterName);
+                INSERT INTO Lectures (CourseID, UserID, Title, Description, Video, LectureImage, Duration, Position, ChapterName)
+                VALUES (@CourseID, @UserID, @Title, @Description, @Video, @LectureImage, @Duration, @Position, @ChapterName);
                 SELECT SCOPE_IDENTITY() AS LectureID;
             `;
             const request = pool.request();
             request.input('CourseID', sql.Int, newLectureData.CourseID || 1); // Assuming 1 as a default value for demonstration
-            request.input('LecturerID', sql.Int, newLectureData.LecturerID);
+            request.input('UserID', sql.Int, newLectureData.UserID);
             request.input('Title', sql.NVarChar, newLectureData.Title);
             request.input('Description', sql.NVarChar, newLectureData.Description);
-            request.input('VideoURL', sql.NVarChar, newLectureData.VideoURL);
             request.input('Video', sql.VarBinary, newLectureData.Video);
             request.input('LectureImage', sql.VarBinary, newLectureData.LectureImage);
             request.input('Duration', sql.Int, newLectureData.Duration);
@@ -166,15 +162,15 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
-  
-    static async getLastChapterName(lecturerID) {
+
+    static async getLastChapterName(userID) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures WHERE LecturerID =  @lecturerID  ORDER BY CreatedAt DESC `;
+            const sqlQuery = `SELECT TOP 1 ChapterName FROM Lectures WHERE UserID =  @userID  ORDER BY CreatedAt DESC `;
             const result = await connection.request()
-            .input('lecturerID', sql.Int, lecturerID)
-            .query(sqlQuery);
+                .input('userID', sql.Int, userID)
+                .query(sqlQuery);
 
             if (result.recordset.length === 0) {
                 console.log("No chapters found in the database.");
@@ -190,10 +186,51 @@ class Lectures {
             await connection.close();
         }
     }
+    static async getLectureVideoByID(lectureID) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            console.log(`Executing query to fetch video for LectureID: ${lectureID}`);
+            const result = await connection.request()
+                .input('lectureID', sql.Int, lectureID)
+                .query('SELECT Video FROM Lectures WHERE LectureID = @lectureID');
     
+            console.log(`Query result: ${result.recordset.length} records found`);
     
+            if (result.recordset.length === 0) {
+                return null;
+            }
+    
+            return result.recordset[0].Video;
+        } catch (error) {
+            console.error('Error retrieving lecture video:', error);
+            throw error;
+        } finally {
+            if (connection) await connection.close();
+        }
+    }
+    static async getLecturesByCourseID(courseID) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            console.log(`Executing query to fetch lectures for CourseID: ${courseID}`);
+            const result = await connection.request()
+                .input('courseID', sql.Int, courseID)
+                .query('SELECT * FROM Lectures WHERE CourseID = @courseID');
 
+            console.log(`Query result: ${result.recordset.length} records found`);
 
+            if (result.recordset.length === 0) {
+                return [];
+            }
+
+            return result.recordset;
+        } catch (error) {
+            console.error('Error retrieving lectures:', error);
+            throw error;
+        } finally {
+            if (connection) await connection.close();
+        }
+    }
 }
-
 module.exports = Lectures;

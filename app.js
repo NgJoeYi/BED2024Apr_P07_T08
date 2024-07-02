@@ -16,10 +16,9 @@ const commentController = require('./controllers/commentController');
 const reviewController = require('./controllers/reviewController');
 const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
-const lecturerController = require('./controllers/lecturerController');
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
-// const jwtAuthorization = require('./middleware/authMiddleware');
+const jwtAuthorization = require('./middleware/authMiddleware');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -40,29 +39,30 @@ const multiUpload = upload.fields([
     {name : 'courseImage', maxCount : 1}
 ]);
 
+// Middleware to ignore favicon requests
+app.get('/favicon.ico', (req, res) => res.status(204));
 
 // Include body-parser middleware to handle JSON data
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Add Routes for users
-app.post('/account/uploadProfilePic/:id', /*jwtAuthorization.verifyJWT,*/ userController.updateProfilePic);
-app.get('/account/profile/:id', userController.getProfilePicByUserId);
+app.post('/register', userValidation, userController.createUser);
+app.post('/login', userController.loginUser);
 
-app.put('/account/:id', updateValidation, userController.updateUser);
-app.post('/users/register', userValidation, userController.createUser);
-app.post('/users/login', userController.loginUser);
-app.get('/account/:id', userController.getUserById);
-app.delete('/account/:id', userController.deleteUser);
-app.get('/current-user/lecturerID/:id',userController.getLecturerIDthroughLogin);
+app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById);
+app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController.updateProfilePic);
+app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
+app.put('/account/:id', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
+app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
-app.get('/discussions/user/:userId', discussionController.getDiscussionsByUser);
-app.get('/discussions/:id', discussionController.getDiscussionById);
-app.post('/discussions', discussionController.createDiscussion);
-app.put('/discussions/:id', discussionController.updateDiscussion);
-app.delete('/discussions/:id', discussionController.deleteDiscussion);
+app.get('/discussions/user', jwtAuthorization.verifyJWT, discussionController.getDiscussionsByUser);
+app.get('/discussions/:id', jwtAuthorization.verifyJWT, jwtAuthorization.verifyJWT, discussionController.getDiscussionById);
+app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.createDiscussion);
+app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.updateDiscussion);
+app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.deleteDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
@@ -80,25 +80,20 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
-app.get('/courses/courseID/:lecturerID',courseController.getCourseID);
 app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
 
 // Add Routes for lectures
-app.get('/lectures', lectureController.getAllLectures);
-app.get('/lectures/:id', lectureController.getLectureByID);
-app.put('/lectures/:id', lectureController.updateLecture);
-app.post('/lectures', multiUpload, lectureController.createLecture); // Removed ensureLoggedIn
-app.delete('/lectures/:id', lectureController.deleteLecture);
-app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); 
+app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
+app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
+app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
+app.put('/lectures/:id', lectureController.updateLecture); 
+app.post('/lectures', multiUpload, lectureController.createLecture); // Creates a new lecture
+app.delete('/lectures/:id', lectureController.deleteLecture); 
+app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
 
-// Add Routes for lecturer
-app.get('/lecturer', lecturerController.getAllLecturers);
-app.get('/lecturer/:id' , lecturerController.getLecturerByID);
-app.put('/lecturer/:id', lecturerController.updateLecturer);
-app.post('/lecturer', lecturerController.createLecturer); 
-app.delete('/lecturer/:id', lecturerController.deleteLecturer);
+
 
 app.listen(port, async () => {
     try {
