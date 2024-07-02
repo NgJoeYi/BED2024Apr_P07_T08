@@ -24,22 +24,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function deleteLecture(button) {
-    // Get the lecture ID from the button's data attribute
     const lectureID = button.dataset.lectureId;
 
-    // Confirm before deletion
     if (!confirm('Are you sure you want to delete this lecture?')) {
         return;
     }
 
     try {
-        // Send DELETE request to the server
         const response = await fetch(`/lectures/${lectureID}`, { method: 'DELETE' });
 
         if (response.ok) {
             alert('Lecture deleted successfully!');
-            // Remove the lecture element from the DOM
             button.closest('.sub-nav-item').remove();
+            // Clear video if the deleted lecture is currently playing
+            const currentVideoLectureID = document.querySelector('.main-content iframe').dataset.lectureId;
+            if (currentVideoLectureID === lectureID) {
+                clearVideo();
+            }
+            getLecturesByCourse();
         } else {
             console.error('Failed to delete lecture. Status:', response.status);
             alert('Failed to delete the lecture.');
@@ -48,6 +50,12 @@ async function deleteLecture(button) {
         console.error('Error deleting lecture:', error);
         alert('Error deleting lecture.');
     }
+}
+
+function clearVideo() {
+    const videoIframe = document.querySelector('.main-content iframe');
+    videoIframe.src = ''; // Clear the video source
+    videoIframe.dataset.lectureId = ''; // Clear the data attribute
 }
 
 async function getLecturesByCourse() {
@@ -74,7 +82,6 @@ function displayLectures(lectures) {
     const sidebar = document.querySelector('.sidebar .nav');
     sidebar.innerHTML = ''; // Clear existing content
 
-    // GROUPING LECTURES ACCORDING TO CHAPTER NAME 
     const groupedLectures = {};
 
     lectures.forEach(lecture => {
@@ -88,6 +95,7 @@ function displayLectures(lectures) {
 
     const userRole = sessionStorage.getItem('role'); // Get user role
     console.log('USER ROLE:', userRole);
+
     for (const chapterName in groupedLectures) {
         const navItem = document.createElement('div');
         navItem.className = 'nav-item';
@@ -96,10 +104,10 @@ function displayLectures(lectures) {
             .map(lecture => {
                 const deleteButton = 
                     userRole === 'lecturer'
-                    ? `<button class="delete-lecture" style = "display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>` 
+                    ? `<button class="delete-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>` 
                     : '';
     
-                return  `
+                return `
                     <div class="sub-nav-item" data-lecture-id="${lecture.LectureID}">
                         ${lecture.Title}
                         ${deleteButton}
@@ -107,16 +115,18 @@ function displayLectures(lectures) {
                 `;
             }).join('');
 
+        console.log('Generated HTML:', subNavItems);
+
         navItem.innerHTML = `
             <div class="nav-title">
-                ${chapterName} 
+                ${chapterName}
                 <span>&#9660;</span>
             </div>
             <div class="sub-nav" style="display: none;">
                 ${subNavItems}
             </div>
         `;
-        console.log('Generated HTML:', subNavItems); 
+
         sidebar.appendChild(navItem);
     }
 
@@ -146,7 +156,6 @@ function displayLectures(lectures) {
     }
 }
 
-
 async function setVideo(lectureID) {
     const videoIframe = document.querySelector('.main-content iframe');
 
@@ -156,6 +165,7 @@ async function setVideo(lectureID) {
         const videoBlob = await response.blob();
         const videoUrl = URL.createObjectURL(videoBlob);
         videoIframe.src = videoUrl;
+        videoIframe.dataset.lectureId = lectureID; // Set the data attribute
     } catch (error) {
         console.error('Error setting video:', error);
     }
