@@ -171,7 +171,7 @@ async function run() {
         
         // Read external file
         const videoBuffer = fs.readFileSync(videoFilePath);
-        const video2Buffer = fs.readdirSync(video2path);
+        const video2Buffer = fs.readFileSync(video2path);
         const imageBuffer = fs.readFileSync(lectureImage);
 
         // Insert data into Lectures table
