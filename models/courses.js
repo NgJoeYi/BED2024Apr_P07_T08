@@ -98,7 +98,10 @@ class Courses {
             pool = await sql.connect(dbConfig);
             const sqlQuery = `
             DELETE FROM Lectures WHERE CourseID = @id;
-            DELETE FROM Courses WHERE CourseID = @id`;
+            DELETE FROM Courses WHERE CourseID = @id
+            // DELETE FROM Courses
+            // WHERE CourseID NOT IN (SELECT DISTINCT CourseID FROM Lectures);
+            `;
             const request = pool.request();
             request.input('id', sql.Int, id);
             const result = await request.query(sqlQuery);

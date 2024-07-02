@@ -96,6 +96,12 @@ function displayLectures(lectures) {
     const userRole = sessionStorage.getItem('role'); // Get user role
     console.log('USER ROLE:', userRole);
 
+    // Check if there are any lectures
+    if (Object.keys(groupedLectures).length === 0) {
+        window.location.href = 'courses.html';
+        return;
+    }
+
     for (const chapterName in groupedLectures) {
         const navItem = document.createElement('div');
         navItem.className = 'nav-item';
@@ -155,7 +161,6 @@ function displayLectures(lectures) {
         setVideo(firstLectureID);
     }
 }
-
 async function setVideo(lectureID) {
     const videoIframe = document.querySelector('.main-content iframe');
 
@@ -171,6 +176,7 @@ async function setVideo(lectureID) {
     }
 }
 
+ // REVIEWS
 function showPopup(type) {
     const popup = document.getElementById('popup');
     const popupContent = popup.querySelector('.popup-content h2');
