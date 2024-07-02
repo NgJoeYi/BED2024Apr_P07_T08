@@ -1,13 +1,6 @@
 const Lectures = require("../models/Lectures");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-const sql = require("mssql");
-const dbConfig = require('../dbConfig');
+const jwt = require('jsonwebtoken'); 
 
-// Multer setup for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 const getAllLectures = async (req, res) => {
     try {
@@ -18,7 +11,7 @@ const getAllLectures = async (req, res) => {
         res.status(500).send('Error retrieving lectures');
     }
 };
-
+// get lecture by courseID
 const getLectureByID = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -118,6 +111,5 @@ module.exports = {
     updateLecture,
     createLecture,
     deleteLecture,
-    getLastChapterName,
-    upload
+    getLastChapterName
 };
