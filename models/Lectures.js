@@ -186,6 +186,51 @@ static async getLectureByID(id) {
             await connection.close();
         }
     }
-}
+    static async getLectureVideoByID(lectureID) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            console.log(`Executing query to fetch video for LectureID: ${lectureID}`);
+            const result = await connection.request()
+                .input('lectureID', sql.Int, lectureID)
+                .query('SELECT Video FROM Lectures WHERE LectureID = @lectureID');
+    
+            console.log(`Query result: ${result.recordset.length} records found`);
+    
+            if (result.recordset.length === 0) {
+                return null;
+            }
+    
+            return result.recordset[0].Video;
+        } catch (error) {
+            console.error('Error retrieving lecture video:', error);
+            throw error;
+        } finally {
+            if (connection) await connection.close();
+        }
+    }
+    static async getLecturesByCourseID(courseID) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            console.log(`Executing query to fetch lectures for CourseID: ${courseID}`);
+            const result = await connection.request()
+                .input('courseID', sql.Int, courseID)
+                .query('SELECT * FROM Lectures WHERE CourseID = @courseID');
 
+            console.log(`Query result: ${result.recordset.length} records found`);
+
+            if (result.recordset.length === 0) {
+                return [];
+            }
+
+            return result.recordset;
+        } catch (error) {
+            console.error('Error retrieving lectures:', error);
+            throw error;
+        } finally {
+            if (connection) await connection.close();
+        }
+    }
+}
 module.exports = Lectures;

@@ -19,7 +19,7 @@ async function getLecturesByCourse() {
     }
 
     try {
-        const response = await fetch(`/lectures/${courseID}`);
+        const response = await fetch(`/lectures/course/${courseID}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -50,7 +50,7 @@ function displayLectures(lectures) {
         navItem.className = 'nav-item';
 
         const subNavItems = groupedLectures[chapterName]
-            .map(lecture => `<div class="sub-nav-item">${lecture.Title}</div>`)
+            .map(lecture => `<div class="sub-nav-item" data-lecture-id="${lecture.LectureID}">${lecture.Title}</div>`)
             .join('');
 
         navItem.innerHTML = `
@@ -71,48 +71,39 @@ function displayLectures(lectures) {
             subNav.style.display = subNav.style.display === "none" ? "block" : "none";
         });
     });
+
+    // Add click event listeners to sub-nav items to load the video
+    const subNavItems = document.querySelectorAll('.sub-nav-item');
+    subNavItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const lectureID = this.getAttribute('data-lecture-id');
+            console.log(`Fetching video for lecture ID: ${lectureID}`);
+            setVideo(lectureID);
+            subNavItems.forEach(item => item.style.fontWeight = 'normal');
+            this.style.fontWeight = 'bold';
+        });
+    });
+
+    // Set the first lecture video on page load
+    if (lectures.length > 0) {
+        const firstLectureID = lectures[0].LectureID;
+        console.log(`Setting video for the first lecture: ${firstLectureID}`);
+        setVideo(firstLectureID);
+    }
 }
 
-function displayLectures(lectures) {
-    const sidebar = document.querySelector('.sidebar .nav');
-    sidebar.innerHTML = ''; 
+async function setVideo(lectureID) {
+    const videoIframe = document.querySelector('.main-content iframe');
 
-    // Group lectures by chapterName
-    const groupedLectures = lectures.reduce((acc, lecture) => {
-        if (!acc[lecture.chapterName]) {
-            acc[lecture.chapterName] = [];
-        }
-        acc[lecture.chapterName].push(lecture);
-        return acc;
-    }, {});
-
-    // Render lectures grouped by chapterName
-    for (const chapterName in groupedLectures) {
-        const navItem = document.createElement('div');
-        navItem.className = 'nav-item';
-
-        const subNavItems = groupedLectures[chapterName]
-            .map(lecture => `<div class="sub-nav-item">${lecture.title}</div>`)
-            .join('');
-
-        navItem.innerHTML = `
-            <div class="nav-title">${chapterName} <span>&#9660;</span></div>
-            <div class="sub-nav" style="display: none;">
-                ${subNavItems}
-            </div>
-        `;
-
-        sidebar.appendChild(navItem);
+    try {
+        const response = await fetch(`/video/${lectureID}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const videoBlob = await response.blob();
+        const videoUrl = URL.createObjectURL(videoBlob);
+        videoIframe.src = videoUrl;
+    } catch (error) {
+        console.error('Error setting video:', error);
     }
-
-    // Add click event listeners to toggle sub-nav display
-    const navTitles = document.querySelectorAll('.nav-title');
-    navTitles.forEach(title => {
-        title.addEventListener('click', () => {
-            const subNav = title.nextElementSibling;
-            subNav.style.display = subNav.style.display === "none" ? "block" : "none";
-        });
-    });
 }
 
 function fetchReviews() {

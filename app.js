@@ -83,12 +83,14 @@ app.post('/courses', upload.single('imageFile'), courseController.createCourse);
 app.delete('/courses/:id', courseController.deleteCourse);
 
 // Add Routes for lectures
-app.get('/lectures', lectureController.getAllLectures);
-app.get('/lectures/:id', lectureController.getLectureByID);
-app.put('/lectures/:id', lectureController.updateLecture);
-app.post('/lectures', multiUpload, lectureController.createLecture); // Removed ensureLoggedIn
-app.delete('/lectures/:id', lectureController.deleteLecture);
-app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); 
+app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
+app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
+app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
+app.put('/lectures/:id', lectureController.updateLecture); 
+app.post('/lectures', multiUpload, lectureController.createLecture); // Creates a new lecture
+app.delete('/lectures/:id', lectureController.deleteLecture); 
+app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
+
 
 
 app.listen(port, async () => {

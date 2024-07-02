@@ -103,7 +103,55 @@ const createLecture = async (req, res) => {
         console.error('Error creating lecture:', error);
         res.status(500).send('Error creating lecture');
     }
+}
+ 
+const getLectureVideoByID = async (req, res) => {
+    const lectureID = parseInt(req.params.lectureID, 10);
+    console.log(`Received lectureID: ${req.params.lectureID}`);
+    console.log(`Parsed lectureID: ${lectureID}`);
+
+    if (isNaN(lectureID)) {
+        console.error('Invalid lectureID:', req.params.lectureID);
+        return res.status(400).send('Invalid lecture ID');
+    }
+
+    try {
+        console.log(`Fetching video for lecture ID: ${lectureID}`);
+        const videoData = await Lectures.getLectureVideoByID(lectureID);
+        if (videoData) {
+            res.writeHead(200, {
+                'Content-Type': 'video/mp4', // Adjust MIME type as needed
+                'Content-Length': videoData.length
+            });
+            res.end(videoData);
+        } else {
+            res.status(404).send('Video not found');
+        }
+    } catch (error) {
+        console.error('Error serving video:', error);
+        res.status(500).send('Internal server error');
+    }
 };
+
+const getLecturesByCourseID = async (req, res) => {
+    const courseID = parseInt(req.params.courseID);
+    console.log(`Received courseID: ${courseID}`);
+
+    if (isNaN(courseID)) {
+        console.error('Invalid courseID:', courseID);
+        return res.status(400).send('Invalid course ID');
+    }
+
+    try {
+        console.log(`Fetching lectures for course ID: ${courseID}`);
+        const lectures = await Lectures.getLecturesByCourseID(courseID);
+        res.json(lectures);
+    } catch (error) {
+        console.error('Error fetching lectures:', error);
+        res.status(500).send('Internal server error');
+    }
+};
+
 
 module.exports = {
     getAllLectures,
@@ -111,5 +159,7 @@ module.exports = {
     updateLecture,
     createLecture,
     deleteLecture,
-    getLastChapterName
+    getLastChapterName,
+    getLectureVideoByID,
+    getLecturesByCourseID
 };
