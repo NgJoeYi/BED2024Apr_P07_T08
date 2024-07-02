@@ -33,7 +33,7 @@ document.getElementById('register-form').addEventListener('submit', async functi
     });
 
     try {
-        const response = await fetch('/users/register', {
+        const response = await fetch('/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
