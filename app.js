@@ -83,6 +83,7 @@ app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
+app.delete('/courses/noLectures',courseController.deleteCourseWithNoLectures);
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures

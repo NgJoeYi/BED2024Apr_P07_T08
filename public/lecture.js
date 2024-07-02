@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function deleteLecture(button) {
     const lectureID = button.dataset.lectureId;
+    const courseID = new URLSearchParams(window.location.search).get('courseID');
 
     if (!confirm('Are you sure you want to delete this lecture?')) {
         return;
@@ -36,12 +37,30 @@ async function deleteLecture(button) {
         if (response.ok) {
             alert('Lecture deleted successfully!');
             button.closest('.sub-nav-item').remove();
+
             // Clear video if the deleted lecture is currently playing
             const currentVideoLectureID = document.querySelector('.main-content iframe').dataset.lectureId;
             if (currentVideoLectureID === lectureID) {
                 clearVideo();
             }
-            getLecturesByCourse();
+
+            // Check if there are any remaining lectures for the course
+            const lecturesResponse = await fetch(`/lectures/course/${courseID}`);
+            const lectures = await lecturesResponse.json();
+
+            if (lectures.length === 0) {
+                // No more lectures, delete the course
+                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { method: 'DELETE' });
+                if (deleteCourseResponse.ok) {
+                    alert('Course deleted successfully!');
+                    window.location.href = 'courses.html';
+                } else {
+                    console.error('Failed to delete course. Status:', deleteCourseResponse.status);
+                }
+            } else {
+                // If there are remaining lectures, reload them
+                getLecturesByCourse();
+            }
         } else {
             console.error('Failed to delete lecture. Status:', response.status);
             alert('Failed to delete the lecture.');
