@@ -7,7 +7,7 @@ document.getElementById('login-contact-form').addEventListener('submit', async f
     });
 
     try {
-        const loginResponse = await fetch('/users/login', {
+        const loginResponse = await fetch('/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

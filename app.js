@@ -45,13 +45,13 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Add Routes for users
+app.post('/register', userValidation, userController.createUser);
+app.post('/login', userController.loginUser);
+
+app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById);
 app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController.updateProfilePic);
 app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
-
-app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
-app.post('/users/register', userValidation, userController.createUser);
-app.post('/users/login', userController.loginUser);
-app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById);
+app.put('/account/:id', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 
 // Add Routes for discussions
