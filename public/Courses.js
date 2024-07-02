@@ -1,5 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     checkUserRoleAndFetchCourses();
+
+    // Add click event listeners to course elements
+    const courseElements = document.querySelectorAll('.course-cd-unique a');
+    courseElements.forEach(courseElement => {
+        courseElement.addEventListener('click', function(event) {
+            const courseID = this.closest('.course-cd-unique').dataset.courseId;
+            // Pass the course ID in the URL as a query parameter
+            this.href = `lecture.html?courseID=${courseID}`;
+        });
+    });
 });
 
 async function fetchCourses() {
@@ -25,12 +35,13 @@ function displayCourses(courses) {
         courseElement.className = 'course-cd-unique';
         courseElement.dataset.category = course.category;
         courseElement.dataset.date = course.createdAt;
+        courseElement.dataset.courseId = course.courseID; // Add courseID to data attribute
 
         // Fetch the image from the new endpoint
         const imageUrl = `/courses/image/${course.courseID}`;
 
         courseElement.innerHTML = `
-            <a href="lecture.html">
+            <a href="lecture.html?courseID=${course.courseID}">
                 <img src="${imageUrl}" alt="Course Image">
                 <div class="course-details-unique">
                     <p class="category">${course.category}</p>
@@ -45,6 +56,7 @@ function displayCourses(courses) {
                 </div>
             </a>
         `;
+        console.log('COURSE ID IN HTML: ', course.courseID);
         coursesGrid.appendChild(courseElement);
     });
 }

@@ -162,14 +162,16 @@ async function run() {
         // Path to external files 
         // WY, RAEANN, JOEYI'S
         const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
+        const video2path = path.join(__dirname,'../BED2024Apr_P07_T08/public/lectureVideos/video2.mp4');
         const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
-        
+
         //AMELIA'S
         // const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureVideos/video1.mp4');
         // const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureImage/lecture1.jpeg');
         
         // Read external file
         const videoBuffer = fs.readFileSync(videoFilePath);
+        const video2Buffer = fs.readFileSync(video2path);
         const imageBuffer = fs.readFileSync(lectureImage);
 
         // Insert data into Lectures table
@@ -181,23 +183,24 @@ async function run() {
 
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
-        'Data Types in Python', 'Understanding different data types in Python.', @video, @lectureImage, 90, 2, 'Chapter Two'),
+        'Data Types in Python', 'Understanding different data types in Python.', @video2, @lectureImage, 90, 2, 'Chapter Two'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
         (SELECT id FROM Users WHERE email = 'bob_brown@example.com'), 
         'Algebraic Structures', 'Exploring advanced algebraic structures.', @video, @lectureImage, 120, 1, 'Introduction'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
         (SELECT id FROM Users WHERE email = 'bob_brown@example.com'), 
-        'Polynomial Equations', 'Solving polynomial equations in algebra.',  @video, @lectureImage, 100, 2, 'Chapter Two'),
+        'Polynomial Equations', 'Solving polynomial equations in algebra.',  @video2, @lectureImage, 100, 2, 'Chapter Two'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
         'SEO Basics', 'Introduction to Search Engine Optimization.',  @video, @lectureImage, 75, 1, 'Introduction'),
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
-        'Content Marketing', 'Strategies for effective content marketing.', @video, @lectureImage, 85, 2, 'Chapter Two');
+        'Content Marketing', 'Strategies for effective content marketing.', @video2, @lectureImage, 85, 2, 'Chapter Two');
         `;
         await connection.request()
         .input('video', sql.VarBinary, videoBuffer)
         .input('lectureImage', sql.VarBinary, imageBuffer)
+        .input('video2',video2Buffer)
         .query(insertLectures);
 
         // Insert data into user_reviews table
