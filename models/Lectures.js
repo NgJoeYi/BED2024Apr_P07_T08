@@ -261,6 +261,24 @@ class Lectures {
             if (pool) await pool.close();
         }
     }
+
+    static async deletingChapterName(courseID, chapterName) {
+        let connection = await sql.connect(dbConfig);
+        try {
+            const sqlQuery = `DELETE FROM Lectures WHERE CourseID = @courseID AND ChapterName = @chapterName`;
+            const request = connection.request();
+            request.input('courseID', sql.Int, courseID);
+            request.input('chapterName', sql.NVarChar, chapterName);
+            const result = await request.query(sqlQuery);
+            return result.rowsAffected[0] > 0;
+        } catch (error) {
+            console.error('Error deleting chapter:', error);
+            throw error;
+        } finally {
+            if (connection) await connection.close();
+        }
+    }
+    
     
         
 }

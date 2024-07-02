@@ -53,6 +53,20 @@ const deleteLecture = async (req, res) => {
     }
 };
 
+const deletingChapterName = async (req, res) => {
+    const { courseID, chapterName } = req.params;
+    try {
+        const success = await Lectures.deletingChapterName(courseID, chapterName);
+        if (!success) {
+            return res.status(404).send("Chapter not found");
+        }
+        res.status(204).send("Lectures successfully deleted");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error deleting lectures");
+    }
+}
+
 const getLastChapterName = async (req, res) => {
     const lecturerID = parseInt(req.params.id);
     try {
@@ -171,6 +185,7 @@ module.exports = {
     updateLecture,
     createLecture,
     deleteLecture,
+    deletingChapterName,
     getLastChapterName,
     getLectureVideoByID,
     getLecturesByCourseID,

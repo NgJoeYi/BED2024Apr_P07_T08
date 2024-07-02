@@ -71,6 +71,48 @@ async function deleteLecture(button) {
     }
 }
 
+async function deleteChapter(button) {
+    const chapterName = button.dataset.chapterName;
+    const courseID = new URLSearchParams(window.location.search).get('courseID');
+
+    if (!confirm(`Are you sure you want to delete the entire chapter: ${chapterName}?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/lectures/course/${courseID}/chapter/${chapterName}`, { method: 'DELETE' });
+
+        if (response.ok) {
+            alert(`Chapter ${chapterName} deleted successfully!`);
+            button.closest('.nav-item').remove();
+
+            // Check if there are any remaining lectures for the course
+            const lecturesResponse = await fetch(`/lectures/course/${courseID}`);
+            const lectures = await lecturesResponse.json();
+
+            if (lectures.length === 0) {
+                // No more lectures, delete the course
+                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { method: 'DELETE' });
+                if (deleteCourseResponse.ok) {
+                    alert('Course deleted successfully!');
+                    window.location.href = 'courses.html';
+                } else {
+                    console.error('Failed to delete course. Status:', deleteCourseResponse.status);
+                }
+            } else {
+                // If there are remaining lectures, reload them
+                getLecturesByCourse();
+            }
+        } else {
+            console.error('Failed to delete chapter. Status:', response.status);
+            alert('Failed to delete the chapter.');
+        }
+    } catch (error) {
+        console.error('Error deleting chapter:', error);
+        alert('Error deleting chapter.');
+    }
+}
+
 function clearVideo() {
     const videoIframe = document.querySelector('.main-content iframe');
     videoIframe.src = ''; // Clear the video source
@@ -125,6 +167,11 @@ function displayLectures(lectures) {
         const navItem = document.createElement('div');
         navItem.className = 'nav-item';
 
+        const deleteChapterButton = 
+            userRole === 'lecturer'
+            ? `<button class="delete-chapter" style="display:block;" data-chapter-name="${chapterName}" onclick="deleteChapter(this)">Delete Chapter</button>` 
+            : '';
+
         const subNavItems = groupedLectures[chapterName]
             .map(lecture => {
                 const deleteButton = 
@@ -146,6 +193,7 @@ function displayLectures(lectures) {
             <div class="nav-title">
                 ${chapterName}
                 <span>&#9660;</span>
+                ${deleteChapterButton}
             </div>
             <div class="sub-nav" style="display: none;">
                 ${subNavItems}
@@ -180,6 +228,7 @@ function displayLectures(lectures) {
         setVideo(firstLectureID);
     }
 }
+
 async function setVideo(lectureID) {
     const videoIframe = document.querySelector('.main-content iframe');
 

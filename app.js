@@ -85,6 +85,7 @@ app.post('/courses', upload.single('imageFile'), courseController.createCourse);
 app.delete('/courses/:id', courseController.deleteCourse);
 app.delete('/courses/noLectures',courseController.deleteCourseWithNoLectures);
 
+
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
@@ -93,7 +94,9 @@ app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting
 app.put('/lectures/:id', lectureController.updateLecture); 
 app.post('/lectures', multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', lectureController.deleteLecture); 
+app.delete('/lectures/course/:courseID/chapter/:chapterName', lectureController.deletingChapterName); // Updated route
 app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
+
 
 
 app.listen(port, async () => {
