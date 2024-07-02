@@ -381,3 +381,228 @@ async function setVideo(lectureID) {
         console.error('Error setting video:', error);
     }
 }
+
+// Fetch the last chapter name for a specific user
+async function fetchLastChapterName() {
+    const userID = sessionStorage.getItem('userId'); 
+    console.log("Fetching chapter for user ID:", userID);
+    if (!userID) {
+        console.error("User ID not found in sessionStorage.");
+        return null; 
+    }
+    console.log('USER ID: ',userID);
+    try {
+        const response = await fetch(`/lectures/last-chapter/${userID}`);
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Fetched last chapter name:", data.chapterName);
+            return data.chapterName;
+        } else {
+            console.error("Failed to fetch last chapter name. Status:", response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching last chapter name:', error);
+        return null;
+    }
+}
+
+// Fetch the max course ID from the server
+async function fetchMaxCourseID() {
+    try {
+        const response = await fetch('/lectures/max-course-id');
+        if (response.ok) {
+            const data = await response.json();
+            return data.maxCourseID;
+        } else {
+            console.error("Failed to fetch max course ID. Status:", response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching max course ID:', error);
+        return null;
+    }
+}
+
+// Function to add files
+async function addFiles() {
+    const previousChapterName = await fetchLastChapterName();
+    const chapterNameInput = document.getElementById('chapterName').value.trim();
+    const title = document.getElementById('lectureName').value.trim();
+    const duration = document.getElementById('duration-lecture').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const videoFileInput = document.getElementById('videoFiles');
+    const imageFileInput = document.getElementById('lectureImage');
+
+    console.log("Chapter Name Input:", chapterNameInput);
+    console.log("Title:", title);
+    console.log("Duration:", duration);
+    console.log("Description:", description);
+
+    const userID = sessionStorage.getItem('userId');
+    const courseID = await fetchMaxCourseID();
+
+    console.log("userID from Session:", userID);
+    console.log("courseID from Input:", courseID);
+
+    if (!userID) {
+        alert('User ID not found. Please log in again.');
+        return;
+    }
+
+    if (!courseID) {
+        alert('Course ID not found. Please select a course.');
+        return;
+    }
+
+    if (!title || !duration || !description || videoFileInput.files.length === 0 || imageFileInput.files.length === 0) {
+        alert('Please fill in all fields and select at least one file.');
+        return;
+    }
+
+    let chapterName = chapterNameInput || previousChapterName;
+    console.log('Final Chapter Name to Use:', chapterName);
+    if (!chapterName) {
+        alert('Please enter a chapter name.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('UserID', userID);
+    formData.append('CourseID', courseID);
+    formData.append('ChapterName', chapterName);
+    formData.append('Title', title);
+    formData.append('Duration', duration);
+    formData.append('Description', description);
+    Array.from(videoFileInput.files).forEach(file => formData.append('Video', file));
+    Array.from(imageFileInput.files).forEach(file => formData.append('LectureImage', file));
+
+    try {
+        const response = await fetch('/lectures', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const newLecture = await response.json();
+            displayNewLecture(newLecture, videoFileInput.files, imageFileInput.files);
+            closeModal();
+            console.log("Lecture added successfully");
+        } else {
+            throw new Error('Failed to save the lecture');
+        }
+    } catch (error) {
+        console.error('Error saving the lecture:', error);
+        alert('Error saving the lecture.');
+    }
+}
+
+function displayNewLecture(newLecture, videoFiles, imageFiles) {
+    const courseArrangement = document.getElementById('course-arrangement');
+
+    const newChapterDiv = document.createElement('div');
+    newChapterDiv.className = 'chapter';
+    newChapterDiv.contentEditable = 'false';
+
+    const chapterNameElement = document.createElement('div');
+    chapterNameElement.className = 'chapter-name';
+    chapterNameElement.innerHTML = `
+        <p contenteditable="true" class="editable-placeholder">Chapter Name: ${newLecture.ChapterName}</p>
+        <span class="delete-chapter-icon" onclick="removeChapter(this)">
+            <i class="fa-solid fa-x" style="color: #ff3838;"></i>
+        </span>
+    `;
+
+    const lectureDetails = document.createElement('div');
+    lectureDetails.className = 'lecture-details';
+    lectureDetails.innerHTML = `
+        <p>Lecture Name: ${newLecture.Title}</p>
+        <p>Duration: ${newLecture.Duration} minutes</p>
+        <p>Description: ${newLecture.Description}</p>
+    `;
+
+    const imageFile = imageFiles[0];
+    const imageURL = URL.createObjectURL(imageFile);
+    const imageElement = document.createElement('img');
+    imageElement.src = imageURL;
+    imageElement.alt = 'Lecture Image';
+    imageElement.width = 200;
+    imageElement.height = 200;
+    lectureDetails.appendChild(imageElement);
+
+    const videoFileNames = Array.from(videoFiles).map(file => file.name).join(', ');
+    const videoElement = document.createElement('p');
+    videoElement.textContent = `Lecture Video: ${videoFileNames}`;
+    lectureDetails.appendChild(videoElement);
+
+    newChapterDiv.appendChild(chapterNameElement);
+    newChapterDiv.appendChild(lectureDetails);
+
+    courseArrangement.insertBefore(newChapterDiv, courseArrangement.querySelector('.new-btn-container'));
+
+    resetForm();
+}
+
+function resetForm() {
+    document.getElementById('chapterName').value = '';
+    document.getElementById('lectureName').value = '';
+    document.getElementById('duration').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('videoFiles').value = '';
+    document.getElementById('lectureImage').value = '';
+    console.log("Form reset completed");
+}
+
+async function addCourses() {
+    const userID = sessionStorage.getItem('userId');
+    const title = document.getElementById('course-name-text').textContent.trim();
+    const description = document.getElementById('course-details').textContent.trim();
+    const category = document.getElementById('category').value.trim();
+    const level = document.getElementById('level').value.trim();
+    const duration = document.getElementById('duration').value.trim();
+    const courseImageInput = document.getElementById('imageFile');
+    const courseArrangement = document.getElementById('course-arrangement');
+
+    if (!userID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
+        alert('Please complete entering course information and select an image.');
+        return;
+    }
+
+    const chapters = courseArrangement.querySelectorAll('.chapter');
+    if (chapters.length === 0) {
+        alert('Please add at least one lecture before submitting the course.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('userID', userID);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('level', level);
+    formData.append('duration', duration);
+    formData.append('imageFile', courseImageInput.files[0]); // Ensure this matches the form field name
+
+    try {
+        const response = await fetch('/courses', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const newCourse = await response.json();
+            alert('Course saved successfully');
+            window.location.href = 'Courses.html'; // Redirect on successful creation
+        } else {
+            const errorData = await response.json();
+            alert(`Failed to save the course: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error('Error saving the course:', error);
+        alert('Error saving the course.');
+    }
+
+    // Show the lectures arrangement section and hide submit and cancel buttons
+    document.getElementById('course-arrangement').style.display = 'block';
+    document.querySelector('.button-container').style.display = 'none';
+}

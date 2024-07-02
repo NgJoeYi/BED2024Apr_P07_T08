@@ -12,19 +12,19 @@ const getAllLectures = async (req, res) => {
     }
 };
 // get lecture by courseID
-const getLectureByID = async (req, res) => {
-    const id = parseInt(req.params.id);
-    try {
-        const lecture = await Lectures.getLectureByID(id);
-        if (!lecture) {
-            return res.status(404).send('Lecture not found!');
-        }
-        res.json(lecture);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error retrieving lecture");
-    }
-};
+// const getLectureByID = async (req, res) => {
+//     const id = parseInt(req.params.id);
+//     try {
+//         const lecture = await Lectures.getLectureByID(id);
+//         if (!lecture) {
+//             return res.status(404).send('Lecture not found!');
+//         }
+//         res.json(lecture);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send("Error retrieving lecture");
+//     }
+// };
 
 const updateLecture = async (req, res) => {
     const id = parseInt(req.params.id);
@@ -68,19 +68,33 @@ const getLastChapterName = async (req, res) => {
         res.status(500).send('Error getting chapter name');
     }
 };
+const getMaxCourseID = async (req, res) => {
+    try {
+        const maxCourseID = await Lectures.getMaxCourseID();
+        res.status(200).json({ maxCourseID });
+    } catch (error) {
+        console.error('Error retrieving max CourseID:', error);
+        res.status(500).send('Error retrieving max CourseID');
+    }
+};
 
 const createLecture = async (req, res) => {
-    const { Title, Duration, Description, ChapterName, UserID } = req.body;
-    console.log('UserID from request body:', UserID); // Log the UserID from the request body
+    const { Title, Duration, Description, ChapterName, UserID, CourseID } = req.body;
+    console.log('UserID from request body:', UserID); 
+    console.log('CourseID from request body:', CourseID); 
 
     if (!UserID) {
         console.error("UserID not provided");
         return res.status(400).send("UserID not provided");
     }
 
+    if (!CourseID) {
+        console.error("CourseID not provided");
+        return res.status(400).send("CourseID not provided");
+    }
+
     const video = req.files.Video[0].buffer;
     const lectureImage = req.files.LectureImage[0].buffer;
-    const CourseID = 1; // Placeholder for CourseID
 
     try {
         const Position = await Lectures.getCurrentPositionInChapter(ChapterName);
@@ -103,7 +117,7 @@ const createLecture = async (req, res) => {
         console.error('Error creating lecture:', error);
         res.status(500).send('Error creating lecture');
     }
-}
+};
  
 const getLectureVideoByID = async (req, res) => {
     const lectureID = parseInt(req.params.lectureID, 10);
@@ -155,11 +169,12 @@ const getLecturesByCourseID = async (req, res) => {
 
 module.exports = {
     getAllLectures,
-    getLectureByID,
+    // getLectureByID,
     updateLecture,
     createLecture,
     deleteLecture,
     getLastChapterName,
     getLectureVideoByID,
-    getLecturesByCourseID
+    getLecturesByCourseID,
+    getMaxCourseID
 };

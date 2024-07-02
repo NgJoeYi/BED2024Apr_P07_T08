@@ -88,11 +88,11 @@ app.delete('/courses/:id', courseController.deleteCourse);
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
+app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
 app.put('/lectures/:id', lectureController.updateLecture); 
-app.post('/lectures', multiUpload, lectureController.createLecture); // Creates a new lecture
+app.post('/lectures', multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', lectureController.deleteLecture); 
 app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
-
 
 
 app.listen(port, async () => {

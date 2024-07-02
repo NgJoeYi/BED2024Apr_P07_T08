@@ -221,6 +221,9 @@ button{
     padding: 5px;
     font-size: 18px;
 }
+#course-arrangement {
+    display: none;
+}
 
 /* footer */
 

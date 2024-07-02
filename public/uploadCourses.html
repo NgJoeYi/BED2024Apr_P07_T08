@@ -33,14 +33,6 @@
 </header>
 
 <div class="course-container">
-  <div class="course-arrangement" id="course-arrangement">
-    <span class="upload-course-title" contenteditable="false">Lectures Arrangement :</span>
-    <!-- Empty initially, users will add new chapters -->
-
-    <div class="new-btn-container">
-      <button class="new-btn" onclick="triggerFileUpload()">New</button>
-    </div>
-  </div>
   <div class="course-name">
     <span class="upload-course-title">Course Title:</span>
     <p id="course-name-text" contenteditable="true" class="editable-placeholder">Enter course name...</p>
@@ -70,11 +62,19 @@
         <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
     </div>
 </div>
-<div class = "button-container">
-  <button type="button" onclick="addCourses()">Submit</button>
-  <button type = "button" onclick = "">Cancel</button>
+<div class="button-container">
+  <button type="button" id="submit-button" onclick="addCourses()">Submit</button>
+  <button type="button" id="cancel-button" onclick="cancelCourse()">Cancel</button>
 </div>
 
+<div class="course-arrangement" id="course-arrangement" style="display: none;">
+  <span class="upload-course-title" contenteditable="false">Lectures Arrangement :</span>
+  <!-- Empty initially, users will add new chapters -->
+
+  <div class="new-btn-container">
+    <button class="new-btn" onclick="triggerFileUpload()">New</button>
+  </div>
+</div>
 
 </div>
 

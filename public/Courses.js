@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// GETTING ALL COURSES
 async function fetchCourses() {
     try {
         const response = await fetch('/courses');

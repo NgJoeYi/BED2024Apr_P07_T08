@@ -53,7 +53,7 @@ async function addFiles() {
     console.log("userID from Session:", userID);
 
     if (!userID) {
-        alert('user id not found. Please log in again.');
+        alert('User ID not found. Please log in again.');
         return;
     }
 
@@ -62,23 +62,30 @@ async function addFiles() {
         return;
     }
     
-    let chapterName = chapterNameInput || previousChapterName;  
+    let chapterName = chapterNameInput || previousChapterName;
     console.log('Final Chapter Name to Use:', chapterName);
     if (!chapterName) {
         alert('Please enter a chapter name.');
         return;
     }
 
-    const formData = new FormData();
-    formData.append('UserID', userID);
-    formData.append('ChapterName', chapterName);
-    formData.append('Title', title);
-    formData.append('Duration', duration);
-    formData.append('Description', description);
-    Array.from(videoFileInput.files).forEach(file => formData.append('Video', file));
-    Array.from(imageFileInput.files).forEach(file => formData.append('LectureImage', file));
-
     try {
+        // Fetch the max course ID
+        const courseIDResponse = await fetch('/lectures/max-course-id');
+        const courseIDData = await courseIDResponse.json();
+        const courseID = courseIDData.maxCourseID;
+        console.log("courseID from Server:", courseID);
+
+        const formData = new FormData();
+        formData.append('UserID', userID);
+        formData.append('CourseID', courseID);
+        formData.append('ChapterName', chapterName);
+        formData.append('Title', title);
+        formData.append('Duration', duration);
+        formData.append('Description', description);
+        Array.from(videoFileInput.files).forEach(file => formData.append('Video', file));
+        Array.from(imageFileInput.files).forEach(file => formData.append('LectureImage', file));
+
         const response = await fetch('/lectures', {
             method: 'POST',
             body: formData
@@ -162,16 +169,9 @@ async function addCourses() {
     const level = document.getElementById('level').value.trim();
     const duration = document.getElementById('duration').value.trim();
     const courseImageInput = document.getElementById('imageFile');
-    const courseArrangement = document.getElementById('course-arrangement');
 
     if (!userID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
         alert('Please complete entering course information and select an image.');
-        return;
-    }
-
-    const chapters = courseArrangement.querySelectorAll('.chapter');
-    if (chapters.length === 0) {
-        alert('Please add at least one lecture before submitting the course.');
         return;
     }
 
@@ -182,7 +182,7 @@ async function addCourses() {
     formData.append('category', category);
     formData.append('level', level);
     formData.append('duration', duration);
-    formData.append('imageFile', courseImageInput.files[0]); // Ensure this matches the form field name
+    formData.append('imageFile', courseImageInput.files[0]);
 
     try {
         const response = await fetch('/courses', {
@@ -193,7 +193,9 @@ async function addCourses() {
         if (response.ok) {
             const newCourse = await response.json();
             alert('Course saved successfully');
-            window.location.href = 'Courses.html'; // Redirect on successful creation
+            document.getElementById('course-arrangement').style.display = 'block';
+            document.getElementById('submit-button').style.display = 'none';
+            document.getElementById('cancel-button').style.display = 'none';
         } else {
             const errorData = await response.json();
             alert(`Failed to save the course: ${errorData.message}`);
@@ -202,4 +204,9 @@ async function addCourses() {
         console.error('Error saving the course:', error);
         alert('Error saving the course.');
     }
+}
+
+function cancelCourse() {
+    // Add your cancel course logic here
+    // For example, you could clear the form fields or redirect the user to another page
 }
