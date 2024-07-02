@@ -83,14 +83,18 @@ app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
+app.delete('/courses/noLectures',courseController.deleteCourseWithNoLectures);
+
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
+app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
 app.put('/lectures/:id', lectureController.updateLecture); 
-app.post('/lectures', multiUpload, lectureController.createLecture); // Creates a new lecture
+app.post('/lectures', multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', lectureController.deleteLecture); 
+app.delete('/lectures/course/:courseID/chapter/:chapterName', lectureController.deletingChapterName); // Updated route
 app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
 
 

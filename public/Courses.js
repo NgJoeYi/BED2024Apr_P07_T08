@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// GETTING ALL COURSES
 async function fetchCourses() {
     try {
         const response = await fetch('/courses');
@@ -29,6 +30,7 @@ async function fetchCourses() {
 function displayCourses(courses) {
     const coursesGrid = document.querySelector('.courses-grid-unique');
     coursesGrid.innerHTML = ''; // Clear any existing content
+    const userRole = sessionStorage.getItem('role');
 
     courses.forEach(course => {
         const courseElement = document.createElement('div');
@@ -53,6 +55,10 @@ function displayCourses(courses) {
                         <p class="posted-date">Posted on: ${new Date(course.createdAt).toLocaleDateString()}</p>
                         <p>${course.level}</p>
                     </div>
+                    ${userRole === 'lecturer' ? `
+                    <div class="delete-button-container">
+                        <button class="delete-course" data-course-id="${course.courseID}" onclick="deleteCourse(event, this)">Delete</button>
+                    </div>` : ''}
                 </div>
             </a>
         `;
@@ -71,4 +77,46 @@ function checkUserRoleAndFetchCourses() {
     }
 
     fetchCourses(); // Fetch courses after checking user role
+}
+
+
+// DELETE COURSE
+async function deleteCourse(event, button) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const courseID = button.dataset.courseId;
+    if (!courseID) {
+        alert('Course ID not found.');
+        return;
+    }
+    console.log('DELETE COURSE ID :',courseID);
+
+    if (!confirm('Are you sure you want to delete this course?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/courses/${courseID}`, {
+            method: 'DELETE'
+        });
+        console.log('PASSED HERE ');
+        if (response.ok) {
+            if (response.status === 204) {
+                alert('Course deleted successfully!');
+                button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
+            } else {
+                const result = await response.json();
+                alert(result.message);
+                button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
+            }
+        } else {
+            const errorData = await response.json();
+            console.error('Failed to delete course. Status:', response.status, 'Message:', errorData.message);
+            alert('Failed to delete the course. ' + errorData.message);
+        }
+    } catch (error) {
+        console.error('Error deleting course:', error);
+        alert('Error deleting course.');
+    }
 }

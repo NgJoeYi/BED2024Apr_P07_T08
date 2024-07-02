@@ -156,6 +156,11 @@ input[type="file" i]{
     display: flex;
     justify-content: space-around;
 }
+.button-container button{
+    min-width: 100px;
+    min-height: 40px;
+    border-radius: 5px;
+}
 
 /* buttons in general */
 button{
@@ -215,6 +220,9 @@ button{
     flex: 1; /* Take the remaining space */
     padding: 5px;
     font-size: 18px;
+}
+#course-arrangement {
+    display: none;
 }
 
 /* footer */
