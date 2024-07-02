@@ -245,5 +245,21 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
+    static async deleteLecture(id) {
+        let pool;
+        try {
+            pool = await sql.connect(dbConfig);
+            const sqlQuery = `DELETE FROM Lectures WHERE LectureID = @id`;
+            const request = pool.request();
+            request.input('id', sql.Int, id);
+            const result = await request.query(sqlQuery);
+            return result.rowsAffected > 0;
+        } catch (error) {
+            console.error('Error deleting lecture:', error);
+            throw error;
+        } finally {
+            if (pool) await pool.close();
+        }
+    }
 }
 module.exports = Lectures;
