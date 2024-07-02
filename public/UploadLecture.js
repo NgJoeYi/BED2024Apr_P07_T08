@@ -1,9 +1,12 @@
-// Function to open the modal
+document.addEventListener('DOMContentLoaded', () => {
+    // Other initialization code
+    // Fetch and display reviews and lectures
+});
+
 function triggerFileUpload() {
     document.getElementById('newFileModal').style.display = 'block';
 }
 
-// Function to close the modal
 function closeModal() {
     document.getElementById('newFileModal').style.display = 'none';
 }
@@ -159,12 +162,19 @@ async function addCourses() {
     const level = document.getElementById('level').value.trim();
     const duration = document.getElementById('duration').value.trim();
     const courseImageInput = document.getElementById('imageFile');
+    const courseArrangement = document.getElementById('course-arrangement');
 
     if (!userID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
         alert('Please complete entering course information and select an image.');
         return;
     }
-    console.log('COURSE USER ID :',userID);
+
+    const chapters = courseArrangement.querySelectorAll('.chapter');
+    if (chapters.length === 0) {
+        alert('Please add at least one lecture before submitting the course.');
+        return;
+    }
+
     const formData = new FormData();
     formData.append('userID', userID);
     formData.append('title', title);
