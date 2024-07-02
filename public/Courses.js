@@ -30,6 +30,7 @@ async function fetchCourses() {
 function displayCourses(courses) {
     const coursesGrid = document.querySelector('.courses-grid-unique');
     coursesGrid.innerHTML = ''; // Clear any existing content
+    const userRole = sessionStorage.getItem('role');
 
     courses.forEach(course => {
         const courseElement = document.createElement('div');
@@ -54,9 +55,10 @@ function displayCourses(courses) {
                         <p class="posted-date">Posted on: ${new Date(course.createdAt).toLocaleDateString()}</p>
                         <p>${course.level}</p>
                     </div>
+                    ${userRole === 'lecturer' ? `
                     <div class="delete-button-container">
                         <button class="delete-course" data-course-id="${course.courseID}" onclick="deleteCourse(event, this)">Delete</button>
-                    </div>
+                    </div>` : ''}
                 </div>
             </a>
         `;
@@ -76,6 +78,7 @@ function checkUserRoleAndFetchCourses() {
 
     fetchCourses(); // Fetch courses after checking user role
 }
+
 
 // DELETE COURSE
 async function deleteCourse(event, button) {
