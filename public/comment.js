@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closePopupBtn.addEventListener('click', closePopup);
 
     addCommentBtn.addEventListener('click', () => {
-        if (currentUserId) {
+        if (token) {
             showPopup('add');
         } else {
             alert('Please log in or sign up to add comments.');
