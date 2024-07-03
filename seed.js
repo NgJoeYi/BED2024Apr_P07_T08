@@ -73,7 +73,7 @@ async function run() {
             created_at DATETIME DEFAULT GETDATE(),
             discussion_id INT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES Users(id),
-            FOREIGN KEY (discussion_id) REFERENCES Discussions(id)
+            FOREIGN KEY (discussion_id) REFERENCES Discussions(id) ON DELETE CASCADE
         );
 
         CREATE TABLE Courses (
