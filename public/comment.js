@@ -176,8 +176,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // };
 
     async function fetchDiscussionDetails(discussionId) {
+        const token = getToken();
         try {
-            const response = await fetch(`/discussions/${discussionId}`);
+            const response = await fetch(`/discussions/${discussionId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (!response.ok) {
                 throw new Error(`Error fetching discussion: ${response.statusText}`);
             }
