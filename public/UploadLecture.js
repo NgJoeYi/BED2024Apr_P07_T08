@@ -206,7 +206,33 @@ async function addCourses() {
     }
 }
 
-function cancelCourse() {
-    // Add your cancel course logic here
-    // For example, you could clear the form fields or redirect the user to another page
+async function cancelCourse() {
+    if (confirm(`Are you sure you want to stop creating course?`)) {
+        window.location.href = 'courses.html';
+        try {
+            const response = await fetch(`/courses/${courseID}`, {
+                method: 'DELETE'
+            });
+            console.log('PASSED HERE ');
+            if (response.ok) {
+                if (response.status === 204) {
+                    alert('Course deleted successfully!');
+                    button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
+                } else {
+                    const result = await response.json();
+                    alert(result.message);
+                    button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
+                }
+            } else {
+                const errorData = await response.json();
+                console.error('Failed to delete course. Status:', response.status, 'Message:', errorData.message);
+                alert('Failed to delete the course. ' + errorData.message);
+            }
+        } catch (error) {
+            console.error('Error deleting course:', error);
+            alert('Error deleting course.');
+        }
+    
+        return;
+    }
 }
