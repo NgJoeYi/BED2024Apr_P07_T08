@@ -1,8 +1,7 @@
 // ---------------------------------------------- EDIT ACCOUNT ----------------------------------------------
-
-// Populate data to make it a prefilled form and ready to be edited but does not update in db yet
+// Populate data to make it a prefilled form and ready to be edited
 document.addEventListener('DOMContentLoaded', async function () {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     if (token) {
         try {
           const response = await fetch('/account', {
@@ -100,7 +99,6 @@ document.addEventListener('DOMContentLoaded', async function () {
           return;
         }
         
-        
         try {
             const response = await fetch(`/account`, {
                 method: 'PUT',
@@ -110,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                   },
                 body: JSON.stringify(updatedUserData)
             });
-            
+
             if (response.ok) {
                 const updatedUser = await response.json();
                 alert('User details updated successfully');
@@ -146,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     
   // ---------------------------------------------- UPLOAD PROFILE PICTURE ----------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     if (token) {
       fetchUserProfile(token);
     }
@@ -173,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   
   function triggerFileInput() {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     if (!token) {
       alert('Please log in first to upload your profile picture.');
       return;
@@ -195,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   
   async function uploadImageToServer(base64Image) {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     try {
       const response = await fetch(`/account/uploadProfilePic`, {
         method: 'POST',
@@ -220,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   // ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
   // Function to confirm account deletion
   function confirmDeleteAccount() {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     
     if (!token) {
       alert('No user is logged in');
@@ -237,7 +235,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   
   // Function to delete account with password authorization
   async function deleteAccount() {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     const password = document.getElementById('delete-password').value;
   
     if (!token) {
@@ -277,7 +275,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   
   // ---------------------------------------------- LOG OUT --------------------------------------------------------------
   function confirmLogout() {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     if (!token) {
       alert('No user is logged in.');
       return;
@@ -295,3 +293,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   }
   
+  function getToken() {
+    return sessionStorage.getItem('token');
+  }
