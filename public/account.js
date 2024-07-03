@@ -187,19 +187,6 @@ function changeSlide(carouselId, n) {
   }
 }
 
-// Feature 7 : Account.html confirm logout and delete account
-function confirmLogout() {
-  const userConfirmed = confirm('Are you sure you want to log out?');
-  if (userConfirmed) {
-    // User clicked "OK"
-    alert('You are logged out.');
-    // Add your logout logic here
-  } else {
-    // User clicked "Cancel"
-    alert('Logout cancelled.');
-  }
-}
-
 function confirmCancel() {
   const userConfirmed = confirm('Are you sure you want to Cancel?');
   if (userConfirmed) {
