@@ -66,9 +66,9 @@ app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
-app.put('/comments/:id', commentController.updateComment);
-app.post('/comments', commentController.createComment); 
-app.delete('/comments/:id', commentController.deleteComment);
+app.put('/comments/:id', jwtAuthorization.verifyJWT, commentController.updateComment);
+app.post('/comments', jwtAuthorization.verifyJWT, commentController.createComment); 
+app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews);
