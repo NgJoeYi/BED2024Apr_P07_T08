@@ -59,7 +59,7 @@ app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
 app.get('/discussions/user', jwtAuthorization.verifyJWT, discussionController.getDiscussionsByUser);
-app.get('/discussions/:id', jwtAuthorization.verifyJWT, jwtAuthorization.verifyJWT, discussionController.getDiscussionById);
+app.get('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.getDiscussionById);
 app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.createDiscussion);
 app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.updateDiscussion);
 app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.deleteDiscussion);
