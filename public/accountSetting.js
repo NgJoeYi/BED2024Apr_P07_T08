@@ -275,3 +275,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   }
   
+  // ---------------------------------------------- LOG OUT --------------------------------------------------------------
+  function confirmLogout() {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      alert('No user is logged in.');
+      return;
+    }
+    
+    const userConfirmed = confirm('Are you sure you want to log out?');
+    if (userConfirmed) {
+      // User clicked "OK"
+      alert('Logging you out...');
+      sessionStorage.removeItem('token'); // Clear the token from session storage
+      window.location.href = '/login.html'; // Redirect to the login page
+    } else {
+      // User clicked "Cancel"
+      alert('Logout cancelled.');
+    }
+  }
+  
