@@ -30,41 +30,19 @@ function verifyJWT(req, res, next) {
         };
         // ************************************** ADD ROUTES HERE **************************************
 
-        // const requestEndpoint = req.url;
-        // //const requestEndpoint = req.path;
-        // const userRole = decoded.role;
-
-        // console.log('Request Endpoint:', requestEndpoint); // Debugging log
-        // console.log('User Role:', userRole); // CHANGED
-
-        // const authorizedRole = Object.entries(authorizedRoles).find(
-        //     ([endpoint, roles]) => {
-        //         const regex = new RegExp(`^${endpoint}$`);
-        //         return regex.test(requestEndpoint) && roles.includes(userRole);
-        //     }
-        // );
-
-        // if (!authorizedRole) {
-        //     console.log('Role not authorized for this endpoint'); 
-        //     return res.status(403).json({ message: 'Forbidden' }); // to do: make it visible on client
-        // }
-
-        // req.user = decoded;
-        // next();
-
         const userRole = decoded.role;
         const requestEndpoint = req.url.split('?')[0]; // Remove query parameters if present
         const method = req.method;
         const routeKey = `${method} ${requestEndpoint}`;
 
-        console.log('Request Endpoint:', requestEndpoint); // Debugging log
-        console.log('User Role:', userRole); // CHANGED
+        console.log('Request Endpoint:', requestEndpoint); // debugging log
+        console.log('User Role:', userRole); // debugging log
         
         // Iterate over authorized roles and handle dynamic segments
         const authorizedRole = Object.entries(authorizedRoles).find(
             ([endpoint, roles]) => {
                 const [method, path] = endpoint.split(' ');
-                const pathPattern = path.replace(/:\w+/g, '\\w+'); // Replace :param with regex pattern
+                const pathPattern = path.replace(/:\w+/g, '\\w+'); // Replace: param with regex pattern
                 const regex = new RegExp(`^${pathPattern}$`);
                 return method === req.method && regex.test(requestEndpoint) && roles.includes(userRole);
             }
