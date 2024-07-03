@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const title = document.getElementById('title').value;
         const category = document.getElementById('category').value;
         const description = document.getElementById('description').value;
-        const userId = getCurrentUserId(); // Function to get the current user's ID
+        const token = getToken(); // Function to get the current user's ID
 
-        if (!userId) {
+        if (!token) {
             alert('User must be logged in to submit a discussion.');
             return;
         }
@@ -22,8 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const data = {
             title: title,
             category: category,
-            description: description,
-            userId: userId
+            description: description
         };
 
         console.log('Submitting form with data:', data);
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userId}`
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
         })
@@ -57,23 +56,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function getCurrentUserId() { // -- jwt implementation
-    const token = sessionStorage.getItem('token');  // -- jwt implementation
-    if (!token) { // -- jwt implementation
+function getToken() {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
         alert('User is not logged in or session has expired');
         return null;
     }
-    return token;
+    return userId;
 }
 
 function fetchDiscussions() {
     const category = document.getElementById('filter-category').value;
     const sort = document.getElementById('sort-date').value;
-
-    const token = getCurrentUserId();  // -- jwt implementation
-    if (!token) {  // -- jwt implementation
-        return;  // -- jwt implementation
-    }  // -- jwt implementation
 
     fetch(`/discussions?category=${category}&sort=${sort}`)
         .then(response => response.json())
@@ -168,7 +162,7 @@ function addDiscussionToFeed(discussion) {
 }
 
 function incrementLikes(discussionId, likeButton, dislikeButton) {
-    const token = getCurrentUserId();  // -- jwt implementation
+    const token = getToken();  // -- jwt implementation
     if (!token) {  // -- jwt implementation
         return;  // -- jwt implementation
     }  // -- jwt implementation
@@ -197,10 +191,10 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
 }
 
 function incrementDislikes(discussionId, likeButton, dislikeButton) {
-    const token = getCurrentUserId(); // -- jwt implementation
-    if (!token) { // -- jwt ijmplementation
-        return; // -- jwt implementation
-    } // -- jwt implementation
+    const token = getToken();  // -- jwt implementation
+    if (!token) {  // -- jwt implementation
+        return;  // -- jwt implementation
+    }  // -- jwt implementation
     fetch(`/discussions/${discussionId}/dislike`, {
         method: 'POST',
         headers: {
@@ -242,3 +236,9 @@ window.onclick = function(event) {
         document.getElementById("popup").style.display = "none";
     }
 }
+
+
+// -- jwt note 
+// 1. users CAN view discussions if they are NOT logged in 
+// 2. users CAN go to comments if they are NOT logged in
+// 3. users CANNOT like or dislike the discussion if they are NOT logged in

@@ -150,9 +150,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (token) {
       fetchUserProfile(token);
     }
-    else {
-      alert('Please log in first to upload your profile picture.');
-    }
   });
   
   async function fetchUserProfile(token) {
