@@ -91,16 +91,36 @@ class Courses {
             throw error;
         }
     }
-
+    static async deleteCourseWithNoLectures(){
+        let connection = await sql.connect(dbConfig);
+        try{
+            const sqlQuery = `
+            DELETE FROM Courses
+            WHERE CourseID NOT IN (SELECT DISTINCT CourseID FROM Lectures);`
+            const result = await connection.request().query(sqlQuery);
+            const rowsAffected = result.rowsAffected.reduce((acc, val) => acc + val, 0);
+            return rowsAffected>0;
+        }catch (error) {
+            console.error('Error deleting course:', error);
+            throw error;
+        } finally {
+            if (pool) await pool.close();
+        }
+    }
     static async deleteCourse(id) {
         let pool;
         try {
             pool = await sql.connect(dbConfig);
-            const sqlQuery = `DELETE FROM Courses WHERE CourseID = @id`;
+            const sqlQuery = `
+            DELETE FROM Lectures WHERE CourseID = @id;
+            DELETE FROM Courses WHERE CourseID = @id
+            `;
             const request = pool.request();
             request.input('id', sql.Int, id);
             const result = await request.query(sqlQuery);
-            return result.rowsAffected > 0;
+            const rowsAffected = result.rowsAffected.reduce((acc, val) => acc + val, 0);
+            console.log('DELETE COURSE MODEL OUTPUT: ', rowsAffected > 0);
+            return rowsAffected > 0;
         } catch (error) {
             console.error('Error deleting course:', error);
             throw error;
@@ -108,7 +128,7 @@ class Courses {
             if (pool) await pool.close();
         }
     }
-    static async createCourse(newCourseData) {
+        static async createCourse(newCourseData) {
         const connection = await sql.connect(dbConfig);
         try {
             const sqlQuery = `

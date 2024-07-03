@@ -150,9 +150,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (token) {
       fetchUserProfile(token);
     }
-    else {
-      alert('Please log in first to upload your profile picture.');
-    }
   });
   
   async function fetchUserProfile(token) {
@@ -275,6 +272,26 @@ document.addEventListener('DOMContentLoaded', async function () {
       console.error('Error:', error);
     } finally {
       closeDeleteModal();
+    }
+  }
+  
+  // ---------------------------------------------- LOG OUT --------------------------------------------------------------
+  function confirmLogout() {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      alert('No user is logged in.');
+      return;
+    }
+    
+    const userConfirmed = confirm('Are you sure you want to log out?');
+    if (userConfirmed) {
+      // User clicked "OK"
+      alert('Logging you out...');
+      sessionStorage.removeItem('token'); // Clear the token from session storage
+      window.location.href = '/login.html'; // Redirect to the login page
+    } else {
+      // User clicked "Cancel"
+      alert('Logout cancelled.');
     }
   }
   

@@ -18,31 +18,39 @@ function verifyJWT(req, res, next) {
 
         // ************************************** ADD ROUTES HERE **************************************
         const authorizedRoles = {
-            '/account': ['student', 'lecturer'],
-            '/account/profile': ['student', 'lecturer'],
-            '/account/uploadProfilePic': ['student', 'lecturer'],
-            '/discussions/user': ['student', 'lecturer'],
-            '/discussions': ['student', 'lecturer']
+            'GET /account': ['student', 'lecturer'],
+            'GET /account/profile': ['student', 'lecturer'],
+            'POST /account/uploadProfilePic': ['student', 'lecturer'],
+            'GET /discussions/user': ['student', 'lecturer'],
+            'GET /discussions': ['student', 'lecturer'],
+            'GET /discussions/:id': ['student', 'lecturer'],
+            'POST /discussions': ['student', 'lecturer'],
+            'PUT /discussions/:id': ['student', 'lecturer'],
+            'DELETE /discussions/:id': ['student', 'lecturer'],
         };
         // ************************************** ADD ROUTES HERE **************************************
 
-        const requestEndpoint = req.url;
-        //const requestEndpoint = req.path;
         const userRole = decoded.role;
+        const requestEndpoint = req.url.split('?')[0]; // Remove query parameters if present
+        const method = req.method;
+        const routeKey = `${method} ${requestEndpoint}`;
 
-        console.log('Request Endpoint:', requestEndpoint); // Debugging log
-        console.log('User Role:', userRole); // CHANGED
-
+        console.log('Request Endpoint:', requestEndpoint); // debugging log
+        console.log('User Role:', userRole); // debugging log
+        
+        // Iterate over authorized roles and handle dynamic segments
         const authorizedRole = Object.entries(authorizedRoles).find(
             ([endpoint, roles]) => {
-                const regex = new RegExp(`^${endpoint}$`);
-                return regex.test(requestEndpoint) && roles.includes(userRole);
+                const [method, path] = endpoint.split(' ');
+                const pathPattern = path.replace(/:\w+/g, '\\w+'); // Replace: param with regex pattern
+                const regex = new RegExp(`^${pathPattern}$`);
+                return method === req.method && regex.test(requestEndpoint) && roles.includes(userRole);
             }
         );
 
         if (!authorizedRole) {
             console.log('Role not authorized for this endpoint'); 
-            return res.status(403).json({ message: 'Forbidden' }); // to do: make it visible on client
+            return res.status(403).json({ message: 'Forbidden' });
         }
 
         req.user = decoded;

@@ -59,7 +59,7 @@ app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
 app.get('/discussions/user', jwtAuthorization.verifyJWT, discussionController.getDiscussionsByUser);
-app.get('/discussions/:id', jwtAuthorization.verifyJWT, jwtAuthorization.verifyJWT, discussionController.getDiscussionById);
+app.get('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.getDiscussionById);
 app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.createDiscussion);
 app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.updateDiscussion);
 app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.deleteDiscussion);
@@ -83,14 +83,18 @@ app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', courseController.updateCourse);
 app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
+app.delete('/courses/noLectures',courseController.deleteCourseWithNoLectures);
+
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
+app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
 app.put('/lectures/:id', lectureController.updateLecture); 
-app.post('/lectures', multiUpload, lectureController.createLecture); // Creates a new lecture
+app.post('/lectures', multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', lectureController.deleteLecture); 
+app.delete('/lectures/course/:courseID/chapter/:chapterName', lectureController.deletingChapterName); // Updated route
 app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
 
 

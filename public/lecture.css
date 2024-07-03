@@ -37,6 +37,25 @@ body {
 .hamburger span {
     font-size: 24px;
 }
+/* DELETE BUTTON */
+.delete-lecture {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 50px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 10px; /* Add some space from the content above */
+}
+
+.delete-lecture:hover {
+  background-color: darkred;
+}
 
 .nav {
     margin-top: 20px;
