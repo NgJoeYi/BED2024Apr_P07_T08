@@ -635,7 +635,7 @@ async function deleteDiscussion(discussionId) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ userId: token })
+      body: JSON.stringify({ token: token })
     });
 
     if (!response.ok) {
@@ -643,7 +643,7 @@ async function deleteDiscussion(discussionId) {
       throw new Error(`Failed to delete discussion: ${errorText}`);
     }
 
-    alert('Discussion deleted successfully');
+    alert('Discussion and associated comments deleted successfully');
     fetchUserDiscussions();
     closeDeleteModal(); // Ensure the modal is closed first
      // Fetch user discussions after closing the modal
