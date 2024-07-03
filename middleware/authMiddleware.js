@@ -21,13 +21,19 @@ function verifyJWT(req, res, next) {
             'GET /account': ['student', 'lecturer'],
             'GET /account/profile': ['student', 'lecturer'],
             'POST /account/uploadProfilePic': ['student', 'lecturer'],
-            'PUT /account': ['student', 'lecturer'],
+            'PUT /account': ['student', 'lecturer'], // -- will need to come back to this
+
             'GET /discussions/user': ['student', 'lecturer'],
             'GET /discussions': ['student', 'lecturer'],
             'GET /discussions/:id': ['student', 'lecturer'],
             'POST /discussions': ['student', 'lecturer'],
             'PUT /discussions/:id': ['student', 'lecturer'],
             'DELETE /discussions/:id': ['student', 'lecturer'],
+
+            'GET /comments': ['student', 'lecturer'],
+            'PUT /comments/:id': ['student', 'lecturer'],
+            'POST /comments': ['student', 'lecturer'],
+            'DELETE /comments/:id': ['student', 'lecturer']
         };
         // ************************************** ADD ROUTES HERE **************************************
 
