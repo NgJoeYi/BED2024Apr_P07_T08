@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ content: commentText, userId: currentUserId })
+                        body: JSON.stringify({ content: commentText })
                     });
                     if (response.ok) {
                         currentComment.querySelector('.comment-content').textContent = commentText;
@@ -140,11 +140,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.editComment = function(button) {
         const comment = button.closest('.comment');
         const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
-
+        const token = getToken();
+        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
+        const currentUserId = decodedToken.id; // Extract user ID from JWT
+    
         console.log('Comment User ID:', comment.dataset.userId); // Debug log
         console.log('Comment User ID (parsed):', commentUserId); // Debug log
-
-        if (commentUserId === parseInt(currentUserId, 10)) {
+    
+        if (commentUserId === currentUserId) {
             currentComment = comment;
             currentCommentId = comment.dataset.id;
             console.log('Current Comment ID:', currentCommentId); // Debug log
@@ -153,6 +156,24 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('You can only edit your own comments.');
         }
     };
+
+    
+    // window.editComment = function(button) {
+    //     const comment = button.closest('.comment');
+    //     const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
+
+    //     console.log('Comment User ID:', comment.dataset.userId); // Debug log
+    //     console.log('Comment User ID (parsed):', commentUserId); // Debug log
+
+    //     if (commentUserId === parseInt(currentUserId, 10)) {
+    //         currentComment = comment;
+    //         currentCommentId = comment.dataset.id;
+    //         console.log('Current Comment ID:', currentCommentId); // Debug log
+    //         showPopup('edit');
+    //     } else {
+    //         alert('You can only edit your own comments.');
+    //     }
+    // };
 
     async function fetchDiscussionDetails(discussionId) {
         try {
