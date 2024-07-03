@@ -518,10 +518,6 @@ function addUserDiscussionToFeed(discussion) {
   post.querySelector('.delete-btn').addEventListener('click', () => openDeleteModal(discussion.id));
 }
 
-function getToken() {
-  return sessionStorage.getItem('token');
-}
-
 // Edit Modal functions
 function openEditModal(discussionId, description, category) {
   document.getElementById('editText').value = description;
@@ -611,4 +607,8 @@ async function deleteDiscussion(discussionId) {
     console.error('Error deleting discussion:', error);
     alert('Error deleting discussion: ' + error.message);
   }
+}
+
+function getToken() {
+  return sessionStorage.getItem('token');
 }
