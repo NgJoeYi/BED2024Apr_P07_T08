@@ -26,7 +26,7 @@ async function getComments(req, res) {
 
 async function createComment(req, res) {
     const { content, discussionId } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.id; // -- jwt implementation
     let connection;
     try {
         connection = await sql.connect(dbConfig);
@@ -45,7 +45,7 @@ async function createComment(req, res) {
 async function updateComment(req, res) {
     const { id } = req.params;
     const { content } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.id; // -- jwt implementation
     console.log('Received User ID:', userId); // Debug log
     console.log('Content:', content); // Debug log
     let connection;
@@ -71,7 +71,7 @@ async function updateComment(req, res) {
 
 async function deleteComment(req, res) {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.id; // -- jwt implementation
     let connection;
     try {
         connection = await sql.connect(dbConfig);
