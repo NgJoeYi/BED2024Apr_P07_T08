@@ -79,30 +79,6 @@ function filterImages(category) {
   });
 }
 
-// Feature 4: Username editing functionality in account.html
-// document.getElementById('edit-icon').addEventListener('click', function() {
-//   const editAccountDetails = document.getElementById('edit-account-details');
-//   editAccountDetails.style.display = editAccountDetails.style.display === 'none' || editAccountDetails.style.display === '' ? 'block' : 'none';
-// });
-
-// document.getElementById('save-changes').addEventListener('click', function() {
-//   const newUsername = document.getElementById('edit-name').value;
-//   const newBirthDate = document.getElementById('edit-birth-date').value;
-//   const newEmail = document.getElementById('edit-email').value;
-  
-//   // Update the profile info
-//   document.querySelector('.profile-info .user-name').textContent = newUsername;
-
-//   // Update all elements with the class 'user-name' in reviews and comments
-//   document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
-//     element.textContent = newUsername;
-//   });
-
-//   // Hide the edit section
-//   document.getElementById('edit-account-details').style.display = 'none';
-// });
-
-
 // Feature 5: Popup functionality
 // Define the popup functions outside the conditional block
 function openPopup() {
@@ -203,7 +179,7 @@ function confirmCancel() {
 
 // Fetch and display reviews
 async function fetchAndDisplayReviews() {
-  const token = sessionStorage.getItem('token'); // Get the logged-in user's ID
+  const token = getToken(); // Get the logged-in user's ID
   // console.log('User ID:', userId); // Debugging
   try {
     const response = await fetch('/reviews', {
@@ -329,7 +305,7 @@ function closeDeleteModal() {
 
 async function deleteReview(reviewId) {
   try {
-    const token = sessionStorage.getItem('token');
+    const token = getToken();
     console.log(`Attempting to delete review with ID: ${reviewId}`); // Debugging
     const response = await fetch(`/reviews/${reviewId}`, {
       method: 'DELETE',
@@ -337,7 +313,6 @@ async function deleteReview(reviewId) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}` 
       },
-      body: JSON.stringify({ userId: sessionStorage.getItem('token') })
     });
     
     if (!response.ok) {
@@ -399,14 +374,14 @@ async function submitEditedReview(reviewId) {
 
   if (newText && newRating >= 1 && newRating <= 5) {
     try {
-      const token = sessionStorage.getItem('token');
+      const token = getToken();
       const response = await fetch(`/reviews/${reviewId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ review_text: newText, rating: newRating, userId: sessionStorage.getItem('token') })
+        body: JSON.stringify({ review_text: newText, rating: newRating })
       });
       if (!response.ok) {
         throw new Error('Failed to update review');
@@ -462,8 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchUserDiscussions() {
-  //const token = getCurrentUserId();
-  const token = sessionStorage.getItem('token');
+  const token = getToken();
   if (!token) {
     console.error('No user token found');
     return;
@@ -544,7 +518,7 @@ function addUserDiscussionToFeed(discussion) {
   post.querySelector('.delete-btn').addEventListener('click', () => openDeleteModal(discussion.id));
 }
 
-function getCurrentUserId() {
+function getToken() {
   return sessionStorage.getItem('token');
 }
 
@@ -568,14 +542,14 @@ async function saveEdit(discussionId) {
   const category = document.getElementById('editCategory').value;
 
   try {
-    const token = getCurrentUserId();
+    const token = getToken();
     const response = await fetch(`/discussions/${discussionId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ description, category, userId: token })
+      body: JSON.stringify({ description, category })
     });
     if (!response.ok) {
       throw new Error('Failed to update discussion');
@@ -613,7 +587,7 @@ function closeDeleteModal() {
 
 async function deleteDiscussion(discussionId) {
   try {
-    const token = getCurrentUserId();
+    const token = getToken();
     console.log('Deleting discussion with ID:', discussionId, 'for user ID:', token);
 
     const response = await fetch(`/discussions/${discussionId}`, {
@@ -622,7 +596,6 @@ async function deleteDiscussion(discussionId) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ token: token })
     });
 
     if (!response.ok) {

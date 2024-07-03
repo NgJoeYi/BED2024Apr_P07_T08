@@ -21,6 +21,7 @@ function verifyJWT(req, res, next) {
             'GET /account': ['student', 'lecturer'],
             'GET /account/profile': ['student', 'lecturer'],
             'POST /account/uploadProfilePic': ['student', 'lecturer'],
+            'PUT /account': ['student', 'lecturer'],
             'GET /discussions/user': ['student', 'lecturer'],
             'GET /discussions': ['student', 'lecturer'],
             'GET /discussions/:id': ['student', 'lecturer'],

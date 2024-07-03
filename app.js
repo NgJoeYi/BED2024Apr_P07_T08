@@ -53,7 +53,7 @@ app.post('/login', userController.loginUser);
 app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById);
 app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController.updateProfilePic);
 app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
-app.put('/account/:id', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
+app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 
 // Add Routes for discussions
