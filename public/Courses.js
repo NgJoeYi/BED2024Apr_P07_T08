@@ -122,3 +122,64 @@ async function deleteCourse(event, button) {
         alert('Error deleting course.');
     }
 }
+
+// EDIT COURSE 
+async function editCourse(event,button){
+    event.stopPropagation();
+    event.preventDefault();
+
+    const courseID = button.dataset.courseId;
+    if (!courseID) {
+        alert('Course ID not found.');
+        return;
+    }
+    console.log('EDIT COURSE ID :',courseID);
+
+
+}
+document.addEventListener('DOMContentLoaded', async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseID = urlParams.get('courseID');
+    
+    if (courseID) {
+        try {
+            const response = await fetch(`/courses/${courseID}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const course = await response.json();
+            populateCourseDetails(course);
+        } catch (error) {
+            console.error('Error fetching course details:', error);
+        }
+    }
+
+    const form = document.getElementById('edit-course-form');
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(form);
+        try {
+            const response = await fetch(`/courses/${courseID}`, {
+                method: 'PUT',
+                body: formData
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            alert('Course updated successfully!');
+            window.location.href = 'courses.html';
+        } catch (error) {
+            console.error('Error updating course:', error);
+            alert('Error updating course.');
+        }
+    });
+});
+
+function populateCourseDetails(course) {
+    document.getElementById('courseTitle').value = course.title;
+    document.getElementById('courseDescription').value = course.description;
+    document.getElementById('courseLevel').value = course.level;
+    document.getElementById('courseCategory').value = course.category;
+    document.getElementById('courseDuration').value = course.duration;
+}
