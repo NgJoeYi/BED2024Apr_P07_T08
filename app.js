@@ -80,7 +80,7 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
-app.put('/courses/:id', courseController.updateCourse);
+app.put('/courses/:id', upload.single('courseImage'), courseController.updateCourse);
 app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
 app.delete('/courses/noLectures',courseController.deleteCourseWithNoLectures);
