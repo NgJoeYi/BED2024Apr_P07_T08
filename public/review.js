@@ -1,6 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Fetch and display reviews
-    fetchReviews();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = urlParams.get('courseID'); 
+     
+    if (courseId) {
+        fetchReviews(courseId);
+    } else {
+        console.error('courseId is not defined');
+    }
+
 
     const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
     console.log('Current User ID:', currentUserId); // Debug log
@@ -250,8 +258,8 @@ function editReview(button) {
     };
 }
 
-function fetchReviews() {
-    fetch('http://localhost:3000/reviews')
+function fetchReviews(courseId) {
+    fetch(`http://localhost:3000/reviews?courseId=${courseId}`)
         .then(response => response.json())
         .then(reviews => {
             const reviewsContainer = document.getElementById('reviews');
@@ -260,8 +268,8 @@ function fetchReviews() {
             reviews.forEach(review => {
                 const reviewElement = document.createElement('div');
                 reviewElement.classList.add('review');
-                reviewElement.setAttribute('data-id', review.review_id); // Add this line
-                reviewElement.setAttribute('data-user-id', review.user_id); // Add this line
+                reviewElement.setAttribute('data-id', review.review_id);
+                reviewElement.setAttribute('data-user-id', review.user_id);
                 reviewElement.setAttribute('data-date', review.review_date);
                 reviewElement.innerHTML = `
                     <div class="review-content">
@@ -282,8 +290,8 @@ function fetchReviews() {
                         <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
                         <button class="helpful">👍 Helpful</button>
                     </div>
-            `;
-            reviewsContainer.appendChild(reviewElement);
+                `;
+                reviewsContainer.appendChild(reviewElement);
             });
         })
         .catch(error => console.error('Error fetching reviews:', error));

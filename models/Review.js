@@ -1,19 +1,23 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
-async function getAllReviews(connection) {
+async function getAllReviews(connection, courseId) {
     try {
-        const result = await connection.request().query(`
-            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
-            FROM user_reviews ur
-            JOIN Users u ON ur.user_id = u.id
-            LEFT JOIN ProfilePic p ON u.id = p.user_id
-        `);
+        const result = await connection.request()
+            .input('course_id', sql.Int, courseId)
+            .query(`
+                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
+                FROM user_reviews ur
+                JOIN Users u ON ur.user_id = u.id
+                LEFT JOIN ProfilePic p ON u.id = p.user_id
+                WHERE ur.course_id = @course_id
+            `);
         return result.recordset;
     } catch (err) {
         throw new Error('Error fetching reviews: ' + err.message);
     }
 }
+
 
 async function getReviewById(connection, id) {
     try {
