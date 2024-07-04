@@ -44,36 +44,35 @@
 
     <div class="container">
         <main>
-            <section class="form-section">
-                <h1>Edit Course</h1>
-                <form id="edit-course-form">
-                    <div class="form-group">
-                        <label for="courseTitle">Course Title:</label>
-                        <input type="text" id="courseTitle" name="courseTitle" placeholder="Enter course name..." required>
-                    </div>
-                    <div class="form-group">
-                        <label for="courseDescription">Course Description:</label>
-                        <textarea id="courseDescription" name="courseDescription" placeholder="Enter course description..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="courseLevel">Course Level:</label>
-                        <input type="text" id="courseLevel" name="courseLevel" placeholder="Enter course level..." required>
-                    </div>
-                    <div class="form-group">
-                        <label for="courseCategory">Course Category:</label>
-                        <input type="text" id="courseCategory" name="courseCategory" placeholder="Enter course category..." required>
-                    </div>
-                    <div class="form-group">
-                        <label for="courseDuration">Course Duration (minutes):</label>
-                        <input type="number" id="courseDuration" name="courseDuration" placeholder="Enter course duration..." required>
-                    </div>
-                    <div class="form-group">
-                        <label for="courseImage">Course Image:</label>
-                        <input type="file" id="courseImage" name="courseImage">
-                    </div>
-                    <button type="submit">Save Changes</button>
-                </form>
-            </section>
+            <form id="edit-course-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="courseTitle">Course Title:</label>
+                    <input type="text" id="courseTitle" name="courseTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseDescription">Course Description:</label>
+                    <textarea id="courseDescription" name="courseDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="courseCategory">Course Category:</label>
+                    <input type="text" id="courseCategory" name="courseCategory" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseLevel">Course Level:</label>
+                    <input type="text" id="courseLevel" name="courseLevel" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseDuration">Course Duration (minutes):</label>
+                    <input type="number" id="courseDuration" name="courseDuration" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseImageInput">Course Image:</label>
+                    <input type="file" id="courseImageInput" name="courseImage">
+                    <img id="courseImage" src="" alt="No Image Available" style="display: block; margin-top: 10px; max-width: 200px;">
+                </div>
+                <button type="submit">Save Changes</button>
+            </form>
+        </section>
         </main>
     </div>
     <footer>

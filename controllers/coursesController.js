@@ -59,18 +59,22 @@ const updateCourse = async (req, res) => {
   const courseID = parseInt(req.params.id);
   const newCourseData = req.body;
 
+  console.log('Update course request received for courseID:', courseID); // Log course ID
+  console.log('Request body:', newCourseData); // Log the request body
+
   try {
-    const updatedCourse = await Courses.updateCourse(courseID, newCourseData);
-    if (!updatedCourse) {
-      return res.status(404).send("Course not found");
-    }
-    res.json(updatedCourse);
+      const updatedCourse = await Courses.updateCourse(courseID, newCourseData);
+      if (!updatedCourse) {
+          return res.status(404).send("Course not found");
+      }
+      res.json(updatedCourse);
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error updating course");
+      console.error('Error updating course:', error);
+      res.status(500).send("Error updating course");
   }
-  };
-  const deleteCourseWithNoLectures = async (req,res)=>{
+};
+
+const deleteCourseWithNoLectures = async (req,res)=>{
     try{
       const success = await Courses.deleteCourseWithNoLectures();
       if(!success){
