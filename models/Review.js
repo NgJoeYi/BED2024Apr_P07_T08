@@ -81,10 +81,30 @@ async function deleteReview(connection, id) {
     }
 }
 
+function fetchReviewCountForCourse(courseId) {
+    fetch(`/reviews/count?courseId=${courseId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.count !== undefined) {
+                const reviewCountElement = document.getElementById(`review-count-${courseId}`);
+                reviewCountElement.textContent = `Total Reviews: ${data.count}`;
+            } else {
+                console.error('Error fetching review count for course:', data);
+                alert('Error fetching review count.');
+            }
+        })
+        .catch(error => {
+            console.error('Network or server error:', error);
+            alert('Error fetching review count.');
+        });
+}
+
+
 module.exports = {
     getAllReviews,
     getReviewById,
     createReview,
     updateReview,
     deleteReview,
+    fetchReviewCountForCourse
 };
