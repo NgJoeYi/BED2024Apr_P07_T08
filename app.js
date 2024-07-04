@@ -66,6 +66,7 @@ app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
+app.get('/comments/count', commentController.getCommentCount);  //Will get total comments in total, but to specify each discussion how much comments is in Js bc then would get comments by discussionId to display number of comments etc
 app.put('/comments/:id', jwtAuthorization.verifyJWT, commentController.updateComment);
 app.post('/comments', jwtAuthorization.verifyJWT, commentController.createComment); 
 app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
