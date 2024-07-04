@@ -61,11 +61,17 @@ function displayCourses(courses) {
                         <button class="edit-course"  data-course-id="${course.courseID}" onclick="editCourse(event, this)">Edit</button>           
                     </div>
                     ` : ''}
+                    <div class="reviews-count-container">
+                        <span id="review-count-${course.courseID}" class="review-count">💬 0 Reviews</span>
+                    </div>
                 </div>
             </a>
         `;
         console.log('COURSE ID IN HTML: ', course.courseID);
         coursesGrid.appendChild(courseElement);
+
+        // Fetch and display the review count for each course
+        fetchReviewCountForCourse(course.courseID);
     });
 }
 
@@ -236,4 +242,22 @@ function populateCourseDetails(course) {
         courseImageElement.src = imageUrl;
         courseImageElement.alt = "Course Image";
     }
+}
+
+function fetchReviewCountForCourse(courseId) {
+    fetch(`/reviews/count?courseId=${courseId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.count !== undefined) {
+                const reviewCountElement = document.getElementById(`review-count-${courseId}`);
+                reviewCountElement.textContent = `💬 ${data.count} Reviews`;
+            } else {
+                console.error('Error fetching review count for course:', data);
+                alert('Error fetching review count.');
+            }
+        })
+        .catch(error => {
+            console.error('Network or server error:', error);
+            alert('Error fetching review count.');
+        });
 }
