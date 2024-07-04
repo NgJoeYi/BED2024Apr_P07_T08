@@ -58,7 +58,9 @@ function displayCourses(courses) {
                     ${userRole === 'lecturer' ? `
                     <div class="delete-button-container">
                         <button class="delete-course" data-course-id="${course.courseID}" onclick="deleteCourse(event, this)">Delete</button>
-                    </div>` : ''}
+                        <button class="edit-course"  data-course-id="${course.courseID}" onclick="editCourse(event, this)">Edit</button>           
+                    </div>
+                    ` : ''}
                 </div>
             </a>
         `;
