@@ -129,12 +129,16 @@ function addDiscussionToFeed(discussion) {
             <div class="likes-dislikes">
                 <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
                 <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
+                <span id="comment-count-${discussion.id}" class="comment-count" style = "margin-left: -2px"; >💬 0 Comments</span>
             </div>
             <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
         </div>
     `;
 
     feed.prepend(post);
+
+    // Fetch and display the comment count for each discussion
+    fetchCommentCountForDiscussion(discussion.id);
 
     // Attach event listeners after appending to the feed to ensure they are correctly set up
     const likeButton = post.querySelector('.like-button');
@@ -159,6 +163,24 @@ function addDiscussionToFeed(discussion) {
         const discussionId = this.getAttribute('data-id');
         window.location.href = `comment.html?discussionId=${discussionId}`;
     });
+}
+
+function fetchCommentCountForDiscussion(discussionId) {
+    fetch(`/comments/count?discussionId=${discussionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.count !== undefined) {
+                const commentCountElement = document.getElementById(`comment-count-${discussionId}`);
+                commentCountElement.textContent = `💬 ${data.count} Comments`;
+            } else {
+                console.error('Error fetching comment count for discussion:', data);
+                alert('Error fetching comment count.');
+            }
+        })
+        .catch(error => {
+            console.error('Network or server error:', error);
+            alert('Error fetching comment count.');
+        });
 }
 
 function incrementLikes(discussionId, likeButton, dislikeButton) {

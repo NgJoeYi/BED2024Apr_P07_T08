@@ -64,7 +64,6 @@ class Courses {
         try {
             const sqlQuery = `
                 UPDATE Courses SET 
-                    UserID = @userID,
                     Title = @title, 
                     Description = @description,
                     Category = @category,
@@ -75,22 +74,23 @@ class Courses {
             `;
             const request = connection.request();
             request.input('id', sql.Int, id);
-            request.input('userID', sql.Int, newCourseData.userID);
             request.input('title', sql.NVarChar, newCourseData.title);
             request.input('description', sql.NVarChar, newCourseData.description);
             request.input('category', sql.NVarChar, newCourseData.category);
-            request.input('level', sql.NVarChar, newCourseData.level );
+            request.input('level', sql.NVarChar, newCourseData.level);
             request.input('duration', sql.Int, newCourseData.duration);
-            request.input('courseImage', sql.VarBinary, newCourseData.courseImage );
-
+            request.input('courseImage', sql.VarBinary, newCourseData.courseImage);
+    
             await request.query(sqlQuery);
-            connection.close();
             return await this.getCourseById(id);
         } catch (error) {
             console.error('Error updating course:', error);  // Log detailed error
             throw error;
+        } finally {
+            await connection.close();
         }
     }
+
     static async deleteCourseWithNoLectures(){
         let connection = await sql.connect(dbConfig);
         try{

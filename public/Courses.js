@@ -58,7 +58,9 @@ function displayCourses(courses) {
                     ${userRole === 'lecturer' ? `
                     <div class="delete-button-container">
                         <button class="delete-course" data-course-id="${course.courseID}" onclick="deleteCourse(event, this)">Delete</button>
-                    </div>` : ''}
+                        <button class="edit-course"  data-course-id="${course.courseID}" onclick="editCourse(event, this)">Edit</button>           
+                    </div>
+                    ` : ''}
                 </div>
             </a>
         `;
@@ -118,5 +120,120 @@ async function deleteCourse(event, button) {
     } catch (error) {
         console.error('Error deleting course:', error);
         alert('Error deleting course.');
+    }
+}
+
+// EDIT COURSE 
+// EDIT COURSE 
+async function editCourse(event, button) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const courseID = button.dataset.courseId;
+    const userID = sessionStorage.getItem('userId');
+    if (!courseID) {
+        alert('Course ID not found.');
+        return;
+    }
+    console.log('EDIT COURSE ID :', courseID);
+
+    try {
+        const response = await fetch(`/courses/${courseID}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const course = await response.json();
+        if (course.userID !== parseInt(userID)) {
+            alert('You do not have permission to edit this course.');
+            return;
+        }
+        // Redirect to edit course page with courseID as query parameter
+        window.location.href = `updateCourse.html?courseID=${courseID}`;
+    } catch (error) {
+        console.error('Error fetching course details:', error);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseID = urlParams.get('courseID');
+    const userID = sessionStorage.getItem('userId');
+    console.log('USER ID UPDATE COURSE: ', userID);
+    if (courseID) {
+        try {
+            const response = await fetch(`/courses/${courseID}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const course = await response.json();
+            populateCourseDetails(course);
+        } catch (error) {
+            console.error('Error fetching course details:', error);
+        }
+    }
+
+    const form = document.getElementById('edit-course-form');
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const title = document.getElementById('courseTitle').value;
+        const description = document.getElementById('courseDescription').value;
+        const category = document.getElementById('courseCategory').value;
+        const level = document.getElementById('courseLevel').value;
+        const duration = document.getElementById('courseDuration').value;
+        const courseImageInput = document.getElementById('courseImageInput');
+
+        if (!title || !description || !category || !level || !duration) {
+            alert('Please fill all the required fields.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('category', category);
+        formData.append('level', level);
+        formData.append('duration', duration);
+
+        if (courseImageInput.files.length > 0) {
+            formData.append('courseImage', courseImageInput.files[0]);
+        }
+        formData.append('userID', userID);
+
+        // Log form data before sending
+        formData.forEach((value, key) => {
+            console.log(`${key}: ${value}`);
+        });
+
+        try {
+            const response = await fetch(`/courses/${courseID}`, {
+                method: 'PUT',
+                body: formData
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            alert('Course updated successfully!');
+            window.location.href = 'courses.html';
+        } catch (error) {
+            console.error('Error updating course:', error);
+            alert('Error updating course.');
+        }
+    });
+});
+
+function populateCourseDetails(course) {
+    document.getElementById('courseTitle').value = course.title;
+    document.getElementById('courseDescription').value = course.description;
+    document.getElementById('courseLevel').value = course.level;
+    document.getElementById('courseCategory').value = course.category;
+    document.getElementById('courseDuration').value = course.duration;
+
+    const courseImageElement = document.getElementById('courseImage');
+    if (courseImageElement && course.courseImage) {
+        const imageUrl = `/courses/image/${course.courseID}`;
+        courseImageElement.src = imageUrl;
+        courseImageElement.alt = "Course Image";
     }
 }

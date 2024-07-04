@@ -66,6 +66,7 @@ app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
+app.get('/comments/count', commentController.getCommentCount);  //Will get total comments in total, but to specify each discussion how much comments is in Js bc then would get comments by discussionId to display number of comments etc
 app.put('/comments/:id', jwtAuthorization.verifyJWT, commentController.updateComment);
 app.post('/comments', jwtAuthorization.verifyJWT, commentController.createComment); 
 app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
@@ -80,7 +81,7 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
-app.put('/courses/:id', courseController.updateCourse);
+app.put('/courses/:id', upload.single('courseImage'), courseController.updateCourse);
 app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/:id', courseController.deleteCourse);
 app.delete('/courses/noLectures',courseController.deleteCourseWithNoLectures);

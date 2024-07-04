@@ -109,8 +109,23 @@ async function deleteComment(connection, id) {
     }
 }
 
-
-
+function fetchCommentCountForDiscussion(discussionId) {
+    fetch(`/comments/count?discussionId=${discussionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.count !== undefined) {
+                const commentCountElement = document.getElementById(`comment-count-${discussionId}`);
+                commentCountElement.textContent = `Total Comments: ${data.count}`;
+            } else {
+                console.error('Error fetching comment count for discussion:', data);
+                alert('Error fetching comment count.');
+            }
+        })
+        .catch(error => {
+            console.error('Network or server error:', error);
+            alert('Error fetching comment count.');
+        });
+}
 
 
 module.exports = {
@@ -119,6 +134,7 @@ module.exports = {
     getCommentsByDiscussionId,
     createComment,
     updateComment,
-    deleteComment
+    deleteComment,
+    fetchCommentCountForDiscussion
     
 };

@@ -104,14 +104,16 @@ async function run() {
             FOREIGN KEY (CourseID) REFERENCES Courses(CourseID),
             FOREIGN KEY (UserID) REFERENCES Users(id)
         );
-
+        
         CREATE TABLE user_reviews (
             review_id INT PRIMARY KEY IDENTITY,
             user_id INT NOT NULL,
             review_text TEXT NOT NULL,
             rating INT CHECK (rating >= 1 AND rating <= 5),
             review_date DATETIME DEFAULT GETDATE(),
-            FOREIGN KEY (user_id) REFERENCES Users(id)
+            course_id INT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES Users(id),
+            FOREIGN KEY (course_id) REFERENCES Courses(CourseID) ON DELETE CASCADE
         );
         `;
         await connection.request().query(createTables);
@@ -139,11 +141,11 @@ async function run() {
 
         // Path to courseImage file
         // WY, RAEANN
-        const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
+        // const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
 
 
         // AMELIA'S
-        // const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08-1/public/courseImage/course1.jpeg');
+        const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08-1/public/courseImage/course1.jpeg');
 
         // Read courseImage file 
         const courseImageBuffer = fs.readFileSync(courseImagePath);
@@ -161,13 +163,14 @@ async function run() {
         
         // Path to external files 
         // WY, RAEANN, JOEYI'S
-        const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
-        const video2path = path.join(__dirname,'../BED2024Apr_P07_T08/public/lectureVideos/video2.mp4');
-        const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
+        // const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
+        // const video2path = path.join(__dirname,'../BED2024Apr_P07_T08/public/lectureVideos/video2.mp4');
+        // const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
 
         //AMELIA'S
-        // const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureVideos/video1.mp4');
-        // const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureImage/lecture1.jpeg');
+        const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureVideos/video1.mp4');
+        const video2path = path.join(__dirname,'../BED2024Apr_P07_T08-1/public/lectureVideos/video2.mp4');
+        const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureImage/lecture1.jpeg');
         
         // Read external file
         const videoBuffer = fs.readFileSync(videoFilePath);
@@ -205,11 +208,11 @@ async function run() {
 
         // Insert data into user_reviews table
         const insertUserReviews = `
-        INSERT INTO user_reviews (user_id, review_text, rating, review_date) VALUES 
-        (6, 'Great course content, very informative!', 5, GETDATE()),
-        (7, 'Needs improvement in course materials.', 3, GETDATE()),
-        (8, 'Well-structured lectures and helpful professor.', 4, GETDATE()),
-        (9, 'Lecture pace was too fast to follow.', 2, GETDATE());
+        INSERT INTO user_reviews (user_id, review_text, rating, review_date, course_id) VALUES 
+        (6, 'Great course content, very informative!', 5, GETDATE(),1),
+        (7, 'Needs improvement in course materials.', 3, GETDATE(),2),
+        (8, 'Well-structured lectures and helpful professor.', 4, GETDATE(),2),
+        (9, 'Lecture pace was too fast to follow.', 2, GETDATE(),3);
         `;
         await connection.request().query(insertUserReviews);
 
