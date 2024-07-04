@@ -3,10 +3,15 @@ const dbConfig = require('../dbConfig');
 const reviewModel = require('../models/Review');
 
 async function getReviews(req, res) {
+    const { courseId } = req.query;
+    if (!courseId) {
+        return res.status(400).json({ error: 'Course ID is required' });
+    }
+    
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const reviews = await reviewModel.getAllReviews(connection);
+        const reviews = await reviewModel.getAllReviews(connection, courseId);
         res.status(200).json(reviews);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -16,6 +21,7 @@ async function getReviews(req, res) {
         }
     }
 }
+
 
 async function updateReview(req, res) {
     const { id } = req.params;
