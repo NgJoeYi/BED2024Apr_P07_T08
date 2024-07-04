@@ -79,30 +79,6 @@ function filterImages(category) {
   });
 }
 
-// Feature 4: Username editing functionality in account.html
-// document.getElementById('edit-icon').addEventListener('click', function() {
-//   const editAccountDetails = document.getElementById('edit-account-details');
-//   editAccountDetails.style.display = editAccountDetails.style.display === 'none' || editAccountDetails.style.display === '' ? 'block' : 'none';
-// });
-
-// document.getElementById('save-changes').addEventListener('click', function() {
-//   const newUsername = document.getElementById('edit-name').value;
-//   const newBirthDate = document.getElementById('edit-birth-date').value;
-//   const newEmail = document.getElementById('edit-email').value;
-  
-//   // Update the profile info
-//   document.querySelector('.profile-info .user-name').textContent = newUsername;
-
-//   // Update all elements with the class 'user-name' in reviews and comments
-//   document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
-//     element.textContent = newUsername;
-//   });
-
-//   // Hide the edit section
-//   document.getElementById('edit-account-details').style.display = 'none';
-// });
-
-
 // Feature 5: Popup functionality
 // Define the popup functions outside the conditional block
 function openPopup() {
@@ -187,19 +163,6 @@ function changeSlide(carouselId, n) {
   }
 }
 
-// Feature 7 : Account.html confirm logout and delete account
-function confirmLogout() {
-  const userConfirmed = confirm('Are you sure you want to log out?');
-  if (userConfirmed) {
-    // User clicked "OK"
-    alert('You are logged out.');
-    // Add your logout logic here
-  } else {
-    // User clicked "Cancel"
-    alert('Logout cancelled.');
-  }
-}
-
 function confirmCancel() {
   const userConfirmed = confirm('Are you sure you want to Cancel?');
   if (userConfirmed) {
@@ -216,10 +179,14 @@ function confirmCancel() {
 
 // Fetch and display reviews
 async function fetchAndDisplayReviews() {
-  const userId = sessionStorage.getItem('userId'); // Get the logged-in user's ID
-  console.log('User ID:', userId); // Debugging
+  const token = getToken(); // Get the logged-in user's ID
+  // console.log('User ID:', userId); // Debugging
   try {
-    const response = await fetch('/reviews');
+    const response = await fetch('/reviews', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch reviews');
     }
@@ -229,7 +196,7 @@ async function fetchAndDisplayReviews() {
     reviewWrapper.innerHTML = ''; // Clear the existing placeholder content
 
     // Filter reviews to show only those by the logged-in user
-    const userReviews = reviews.filter(review => review.user_id == userId);
+    const userReviews = reviews.filter(review => review.user_id == token);
     console.log('Filtered Reviews:', userReviews); // Debugging
 
     if (userReviews.length === 0) {
@@ -338,13 +305,14 @@ function closeDeleteModal() {
 
 async function deleteReview(reviewId) {
   try {
+    const token = getToken();
     console.log(`Attempting to delete review with ID: ${reviewId}`); // Debugging
     const response = await fetch(`/reviews/${reviewId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
       },
-      body: JSON.stringify({ userId: sessionStorage.getItem('userId') })
     });
     
     if (!response.ok) {
@@ -406,12 +374,14 @@ async function submitEditedReview(reviewId) {
 
   if (newText && newRating >= 1 && newRating <= 5) {
     try {
+      const token = getToken();
       const response = await fetch(`/reviews/${reviewId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ review_text: newText, rating: newRating, userId: sessionStorage.getItem('userId') })
+        body: JSON.stringify({ review_text: newText, rating: newRating })
       });
       if (!response.ok) {
         throw new Error('Failed to update review');
@@ -467,19 +437,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function fetchUserDiscussions() {
-  const userId = getCurrentUserId();
-  if (!userId) {
-    console.error('No user ID found');
+  const token = getToken();
+  if (!token) {
+    console.error('No user token found');
     return;
   }
 
   try {
-    const response = await fetch(`/discussions/user/${userId}`);
+    const response = await fetch(`/discussions/user`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch user discussions');
     }
 
     const data = await response.json();
+    console.log('Fetched discussions data:', data); 
+
     const discussionsContainer = document.querySelector('.user-discussions');
     const noDiscussionsMessage = document.querySelector('.no-discussions-message');
     
@@ -495,10 +471,12 @@ async function fetchUserDiscussions() {
         });
       }
     } else {
+      console.log(data.success);
       alert('Error fetching user discussions.');
     }
   } catch (error) {
-    alert('Error fetching user discussions.');
+    console.error('Error fetching user discussions:', error); // CHANGED
+    alert('Error fetching user discussions: ' + error.message); // CHANGED
   }
 }
 
@@ -540,10 +518,6 @@ function addUserDiscussionToFeed(discussion) {
   post.querySelector('.delete-btn').addEventListener('click', () => openDeleteModal(discussion.id));
 }
 
-function getCurrentUserId() {
-  return sessionStorage.getItem('userId');
-}
-
 // Edit Modal functions
 function openEditModal(discussionId, description, category) {
   document.getElementById('editText').value = description;
@@ -564,12 +538,14 @@ async function saveEdit(discussionId) {
   const category = document.getElementById('editCategory').value;
 
   try {
+    const token = getToken();
     const response = await fetch(`/discussions/${discussionId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ description, category, userId: getCurrentUserId() })
+      body: JSON.stringify({ description, category })
     });
     if (!response.ok) {
       throw new Error('Failed to update discussion');
@@ -607,15 +583,15 @@ function closeDeleteModal() {
 
 async function deleteDiscussion(discussionId) {
   try {
-    const userId = getCurrentUserId();
-    console.log('Deleting discussion with ID:', discussionId, 'for user ID:', userId);
+    const token = getToken();
+    console.log('Deleting discussion with ID:', discussionId, 'for user ID:', token);
 
     const response = await fetch(`/discussions/${discussionId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ userId: userId })
     });
 
     if (!response.ok) {
@@ -623,7 +599,7 @@ async function deleteDiscussion(discussionId) {
       throw new Error(`Failed to delete discussion: ${errorText}`);
     }
 
-    alert('Discussion deleted successfully');
+    alert('Discussion and associated comments deleted successfully');
     fetchUserDiscussions();
     closeDeleteModal(); // Ensure the modal is closed first
      // Fetch user discussions after closing the modal
@@ -631,4 +607,8 @@ async function deleteDiscussion(discussionId) {
     console.error('Error deleting discussion:', error);
     alert('Error deleting discussion: ' + error.message);
   }
+}
+
+function getToken() {
+  return sessionStorage.getItem('token');
 }

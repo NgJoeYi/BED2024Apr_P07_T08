@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const title = document.getElementById('title').value;
         const category = document.getElementById('category').value;
         const description = document.getElementById('description').value;
-        const userId = getCurrentUserId(); // Function to get the current user's ID
+        const token = getToken(); // Function to get the current user's ID
 
-        if (!userId) {
+        if (!token) {
             alert('User must be logged in to submit a discussion.');
             return;
         }
@@ -22,8 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const data = {
             title: title,
             category: category,
-            description: description,
-            userId: userId
+            description: description
         };
 
         console.log('Submitting form with data:', data);
@@ -31,7 +30,8 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/discussions', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
         })
@@ -56,9 +56,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function getCurrentUserId() {
-    const userId = sessionStorage.getItem('userId');
-    if (!userId) {
+function getToken() {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
         alert('User is not logged in or session has expired');
         return null;
     }
@@ -129,12 +129,16 @@ function addDiscussionToFeed(discussion) {
             <div class="likes-dislikes">
                 <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
                 <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
+                <span id="comment-count-${discussion.id}" class="comment-count" style = "margin-left: -2px"; >💬 0 Comments</span>
             </div>
             <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
         </div>
     `;
 
     feed.prepend(post);
+
+    // Fetch and display the comment count for each discussion
+    fetchCommentCountForDiscussion(discussion.id);
 
     // Attach event listeners after appending to the feed to ensure they are correctly set up
     const likeButton = post.querySelector('.like-button');
@@ -161,11 +165,34 @@ function addDiscussionToFeed(discussion) {
     });
 }
 
+function fetchCommentCountForDiscussion(discussionId) {
+    fetch(`/comments/count?discussionId=${discussionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.count !== undefined) {
+                const commentCountElement = document.getElementById(`comment-count-${discussionId}`);
+                commentCountElement.textContent = `💬 ${data.count} Comments`;
+            } else {
+                console.error('Error fetching comment count for discussion:', data);
+                alert('Error fetching comment count.');
+            }
+        })
+        .catch(error => {
+            console.error('Network or server error:', error);
+            alert('Error fetching comment count.');
+        });
+}
+
 function incrementLikes(discussionId, likeButton, dislikeButton) {
+    const token = getToken();  // -- jwt implementation
+    if (!token) {  // -- jwt implementation
+        return;  // -- jwt implementation
+    }  // -- jwt implementation
     fetch(`/discussions/${discussionId}/like`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         }
     })
     .then(response => response.json())
@@ -186,10 +213,15 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
 }
 
 function incrementDislikes(discussionId, likeButton, dislikeButton) {
+    const token = getToken();  // -- jwt implementation
+    if (!token) {  // -- jwt implementation
+        return;  // -- jwt implementation
+    }  // -- jwt implementation
     fetch(`/discussions/${discussionId}/dislike`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         }
     })
     .then(response => response.json())
@@ -226,3 +258,9 @@ window.onclick = function(event) {
         document.getElementById("popup").style.display = "none";
     }
 }
+
+
+// -- jwt note 
+// 1. users CAN view discussions if they are NOT logged in 
+// 2. users CAN go to comments if they are NOT logged in
+// 3. users CANNOT like or dislike the discussion if they are NOT logged in

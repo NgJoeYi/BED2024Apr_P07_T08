@@ -7,7 +7,7 @@ document.getElementById('login-contact-form').addEventListener('submit', async f
     });
 
     try {
-        const loginResponse = await fetch('/users/login', {
+        const loginResponse = await fetch('/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -19,10 +19,10 @@ document.getElementById('login-contact-form').addEventListener('submit', async f
             const user = await loginResponse.json();
             alert('Login successful!');
 // --------------------------------------- JWT ---------------------------------------
-            //sessionStorage.setItem('token', data.token);
+            sessionStorage.setItem('token', user.token);
 // --------------------------------------- JWT ---------------------------------------
-            sessionStorage.setItem('userId', user.id);
-            sessionStorage.setItem('role', user.role); // Store role in sessionStorage
+            // sessionStorage.setItem('userId', user.id);
+            // sessionStorage.setItem('role', user.role); // Store role in sessionStorage
             
             window.location.href = 'index.html'; // Redirect on successful login
         } else {

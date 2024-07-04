@@ -73,7 +73,7 @@ async function run() {
             created_at DATETIME DEFAULT GETDATE(),
             discussion_id INT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES Users(id),
-            FOREIGN KEY (discussion_id) REFERENCES Discussions(id)
+            FOREIGN KEY (discussion_id) REFERENCES Discussions(id) ON DELETE CASCADE
         );
 
         CREATE TABLE Courses (
@@ -167,6 +167,7 @@ async function run() {
 
         //AMELIA'S
         // const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureVideos/video1.mp4');
+        // const video2path = path.join(__dirname,'../BED2024Apr_P07_T08-1/public/lectureVideos/video2.mp4');
         // const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08-1/public/lectureImage/lecture1.jpeg');
         
         // Read external file
