@@ -54,11 +54,30 @@ body {
 }
 
 .delete-lecture:hover {
-  background-color: darkred;
+  background-color: #FF312E;
+}
+/* edit lecture button*/
+.edit-lecture {
+  background-color: #F9E0D9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 60px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 10px; /* Add some space from the content above */
+}
+
+.edit-lecture:hover {
+  background-color: #E6DBD0;
 }
 
 .nav {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .nav-item {

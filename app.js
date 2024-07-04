@@ -89,6 +89,7 @@ app.delete('/courses/noLectures',courseController.deleteCourseWithNoLectures);
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
+app.get('/lectures/:id', lectureController.getLectureByID); // Fix here
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
 app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
 app.put('/lectures/:id', lectureController.updateLecture); 

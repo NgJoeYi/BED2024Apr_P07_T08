@@ -178,11 +178,16 @@ function displayLectures(lectures) {
                     userRole === 'lecturer'
                     ? `<button class="delete-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>` 
                     : '';
+                const editButton = 
+                    userRole === 'lecturer'
+                    ? `<button class="edit-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="editLecture(this)">Edit</button>`
+                    : '';
     
                 return `
                     <div class="sub-nav-item" data-lecture-id="${lecture.LectureID}">
                         ${lecture.Title}
                         ${deleteButton}
+                        ${editButton}
                     </div>
                 `;
             }).join('');
@@ -244,3 +249,106 @@ async function setVideo(lectureID) {
     }
 }
 
+async function editLecture(button) {
+    const lectureID = button.dataset.lectureId;
+    const courseID = new URLSearchParams(window.location.search).get('courseID');
+
+    // Redirect to edit lecture page with lectureID and courseID as query parameters
+    window.location.href = `editLecture.html?courseID=${courseID}&lectureID=${lectureID}`;
+}
+// EDIT LECTURE
+document.addEventListener('DOMContentLoaded', async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const lectureID = urlParams.get('lectureID');
+    const courseID = urlParams.get('courseID');
+    const userID = sessionStorage.getItem('userId');
+    console.log('USER ID UPDATE LECTURE: ', userID);
+
+    if (lectureID && courseID) {
+        try {
+            const response = await fetch(`/lectures/${lectureID}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const lecture = await response.json();
+            console.log('Fetched lecture:', lecture);
+            populateLectureDetails(lecture);
+        } catch (error) {
+            console.error('Error fetching lecture details:', error);
+        }
+    }
+
+    const form = document.getElementById('edit-lecture-form');
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('title', document.getElementById('lectureTitle').value);
+        formData.append('description', document.getElementById('lectureDescription').value);
+        formData.append('chapterName', document.getElementById('lectureChapterName').value);
+        formData.append('duration', document.getElementById('lectureDuration').value);
+        const lectureImageInput = document.getElementById('lectureImageInput');
+        const lectureVideoInput = document.getElementById('lectureVideoInput');
+
+        if (lectureImageInput.files.length > 0) {
+            formData.append('lectureImage', lectureImageInput.files[0]);
+        }
+        if (lectureVideoInput.files.length > 0) {
+            formData.append('lectureVideo', lectureVideoInput.files[0]);
+        }
+        formData.append('userID', sessionStorage.getItem('userId'));
+
+        // Log form data before sending
+        console.log('Form Data:', Object.fromEntries(formData.entries()));
+
+        try {
+            const response = await fetch(`/lectures/${lectureID}`, {
+                method: 'PUT',
+                body: formData
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            alert('Lecture updated successfully!');
+            window.location.href = `lecture.html?courseID=${courseID}`;
+        } catch (error) {
+            console.error('Error updating lecture:', error);
+            alert('Error updating lecture.');
+        }
+    });
+});
+
+function populateLectureDetails(lecture) {
+    console.log('Populating lecture details:', lecture); // Debug log
+
+    document.getElementById('lectureTitle').value = lecture.title || '';
+    document.getElementById('lectureDescription').value = lecture.description || '';
+    document.getElementById('lectureChapterName').value = lecture.chapterName || '';
+    document.getElementById('lectureDuration').value = lecture.duration || '';
+
+    const lectureImageElement = document.getElementById('lectureImage');
+    const lectureImageInputElement = document.getElementById('lectureImageInput');
+
+    if (lectureImageElement && lecture.lectureImage) {
+        const imageUrl = `/lectures/image/${lecture.lectureID}`;
+        lectureImageElement.src = imageUrl;
+        lectureImageElement.alt = "Lecture Image";
+        lectureImageElement.style.display = 'block';
+        lectureImageInputElement.value = '';
+    } else {
+        lectureImageElement.style.display = 'none';
+    }
+
+    const lectureVideoElement = document.getElementById('lectureVideo');
+    const lectureVideoInputElement = document.getElementById('lectureVideoInput');
+
+    if (lectureVideoElement && lecture.video) {
+        const videoUrl = `/video/${lecture.lectureID}`;
+        lectureVideoElement.src = videoUrl;
+        lectureVideoElement.controls = true;
+        lectureVideoElement.style.display = 'block';
+        lectureVideoInputElement.value = '';
+    } else {
+        lectureVideoElement.style.display = 'none';
+    }
+}
