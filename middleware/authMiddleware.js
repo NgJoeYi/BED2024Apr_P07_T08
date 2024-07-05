@@ -22,6 +22,8 @@ function verifyJWT(req, res, next) {
             'GET /account/profile': ['student', 'lecturer'],
             'POST /account/uploadProfilePic': ['student', 'lecturer'],
             'PUT /account': ['student', 'lecturer'], // -- will need to come back to this
+            'DELETE /account': ['student', 'lecturer'], //hi i added this here - Raeann( delete it when u see HAHHAH)
+            
 
             'GET /discussions/user': ['student', 'lecturer'],
             'GET /discussions': ['student', 'lecturer'],
