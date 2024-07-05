@@ -84,7 +84,7 @@ app.post('/comments', jwtAuthorization.verifyJWT, commentController.createCommen
 app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
 
 // Add Routes for reviews
-app.get('/reviews', reviewController.getReviews);
+app.get('/reviews', reviewController.getReviews); //Filtering & Sorting is done here also done using route, using this.
 app.get('/reviews/count', reviewController.getReviewCount); 
 app.put('/reviews/:id', reviewController.updateReview);
 app.post('/reviews', reviewController.createReview); 

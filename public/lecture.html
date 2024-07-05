@@ -51,18 +51,18 @@
             <div class="filter-sort">
                 <div class="filter">
                     Filter by:
-                    <select id="filter" onchange="filterReviews()">
+                    <select id="filter" onchange="fetchReviews(courseId)">
                         <option value="all">All</option>
                         <option value="5">5 stars</option>
                         <option value="4">4 stars</option>
                         <option value="3">3 stars</option>
                         <option value="2">2 stars</option>
                         <option value="1">1 star</option>
-                    </select>
+                    </select>                    
                 </div>
                 <div class="sort">
                     Sort by:
-                    <select id="sort" onchange="sortReviews()">
+                    <select id="sort" onchange="fetchReviews(courseId)">
                         <option value="mostRecent">Most Recent</option>
                         <option value="highestRating">Highest Rating</option>
                         <option value="lowestRating">Lowest Rating</option>
