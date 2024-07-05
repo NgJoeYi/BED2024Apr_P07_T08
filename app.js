@@ -85,6 +85,7 @@ app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.delete
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews);
+app.get('/reviews/count', reviewController.getReviewCount); 
 app.put('/reviews/:id', reviewController.updateReview);
 app.post('/reviews', reviewController.createReview); 
 app.delete('/reviews/:id', reviewController.deleteReview);

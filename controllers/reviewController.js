@@ -81,9 +81,36 @@ async function deleteReview(req, res) {
     }
 }
 
+async function getReviewCount(req, res) {
+    const { courseId } = req.query;
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        let countQuery = `SELECT COUNT(*) AS count FROM user_reviews`;
+        if (courseId) {
+            countQuery += ` WHERE course_id = @courseId`;
+        }
+        const request = new sql.Request(connection);
+        if (courseId) {
+            request.input('courseId', sql.Int, courseId);
+        }
+        const result = await request.query(countQuery);
+        res.json({ count: result.recordset[0].count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching review count");
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
+
 module.exports = {
     getReviews,
     updateReview,
     createReview,
     deleteReview,
+    getReviewCount,
 };
