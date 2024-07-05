@@ -248,41 +248,42 @@ document.addEventListener('DOMContentLoaded', async function () {
   async function deleteAccount() {
     const token = getToken();
     const password = document.getElementById('delete-password').value;
-  
+
     if (!token) {
-      alert('No user is logged in');
-      return;
+        alert('No user is logged in');
+        return;
     }
-  
+
     if (!password) {
-      alert('Please enter your password');
-      return;
+        alert('Please enter your password');
+        return;
     }
-  
+
     try {
-      const response = await fetch(`/account`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ password: password })
-      });
-  
-      if (response.ok) {
-        alert('Account deleted successfully');
-        sessionStorage.removeItem('token');
-        window.location.href = 'Index.html';
-      } else {
-        const errorData = await response.json();
-        alert(`${errorData.message}`);
-      }
+        const response = await fetch('/account', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ password: password })
+        });
+
+        if (response.ok) {
+            alert('Account deleted successfully');
+            sessionStorage.removeItem('token');
+            window.location.href = 'Index.html';
+        } else {
+            const errorData = await response.json();
+            alert(errorData.message);
+        }
     } catch (error) {
-      console.error('Error:', error);
+        console.error('Error:', error);
     } finally {
-      closeDeleteModal();
+        closeDeleteModal();
     }
-  }
+}
+
   
   // ---------------------------------------------- LOG OUT --------------------------------------------------------------
   function confirmLogout() {
