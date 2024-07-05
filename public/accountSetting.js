@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (response.ok) {
                 const user = await response.json();
                 // Populate profile info
-                document.querySelector('.profile-info .user-name').textContent = user.name;
+                document.querySelector('.user-name').textContent = user.name;
+                document.querySelector('.h3 .user-name').textContent = user.name;
                 
                 // Prefill edit form fields
                 document.getElementById('edit-name').value = user.name; 
@@ -194,7 +195,14 @@ document.addEventListener('DOMContentLoaded', async function () {
   
   async function uploadImageToServer(base64Image) {
     const token = getToken();
+    
+    if (!token) {
+      alert('No token found. Please log in first.');
+      return;
+    }
+  
     try {
+      console.log('Uploading image...');
       const response = await fetch(`/account/uploadProfilePic`, {
         method: 'POST',
         headers: {
@@ -207,13 +215,16 @@ document.addEventListener('DOMContentLoaded', async function () {
       if (response.ok) {
         alert('Profile picture updated successfully');
       } else {
-        alert('Failed to update profile picture');
+        const errorData = await response.json();
+        console.error('Upload failed:', errorData);
+        alert(`Failed to update profile picture: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Error uploading image');
     }
   }
+  
       
   // ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
   // Function to confirm account deletion

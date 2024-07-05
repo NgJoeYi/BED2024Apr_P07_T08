@@ -62,7 +62,7 @@ function getToken() {
         alert('User is not logged in or session has expired');
         return null;
     }
-    return userId;
+    return token;
 }
 
 function fetchDiscussions() {
