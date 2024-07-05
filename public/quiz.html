@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Application</title>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="quiz.css">
+</head>
+<body>
+<!-- navbar -->
+<header>
+    <nav class="navbar">
+        <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
+        <ul class="menu-links" id="menu-links">
+            <li><a href="Index.html">HOME</a></li>
+            <li><a href="ContactUs.html">CONTACT US</a></li>
+            <li><a href="quiz.html">QUIZ</a></li>
+            <li><a href="Courses.html" id="nav-courses" style="display: none;">COURSES</a></li>
+            <li><a href="activityfeed.html" id="nav-activityfeed" style="display: none;">ACTIVITYFEED</a></li>
+            <li><a href="account.html" id="nav-account" style="display: none;">ACCOUNT</a></li>
+        </ul>
+        <div class="auth-links" id="auth-links">
+            <a href="Login.html" id="navbar-login">LOG IN</a>
+            <a href="Register.html" id="navbar-signup">SIGN UP</a>
+        </div>
+        <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
+    </nav>
+</header>
+    <main>
+        <section id="quiz-list">
+            <div id="quiz-container">
+                <!-- Quizzes will be dynamically inserted here -->
+            </div>
+        </section>
+    </main>
+    <script src="quiz.js"></script>
+</body>
+</html>
