@@ -11,6 +11,7 @@ const multer = require('multer');
 dotenv.config();
 
 const userController = require('./controllers/userController');
+const quizController = require('./controllers/quizController');
 const discussionController = require('./controllers/discussionController');
 const commentController = require('./controllers/commentController');
 const reviewController = require('./controllers/reviewController');
@@ -46,15 +47,26 @@ app.get('/favicon.ico', (req, res) => res.status(204));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
-// Add Routes for users
+// Add Routes for log in & register
 app.post('/register', userValidation, userController.createUser);
 app.post('/login', userController.loginUser);
 
+// Add Routes for account management
 app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById);
 app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController.updateProfilePic);
 app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
 app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
+
+// Add Routes for quizzes
+app.get('/quizzes', quizController.getAllQuizWithCreatorName);
+app.get('/quizzes/:id', quizController.getQuizById);
+app.post('/quizzes', quizController.createQuiz);
+app.put('/quizzes/:id', quizController.updateQuiz);
+app.delete('/quizzes/:id', quizController.deleteQuiz);
+
+// Add Routes for quiz questions 
+app.get('/quizzes/:id/questions', quizController.getQuizWithQuestions);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);

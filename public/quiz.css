@@ -1,0 +1,102 @@
+main {
+    padding: 60px 20px;
+    padding-top: 220px; /* Ensure content is below the navbar */
+    max-width: 1600px; /* Adjust the max width to fit four wider cards */
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+#quiz-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Ensure four quizzes per row */
+    gap: 20px;
+    margin-top: 20px; /* Add some margin to move it down from the navbar */
+    width: 100%;
+}
+
+.quiz-card {
+    background-color: #1b2b40;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%; /* Make width 100% to fill grid column */
+    max-width: 350px; /* Ensure the card doesn't exceed the max width */
+}
+
+.quiz-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.quiz-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.quiz-card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.quiz-card h3 {
+    font-size: 24px;
+    margin: 0 0 10px;
+    color: #d9aa52;
+}
+
+.quiz-card p {
+    font-size: 16px;
+    color: #ffffff;
+    margin: 0 0 15px;
+    flex-grow: 1;
+}
+
+.quiz-card .quiz-details {
+    font-size: 14px;
+    color: #c0c0c0;
+    margin-bottom: 15px;
+}
+
+.quiz-card button {
+    background-color: #d9aa52;
+    color: #1b2b40;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    align-self: center;
+}
+
+.quiz-card button:hover {
+    background-color: #b28f3e;
+    transform: translateY(-3px);
+}
+
+/* Ensure responsiveness */
+@media (max-width: 1400px) {
+    #quiz-container {
+        grid-template-columns: repeat(3, 1fr); /* Three quizzes per row for large screens */
+    }
+}
+
+@media (max-width: 1024px) {
+    #quiz-container {
+        grid-template-columns: repeat(2, 1fr); /* Two quizzes per row for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    #quiz-container {
+        grid-template-columns: repeat(1, 1fr); /* One quiz per row for small screens */
+    }
+}

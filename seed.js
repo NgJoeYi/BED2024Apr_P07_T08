@@ -123,6 +123,7 @@ async function run() {
             total_questions INT,
             total_marks INT,
             created_by INT,
+            quizImg VARBINARY(MAX),
             FOREIGN KEY (created_by) REFERENCES Users(id)
         );
 
@@ -130,7 +131,7 @@ async function run() {
             question_id INT PRIMARY KEY IDENTITY(1,1),
             quiz_id INT NOT NULL,
             question_text NVARCHAR(MAX) NOT NULL,
-            image_url NVARCHAR(MAX),
+            qnsImg VARBINARY(MAX),
             option_1 NVARCHAR(255) NOT NULL,
             option_2 NVARCHAR(255) NOT NULL,
             option_3 NVARCHAR(255) NOT NULL,
@@ -291,52 +292,97 @@ async function run() {
         `;
         await connection.request().query(insertDiscussionComments);
 
+        // Path to image files
+        const imageFiles = {
+            colorBlindPlaceHolder: path.join(__dirname, 'public/Images/colourBlindQns2.jpg'),
+            dyslexiaPlaceHolder: path.join(__dirname, 'public/Images/dyslexiaPlaceHolder.jpg'),
+            depressionPlaceHolder: path.join(__dirname, 'public/Images/depressionPlaceHolder.jpg'),
+            dysgraphiaPlaceHolder: path.join(__dirname, 'public/Images/dysgraphiaPlaceHolder.jpg'),
+            colorBlindQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            colorBlindQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            colorBlindQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            colorBlindQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            colorBlindQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            visualAcuityQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            visualAcuityQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            visualAcuityQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            visualAcuityQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            visualAcuityQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            astigmatismQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            astigmatismQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            astigmatismQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            astigmatismQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            astigmatismQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            macularDegenerationQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            macularDegenerationQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            macularDegenerationQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            macularDegenerationQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            macularDegenerationQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg')
+        };
 
-
+        const imageBuffers = {};
+        for (const [key, value] of Object.entries(imageFiles)) {
+            if (fs.existsSync(value)) {
+                const buffer = fs.readFileSync(value);
+                imageBuffers[key] = buffer; // Store the buffer directly
+            } else {
+                console.error(`Error: File ${value} does not exist`);
+                return;
+            }
+        }
 
         const insertQuizzes = `
-        INSERT INTO Quizzes (title, description, total_questions, total_marks, created_by) VALUES
-        ('Color Blindness Assessment', 'A quiz to assess your ability to distinguish colors and detect color blindness.', 5, 100, 2),
-        ('Visual Acuity Test', 'A quiz to assess your visual acuity and sharpness of vision.', 5, 100, 4),
-        ('Astigmatism Test', 'A quiz to detect the presence of astigmatism in your vision.', 5, 100, 3),
-        ('Macular Degeneration Assessment', 'A quiz to assess the risk of macular degeneration.', 5, 100, 1);
+        INSERT INTO Quizzes (title, description, total_questions, total_marks, created_by, quizImg) VALUES
+        ('Color Blindness Assessment', 'A quiz to assess your ability to distinguish colors and detect color blindness.', 5, 100, 2, @colorBlindPlaceHolder),
+        ('Dyslexia Test', 'A quiz to assess your visual acuity and sharpness of vision.', 5, 100, 4, @dyslexiaPlaceHolder),
+        ('Astigmatism Test', 'A quiz to detect the presence of astigmatism in your vision.', 5, 100, 3, @depressionPlaceHolder),
+        ('Macular Degeneration Assessment', 'A quiz to assess the risk of macular degeneration.', 5, 100, 1, @dysgraphiaPlaceHolder);
         `;
-        await connection.request().query(insertQuizzes);
+        await connection.request()
+        .input('colorBlindPlaceHolder', sql.VarBinary, imageBuffers.colorBlindPlaceHolder)
+        .input('dyslexiaPlaceHolder', sql.VarBinary, imageBuffers.dyslexiaPlaceHolder)
+        .input('depressionPlaceHolder', sql.VarBinary, imageBuffers.depressionPlaceHolder)
+        .input('dysgraphiaPlaceHolder', sql.VarBinary, imageBuffers.dysgraphiaPlaceHolder)
+        .query(insertQuizzes);
 
+        // Insert data into Questions table
         const insertQuestions = `
+        INSERT INTO Questions (quiz_id, question_text, qnsImg, option_1, option_2, option_3, option_4, correct_option) VALUES
         -- Color Blindness Assessment Questions
-        INSERT INTO Questions (quiz_id, question_text, image_url, option_1, option_2, option_3, option_4, correct_option) VALUES
-        (1, 'What number do you see in the image?', 'public/images/colorBlindQns1.jpg', '12', '8', '5', 'None', '12'),
-        (1, 'Can you see a pattern in the following image?', 'public/images/colorBlindQns2.jpg', 'Yes', 'No', 'Not sure', 'I see nothing', 'Yes'),
-        (1, 'What colors are visible in this image?', 'public/images/colorBlindQns3.jpg', 'Red and Green', 'Blue and Yellow', 'Only Red', 'Only Green', 'Red and Green'),
-        (1, 'Identify the shapes in the image.', 'public/images/colorBlindQns4.jpg', 'Circles', 'Squares', 'Triangles', 'None', 'Circles'),
-        (1, 'Do you see a number in this image?', 'public/images/colorBlindQns5.jpg', 'Yes, it is 7', 'Yes, it is 3', 'No', 'Not sure', 'Yes, it is 7');
+        (1, 'What number do you see in the image?', @colorBlindQns1, '12', '8', '5', 'None', '12'),
+        (1, 'Can you see a pattern in the following image?', @colorBlindQns2, 'Yes', 'No', 'Not sure', 'I see nothing', 'Yes'),
+        (1, 'What colors are visible in this image?', @colorBlindQns3, 'Red and Green', 'Blue and Yellow', 'Only Red', 'Only Green', 'Red and Green'),
+        (1, 'Identify the shapes in the image.', @colorBlindQns4, 'Circles', 'Squares', 'Triangles', 'None', 'Circles'),
+        (1, 'Do you see a number in this image?', @colorBlindQns5, 'Yes, it is 7', 'Yes, it is 3', 'No', 'Not sure', 'Yes, it is 7'),
 
         -- Visual Acuity Test Questions
-        INSERT INTO Questions (quiz_id, question_text, image_url, option_1, option_2, option_3, option_4, correct_option) VALUES
-        (2, 'What is the smallest line you can read in this image?', 'public/images/visualAcuityQns1.jpg', 'Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 3'),
-        (2, 'What letter do you see in the middle of this image?', 'public/images/visualAcuityQns2.jpg', 'A', 'B', 'C', 'D', 'C'),
-        (2, 'Identify the direction of the "E" in this image.', 'public/images/visualAcuityQns3.jpg', 'Up', 'Down', 'Left', 'Right', 'Right'),
-        (2, 'How many letters do you see in this image?', 'public/images/visualAcuityQns4.jpg', '4', '5', '6', '7', '5'),
-        (2, 'What is the color of the largest letter in this image?', 'public/images/visualAcuityQns5.jpg', 'Red', 'Blue', 'Green', 'Black', 'Black');
+        (2, 'What is the smallest line you can read in this image?', @visualAcuityQns1, 'Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 3'),
+        (2, 'What letter do you see in the middle of this image?', @visualAcuityQns2, 'A', 'B', 'C', 'D', 'C'),
+        (2, 'Identify the direction of the "E" in this image.', @visualAcuityQns3, 'Up', 'Down', 'Left', 'Right', 'Right'),
+        (2, 'How many letters do you see in this image?', @visualAcuityQns4, '4', '5', '6', '7', '5'),
+        (2, 'What is the color of the largest letter in this image?', @visualAcuityQns5, 'Red', 'Blue', 'Green', 'Black', 'Black'),
 
         -- Astigmatism Test Questions
-        INSERT INTO Questions (quiz_id, question_text, image_url, option_1, option_2, option_3, option_4, correct_option) VALUES
-        (3, 'Do the lines in this image appear to be straight and parallel?', 'public/images/astigmatismQns1.jpg', 'Yes', 'No', 'Not sure', 'Somewhat', 'Yes'),
-        (3, 'Do the circles in this image look equally clear?', 'public/images/astigmatismQns2.jpg', 'Yes', 'No', 'Not sure', 'Somewhat', 'Yes'),
-        (3, 'What shape do you see in this image?', 'public/images/astigmatismQns3.jpg', 'Circle', 'Oval', 'Square', 'Rectangle', 'Circle'),
-        (3, 'Are there any blurry areas in this image?', 'public/images/astigmatismQns4.jpg', 'Yes', 'No', 'Not sure', 'Somewhat', 'No'),
-        (3, 'Do you see any wavy lines in this image?', 'public/images/astigmatismQns5.jpg', 'Yes', 'No', 'Not sure', 'Somewhat', 'No');
+        (3, 'Do the lines in this image appear to be straight and parallel?', @astigmatismQns1, 'Yes', 'No', 'Not sure', 'Somewhat', 'Yes'),
+        (3, 'Do the circles in this image look equally clear?', @astigmatismQns2, 'Yes', 'No', 'Not sure', 'Somewhat', 'Yes'),
+        (3, 'What shape do you see in this image?', @astigmatismQns3, 'Circle', 'Oval', 'Square', 'Rectangle', 'Circle'),
+        (3, 'Are there any blurry areas in this image?', @astigmatismQns4, 'Yes', 'No', 'Not sure', 'Somewhat', 'No'),
+        (3, 'Do you see any wavy lines in this image?', @astigmatismQns5, 'Yes', 'No', 'Not sure', 'Somewhat', 'No'),
 
         -- Macular Degeneration Assessment Questions
-        INSERT INTO Questions (quiz_id, question_text, image_url, option_1, option_2, option_3, option_4, correct_option) VALUES
-        (4, 'Do you see a grid of straight lines in this image?', 'public/images/macularDegenerationQns1.jpg', 'Yes', 'No', 'Some lines are wavy', 'Some lines are missing', 'Yes'),
-        (4, 'Is there any distortion in the lines of this image?', 'public/images/macularDegenerationQns2.jpg', 'Yes', 'No', 'Some lines are wavy', 'Some lines are missing', 'No'),
-        (4, 'Do you see any missing areas in this image?', 'public/images/macularDegenerationQns3.jpg', 'Yes', 'No', 'Some areas are missing', 'Not sure', 'No'),
-        (4, 'What shapes do you see in this image?', 'public/images/macularDegenerationQns4.jpg', 'Circles', 'Squares', 'Triangles', 'None', 'Squares'),
-        (4, 'Is there any blur in the center of this image?', 'public/images/macularDegenerationQns5.jpg', 'Yes', 'No', 'Somewhat', 'Not sure', 'No');
+        (4, 'Do you see a grid of straight lines in this image?', @macularDegenerationQns1, 'Yes', 'No', 'Some lines are wavy', 'Some lines are missing', 'Yes'),
+        (4, 'Is there any distortion in the lines of this image?', @macularDegenerationQns2, 'Yes', 'No', 'Some lines are wavy', 'Some lines are missing', 'No'),
+        (4, 'Do you see any missing areas in this image?', @macularDegenerationQns3, 'Yes', 'No', 'Some areas are missing', 'Not sure', 'No'),
+        (4, 'What shapes do you see in this image?', @macularDegenerationQns4, 'Circles', 'Squares', 'Triangles', 'None', 'Squares'),
+        (4, 'Is there any blur in the center of this image?', @macularDegenerationQns5, 'Yes', 'No', 'Somewhat', 'Not sure', 'No');
         `;
-        await connection.request().query(insertQuestions);
+
+        const request = connection.request();
+        for (const [key, value] of Object.entries(imageBuffers)) {
+            request.input(key, sql.VarBinary, value);
+        }
+
+        await request.query(insertQuestions);
 
         const insertUserQuizAttempts = `
         INSERT INTO UserQuizAttempts (user_id, quiz_id, attempt_date, score, time_taken, total_questions, total_marks, passed) VALUES
