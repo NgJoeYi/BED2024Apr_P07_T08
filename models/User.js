@@ -154,20 +154,19 @@ class User {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
-            const sqlQuery = 
-            `
-            DELETE FROM ProfilePic WHERE user_id=@user_Id;
-            DELETE FROM Users WHERE id=@userId
+            const sqlQuery = `
+                DELETE FROM Discussions WHERE user_id=@userId;
+                DELETE FROM ProfilePic WHERE user_id=@userId;
+                DELETE FROM Users WHERE id=@userId;
             `;
             const request = connection.request();
-            request.input('user_Id', userId);
             request.input('userId', userId);
             const results = await request.query(sqlQuery);
             if (results.rowsAffected[0] === 0) {
                 return null;
             }
             return results.rowsAffected[0] > 0; //returns true 
-        } catch(error) {
+        } catch (error) {
             console.error('Error deleting user:', error);
             throw error;
         } finally {
@@ -176,7 +175,7 @@ class User {
             }
         }
     }
-
+        
 
 
 
