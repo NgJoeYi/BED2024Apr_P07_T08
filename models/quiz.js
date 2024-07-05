@@ -228,6 +228,21 @@ class Quiz {
             }
         }
     }
+
+
+    // ----------------------------------- START OF MY CODE FOR USER QUIZ RESULTS RELATED
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 module.exports= Quiz;
