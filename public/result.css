@@ -1,0 +1,44 @@
+main {
+    padding: 60px 20px;
+    padding-top: 220px; /* Ensure content is below the navbar */
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#result-container {
+    margin-top: 20px;
+    width: 100%;
+    background-color: #1b2b40;
+    border-radius: 15px;
+    padding: 20px;
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#result-container h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#result-container p {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+button {
+    background-color: #d9aa52;
+    color: #1b2b40;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin: 20px 10px;
+}
+
+button:hover {
+    background-color: #b28f3e;
+    transform: translateY(-3px);
+}

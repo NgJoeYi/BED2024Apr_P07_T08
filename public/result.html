@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="result.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">EduHelper</a>
+            <ul class="menu-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#quizzes">Quizzes</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="auth-links">
+                <a href="#login">Login</a>
+                <a href="#signup" id="navbar-signup">Sign Up</a>
+            </div>
+            <div id="hamburger-btn">&#9776;</div>
+        </nav>
+    </header>
+    <main>
+        <section id="quiz-result">
+            <h2>Quiz Results</h2>
+            <div id="result-container">
+                <!-- Results will be dynamically inserted here -->
+            </div>
+            <button id="retake-quiz" onclick="retakeQuiz()">Retake Quiz</button>
+            <button id="back-to-quizzes" onclick="backToQuizzes()">Back to Quizzes</button>
+        </section>
+    </main>
+    <script src="result.js"></script>
+</body>
+</html>

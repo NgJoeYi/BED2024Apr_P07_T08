@@ -80,8 +80,11 @@ function prevQuestion() {
 }
 
 function submitQuiz() {
-    alert('Quiz submitted!'); // Placeholder action
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('quizId');
+    window.location.href = `/result.html?quizId=${quizId}`;
 }
+
 
 function arrayBufferToBase64(buffer) {
     let binary = '';
