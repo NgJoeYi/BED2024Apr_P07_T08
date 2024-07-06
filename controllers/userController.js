@@ -146,11 +146,14 @@ const deleteUser = async (req, res) => {
             return res.status(400).json({ message: 'Password is incorrect' });
         }
 
+        const deleteFK = await User.deleteUtility();
+        if (!deleteFK) {
+            return res.status(500).json({ message: 'Failed to delete user-related records' });
+        }
         const userDeleted = await User.deleteUser(userId);
         if (!userDeleted) {
             return res.status(500).json({ message: 'Failed to delete user' });
         }
-
         res.status(200).json({ message: 'User successfully deleted' });
     } catch (error) {
         console.error('Server error:', error);

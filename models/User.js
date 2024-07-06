@@ -155,8 +155,6 @@ class User {
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-                DELETE FROM Discussions WHERE user_id=@userId;
-                DELETE FROM ProfilePic WHERE user_id=@userId;
                 DELETE FROM Users WHERE id=@userId;
             `;
             const request = connection.request();
@@ -175,7 +173,35 @@ class User {
             }
         }
     }
-        
+
+    static async deleteUtility() {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+                DECLARE @sql NVARCHAR(MAX) = N'';
+                
+                SELECT @sql += ' ALTER TABLE ' + QUOTENAME(OBJECT_SCHEMA_NAME(f.parent_object_id)) + '.' + QUOTENAME(OBJECT_NAME(f.parent_object_id)) + 
+                                ' DROP CONSTRAINT ' + QUOTENAME(f.name) + ';'
+                FROM sys.foreign_keys AS f
+                INNER JOIN sys.foreign_key_columns AS fc
+                ON f.object_id = fc.constraint_object_id
+                WHERE fc.referenced_object_id = OBJECT_ID(N'Users');
+                
+                EXEC sp_executesql @sql;
+            `;
+            const request = connection.request();
+            const results = await request.query(sqlQuery);
+            return results.rowsAffected.length > 0; // returns true
+        } catch (error) {
+            console.error('Error deleting user-related records:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 
 
 
@@ -243,8 +269,6 @@ class User {
             }
         }
     }
-
-
 }
 
 module.exports = User;
