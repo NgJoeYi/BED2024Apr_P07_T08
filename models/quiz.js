@@ -272,6 +272,36 @@ class Quiz {
     //     }
     // }
 
+// this block doesnt show the incorrect ans js the results
+    // static async getUserQuizResult(userId, attemptId) {
+    //     let connection;
+    //     try {
+    //         connection = await sql.connect(dbConfig);
+    //         const sqlQuery = `
+    //         SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
+    //                U.time_taken AS TimeTaken, U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, 
+    //                U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription
+    //         FROM UserQuizAttempts U 
+    //         INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
+    //         WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
+    //         `;
+    //         const request = connection.request();
+    //         request.input('inputUserId', userId);
+    //         request.input('inputAttemptId', attemptId);
+    //         const result = await request.query(sqlQuery);
+    //         if (result.recordset.length === 0) {
+    //             return null;
+    //         }
+    //         return result.recordset[0]; // returning the first record instead of mapping
+    //     } catch (error) {
+    //         console.error(error);
+    //         throw new Error("Error fetching user's quiz result");
+    //     } finally {
+    //         if (connection) {
+    //             await connection.close();
+    //         }
+    //     }
+    // }
 
     static async getUserQuizResult(userId, attemptId) {
         let connection;
@@ -280,9 +310,13 @@ class Quiz {
             const sqlQuery = `
             SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
                    U.time_taken AS TimeTaken, U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, 
-                   U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription
+                   U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription,
+                   QR.question_id AS QuestionID, QR.selected_option AS SelectedOption, 
+                   QNS.correct_option AS CorrectOption, QNS.question_text AS QuestionText
             FROM UserQuizAttempts U 
             INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
+            INNER JOIN UserResponses QR ON U.attempt_id = QR.attempt_id
+            INNER JOIN Questions QNS ON QR.question_id = QNS.question_id
             WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
             `;
             const request = connection.request();
@@ -292,7 +326,28 @@ class Quiz {
             if (result.recordset.length === 0) {
                 return null;
             }
-            return result.recordset[0]; // returning the first record instead of mapping
+            
+            const attemptData = result.recordset[0];
+            const userResponses = result.recordset.map(record => ({
+                question_id: record.QuestionID,
+                question_text: record.QuestionText,
+                selected_option: record.SelectedOption,
+                correct_option: record.CorrectOption
+            }));
+    
+            return {
+                AttemptID: attemptData.AttemptID,
+                UserID: attemptData.UserID,
+                AttemptDate: attemptData.AttemptDate,
+                Score: attemptData.Score,
+                TimeTaken: attemptData.TimeTaken,
+                TotalQuestions: attemptData.TotalQuestions,
+                TotalMarks: attemptData.TotalMarks,
+                Passed: attemptData.Passed,
+                QuizTitle: attemptData.QuizTitle,
+                QuizDescription: attemptData.QuizDescription,
+                UserResponses: userResponses
+            };
         } catch (error) {
             console.error(error);
             throw new Error("Error fetching user's quiz result");
@@ -302,9 +357,7 @@ class Quiz {
             }
         }
     }
-    
-
-
+   
     static async getAttemptCount(userId) {
         let connection;
         try {
