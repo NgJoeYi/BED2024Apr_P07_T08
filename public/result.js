@@ -1,52 +1,40 @@
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const quizId = urlParams.get('quizId');
-    fetchQuizResults(quizId);
+    const attemptId = urlParams.get('attemptId');
+    fetchQuizResult(attemptId);
 });
 
-function fetchQuizResults(quizId) {
-    fetch(`/quizzes/${quizId}/results`)
-        .then(response => response.json())
-        .then(results => {
-            if (results) {
-                displayResults(results);
-            } else {
-                console.error('Results not found');
-                document.getElementById('result-container').innerText = 'Results not available.';
-            }
-        })
-        .catch(error => console.error('Error fetching results:', error));
+function fetchQuizResult(attemptId) {
+    fetch(`/quizResult/${attemptId}`, {
+        headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        }
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log('Quiz result:', result); // Add this line to log the result
+        if (result) {
+            displayResult(result);
+        } else {
+            console.error('Quiz result not found');
+            document.getElementById('result-container').innerText = 'Quiz result not available.';
+        }
+    })
+    .catch(error => console.error('Error fetching quiz result:', error));
 }
 
-function displayResults(results) {
+function displayResult(result) {
     const resultContainer = document.getElementById('result-container');
-    resultContainer.innerHTML = '';
-
-    const resultTitle = document.createElement('h3');
-    resultTitle.innerText = `Your Results for Quiz: ${results.quizTitle}`;
-    resultContainer.appendChild(resultTitle);
-
-    const scoreText = document.createElement('p');
-    scoreText.innerText = `Score: ${results.score} / ${results.totalMarks}`;
-    resultContainer.appendChild(scoreText);
-
-    const timeText = document.createElement('p');
-    timeText.innerText = `Time Taken: ${results.timeTaken} seconds`;
-    resultContainer.appendChild(timeText);
-
-    const passedText = document.createElement('p');
-    passedText.innerText = `Passed: ${results.passed ? 'Yes' : 'No'}`;
-    resultContainer.appendChild(passedText);
-
-    // Display any other relevant result details here
-}
-
-function retakeQuiz() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const quizId = urlParams.get('quizId');
-    window.location.href = `/question.html?quizId=${quizId}`;
-}
-
-function backToQuizzes() {
-    window.location.href = '/quiz.html';
+    resultContainer.innerHTML = `
+        <p>Attempt ID: ${result.AttemptID}</p>
+        <p>User ID: ${result.UserID}</p>
+        <p>Attempt Date: ${new Date(result.AttemptDate).toLocaleString()}</p>
+        <p>Score: ${result.Score}</p>
+        <p>Time Taken: ${result.TimeTaken} seconds</p>
+        <p>Total Questions: ${result.TotalQuestions}</p>
+        <p>Total Marks: ${result.TotalMarks}</p>
+        <p>Passed: ${result.Passed ? 'Yes' : 'No'}</p>
+        <p>Quiz Title: ${result.QuizTitle}</p>
+        <p>Quiz Description: ${result.QuizDescription}</p>
+    `;
 }

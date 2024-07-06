@@ -67,6 +67,9 @@ app.delete('/quizzes/:id', quizController.deleteQuiz);
 
 // Add Routes for quiz questions 
 app.get('/quizzes/:id/questions', quizController.getQuizWithQuestions);
+app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz);
+app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult);
+
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
