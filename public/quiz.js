@@ -1,6 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+    checkSessionToken();
     fetchQuizzes();
 });
+
+function checkSessionToken() {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        alert('You are not logged in. Please log in to continue.');
+        window.location.href = '/login.html'; // Redirect to the login page
+    }
+}
 
 function fetchQuizzes() {
     fetch('/quizzes')

@@ -8,33 +8,30 @@
     <link rel="stylesheet" href="result.css">
 </head>
 <body>
-<!-- navbar -->
-<header>
-    <nav class="navbar">
-        <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
-        <ul class="menu-links" id="menu-links">
-            <li><a href="Index.html">HOME</a></li>
-            <li><a href="ContactUs.html">CONTACT US</a></li>
-            <li><a href="quiz.html">QUIZ</a></li>
-            <li><a href="Courses.html" id="nav-courses" style="display: none;">COURSES</a></li>
-            <li><a href="activityfeed.html" id="nav-activityfeed" style="display: none;">ACTIVITYFEED</a></li>
-            <li><a href="account.html" id="nav-account" style="display: none;">ACCOUNT</a></li>
-        </ul>
-        <div class="auth-links" id="auth-links">
-            <a href="Login.html" id="navbar-login">LOG IN</a>
-            <a href="Register.html" id="navbar-signup">SIGN UP</a>
-        </div>
-        <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
-    </nav>
-</header>
+    <!-- navbar -->
+    <header>
+        <nav class="navbar">
+            <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
+            <ul class="menu-links" id="menu-links">
+                <li><a href="Index.html">HOME</a></li>
+                <li><a href="ContactUs.html">CONTACT US</a></li>
+                <li><a href="quiz.html">QUIZ</a></li>
+                <li><a href="Courses.html" id="nav-courses" style="display: none;">COURSES</a></li>
+                <li><a href="activityfeed.html" id="nav-activityfeed" style="display: none;">ACTIVITYFEED</a></li>
+                <li><a href="account.html" id="nav-account" style="display: none;">ACCOUNT</a></li>
+            </ul>
+            <div class="auth-links" id="auth-links">
+                <a href="Login.html" id="navbar-login">LOG IN</a>
+                <a href="Register.html" id="navbar-signup">SIGN UP</a>
+            </div>
+            <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
+        </nav>
+    </header>
     <main>
         <section id="quiz-result">
-            <h2>Quiz Results</h2>
             <div id="result-container">
                 <!-- Results will be dynamically inserted here -->
             </div>
-            <button id="retake-quiz" onclick="retakeQuiz()">Retake Quiz</button>
-            <button id="back-to-quizzes" onclick="backToQuizzes()">Back to Quizzes</button>
         </section>
     </main>
     <script src="result.js"></script>

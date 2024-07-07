@@ -272,6 +272,66 @@ class Quiz {
     //     }
     // }
 
+// this block doesnt show the incorrect ans js the results
+    // static async getUserQuizResult(userId, attemptId) {
+    //     let connection;
+    //     try {
+    //         connection = await sql.connect(dbConfig);
+    //         const sqlQuery = `
+    //         SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
+    //                U.time_taken AS TimeTaken, U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, 
+    //                U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription
+    //         FROM UserQuizAttempts U 
+    //         INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
+    //         WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
+    //         `;
+    //         const request = connection.request();
+    //         request.input('inputUserId', userId);
+    //         request.input('inputAttemptId', attemptId);
+    //         const result = await request.query(sqlQuery);
+    //         if (result.recordset.length === 0) {
+    //             return null;
+    //         }
+    //         return result.recordset[0]; // returning the first record instead of mapping
+    //     } catch (error) {
+    //         console.error(error);
+    //         throw new Error("Error fetching user's quiz result");
+    //     } finally {
+    //         if (connection) {
+    //             await connection.close();
+    //         }
+    //     }
+    // }
+
+    static async getAllQuizResultsForUser(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
+                   U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, U.passed AS Passed, 
+                   Q.title AS QuizTitle, Q.description AS QuizDescription
+            FROM UserQuizAttempts U 
+            INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
+            WHERE U.user_id = @inputUserId;
+            `;
+            const request = connection.request();
+            request.input('inputUserId', userId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset;
+        } catch (error) {
+            console.error('Error fetching quiz results:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
 
     static async getUserQuizResult(userId, attemptId) {
         let connection;
@@ -279,11 +339,17 @@ class Quiz {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
             SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
-                   U.time_taken AS TimeTaken, U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, 
-                   U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription
-            FROM UserQuizAttempts U 
-            INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
-            WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
+               U.time_taken AS TimeTaken, U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, 
+               U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription,
+               QR.question_id AS QuestionID, QR.selected_option AS SelectedOption, 
+               QNS.correct_option AS CorrectOption, QNS.question_text AS QuestionText,
+               Users.name AS UserName
+                FROM UserQuizAttempts U 
+                INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
+                INNER JOIN UserResponses QR ON U.attempt_id = QR.attempt_id
+                INNER JOIN Questions QNS ON QR.question_id = QNS.question_id
+                INNER JOIN Users ON U.user_id = Users.id
+                WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
             `;
             const request = connection.request();
             request.input('inputUserId', userId);
@@ -292,7 +358,28 @@ class Quiz {
             if (result.recordset.length === 0) {
                 return null;
             }
-            return result.recordset[0]; // returning the first record instead of mapping
+            
+            const attemptData = result.recordset[0];
+            const userResponses = result.recordset.map(record => ({
+                question_id: record.QuestionID,
+                question_text: record.QuestionText,
+                selected_option: record.SelectedOption,
+                correct_option: record.CorrectOption
+            }));
+    
+            return {
+                AttemptID: attemptData.AttemptID,
+                UserName: attemptData.UserName, // Add UserName here
+                AttemptDate: attemptData.AttemptDate,
+                Score: attemptData.Score,
+                TimeTaken: attemptData.TimeTaken,
+                TotalQuestions: attemptData.TotalQuestions,
+                TotalMarks: attemptData.TotalMarks,
+                Passed: attemptData.Passed,
+                QuizTitle: attemptData.QuizTitle,
+                QuizDescription: attemptData.QuizDescription,
+                UserResponses: userResponses
+            };
         } catch (error) {
             console.error(error);
             throw new Error("Error fetching user's quiz result");
@@ -302,9 +389,7 @@ class Quiz {
             }
         }
     }
-    
-
-
+   
     static async getAttemptCount(userId) {
         let connection;
         try {
@@ -339,15 +424,19 @@ class Quiz {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            INSERT INTO UserResponses (attempt_id, question_id, selected_option)
+            VALUES (@attemptId, @questionId, @selectedOption)
+            `;
             const request = connection.request();
-            request.input('attemptId', sql.Int, attemptId)
-                   .input('questionId', sql.Int, questionId)
-                   .input('selectedOption', sql.NVarChar, selectedOption);
-    
-            await request.query(`
-                INSERT INTO UserResponses (attempt_id, question_id, selected_option)
-                VALUES (@attemptId, @questionId, @selectedOption)
-            `);
+            request.input('attemptId', attemptId)
+            request.input('questionId', questionId)
+            request.input('selectedOption', selectedOption);
+            const result = await request.query(sqlQuery);
+            if (result.rowsAffected[0] === 0) {
+                return null;
+            }
+            return result.rowsAffected[0] > 0;
         } catch (error) {
             console.error('Error saving user response:', error);
             throw error;
@@ -363,19 +452,18 @@ class Quiz {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
+            const sqlQuery = `                
+            SELECT correct_option
+            FROM Questions
+            WHERE question_id = @questionId`
+            ;
             const request = connection.request();
-            request.input('questionId', sql.Int, questionId);
-    
-            const result = await request.query(`
-                SELECT correct_option
-                FROM Questions
-                WHERE question_id = @questionId
-            `);
-    
-            if (result.recordset.length > 0) {
-                return result.recordset[0].correct_option === selectedOption;
+            request.input('questionId', questionId);  
+            const result = await request.query(sqlQuery);  
+            if (result.recordset.length === 0) {
+                return null;
             }
-            return false;
+            return result.recordset[0].correct_option === selectedOption;
         } catch (error) {
             console.error('Error checking correct answer:', error);
             throw error;
@@ -391,12 +479,12 @@ class Quiz {
         try {
             connection = await sql.connect(dbConfig);
             const request = connection.request();
-            request.input('userId', sql.Int, userId)
-                   .input('quizId', sql.Int, quizId)
-                   .input('totalQuestions', sql.Int, totalQuestions)
-                   .input('totalMarks', sql.Int, totalMarks)
-                   .input('score', sql.Int, score)
-                   .input('passed', sql.Bit, passed);
+            request.input('userId', userId)
+            request.input('quizId', quizId)
+            request.input('totalQuestions', totalQuestions)
+            request.input('totalMarks', totalMarks)
+            request.input('score', score)
+            request.input('passed', passed);
     
             const result = await request.query(`
                 INSERT INTO UserQuizAttempts (user_id, quiz_id, attempt_date, total_questions, total_marks, score, passed)
@@ -418,18 +506,22 @@ class Quiz {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
+            const sqlQuery = `                
+            UPDATE UserQuizAttempts
+            SET total_questions = @totalQuestions, total_marks = @totalMarks, score = @score, passed = @passed
+            WHERE attempt_id = @attemptId
+            `;
             const request = connection.request();
-            request.input('attemptId', sql.Int, attemptId)
-                   .input('totalQuestions', sql.Int, totalQuestions)
-                   .input('totalMarks', sql.Int, totalMarks)
-                   .input('score', sql.Int, score)
-                   .input('passed', sql.Bit, passed);
-    
-            await request.query(`
-                UPDATE UserQuizAttempts
-                SET total_questions = @totalQuestions, total_marks = @totalMarks, score = @score, passed = @passed
-                WHERE attempt_id = @attemptId
-            `);
+            request.input('attemptId', attemptId)
+            request.input('totalQuestions', totalQuestions)
+            request.input('totalMarks', totalMarks)
+            request.input('score', score)
+            request.input('passed', passed);
+            const result = await request.query(sqlQuery);
+            if (result.rowsAffected[0] === 0) {
+                return null;
+            }
+            return result.rowsAffected[0] > 0;
         } catch (error) {
             console.error('Error updating quiz attempt:', error);
             throw error;
