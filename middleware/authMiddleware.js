@@ -23,8 +23,8 @@ function verifyJWT(req, res, next) {
             'POST /account/uploadProfilePic': ['student', 'lecturer'],
             'PUT /account': ['student', 'lecturer'], // -- will need to come back to this
             'DELETE /account': ['student', 'lecturer'], //hi i added this here - Raeann( delete it when u see HAHHAH)
+            'GET /quizResults': ['student', 'lecturer'], 
             
-
             'GET /discussions/user': ['student', 'lecturer'],
             'GET /discussions': ['student', 'lecturer'],
             'GET /discussions/:id': ['student', 'lecturer'],
@@ -46,6 +46,7 @@ function verifyJWT(req, res, next) {
             'GET /quizzes/:id/questions': ['student', 'lecturer'],
             'POST /submitQuiz': ['student', 'lecturer'], // Only students can submit quizzes
             'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
+
         };
         // ************************************** ADD ROUTES HERE **************************************
 

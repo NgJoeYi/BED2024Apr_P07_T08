@@ -174,6 +174,19 @@ const submitQuiz = async (req, res) => {
     }
 };
 
+const getAllQuizResultsForUser = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const results = await Quiz.getAllQuizResultsForUser(userId);
+        if (!results) {
+            return res.status(400).json({ message: 'No quiz completed' });
+        }
+        res.status(200).json(results);
+    } catch (error) {
+        console.error('Error fetching quiz results:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
 
 
 
@@ -188,5 +201,6 @@ module.exports = {
     getQuizWithQuestions,
     getUserQuizResult,
     getAttemptCount,
-    submitQuiz
+    submitQuiz,
+    getAllQuizResultsForUser
 }

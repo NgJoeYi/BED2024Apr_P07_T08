@@ -75,7 +75,7 @@ function displayResult(result) {
             <div class="result-description">${result.QuizDescription}</div>
             <div class="result-details">
                 <p><strong>Attempt ID:</strong> ${result.AttemptID}</p>
-                <p><strong>User ID:</strong> ${result.UserID}</p>
+                <p><strong>User Name:</strong> ${result.UserName}</p> <!-- Updated line -->
                 <p><strong>Attempt Date:</strong> ${new Date(result.AttemptDate).toLocaleString()}</p>
                 <p><strong>Score:</strong> ${result.Score}</p>
                 <p><strong>Time Taken:</strong> ${result.TimeTaken ? result.TimeTaken + ' seconds' : 'N/A'}</p>
