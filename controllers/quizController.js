@@ -116,6 +116,81 @@ const getQuizWithQuestions = async (req, res) => {
     }
 };
 
+const getUserQuizResult = async (req, res) => {
+    const userId = req.user.id;
+    const attemptId = parseInt(req.params.attemptId);
+    try {
+        const result = await Quiz.getUserQuizResult(userId, attemptId);
+        if (!result) {
+            return res.status(400).json({ message: 'Failed to retrieve user\'s quiz result' });
+        }
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Get User\'s Quiz results - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const getAttemptCount = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const count = await Quiz.getAttemptCount(userId);
+        res.status(200).json({ attemptCount: count });
+    } catch (error) {
+        console.error('Get Attempt Count - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const submitQuiz = async (req, res) => {
+    const { quizId, responses } = req.body;
+    const userId = req.user.id;
+    let totalScore = 0;
+    let totalQuestions = responses.length;
+
+    try {
+        const attemptId = await Quiz.createQuizAttempt(userId, quizId, totalQuestions, totalQuestions, totalScore, false);
+
+        for (const response of responses) {
+            const { question_id, selected_option } = response;
+            await Quiz.saveUserResponse(attemptId, question_id, selected_option);
+            const isCorrect = await Quiz.isCorrectAnswer(question_id, selected_option);
+            if (isCorrect) {
+                totalScore++;
+            }
+        }
+
+        const totalMarks = totalQuestions;
+        const passingScore = totalMarks * 0.5;
+        const passed = totalScore >= passingScore;
+
+        // Update the attempt with the final score and pass status
+        await Quiz.updateQuizAttempt(attemptId, totalQuestions, totalMarks, totalScore, passed);
+
+        res.status(200).json({ attemptId });
+    } catch (error) {
+        console.error('Error submitting quiz:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const getAllQuizResultsForUser = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const results = await Quiz.getAllQuizResultsForUser(userId);
+        if (!results) {
+            return res.status(400).json({ message: 'No quiz completed' });
+        }
+        res.status(200).json(results);
+    } catch (error) {
+        console.error('Error fetching quiz results:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+
+
+
 
 module.exports = {
     createQuiz,
@@ -123,5 +198,9 @@ module.exports = {
     getAllQuizWithCreatorName,
     updateQuiz,
     deleteQuiz,
-    getQuizWithQuestions
+    getQuizWithQuestions,
+    getUserQuizResult,
+    getAttemptCount,
+    submitQuiz,
+    getAllQuizResultsForUser
 }

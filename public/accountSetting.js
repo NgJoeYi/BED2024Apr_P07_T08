@@ -248,41 +248,42 @@ document.addEventListener('DOMContentLoaded', async function () {
   async function deleteAccount() {
     const token = getToken();
     const password = document.getElementById('delete-password').value;
-  
+
     if (!token) {
-      alert('No user is logged in');
-      return;
+        alert('No user is logged in');
+        return;
     }
-  
+
     if (!password) {
-      alert('Please enter your password');
-      return;
+        alert('Please enter your password');
+        return;
     }
-  
+
     try {
-      const response = await fetch(`/account`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ password: password })
-      });
-  
-      if (response.ok) {
-        alert('Account deleted successfully');
-        sessionStorage.removeItem('token');
-        window.location.href = 'Index.html';
-      } else {
-        const errorData = await response.json();
-        alert(`${errorData.message}`);
-      }
+        const response = await fetch('/account', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ password: password })
+        });
+
+        if (response.ok) {
+            alert('Account deleted successfully');
+            sessionStorage.removeItem('token');
+            window.location.href = 'Index.html';
+        } else {
+            const errorData = await response.json();
+            alert(errorData.message);
+        }
     } catch (error) {
-      console.error('Error:', error);
+        console.error('Error:', error);
     } finally {
-      closeDeleteModal();
+        closeDeleteModal();
     }
-  }
+}
+
   
   // ---------------------------------------------- LOG OUT --------------------------------------------------------------
   function confirmLogout() {
@@ -307,3 +308,62 @@ document.addEventListener('DOMContentLoaded', async function () {
   function getToken() {
     return sessionStorage.getItem('token');
   }
+
+
+// ---------------------------------------------- QUIZ RESULTS ----------------------------------------------
+async function fetchUserQuizResults() {
+  const token = getToken();
+  try {
+      const response = await fetch('/quizResults', {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+      if (!response.ok) throw new Error('Failed to fetch quiz results');
+
+      const quizResults = await response.json();
+      console.log('Fetched quiz results:', quizResults); // Debugging log
+
+      const quizResultsContainer = document.querySelector('.quiz-results');
+      const noQuizResultsMessage = document.querySelector('.no-quiz-results-message');
+
+      quizResultsContainer.innerHTML = '';
+
+      if (quizResults.length === 0) {
+          noQuizResultsMessage.style.display = 'block';
+      } else {
+          noQuizResultsMessage.style.display = 'none';
+          quizResults.forEach(result => createQuizResultCard(result, quizResultsContainer));
+      }
+  } catch (error) {
+      console.error('Error fetching quiz results:', error);
+  }
+}
+
+function createQuizResultCard(result, quizResultsContainer) {
+  console.log('Creating quiz result card for:', result); // Debugging log
+  const quizResultCard = document.createElement('div');
+  quizResultCard.className = 'quiz-result-card';
+  quizResultCard.setAttribute('data-quiz-id', result.AttemptID);
+
+  quizResultCard.innerHTML = `
+      <div class="quiz-result-header">
+          <span class="quiz-title">${result.QuizTitle}</span>
+          <span class="quiz-date">${new Date(result.AttemptDate).toLocaleDateString()}</span>
+      </div>
+      <div class="quiz-result-details">
+          <p><strong>Score:</strong> ${result.Score}</p>
+          <p><strong>Total Questions:</strong> ${result.TotalQuestions}</p>
+          <p><strong>Total Marks:</strong> ${result.TotalMarks}</p>
+          <p><strong>Passed:</strong> ${result.Passed ? 'Yes' : 'No'}</p>
+      </div>
+  `;
+
+  quizResultsContainer.appendChild(quizResultCard);
+}
+
+function getToken() {
+  return sessionStorage.getItem('token');
+}
+
+document.addEventListener('DOMContentLoaded', fetchUserQuizResults);

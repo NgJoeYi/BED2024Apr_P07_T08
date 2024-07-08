@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let currentQuestionIndex = 0;
 let questions = [];
+let userResponses = {};
 
 function fetchQuizWithQuestions(quizId) {
     fetch(`/quizzes/${quizId}/questions`)
@@ -50,12 +51,17 @@ function displayQuestion(index) {
         optionInput.name = `question_${question.question_id}`;
         optionInput.value = option;
 
+        if (userResponses[question.question_id] === option) {
+            optionInput.checked = true;
+        }
+
         const optionLabel = document.createElement('label');
         optionLabel.htmlFor = optionId;
         optionLabel.appendChild(document.createTextNode(option));
 
         questionCard.appendChild(optionInput);
         questionCard.appendChild(optionLabel);
+        questionCard.appendChild(document.createElement('br'));
     });
 
     questionsContainer.appendChild(questionCard);
@@ -66,6 +72,7 @@ function displayQuestion(index) {
 }
 
 function nextQuestion() {
+    saveCurrentResponse();
     if (currentQuestionIndex < questions.length - 1) {
         currentQuestionIndex++;
         displayQuestion(currentQuestionIndex);
@@ -73,14 +80,49 @@ function nextQuestion() {
 }
 
 function prevQuestion() {
+    saveCurrentResponse();
     if (currentQuestionIndex > 0) {
         currentQuestionIndex--;
         displayQuestion(currentQuestionIndex);
     }
 }
 
+function saveCurrentResponse() {
+    const currentQuestion = questions[currentQuestionIndex];
+    const selectedOption = document.querySelector(`input[name="question_${currentQuestion.question_id}"]:checked`);
+    userResponses[currentQuestion.question_id] = selectedOption ? selectedOption.value : null;
+}
+
 function submitQuiz() {
-    alert('Quiz submitted!'); // Placeholder action
+    saveCurrentResponse();
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('quizId');
+
+    const userResponsesArray = questions.map((question) => ({
+        question_id: question.question_id,
+        selected_option: userResponses[question.question_id] || null
+    }));
+
+    fetch(`/submitQuiz`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+            quizId,
+            responses: userResponsesArray
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.attemptId) {
+            window.location.href = `/result.html?attemptId=${data.attemptId}`;
+        } else {
+            console.error('Error submitting quiz:', data.message);
+        }
+    })
+    .catch(error => console.error('Error submitting quiz:', error));
 }
 
 function arrayBufferToBase64(buffer) {

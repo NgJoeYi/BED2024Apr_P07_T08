@@ -748,5 +748,108 @@ textarea {
     width: 20%;
     font-size: 16px;
   }
-  
-  
+
+
+
+
+
+
+/*      hello can help me adjust......          */
+/* User Discussions and Quiz Results Alignment */
+.title-container {
+  width: 100%;
+}
+
+.user-discussions, .quiz-results {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px auto;
+}
+
+.no-quiz-results-message, .no-discussions-message {
+  width: 100%;
+  text-align: center;
+}
+
+.title-container .title {
+  font-size: 25px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.review-wrapper, .user-discussions, .quiz-results {
+  width: 80%;  /* Adjust this width as needed */
+  margin: 20px auto;
+}
+
+.review-card, .post, .quiz-result-card {
+  background-color: rgba(228, 179, 164, 0.8);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Ensure quiz result cards have consistent styling */
+.quiz-result-card .quiz-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quiz-result-card .quiz-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.quiz-result-card .quiz-date {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.quiz-result-card .quiz-result-details {
+  font-size: 1rem;
+  color: #333;
+  margin-top: 10px;
+}
+
+/* Ensure consistent styling for user discussions and quiz results */
+.post-header, .quiz-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-header .username, .quiz-result-header .quiz-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.post-meta, .quiz-date {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.post-content, .quiz-result-details {
+  font-size: 1rem;
+  color: #333;
+  margin-top: 10px;
+}
+
+/* Ensure container padding and alignment */
+.title-container, .quiz-results, .user-discussions {
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+}

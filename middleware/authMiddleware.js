@@ -23,8 +23,8 @@ function verifyJWT(req, res, next) {
             'POST /account/uploadProfilePic': ['student', 'lecturer'],
             'PUT /account': ['student', 'lecturer'], // -- will need to come back to this
             'DELETE /account': ['student', 'lecturer'], //hi i added this here - Raeann( delete it when u see HAHHAH)
+            'GET /quizResults': ['student', 'lecturer'], 
             
-
             'GET /discussions/user': ['student', 'lecturer'],
             'GET /discussions': ['student', 'lecturer'],
             'GET /discussions/:id': ['student', 'lecturer'],
@@ -35,7 +35,18 @@ function verifyJWT(req, res, next) {
             'GET /comments': ['student', 'lecturer'],
             'PUT /comments/:id': ['student', 'lecturer'],
             'POST /comments': ['student', 'lecturer'],
-            'DELETE /comments/:id': ['student', 'lecturer']
+            'DELETE /comments/:id': ['student', 'lecturer'],
+
+            'GET /quizzes': ['student', 'lecturer'],
+            'GET /quizzes/:id': ['student', 'lecturer'],
+            'POST /quizzes': ['lecturer'], // Only lecturers can create quizzes
+            'PUT /quizzes/:id': ['lecturer'], // Only lecturers can update quizzes
+            'DELETE /quizzes/:id': ['lecturer'], // Only lecturers can delete quizzes
+
+            'GET /quizzes/:id/questions': ['student', 'lecturer'],
+            'POST /submitQuiz': ['student', 'lecturer'], // Only students can submit quizzes
+            'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
+
         };
         // ************************************** ADD ROUTES HERE **************************************
 

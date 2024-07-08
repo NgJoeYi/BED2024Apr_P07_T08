@@ -3,17 +3,19 @@ const dbConfig = require('../dbConfig');
 const reviewModel = require('../models/Review');
 
 async function getReviews(req, res) {
-    const { courseId } = req.query;
-    if (!courseId) {
-        return res.status(400).json({ error: 'Course ID is required' });
+    const { courseId, filter = 'all', sort = 'mostRecent' } = req.query;
+    if (!courseId || isNaN(courseId)) {
+        return res.status(400).json({ error: 'Course ID is required and must be a valid number' });
     }
     
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const reviews = await reviewModel.getAllReviews(connection, courseId);
+        const reviews = await reviewModel.getAllReviews(connection, parseInt(courseId, 10), filter, sort);
+        console.log('Reviews:', reviews); // Add this line to log the reviews
         res.status(200).json(reviews);
     } catch (err) {
+        console.error('Server error:', err.message); // Add this line to log errors
         res.status(500).json({ error: err.message });
     } finally {
         if (connection) {
@@ -21,7 +23,6 @@ async function getReviews(req, res) {
         }
     }
 }
-
 
 async function updateReview(req, res) {
     const { id } = req.params;

@@ -228,6 +228,363 @@ class Quiz {
             }
         }
     }
+
+
+    // ----------------------------------- START OF MY CODE FOR USER QUIZ RESULTS RELATED
+
+
+    // static async getUserQuizResult(userId, attemptId) {
+    //     let connection;
+    //     try {
+    //         connection = await sql.connect(dbConfig);
+    //         const sqlQuery = `
+    //         SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, U.time_taken AS TimeTaken, U.total_questions AS TotalQuestions, 
+    //         U.total_marks AS TotalMarks, U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription
+    //         FROM UserQuizAttempts U INNER JOIN quizzes Q ON U.quiz_id = Q.quiz_id
+    //         WHERE U.user_id=@inputUserId AND U.attempt_id=@inputAttemptId;
+    //         `;
+    //         const request = connection.request();
+    //         request.input('inputUserId', userId);
+    //         request.input('inputAttemptId', attemptId);
+    //         const result = await request.query(sqlQuery);
+    //         if (result.recordset.length === 0) {
+    //             return null;
+    //         }
+    //         return result.recordset.map(record => ({
+    //             AttemptID: record.AttemptID,
+    //             UserID: record.UserID,
+    //             AttemptDate: record.AttemptDate,
+    //             Score: record.Score,
+    //             TimeTaken: record.TimeTaken,
+    //             TotalQuestions: record.TotalQuestions,
+    //             TotalMarks: record.TotalMarks,
+    //             Passed: record.Passed,
+    //             QuizTitle: record.QuizTitle,
+    //             QuizDescription: record.QuizDescription
+    //         }));
+    //     } catch (error) {
+    //         console.error(error);
+    //         throw new Error("Error fetching quiz with questions");
+    //     } finally {
+    //         if (connection) {
+    //             await connection.close();
+    //         }
+    //     }
+    // }
+
+// this block doesnt show the incorrect ans js the results
+    // static async getUserQuizResult(userId, attemptId) {
+    //     let connection;
+    //     try {
+    //         connection = await sql.connect(dbConfig);
+    //         const sqlQuery = `
+    //         SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
+    //                U.time_taken AS TimeTaken, U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, 
+    //                U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription
+    //         FROM UserQuizAttempts U 
+    //         INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
+    //         WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
+    //         `;
+    //         const request = connection.request();
+    //         request.input('inputUserId', userId);
+    //         request.input('inputAttemptId', attemptId);
+    //         const result = await request.query(sqlQuery);
+    //         if (result.recordset.length === 0) {
+    //             return null;
+    //         }
+    //         return result.recordset[0]; // returning the first record instead of mapping
+    //     } catch (error) {
+    //         console.error(error);
+    //         throw new Error("Error fetching user's quiz result");
+    //     } finally {
+    //         if (connection) {
+    //             await connection.close();
+    //         }
+    //     }
+    // }
+
+    static async getAllQuizResultsForUser(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
+                   U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, U.passed AS Passed, 
+                   Q.title AS QuizTitle, Q.description AS QuizDescription
+            FROM UserQuizAttempts U 
+            INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
+            WHERE U.user_id = @inputUserId;
+            `;
+            const request = connection.request();
+            request.input('inputUserId', userId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset;
+        } catch (error) {
+            console.error('Error fetching quiz results:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
+
+    static async getUserQuizResult(userId, attemptId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
+               U.time_taken AS TimeTaken, U.total_questions AS TotalQuestions, U.total_marks AS TotalMarks, 
+               U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription,
+               QR.question_id AS QuestionID, QR.selected_option AS SelectedOption, 
+               QNS.correct_option AS CorrectOption, QNS.question_text AS QuestionText,
+               Users.name AS UserName
+                FROM UserQuizAttempts U 
+                INNER JOIN Quizzes Q ON U.quiz_id = Q.quiz_id
+                INNER JOIN UserResponses QR ON U.attempt_id = QR.attempt_id
+                INNER JOIN Questions QNS ON QR.question_id = QNS.question_id
+                INNER JOIN Users ON U.user_id = Users.id
+                WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
+            `;
+            const request = connection.request();
+            request.input('inputUserId', userId);
+            request.input('inputAttemptId', attemptId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            
+            const attemptData = result.recordset[0];
+            const userResponses = result.recordset.map(record => ({
+                question_id: record.QuestionID,
+                question_text: record.QuestionText,
+                selected_option: record.SelectedOption,
+                correct_option: record.CorrectOption
+            }));
+    
+            return {
+                AttemptID: attemptData.AttemptID,
+                UserName: attemptData.UserName, // Add UserName here
+                AttemptDate: attemptData.AttemptDate,
+                Score: attemptData.Score,
+                TimeTaken: attemptData.TimeTaken,
+                TotalQuestions: attemptData.TotalQuestions,
+                TotalMarks: attemptData.TotalMarks,
+                Passed: attemptData.Passed,
+                QuizTitle: attemptData.QuizTitle,
+                QuizDescription: attemptData.QuizDescription,
+                UserResponses: userResponses
+            };
+        } catch (error) {
+            console.error(error);
+            throw new Error("Error fetching user's quiz result");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+   
+    static async getAttemptCount(userId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT COUNT(*) AS AttemptCount
+            FROM UserQuizAttempts
+            WHERE user_id = @userId;
+            `;
+            const request = connection.request();
+            request.input('userId', userId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0];
+        } catch (error) {
+            console.error(error);
+            throw new Error("Error fetching quiz with questions");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+
+
+
+
+    static async saveUserResponse(attemptId, questionId, selectedOption) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            INSERT INTO UserResponses (attempt_id, question_id, selected_option)
+            VALUES (@attemptId, @questionId, @selectedOption)
+            `;
+            const request = connection.request();
+            request.input('attemptId', attemptId)
+            request.input('questionId', questionId)
+            request.input('selectedOption', selectedOption);
+            const result = await request.query(sqlQuery);
+            if (result.rowsAffected[0] === 0) {
+                return null;
+            }
+            return result.rowsAffected[0] > 0;
+        } catch (error) {
+            console.error('Error saving user response:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
+    
+    static async isCorrectAnswer(questionId, selectedOption) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `                
+            SELECT correct_option
+            FROM Questions
+            WHERE question_id = @questionId`
+            ;
+            const request = connection.request();
+            request.input('questionId', questionId);  
+            const result = await request.query(sqlQuery);  
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0].correct_option === selectedOption;
+        } catch (error) {
+            console.error('Error checking correct answer:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
+    static async createQuizAttempt(userId, quizId, totalQuestions, totalMarks, score, passed) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = connection.request();
+            request.input('userId', userId)
+            request.input('quizId', quizId)
+            request.input('totalQuestions', totalQuestions)
+            request.input('totalMarks', totalMarks)
+            request.input('score', score)
+            request.input('passed', passed);
+    
+            const result = await request.query(`
+                INSERT INTO UserQuizAttempts (user_id, quiz_id, attempt_date, total_questions, total_marks, score, passed)
+                OUTPUT INSERTED.attempt_id
+                VALUES (@userId, @quizId, GETDATE(), @totalQuestions, @totalMarks, @score, @passed)
+            `);
+            return result.recordset[0].attempt_id;
+        } catch (error) {
+            console.error('Error creating quiz attempt:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
+    static async updateQuizAttempt(attemptId, totalQuestions, totalMarks, score, passed) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `                
+            UPDATE UserQuizAttempts
+            SET total_questions = @totalQuestions, total_marks = @totalMarks, score = @score, passed = @passed
+            WHERE attempt_id = @attemptId
+            `;
+            const request = connection.request();
+            request.input('attemptId', attemptId)
+            request.input('totalQuestions', totalQuestions)
+            request.input('totalMarks', totalMarks)
+            request.input('score', score)
+            request.input('passed', passed);
+            const result = await request.query(sqlQuery);
+            if (result.rowsAffected[0] === 0) {
+                return null;
+            }
+            return result.rowsAffected[0] > 0;
+        } catch (error) {
+            console.error('Error updating quiz attempt:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
+    
+    
+
+
+
+    // static async createQuizAttempt(userId, quizId, responses) {
+    //     let connection;
+    //     try {
+    //         connection = await sql.connect(dbConfig);
+    //         const transaction = new sql.Transaction(connection);
+
+    //         await transaction.begin();
+
+    //         const request = new sql.Request(transaction);
+    //         request.input('userId', userId);
+    //         request.input('quizId', quizId);
+
+    //         // Insert into UserQuizAttempts
+    //         const result = await request.query(`
+    //             INSERT INTO UserQuizAttempts (user_id, quiz_id, attempt_date, total_questions, total_marks, score, time_taken, passed)
+    //             OUTPUT INSERTED.attempt_id
+    //             VALUES (@userId, @quizId, GETDATE(), 0, 0, 0, 0, 0);
+    //         `);
+    //         const attemptId = result.recordset[0].attempt_id;
+
+    //         // Insert into UserResponses
+    //         for (const response of responses) {
+    //             await request.input('attemptId', attemptId);
+    //             await request.input('questionId', response.question_id);
+    //             await request.input('selectedOption', response.selected_option);
+    //             await request.query(`
+    //                 INSERT INTO UserResponses (attempt_id, question_id, selected_option)
+    //                 VALUES (@attemptId, @questionId, @selectedOption);
+    //             `);
+    //         }
+
+    //         await transaction.commit();
+    //         return attemptId;
+    //     } catch (error) {
+    //         if (transaction) await transaction.rollback();
+    //         console.error('Error creating quiz attempt:', error);
+    //         throw error;
+    //     } finally {
+    //         if (connection) {
+    //             await connection.close();
+    //         }
+    //     }
+    // }
+
+
+
+
+
 }
 
 module.exports= Quiz;

@@ -94,8 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('sort').value = 'mostRecent'; // Set default value
-    sortReviews(); // Sort reviews by most recent on page load
+    document.getElementById('filter').addEventListener('change', () => {
+        fetchReviews(courseId);
+    });
+
+    document.getElementById('sort').addEventListener('change', () => {
+        fetchReviews(courseId);
+    });
+
+    document.getElementById('sort').value = 'mostRecent';
 });
 
 function showPopup(type) {
@@ -118,38 +125,6 @@ function showPopup(type) {
 function closePopup() {
     const popup = document.getElementById('popup');
     popup.style.display = 'none';
-}
-
-function filterReviews() {
-    const filter = document.getElementById('filter').value;
-    const reviews = document.querySelectorAll('.review');
-    reviews.forEach(review => {
-        const rating = review.querySelectorAll('.fa-star.selected').length;
-        review.style.display = filter === 'all' || filter == rating ? 'flex' : 'none';
-    });
-}
-
-function sortReviews() {
-    const sort = document.getElementById('sort').value;
-    const reviewsContainer = document.getElementById('reviews');
-    const reviews = Array.from(reviewsContainer.children);
-
-    reviews.sort((a, b) => {
-        const ratingA = a.querySelectorAll('.fa-star.selected').length;
-        const ratingB = b.querySelectorAll('.fa-star.selected').length;
-        const dateA = new Date(a.getAttribute('data-date'));
-        const dateB = new Date(b.getAttribute('data-date'));
-
-        if (sort === 'mostRecent') {
-            return dateB - dateA;
-        } else if (sort === 'highestRating') {
-            return ratingB - ratingA;
-        } else if (sort === 'lowestRating') {
-            return ratingA - ratingB;
-        }
-    });
-
-    reviews.forEach(review => reviewsContainer.appendChild(review));
 }
 
 async function deleteReview(button) {
@@ -259,9 +234,22 @@ function editReview(button) {
 }
 
 function fetchReviews(courseId) {
-    fetch(`http://localhost:3000/reviews?courseId=${courseId}`)
+    if (isNaN(courseId)) {
+        console.error('Invalid course ID');
+        return;
+    }
+
+    const filter = document.getElementById('filter').value;
+    const sort = document.getElementById('sort').value;
+
+    fetch(`http://localhost:3000/reviews?courseId=${courseId}&filter=${filter}&sort=${sort}`)
         .then(response => response.json())
         .then(reviews => {
+            console.log('Fetched Reviews:', reviews); // Log the fetched reviews
+            if (!Array.isArray(reviews)) {
+                throw new TypeError('Expected an array of reviews');
+            }
+
             const reviewsContainer = document.getElementById('reviews');
             reviewsContainer.innerHTML = ''; // Clear existing reviews
 
