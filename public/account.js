@@ -312,7 +312,7 @@ function addUserDiscussionToFeed(discussion) {
     </div>
     <div class="post-meta">
       <span class="category">Category: ${discussion.category}</span>
-      <span class="posted-date-activity">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+      <span class="posted-date-activity">${new Date(discussion.posted_date).toLocaleDateString()}</span>
     </div>
     <div class="post-content">
       <p>${discussion.description}</p>
