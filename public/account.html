@@ -123,101 +123,85 @@
       </div>
     </div>
 
-    <!-- Reviews Section -->
-    <div class="title-container">
-      <div class="title">Review</div>
-    
-    <div class="review-wrapper">
-      <!-- Reviews will be populated here -->
-    </div>
-    <div class="modalreview" id="editReviewModal" style="display:none;">
-      <div class="modal-content-review">
-        <span class="close" onclick="closeEditReviewModal()">&times;</span>
-        <h2>Edit Review</h2>
-        <div class="stars" style="margin-left: 80px; margin-top: 10px;">
-          <i class="fa fa-star" data-value="1" style="margin-right: 50px;"></i>
-          <i class="fa fa-star" data-value="2" style="margin-right: 50px;"></i>
-          <i class="fa fa-star" data-value="3" style="margin-right: 50px;"></i>
-          <i class="fa fa-star" data-value="4" style="margin-right: 50px;"></i>
-          <i class="fa fa-star" data-value="5"></i>
-        </div>
-        <textarea id="editReviewText" placeholder="Review.."></textarea>
-        <button id="submitEditedReview">Post!</button>
+<!-- Reviews Section -->
+<div class="section-container">
+  <div class="title-container">
+    <div class="title">Review</div>
+  </div>
+  <div class="review-wrapper">
+    <!-- Reviews will be populated here -->
+  </div>
+  <div class="modalreview" id="editReviewModal" style="display:none;">
+    <div class="modal-content-review">
+      <span class="close" onclick="closeEditReviewModal()">&times;</span>
+      <h2>Edit Review</h2>
+      <div class="stars" style="margin-left: 80px; margin-top: 10px;">
+        <i class="fa fa-star" data-value="1" style="margin-right: 50px;"></i>
+        <i class="fa fa-star" data-value="2" style="margin-right: 50px;"></i>
+        <i class="fa fa-star" data-value="3" style="margin-right: 50px;"></i>
+        <i class="fa fa-star" data-value="4" style="margin-right: 50px;"></i>
+        <i class="fa fa-star" data-value="5"></i>
       </div>
+      <textarea id="editReviewText" placeholder="Review.."></textarea>
+      <button id="submitEditedReview">Post!</button>
     </div>
-    <div id="deleteReviewModel" class="modal-delete">
-      <div class="modal-content-delete">
-        <span class="close" onclick="closeDeleteModal()">&times;</span>
-        <h2>Confirm Review Deletion</h2>
-        <p>Are you sure you want to delete this review? This action cannot be undone.</p>
-        <button id="confirmReviewDelete">Yes, Delete</button>
-        <button id="cancelDelete" onclick="closeDeleteModal()">Cancel</button>
-      </div>
-    </div>
-    </div>
-
-    <!-- Discussions Section -->
-
-    
-
-    <div class="title-container">
-      <div class="title">Discussion</div>
-    
-     
-    
-    <div class="user-discussions">
-      <!-- User discussions will be populated here -->
-    </div>
-    <div class="no-discussions-message" style="display: none;">
-      <p>No discussions posted by this user.</p>
-    </div>
-    <div id="editModal" class="modal-edit">
-      <div class="modal-content-edit">
-        <span class="close" onclick="closeEditModal()">&times;</span>
-        <h2>Edit Discussion</h2>
-        <form id="editForm">
-          <label for="editText">Discussion Text:</label>
-          <textarea id="editText"></textarea>
-          <label for="editCategory">Category:</label>
-          <select id="editCategory">
-            <option value="coding">Coding</option>
-            <option value="math">Math</option>
-            <option value="english">English</option>
-            <option value="microsoft">Microsoft</option>
-          </select>
-          <button type="button" id="saveEdit">Save Changes</button>
-        </form>
-      </div>
-    </div>
-    <div id="deleteDiscussionModal" class="modal-delete">
-      <div class="modal-content-delete">
-        <span id="closeDeleteModal" onclick="closeDeleteModal()">&times;</span>
-        <h2>Confirm Discussion Deletion</h2>
-        <p>Are you sure you want to delete this discussion? This action cannot be undone.</p>
-        <button id="confirmDelete">Yes, Delete</button>
-        <button id="cancelDeleteModal" onclick="closeDeleteModal()">Cancel</button>
-      </div>
+  </div>
+  <div id="deleteReviewModel" class="modal-delete">
+    <div class="modal-content-delete">
+      <span class="close" onclick="closeDeleteModal()">&times;</span>
+      <h2>Confirm Review Deletion</h2>
+      <p>Are you sure you want to delete this review? This action cannot be undone.</p>
+      <button id="confirmReviewDelete">Yes, Delete</button>
+      <button id="cancelDelete" onclick="closeDeleteModal()">Cancel</button>
     </div>
   </div>
 </div>
 
+<!-- Discussions Section -->
+<div class="section-container">
+  <div class="title-container">
+    <div class="title">Discussion</div>
+  </div>
+  <div class="user-discussions">
+    <!-- User discussions will be populated here -->
+  </div>
+  <div class="no-discussions-message" style="display: none;">
+    <p>No discussions posted by this user.</p>
+  </div>
+  <div id="editModal" class="modal-edit">
+    <div class="modal-content-edit">
+      <span class="close" onclick="closeEditModal()">&times;</span>
+      <h2>Edit Discussion</h2>
+      <form id="editForm">
+        <label for="editText">Discussion Text:</label>
+        <textarea id="editText"></textarea>
+        <label for="editCategory">Category:</label>
+        <select id="editCategory">
+          <option value="coding">Coding</option>
+          <option value="math">Math</option>
+          <option value="english">English</option>
+          <option value="microsoft">Microsoft</option>
+        </select>
+        <button type="button" id="saveEdit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+  <div id="deleteDiscussionModal" class="modal-delete">
+    <div class="modal-content-delete">
+      <span class="close" onclick="closeDeleteModal()">&times;</span>
+      <h2>Confirm Discussion Deletion</h2>
+      <p>Are you sure you want to delete this discussion? This action cannot be undone.</p>
+      <button id="confirmDelete">Yes, Delete</button>
+      <button id="cancelDeleteModal" onclick="closeDeleteModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- Quiz Results Section -->
-<div class="title-container">
-  <div class="title">Quiz Results</div>
-  <div class="quiz-results">
-    <!-- User quiz results will be populated here -->
+<div class="section-container">
+  <div class="title-container">
+    <div class="title">Quiz Results</div>
   </div>
-  <div class="no-quiz-results-message" style="display: none;">
-    <p>No quizzes attempted by this user.</p>
-  </div>
-</div> 
-
-
-
-<!-- Quiz Results Section -->
-<div class="title-container">
-  <div class="title">Quiz Results</div>
   <div class="quiz-results">
     <!-- User quiz results will be populated here -->
   </div>
@@ -225,6 +209,7 @@
     <p>No quizzes attempted by this user.</p>
   </div>
 </div>
+
 
 
 
