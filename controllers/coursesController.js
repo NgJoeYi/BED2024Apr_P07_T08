@@ -24,8 +24,8 @@ const getCoursesById = async (req, res) => {
       if (!course) {
           return res.status(404).json({ message: "Course not found" });
       }
-      console.log('Sending response:', course); // Log the response before sending
-      res.json(course);
+      console.log('COURSE USER ID:', course.userID );
+      res.json({ course, userID: course.userID });
   } catch (error) {
       console.error('Error retrieving course:', error);
       res.status(500).json({ message: "Error retrieving course" });
@@ -37,9 +37,7 @@ const getCoursesById = async (req, res) => {
 const createCourse = async (req, res) => {
   const newCourse = req.body;
   const userID = req.user.id;
-  console.log('USERID', userID);
-  console.log('Request Body:', newCourse); // Log the request body
-
+  
   if (req.file) {
       newCourse.courseImage = req.file.buffer; // Directly use the buffer from multer
   } else {
@@ -57,6 +55,7 @@ const createCourse = async (req, res) => {
 };
 
 const updateCourse = async (req, res) => {
+  userID = req.user.id; // user id that log on now 
   const courseID = parseInt(req.params.id);
   const newCourseData = req.body;
 
@@ -68,31 +67,33 @@ const updateCourse = async (req, res) => {
       if (!updatedCourse) {
           return res.status(404).send("Course not found");
       }
-      res.json(updatedCourse);
+      res.json(updatedCourse,userID);
   } catch (error) {
       console.error('Error updating course:', error);
       res.status(500).send("Error updating course");
   }
 };
-
-const deleteCourseWithNoLectures = async (req,res)=>{
-    try{
-      const success = await Courses.deleteCourseWithNoLectures();
-      if(!success){
-        return res.status(404).send('Error deleting course with no lectures.')
-      }
-      res.status(204).send('Course deleted successfully!!')
-    }catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Error deleting course with no lectures:(" });
+const deleteCourseWithNoLectures = async (req, res) => {
+  try {
+    const success = await Courses.deleteCourseWithNoLectures();
+    if (!success) {
+      console.log('No courses were deleted.'); // Log if no courses were deleted
+      return res.status(404).send('Error deleting course with no lectures.');
     }
-  };
+    console.log('Courses with no lectures deleted successfully.'); // Log success
+    res.status(204).send('Course deleted successfully!!');
+  } catch (error) {
+    console.error('Error deleting course with no lectures:', error);
+    res.status(500).json({ message: "Error deleting course with no lectures:(" });
+  }
+};
+
+
   const deleteCourse = async (req, res) => {
     const courseID = parseInt(req.params.id);
   
     try {
       const success = await Courses.deleteCourse(courseID);
-      console.log('DELETE SUCCESS:',success);
       if (!success) {
         return res.status(404).json({ message: "Course not foundd" });
       }

@@ -1,5 +1,7 @@
+// Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
     checkUserRoleAndFetchCourses();
+    deleteCourseWithNoLectures();
 
     // Add click event listeners to course elements
     const courseElements = document.querySelectorAll('.course-cd-unique a');
@@ -24,6 +26,26 @@ async function fetchCourses() {
         displayCourses(courses);
     } catch (error) {
         console.error('Error fetching courses:', error);
+    }
+}
+// DELETING COURSES WITH NO LECTURES 
+async function deleteCourseWithNoLectures() {
+    try {
+        const token = sessionStorage.getItem('token');
+        const response = await fetch('/courses/noLectures', {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        console.log('came here')
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        console.log('Deleted courses with no lectures'); // Log success
+        fetchCourses(); // Refresh the courses list
+    } catch (error) {
+        console.error('Error deleting courses with no lectures:', error);
     }
 }
 
@@ -67,7 +89,6 @@ function displayCourses(courses) {
                 </div>
             </a>
         `;
-        console.log('COURSE ID IN HTML: ', course.courseID);
         coursesGrid.appendChild(courseElement);
 
         // Fetch and display the review count for each course
@@ -133,22 +154,18 @@ async function deleteCourse(event, button) {
     }
 }
 
-
-// EDIT COURSE 
+//  EDIT COURSE
 async function editCourse(event, button) {
     event.stopPropagation();
     event.preventDefault();
 
     const courseID = button.dataset.courseId;
-    const userID = sessionStorage.getItem('userId');
+    const token = sessionStorage.getItem('token'); // Get the JWT token from sessionStorage
     if (!courseID) {
         alert('Course ID not found.');
         return;
     }
-    console.log('EDIT COURSE ID :', courseID);
-
     try {
-        const token = sessionStorage.getItem('token');
         const response = await fetch(`/courses/${courseID}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -157,8 +174,13 @@ async function editCourse(event, button) {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        const course = await response.json();
-        if (course.userID !== parseInt(userID)) {
+        const { course, userID: courseCreatorUserID } = await response.json();
+        
+        // Decode the JWT to get the user ID of the logged-in user
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const loggedInUserID = decodedToken.id;
+        console.log(courseCreatorUserID);
+        if (courseCreatorUserID !== loggedInUserID) {
             alert('You do not have permission to edit this course.');
             return;
         }
@@ -169,12 +191,9 @@ async function editCourse(event, button) {
     }
 }
 
-
 document.addEventListener('DOMContentLoaded', async function() {
     const urlParams = new URLSearchParams(window.location.search);
     const courseID = urlParams.get('courseID');
-    const userID = sessionStorage.getItem('userId');
-    console.log('USER ID UPDATE COURSE: ', userID);
     if (courseID) {
         try {
             const response = await fetch(`/courses/${courseID}`);
