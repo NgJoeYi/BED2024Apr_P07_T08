@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('courseId is not defined');
     }
 
-
-    const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
-    console.log('Current User ID:', currentUserId); // Debug log
+    const token = sessionStorage.getItem('token'); // Get the token from session storage
+    // const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+    // console.log('Current User ID:', currentUserId); // Debug log
 
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
@@ -130,17 +130,18 @@ function closePopup() {
 async function deleteReview(button) {
     const review = button.closest('.review');
     const reviewId = review.getAttribute('data-id');
-    const userId = sessionStorage.getItem('userId');
-
-    console.log(`Attempting to delete review with ID: ${reviewId} by user ID: ${userId}`);
+    const token = sessionStorage.getItem('token');
+    // const userId = sessionStorage.getItem('userId');
+    // console.log(`Attempting to delete review with ID: ${reviewId} by user ID: ${userId}`);
 
     try {
         const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ userId }) // Include userId in the body
+            // body: JSON.stringify({ userId }) // Include userId in the body
         });
 
         if (response.ok) {
@@ -160,9 +161,10 @@ async function deleteReview(button) {
 function postReview() {
     const reviewText = document.getElementById('review-text').value;
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
-    const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+    const token = sessionStorage.getItem('token');
+    // const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
 
-    if (!reviewText || !rating || !userId) {
+    if (!reviewText || !rating || !token) {
         alert('Please log in or sign up to add reviews.');
         return;
     }
@@ -170,9 +172,10 @@ function postReview() {
     fetch('http://localhost:3000/reviews', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ review_text: reviewText, rating: rating, userId: userId }) // Include userId
+        body: JSON.stringify({ review_text: reviewText, rating: rating }) // Include userId - no more aft jwt
     })
     .then(response => response.json())
     .then(data => {
@@ -186,12 +189,13 @@ function postReview() {
 function editReview(button) {
     const review = button.closest('.review');
     const reviewUserId = parseInt(review.dataset.userId, 10); // Get the user ID from the review
-    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage
+    const token = sessionStorage.getItem('token');
+    // const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage
 
-    if (reviewUserId !== currentUserId) {
-        alert('You can only edit your own reviews.');
-        return;
-    }
+    // if (reviewUserId !== currentUserId) {
+    //     alert('You can only edit your own reviews.');
+    //     return;
+    // }
 
     const reviewText = review.querySelector('.review-details p').textContent;
     const reviewStars = review.querySelectorAll('.fa-star');
@@ -219,9 +223,10 @@ function editReview(button) {
         fetch(`http://localhost:3000/reviews/${review.getAttribute('data-id')}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, userId: currentUserId }) // Include userId
+            body: JSON.stringify({ review_text: updatedText, rating: updatedRating }) // Include userId - no more aft jwt
         })
         .then(response => response.json())
         .then(data => {

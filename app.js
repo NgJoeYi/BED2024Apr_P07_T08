@@ -65,7 +65,6 @@ app.get('/quizzes/:id', quizController.getQuizById);
 app.post('/quizzes', quizController.createQuiz);
 app.put('/quizzes/:id', quizController.updateQuiz);
 app.delete('/quizzes/:id', quizController.deleteQuiz);
-
 // Add Routes for quiz questions 
 app.get('/quizzes/:id/questions', quizController.getQuizWithQuestions);
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz);
@@ -90,9 +89,9 @@ app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.delete
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews); //Filtering & Sorting is done here also done using route, using this.
 app.get('/reviews/count', reviewController.getReviewCount); 
-app.put('/reviews/:id', reviewController.updateReview);
-app.post('/reviews', reviewController.createReview); 
-app.delete('/reviews/:id', reviewController.deleteReview);
+app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.updateReview); // -- jwt
+app.post('/reviews', jwtAuthorization.verifyJWT, reviewController.createReview); // -- jwt
+app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt
 
 // Add Routes for courses
 app.get('/courses', courseController.getAllCourses);
@@ -110,11 +109,11 @@ app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
 app.get('/lectures/:id', lectureController.getLectureByID); // Fix here
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
 app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
-app.put('/lectures/:id', lectureController.updateLecture); 
-app.post('/lectures', multiUpload, lectureController.createLecture);
-app.delete('/lectures/:id', lectureController.deleteLecture); 
-app.delete('/lectures/course/:courseID/chapter/:chapterName', lectureController.deletingChapterName); // Updated route
-app.get('/lectures/last-chapter/:id', lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
+app.put('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.updateLecture); 
+app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
+app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 
+app.delete('/lectures/course/:courseID/chapter/:chapterName', jwtAuthorization.verifyJWT, lectureController.deletingChapterName); // Updated route
+app.get('/lectures/last-chapter/:id', jwtAuthorization.verifyJWT, lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
 
 
 
