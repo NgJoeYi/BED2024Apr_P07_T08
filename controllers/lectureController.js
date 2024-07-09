@@ -9,20 +9,19 @@ const getAllLectures = async (req, res) => {
         res.status(500).send('Error retrieving lectures');
     }
 };
-// get lecture by courseID
-// const getLectureByID = async (req, res) => {
-//     const id = parseInt(req.params.id);
-//     try {
-//         const lecture = await Lectures.getLectureByID(id);
-//         if (!lecture) {
-//             return res.status(404).send('Lecture not found!');
-//         }
-//         res.json(lecture);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send("Error retrieving lecture");
-//     }
-// };
+const getLectureByID = async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
+        const lecture = await Lectures.getLectureByID(id);
+        if (!lecture) {
+            return res.status(404).send('Lecture not found!');
+        }
+        res.json(lecture);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error retrieving lecture");
+    }
+};
 
 const updateLecture = async (req, res) => {
     const id = parseInt(req.params.id);
@@ -181,7 +180,6 @@ const getLecturesByCourseID = async (req, res) => {
 
 module.exports = {
     getAllLectures,
-    // getLectureByID,
     updateLecture,
     createLecture,
     deleteLecture,
@@ -189,5 +187,6 @@ module.exports = {
     getLastChapterName,
     getLectureVideoByID,
     getLecturesByCourseID,
-    getMaxCourseID
+    getMaxCourseID,
+    getLectureByID
 };
