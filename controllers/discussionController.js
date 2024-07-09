@@ -11,7 +11,6 @@ const getDiscussions = async (req, res) => {
     }
 };
 
-// Fetch a specific discussion by ID
 const getDiscussionById = async (req, res) => {
     const discussionId = req.params.id;
     try {
@@ -27,15 +26,14 @@ const getDiscussionById = async (req, res) => {
     }
 };
 
-// Create a new discussion
 const createDiscussion = async (req, res) => {
     try {
-        const userId = req.user.id; // -- jwt implementation
-        if (!userId) { // -- jwt implementation
+        const userId = req.user.id; 
+        if (!userId) {
             return res.status(401).json({ success: false, error: 'Unauthorized' });
         }
         const { title, category, description } = req.body;
-        const newDiscussion = await discussionModel.createDiscussion(title, category, description, userId); // -- jwt implementation
+        const newDiscussion = await discussionModel.createDiscussion(title, category, description, userId);
         res.json({ success: true, discussion: newDiscussion });
     } catch (err) {
         console.error('Error creating discussion:', err);
@@ -43,10 +41,9 @@ const createDiscussion = async (req, res) => {
     }
 };
 
-// Increment likes for a discussion
 const incrementLikes = async (req, res) => {
     try {
-        const { discussionId } = req.body;
+        const discussionId = req.params.discussionId;
         const likes = await discussionModel.incrementLikes(discussionId);
         res.json({ success: true, likes });
     } catch (err) {
@@ -55,10 +52,9 @@ const incrementLikes = async (req, res) => {
     }
 };
 
-// Increment dislikes for a discussion
 const incrementDislikes = async (req, res) => {
     try {
-        const { discussionId } = req.body;
+        const discussionId = req.params.discussionId;
         const dislikes = await discussionModel.incrementDislikes(discussionId);
         res.json({ success: true, dislikes });
     } catch (err) {
@@ -67,11 +63,10 @@ const incrementDislikes = async (req, res) => {
     }
 };
 
-// Fetch discussions by user ID
 const getDiscussionsByUser = async (req, res) => {
     try {
-        const userId = req.user.id; // -- jwt implementation
-        const discussions = await discussionModel.getDiscussionsByUser(userId); // -- jwt implementation
+        const userId = req.user.id;
+        const discussions = await discussionModel.getDiscussionsByUser(userId);
         res.status(200).json({ success: true, discussions });
     } catch (err) {
         console.error('Error getting user discussions:', err);
@@ -79,13 +74,12 @@ const getDiscussionsByUser = async (req, res) => {
     }
 };
 
-// Update discussion
 const updateDiscussion = async (req, res) => {
     try {
         const discussionId = req.params.id;
         const { description, category } = req.body;
-        const userId = req.user.id; // -- jwt implementation
-        const success = await discussionModel.updateDiscussion(discussionId, description, category, userId); // -- jwt implementation
+        const userId = req.user.id;
+        const success = await discussionModel.updateDiscussion(discussionId, description, category, userId);
         if (success) {
             res.json({ success: true });
         } else {
@@ -97,12 +91,11 @@ const updateDiscussion = async (req, res) => {
     }
 };
 
-// Delete discussion
 const deleteDiscussion = async (req, res) => {
     try {
         const discussionId = req.params.id;
-        const userId = req.user.id; // -- jwt implementation
-        const success = await discussionModel.deleteDiscussion(discussionId, userId); // -- jwt implementation
+        const userId = req.user.id;
+        const success = await discussionModel.deleteDiscussion(discussionId, userId);
         if (success) {
             res.json({ success: true });
         } else {

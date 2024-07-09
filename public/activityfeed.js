@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 addDiscussionToFeed(data.discussion);
                 closePopup();
             } else {
-                console.error('User must be logged in to submit a discussion.', data);
-                alert('User must be logged in to submit a discussion.');
+                console.error('Error submitting discussion:', data);
+                alert('Error submitting discussion.');
             }
         })
         .catch(error => {
@@ -79,7 +79,7 @@ function fetchDiscussions() {
                     addDiscussionToFeed(discussion);
                 });
             } else {
-                console.error('Error response from server:', data.error);
+                console.error('Error fetching discussions:', data.error);
                 alert('Error fetching discussions.');
             }
         })
@@ -99,8 +99,8 @@ function addDiscussionToFeed(discussion) {
     post.classList.add('post');
     post.setAttribute('data-id', discussion.id);
 
-    const likedByUser = discussion.userLiked; // should be a boolean
-    const dislikedByUser = discussion.userDisliked; // should be a boolean
+    const likedByUser = discussion.userLiked ? 'true' : 'false';
+    const dislikedByUser = discussion.userDisliked ? 'true' : 'false';
 
     const likesText = `👍 ${discussion.likes} Likes`;
     const dislikesText = `👎 ${discussion.dislikes} Dislikes`;
@@ -129,7 +129,7 @@ function addDiscussionToFeed(discussion) {
             <div class="likes-dislikes">
                 <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
                 <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
-                <span id="comment-count-${discussion.id}" class="comment-count" style = "margin-left: -2px"; >💬 0 Comments</span>
+                <span id="comment-count-${discussion.id}" class="comment-count" style="margin-left: -2px;">💬 0 Comments</span>
             </div>
             <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
         </div>
@@ -184,10 +184,16 @@ function fetchCommentCountForDiscussion(discussionId) {
 }
 
 function incrementLikes(discussionId, likeButton, dislikeButton) {
-    const token = getToken();  // -- jwt implementation
-    if (!token) {  // -- jwt implementation
-        return;  // -- jwt implementation
-    }  // -- jwt implementation
+    const token = getToken();
+    if (!token) {
+        return;
+    }
+    
+    if (likeButton.getAttribute('data-liked') === 'true') {
+        alert('You have already liked this discussion.');
+        return;
+    }
+
     fetch(`/discussions/${discussionId}/like`, {
         method: 'POST',
         headers: {
@@ -198,7 +204,6 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Like added successfully!');
             likeButton.textContent = `👍 ${data.likes} Likes`;
             likeButton.setAttribute('data-liked', 'true');
             dislikeButton.setAttribute('data-disliked', 'false');
@@ -213,10 +218,16 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
 }
 
 function incrementDislikes(discussionId, likeButton, dislikeButton) {
-    const token = getToken();  // -- jwt implementation
-    if (!token) {  // -- jwt implementation
-        return;  // -- jwt implementation
-    }  // -- jwt implementation
+    const token = getToken();
+    if (!token) {
+        return;
+    }
+
+    if (dislikeButton.getAttribute('data-disliked') === 'true') {
+        alert('You have already disliked this discussion.');
+        return;
+    }
+
     fetch(`/discussions/${discussionId}/dislike`, {
         method: 'POST',
         headers: {
@@ -227,7 +238,6 @@ function incrementDislikes(discussionId, likeButton, dislikeButton) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Dislike added successfully!');
             dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
             dislikeButton.setAttribute('data-disliked', 'true');
             likeButton.setAttribute('data-liked', 'false');
