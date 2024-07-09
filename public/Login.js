@@ -20,12 +20,10 @@ document.getElementById('login-contact-form').addEventListener('submit', async f
             alert('Login successful!');
 // --------------------------------------- JWT ---------------------------------------
             sessionStorage.setItem('token', user.token);
+            sessionStorage.setItem('role', user.role);
 // --------------------------------------- JWT ---------------------------------------
             // sessionStorage.setItem('userId', user.id);
             // sessionStorage.setItem('role', user.role); // Store role in sessionStorage
-
-            const decodedToken = JSON.parse(atob(user.token.split('.')[1]));
-            sessionStorage.setItem('role',decodedToken.role); // store role in session storage
             
             window.location.href = 'index.html'; // Redirect on successful login
         } else {
