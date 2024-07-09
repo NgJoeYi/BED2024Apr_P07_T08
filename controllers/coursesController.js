@@ -54,7 +54,7 @@ const createCourse = async (req, res) => {
 };
 
 const updateCourse = async (req, res) => {
-  userID = req.user.id; // user id that log on now 
+  const userID = req.user.id; // user id that logged on now
   const courseID = parseInt(req.params.id);
   const newCourseData = req.body;
 
@@ -62,16 +62,33 @@ const updateCourse = async (req, res) => {
   console.log('Request body:', newCourseData); // Log the request body
 
   try {
+      // If no new image is uploaded, retain the current image
+      if (!req.file) {
+        console.log('DIDNT CHANGE IMAGE');
+          const existingCourse = await Courses.getCourseById(courseID);
+          if (!existingCourse) {
+          return res.status(404).send("Course not found");
+          }
+          newCourseData.courseImage = existingCourse.courseImage;
+          console.log('EXISTING COURSE: ',existingCourse);
+          console.log('OLD IMAGE:', newCourseData.courseImage);
+      } else {
+        console.log('IMAGE CHANGED');
+        newCourseData.courseImage = req.file.buffer;
+      }
+
       const updatedCourse = await Courses.updateCourse(courseID, newCourseData);
       if (!updatedCourse) {
-          return res.status(404).send("Course not found");
+        return res.status(404).send("Course not found");
       }
-      res.json(updatedCourse,userID);
+      res.json(updatedCourse);
   } catch (error) {
       console.error('Error updating course:', error);
       res.status(500).send("Error updating course");
   }
 };
+
+
 const deleteCourseWithNoLectures = async (req, res) => {
   try {
     const success = await Courses.deleteCourseWithNoLectures();

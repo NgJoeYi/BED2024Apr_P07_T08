@@ -38,7 +38,6 @@ async function deleteCourseWithNoLectures() {
                 'Authorization': `Bearer ${token}`
             }
         });
-        console.log('came here')
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -233,16 +232,18 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (courseImageInput.files.length > 0) {
             formData.append('courseImage', courseImageInput.files[0]);
         }
-        formData.append('userID', userID);
-
         // Log form data before sending
         formData.forEach((value, key) => {
             console.log(`${key}: ${value}`);
         });
 
         try {
+            const token = sessionStorage.getItem('token');
             const response = await fetch(`/courses/${courseID}`, {
                 method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
                 body: formData
             });
             if (!response.ok) {
@@ -263,7 +264,7 @@ function populateCourseDetails(course) {
     document.getElementById('courseLevel').value = course.level;
     document.getElementById('courseCategory').value = course.category;
     document.getElementById('courseDuration').value = course.duration;
-
+    console.log('IMAGE:',course.courseID);
     const courseImageElement = document.getElementById('courseImage');
     if (courseImageElement && course.courseImage) {
         const imageUrl = `/courses/image/${course.courseID}`;
