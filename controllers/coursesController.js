@@ -36,10 +36,11 @@ const getCoursesById = async (req, res) => {
 
 const createCourse = async (req, res) => {
   const newCourse = req.body;
+  const userID = req.user.id;
+  console.log('USERID', userID);
   console.log('Request Body:', newCourse); // Log the request body
 
   if (req.file) {
-      console.log('Course Image:', req.file); // Log the file details
       newCourse.courseImage = req.file.buffer; // Directly use the buffer from multer
   } else {
       console.log('Course Image not provided');
@@ -47,7 +48,7 @@ const createCourse = async (req, res) => {
   }
 
   try {
-      const createdCourse = await Courses.createCourse(newCourse);
+      const createdCourse = await Courses.createCourse(newCourse,userID);
       res.status(201).json(createdCourse);
   } catch (error) {
       console.error('Error creating course:', error);

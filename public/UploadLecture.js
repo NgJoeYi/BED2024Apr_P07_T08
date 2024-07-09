@@ -162,7 +162,12 @@ function resetForm() {
 }
 
 async function addCourses() {
-    const userID = sessionStorage.getItem('userId');
+    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
+    if (!token) {
+        alert('User not authenticated. Please log in.');
+        return;
+    }
+
     const title = document.getElementById('course-name-text').textContent.trim();
     const description = document.getElementById('course-details').textContent.trim();
     const category = document.getElementById('category').value.trim();
@@ -170,13 +175,12 @@ async function addCourses() {
     const duration = document.getElementById('duration').value.trim();
     const courseImageInput = document.getElementById('imageFile');
 
-    if (!userID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
+    if (!title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
         alert('Please complete entering course information and select an image.');
         return;
     }
 
     const formData = new FormData();
-    formData.append('userID', userID);
     formData.append('title', title);
     formData.append('description', description);
     formData.append('category', category);
@@ -187,6 +191,9 @@ async function addCourses() {
     try {
         const response = await fetch('/courses', {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
+            },
             body: formData
         });
 

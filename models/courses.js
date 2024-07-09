@@ -128,7 +128,7 @@ class Courses {
             if (pool) await pool.close();
         }
     }
-        static async createCourse(newCourseData) {
+        static async createCourse(newCourseData,id) {
         const connection = await sql.connect(dbConfig);
         try {
             const sqlQuery = `
@@ -137,7 +137,7 @@ class Courses {
                 SELECT SCOPE_IDENTITY() AS CourseID;
             `;
             const request = connection.request();
-            request.input("UserID", sql.Int, newCourseData.userID);
+            request.input("UserID", sql.Int, id);
             request.input("Title", sql.NVarChar, newCourseData.title);
             request.input("Description", sql.NVarChar, newCourseData.description);
             request.input("Category", sql.NVarChar, newCourseData.category);
