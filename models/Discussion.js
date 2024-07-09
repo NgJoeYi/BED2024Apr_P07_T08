@@ -14,7 +14,6 @@ class Discussion {
         this.profilePic = profilePic;
     }
 
-    // Fetch all discussions
     static async getDiscussions(category, sort) {
         try {
             let query = `
