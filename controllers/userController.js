@@ -74,7 +74,7 @@ const loginUser = async (req, res) => {
             id: loginSuccess.id,
             role: loginSuccess.role,
         };
-        const token = jwt.sign(payload, "your_secret_key", { expiresIn: '3600s' });
+        const token = jwt.sign(payload, process.env.SECRET_TOKEN, { expiresIn: '3600s' });
         res.status(200).json({ token });
         //res.status(200).json(loginSuccess);
     } catch (error) {
