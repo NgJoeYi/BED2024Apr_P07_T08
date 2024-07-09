@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // GETTING ALL COURSES
 async function fetchCourses() {
     try {
-        const response = await fetch('/courses');
+        const response = await fetch('/courses'); // -- jwt, no token required, users that are not logged in can view the courses
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -105,8 +105,12 @@ async function deleteCourse(event, button) {
     }
 
     try {
+        const token = sessionStorage.getItem('token');
         const response = await fetch(`/courses/${courseID}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {  // -- jwt implementation
+                'Authorization': `Bearer ${token}` // -- jwt implementation
+            }  // -- jwt implementation
         });
         console.log('PASSED HERE ');
         if (response.ok) {
@@ -129,7 +133,7 @@ async function deleteCourse(event, button) {
     }
 }
 
-// EDIT COURSE 
+
 // EDIT COURSE 
 async function editCourse(event, button) {
     event.stopPropagation();
@@ -144,7 +148,12 @@ async function editCourse(event, button) {
     console.log('EDIT COURSE ID :', courseID);
 
     try {
-        const response = await fetch(`/courses/${courseID}`);
+        const token = sessionStorage.getItem('token');
+        const response = await fetch(`/courses/${courseID}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }

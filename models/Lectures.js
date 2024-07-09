@@ -42,40 +42,40 @@ class Lectures {
         }
     }
 
-    // getting lectures by course ID
-    // static async getLectureByID(id) {
-    //     let connection = await sql.connect(dbConfig);
-    //     try {
-    //         const sqlQuery = `SELECT * FROM Lectures WHERE CourseID = @courseID`;
-    //         const request = connection.request();
-    //         request.input('courseID', sql.Int, id);
-    //         const result = await request.query(sqlQuery);
-
-    //         if (result.recordset.length === 0) {
-    //             return null;
-    //         }
-
-    //         return result.recordset.map(lecture => new Lectures(
-    //             lecture.LectureID,
-    //             lecture.CourseID,
-    //             lecture.UserID,
-    //             lecture.Title,
-    //             lecture.Description,
-    //             lecture.Video,
-    //             lecture.LectureImage,
-    //             lecture.Duration,
-    //             lecture.Position,
-    //             lecture.CreatedAt,
-    //             lecture.ChapterName
-    //         ));
-    //     } catch (error) {
-    //         console.error('Error retrieving lectures: ', error);
-    //         throw error;
-    //     } finally {
-    //         await connection.close();
-    //     }
-    // }
-
+    static async getLectureByID(id) {
+        let connection = await sql.connect(dbConfig);
+        try {
+            const sqlQuery = `SELECT * FROM Lectures WHERE LectureID = @lectureID`;
+            const request = connection.request();
+            request.input('lectureID', sql.Int, id);
+            const result = await request.query(sqlQuery);
+    
+            if (result.recordset.length === 0) {
+                return null;
+            }
+    
+            const lecture = result.recordset[0];
+            return new Lectures(
+                lecture.LectureID,
+                lecture.CourseID,
+                lecture.UserID,
+                lecture.Title,
+                lecture.Description,
+                lecture.Video,
+                lecture.LectureImage,
+                lecture.Duration,
+                lecture.Position,
+                lecture.CreatedAt,
+                lecture.ChapterName
+            );
+        } catch (error) {
+            console.error('Error retrieving lecture: ', error);
+            throw error;
+        } finally {
+            await connection.close();
+        }
+    }
+    
     static async updateLecture(id, newLectureData) {
         let connection = await sql.connect(dbConfig);
         try {

@@ -98,15 +98,16 @@ app.delete('/reviews/:id', reviewController.deleteReview);
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
-app.put('/courses/:id', upload.single('courseImage'), courseController.updateCourse);
-app.post('/courses', upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
-app.delete('/courses/:id', courseController.deleteCourse);
-app.delete('/courses/noLectures',courseController.deleteCourseWithNoLectures);
+app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.updateCourse);
+app.post('/courses', jwtAuthorization.verifyJWT, upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
+app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
+app.delete('/courses/noLectures', jwtAuthorization.verifyJWT, courseController.deleteCourseWithNoLectures);
 
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
+app.get('/lectures/:id', lectureController.getLectureByID); // Fix here
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
 app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
 app.put('/lectures/:id', lectureController.updateLecture); 

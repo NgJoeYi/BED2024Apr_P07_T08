@@ -3,12 +3,13 @@ const jwt = require('jsonwebtoken');
 function verifyJWT(req, res, next) {
     const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
 
+    console.log(token);
     if (!token) {
         console.log('No token provided'); 
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    jwt.verify(token, "your_secret_key", (err, decoded) => {
+    jwt.verify(token, process.env.SECRET_TOKEN, (err, decoded) => {
         if (err) {
             console.log('Token verification failed:', err);
             return res.status(403).json({ message: 'Forbidden' });
@@ -46,7 +47,14 @@ function verifyJWT(req, res, next) {
             'GET /quizzes/:id/questions': ['student', 'lecturer'],
             'POST /submitQuiz': ['student', 'lecturer'], // Only students can submit quizzes
             'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
-
+            
+            // 'GET /courses': ['student', 'lecturer'],
+            // 'GET /courses/:id': ['student', 'lecturer'],
+            // 'GET /courses/images/:id': ['student', 'lecturer'],
+            'PUT /courses/:id': ['student', 'lecturer'],
+            'POST /courses': ['student', 'lecturer'],
+            'DELETE /courses/:id': ['student', 'lecturer'],
+            'DELETE /courses/noLectures': ['student', 'lecturer'],
         };
         // ************************************** ADD ROUTES HERE **************************************
 
@@ -79,3 +87,10 @@ function verifyJWT(req, res, next) {
 }
 
 module.exports = { verifyJWT };
+
+
+// note 
+// - users that are not logged in can view comments 
+// - users that are not logged in can view courses 
+// - users that are not logged in can view discussions
+// -- users that are not logged in can attempt the quizzes // maybe...
