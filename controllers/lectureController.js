@@ -90,7 +90,8 @@ const getMaxCourseID = async (req, res) => {
 };
 
 const createLecture = async (req, res) => {
-    const { Title, Duration, Description, ChapterName, UserID, CourseID } = req.body;
+    const { Title, Duration, Description, ChapterName, CourseID } = req.body;
+    const UserID = req.user.id;
     console.log('UserID from request body:', UserID); 
     console.log('CourseID from request body:', CourseID); 
 
