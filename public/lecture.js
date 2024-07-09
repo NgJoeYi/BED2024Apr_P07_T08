@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     getLecturesByCourse();
 
-    const currentUserId = sessionStorage.getItem('userId');
-    console.log('Current User ID:', currentUserId); // Debug log
+    // const currentUserId = sessionStorage.getItem('userId');
+    // console.log('Current User ID:', currentUserId); // Debug log
 
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
@@ -25,13 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
 async function deleteLecture(button) {
     const lectureID = button.dataset.lectureId;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
+    const token = sessionStorage.getItem('token');
 
     if (!confirm('Are you sure you want to delete this lecture?')) {
         return;
     }
 
     try {
-        const response = await fetch(`/lectures/${lectureID}`, { method: 'DELETE' });
+        const response = await fetch(`/lectures/${lectureID}`, { 
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
 
         if (response.ok) {
             alert('Lecture deleted successfully!');
@@ -49,7 +55,12 @@ async function deleteLecture(button) {
 
             if (lectures.length === 0) {
                 // No more lectures, delete the course
-                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { method: 'DELETE' });
+                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { 
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 if (deleteCourseResponse.ok) {
                     alert('Course deleted successfully!');
                     window.location.href = 'courses.html';
@@ -73,13 +84,17 @@ async function deleteLecture(button) {
 async function deleteChapter(button) {
     const chapterName = button.dataset.chapterName;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
+    const token = sessionStorage.getItem('token');
 
     if (!confirm(`Are you sure you want to delete the entire chapter: ${chapterName}?`)) {
         return;
     }
 
     try {
-        const response = await fetch(`/lectures/course/${courseID}/chapter/${chapterName}`, { method: 'DELETE' });
+        const response = await fetch(`/lectures/course/${courseID}/chapter/${chapterName}`, { 
+            method: 'DELETE',
+            'Authorization': `Bearer ${token}`
+        });
 
         if (response.ok) {
             alert(`Chapter ${chapterName} deleted successfully!`);
@@ -91,7 +106,10 @@ async function deleteChapter(button) {
 
             if (lectures.length === 0) {
                 // No more lectures, delete the course
-                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { method: 'DELETE' });
+                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { 
+                    method: 'DELETE',
+                    'Authorization': `Bearer ${token}`
+                });
                 if (deleteCourseResponse.ok) {
                     alert('Course deleted successfully!');
                     window.location.href = 'courses.html';
@@ -260,12 +278,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     const urlParams = new URLSearchParams(window.location.search);
     const lectureID = urlParams.get('lectureID');
     const courseID = urlParams.get('courseID');
-    const userID = sessionStorage.getItem('userId');
-    console.log('USER ID UPDATE LECTURE: ', userID);
+    // const userID = sessionStorage.getItem('userId');
+    const token = sessionStorage.getItem('token');
+    // console.log('USER ID UPDATE LECTURE: ', userID);
 
     if (lectureID && courseID) {
         try {
-            const response = await fetch(`/lectures/${lectureID}`);
+            const response = await fetch(`/lectures/${lectureID}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -295,7 +318,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (lectureVideoInput.files.length > 0) {
             formData.append('lectureVideo', lectureVideoInput.files[0]);
         }
-        formData.append('userID', sessionStorage.getItem('userId'));
+        // formData.append('userID', sessionStorage.getItem('userId'));
 
         // Log form data before sending
         console.log('Form Data:', Object.fromEntries(formData.entries()));
@@ -303,7 +326,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const response = await fetch(`/lectures/${lectureID}`, {
                 method: 'PUT',
-                body: formData
+                body: formData,
+                header: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');

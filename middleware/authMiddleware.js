@@ -55,6 +55,16 @@ function verifyJWT(req, res, next) {
             'POST /courses': ['student', 'lecturer'],
             'DELETE /courses/:id': ['student', 'lecturer'],
             'DELETE /courses/noLectures': ['student', 'lecturer'],
+
+            'GET /lectures/last-chapter/:id': ['lecturer'],
+            'POST /lectures': ['lecturer'],
+            'PUT /lectures/:id': ['lecturer'],
+            'DELETE /lectures/:id': ['lecturer'],
+            'DELETE /lectures/course/:courseID/chapter/:chapterName': ['lecturer'],
+
+            'PUT /reviews/:id': ['student', 'lecturer'],
+            'POST /reviews': ['student', 'lecturer'],
+            'DELETE /reviews/:id': ['student', 'lecturer'],
         };
         // ************************************** ADD ROUTES HERE **************************************
 
