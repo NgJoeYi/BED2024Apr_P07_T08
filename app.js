@@ -78,6 +78,8 @@ app.get('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.get
 app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.createDiscussion);
 app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.updateDiscussion);
 app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.deleteDiscussion);
+app.post('/discussions/:discussionId/like', jwtAuthorization.verifyJWT, discussionController.incrementLikes);
+app.post('/discussions/:discussionId/dislike',  jwtAuthorization.verifyJWT, discussionController.incrementDislikes);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);

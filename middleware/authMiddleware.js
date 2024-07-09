@@ -30,8 +30,11 @@ function verifyJWT(req, res, next) {
             'GET /discussions': ['student', 'lecturer'],
             'GET /discussions/:id': ['student', 'lecturer'],
             'POST /discussions': ['student', 'lecturer'],
+            'POST /discussions/:discussionId/like': ['student', 'lecturer'],
+            'POST /discussions/:discussionId/dislike': ['student', 'lecturer'],
             'PUT /discussions/:id': ['student', 'lecturer'],
             'DELETE /discussions/:id': ['student', 'lecturer'],
+            
 
             'GET /comments': ['student', 'lecturer'],
             'PUT /comments/:id': ['student', 'lecturer'],
