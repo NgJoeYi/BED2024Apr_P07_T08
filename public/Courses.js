@@ -76,8 +76,8 @@ function displayCourses(courses) {
 }
 
 function checkUserRoleAndFetchCourses() {
-    const userRole = sessionStorage.getItem('role');
-    console.log(userRole);
+    const userRole = sessionStorage.getItem('role'); // Get the user role from sessionStorage
+
     if (userRole === 'lecturer') {
         document.querySelector('.add-button').style.display = 'block';
     } else {
@@ -86,6 +86,7 @@ function checkUserRoleAndFetchCourses() {
 
     fetchCourses(); // Fetch courses after checking user role
 }
+
 
 
 // DELETE COURSE
