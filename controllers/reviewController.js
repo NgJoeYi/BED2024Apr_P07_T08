@@ -3,12 +3,19 @@ const dbConfig = require('../dbConfig');
 const reviewModel = require('../models/Review');
 
 async function getReviews(req, res) {
+    const { courseId, filter = 'all', sort = 'mostRecent' } = req.query;
+    if (!courseId || isNaN(courseId)) {
+        return res.status(400).json({ error: 'Course ID is required and must be a valid number' });
+    }
+    
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const reviews = await reviewModel.getAllReviews(connection);
+        const reviews = await reviewModel.getAllReviews(connection, parseInt(courseId, 10), filter, sort);
+        console.log('Reviews:', reviews); // Add this line to log the reviews
         res.status(200).json(reviews);
     } catch (err) {
+        console.error('Server error:', err.message); // Add this line to log errors
         res.status(500).json({ error: err.message });
     } finally {
         if (connection) {
@@ -75,9 +82,36 @@ async function deleteReview(req, res) {
     }
 }
 
+async function getReviewCount(req, res) {
+    const { courseId } = req.query;
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        let countQuery = `SELECT COUNT(*) AS count FROM user_reviews`;
+        if (courseId) {
+            countQuery += ` WHERE course_id = @courseId`;
+        }
+        const request = new sql.Request(connection);
+        if (courseId) {
+            request.input('courseId', sql.Int, courseId);
+        }
+        const result = await request.query(countQuery);
+        res.json({ count: result.recordset[0].count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching review count");
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
+
 module.exports = {
     getReviews,
     updateReview,
     createReview,
     deleteReview,
+    getReviewCount,
 };

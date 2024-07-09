@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken'); 
 
 const getUserById = async (req, res) => {
@@ -74,7 +74,7 @@ const loginUser = async (req, res) => {
             id: loginSuccess.id,
             role: loginSuccess.role,
         };
-        const token = jwt.sign(payload, "your_secret_key", { expiresIn: '3600s' });
+        const token = jwt.sign(payload, process.env.SECRET_TOKEN, { expiresIn: '3600s' });
         res.status(200).json({ token });
         //res.status(200).json(loginSuccess);
     } catch (error) {
@@ -133,24 +133,31 @@ const updateUser = async (req, res) => {
 // after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
 const deleteUser = async (req, res) => {
     const userId = req.user.id;
-    const passwordInput = req.body;
+    const { password } = req.body;
     try {
         const checkUser = await User.getUserById(userId);
         if (!checkUser) {
-            return res.status(404).send('User does not exist');
+            return res.status(404).json({ message: 'User does not exist' });
         }
 
-        // compare current password and the password in the database 
-        const isPasswordMatch = await bcrypt.compare(passwordInput.password, checkUser.password);
+        // Compare current password and the password in the database 
+        const isPasswordMatch = await bcrypt.compare(password, checkUser.password);
         if (!isPasswordMatch) {
             return res.status(400).json({ message: 'Password is incorrect' });
         }
 
-        await User.deleteUser(userId);
-        res.status(200).send('User successfully deleted');
+        const deleteFK = await User.deleteUtility();
+        if (!deleteFK) {
+            return res.status(500).json({ message: 'Failed to delete user-related records' });
+        }
+        const userDeleted = await User.deleteUser(userId);
+        if (!userDeleted) {
+            return res.status(500).json({ message: 'Failed to delete user' });
+        }
+        res.status(200).json({ message: 'User successfully deleted' });
     } catch (error) {
         console.error('Server error:', error);
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 

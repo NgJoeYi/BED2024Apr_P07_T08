@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetchReviews();
     getLecturesByCourse();
 
     const currentUserId = sessionStorage.getItem('userId');

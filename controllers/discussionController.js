@@ -1,10 +1,8 @@
 const discussionModel = require('../models/Discussion');
 
-// Fetch all discussions
 const getDiscussions = async (req, res) => {
     try {
-        const category = req.query.category;
-        const sort = req.query.sort;
+        const { category = 'all', sort = 'most-recent' } = req.query;
         const discussions = await discussionModel.getDiscussions(category, sort);
         res.json({ success: true, discussions });
     } catch (err) {

@@ -62,7 +62,7 @@ function getToken() {
         alert('User is not logged in or session has expired');
         return null;
     }
-    return userId;
+    return token;
 }
 
 function fetchDiscussions() {
@@ -241,8 +241,6 @@ function incrementDislikes(discussionId, likeButton, dislikeButton) {
     });
 }
 
-
-
 // Define the popup functions
 function openPopup() {
     document.getElementById("popup").style.display = "block";
@@ -258,9 +256,3 @@ window.onclick = function(event) {
         document.getElementById("popup").style.display = "none";
     }
 }
-
-
-// -- jwt note 
-// 1. users CAN view discussions if they are NOT logged in 
-// 2. users CAN go to comments if they are NOT logged in
-// 3. users CANNOT like or dislike the discussion if they are NOT logged in
