@@ -24,7 +24,6 @@ const getCoursesById = async (req, res) => {
       if (!course) {
           return res.status(404).json({ message: "Course not found" });
       }
-      console.log('COURSE USER ID:', course.userID );
       res.json({ course, userID: course.userID });
   } catch (error) {
       console.error('Error retrieving course:', error);

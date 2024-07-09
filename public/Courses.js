@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            const course = await response.json();
+            const { course, userID: courseCreatorUserID } = await response.json();
             populateCourseDetails(course);
         } catch (error) {
             console.error('Error fetching course details:', error);
