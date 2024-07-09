@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
             role: loginSuccess.role,
         };
         const token = jwt.sign(payload, process.env.SECRET_TOKEN, { expiresIn: '3600s' });
-        res.status(200).json({ token });
+        res.status(200).json({ token, role: loginSuccess.role });
         //res.status(200).json(loginSuccess);
     } catch (error) {
         console.error('Server error:', error); // Log error details
