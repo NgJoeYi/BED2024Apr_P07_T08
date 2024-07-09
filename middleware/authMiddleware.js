@@ -61,6 +61,10 @@ function verifyJWT(req, res, next) {
             'PUT /lectures/:id': ['lecturer'],
             'DELETE /lectures/:id': ['lecturer'],
             'DELETE /lectures/course/:courseID/chapter/:chapterName': ['lecturer'],
+
+            'PUT /reviews/:id': ['student', 'lecturer'],
+            'POST /reviews': ['student', 'lecturer'],
+            'DELETE /reviews/:id': ['student', 'lecturer'],
         };
         // ************************************** ADD ROUTES HERE **************************************
 

@@ -65,7 +65,6 @@ app.get('/quizzes/:id', quizController.getQuizById);
 app.post('/quizzes', quizController.createQuiz);
 app.put('/quizzes/:id', quizController.updateQuiz);
 app.delete('/quizzes/:id', quizController.deleteQuiz);
-
 // Add Routes for quiz questions 
 app.get('/quizzes/:id/questions', quizController.getQuizWithQuestions);
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz);
@@ -90,9 +89,9 @@ app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.delete
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews); //Filtering & Sorting is done here also done using route, using this.
 app.get('/reviews/count', reviewController.getReviewCount); 
-app.put('/reviews/:id', reviewController.updateReview);
-app.post('/reviews', reviewController.createReview); 
-app.delete('/reviews/:id', reviewController.deleteReview);
+app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.updateReview); // -- jwt
+app.post('/reviews', jwtAuthorization.verifyJWT, reviewController.createReview); // -- jwt
+app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt
 
 // Add Routes for courses
 app.get('/courses', courseController.getAllCourses);
