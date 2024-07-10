@@ -8,8 +8,18 @@ let currentQuestionIndex = 0;
 let questions = [];
 let userResponses = {};
 
+function getToken() {
+    return sessionStorage.getItem('token');
+  }
+
 function fetchQuizWithQuestions(quizId) {
-    fetch(`/quizzes/${quizId}/questions`)
+    const token = getToken()
+    fetch(`/quizzes/${quizId}/questions`, {
+        headers: 
+        {
+            'Authorization': `Bearer ${token}`
+        }
+    })
         .then(response => response.json())
         .then(quiz => {
             if (quiz) {

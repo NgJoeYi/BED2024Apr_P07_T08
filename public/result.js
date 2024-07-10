@@ -97,7 +97,7 @@ function displayResult(result) {
                     `).join('')}
             </div>
             <button id="retake-quiz" onclick="retakeQuiz(${result.QuizID})">Retake Quiz</button>
-            <button id="back-to-quizzes" onclick="backToQuizzes()">Back to Quizzes</button>
+            <button id="back-to-home" onclick="backToQuizzes()">Back to home</button>
         </div>
     `;
 }
@@ -109,5 +109,5 @@ function retakeQuiz(quizId) {
 
 function backToQuizzes() {
     // Implement the function to go back to quizzes list
-    window.location.href = 'quizzes.html';
+    window.location.href = 'index.html';
 }

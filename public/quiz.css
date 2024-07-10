@@ -1,10 +1,12 @@
+/* Main Layout */
 main {
     padding: 60px 20px;
     padding-top: 220px; /* Ensure content is below the navbar */
     max-width: 1600px; /* Adjust the max width to fit four wider cards */
     margin: 0 auto;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center; /* Center align items */
 }
 
 #quiz-container {
@@ -15,6 +17,114 @@ main {
     width: 100%;
 }
 
+.create-quiz-btn {
+    background-color: #1b2b40;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-bottom: 20px; /* Add some margin to move it down */
+    transition: background-color 0.3s;
+    align-self: flex-end; /* Align button to the end */
+}
+
+.create-quiz-btn:hover {
+    background-color: #d9aa52;
+}
+
+/* Modal Styling */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto; /* Centered */
+    padding: 30px 40px;
+    border: none;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 500px; /* Ensure the modal doesn't exceed the max width */
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out; /* Add fade-in effect */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.close-quiz-modal-btn, .close-question-modal-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-quiz-modal-btn:hover, .close-quiz-modal-btn:focus,
+.close-question-modal-btn:hover, .close-question-modal-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#quiz-form div, #question-form div {
+    margin-bottom: 20px;
+}
+
+#quiz-form label, #question-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+}
+
+#quiz-form input, #quiz-form textarea, #question-form input, #question-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#quiz-form input:focus, #quiz-form textarea:focus, #question-form input:focus, #question-form textarea:focus {
+    border-color: #1b2b40;
+    box-shadow: 0 0 5px rgba(27, 43, 64, 0.5);
+}
+
+#quiz-form input[type="file"], #question-form input[type="file"] {
+    padding: 5px; /* Reduce padding for file input */
+}
+
+#quiz-form button, #question-form button {
+    background-color: #1b2b40;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+#quiz-form button:hover, #question-form button:hover {
+    background-color: #d9aa52;
+}
+
+/* Quiz Card Styling */
 .quiz-card {
     background-color: #1b2b40;
     border-radius: 15px;

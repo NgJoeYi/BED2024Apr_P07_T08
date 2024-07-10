@@ -7,12 +7,13 @@ function base64ToBuffer(base64) {
 
 const createQuiz = async (req, res) => {
     const newQuizData = req.body;
+    const userId = req.user.id;
     try {
         // Convert img_url to buffer if it's a base64 string
         if (newQuizData.quizImg) {
             newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg);
         }
-        const quiz = await Quiz.createQuiz(newQuizData);
+        const quiz = await Quiz.createQuiz(userId, newQuizData);
         if (!quiz) {
             return res.status(400).json({ message: 'Failed to create a new quiz' });
         }
@@ -20,6 +21,23 @@ const createQuiz = async (req, res) => {
     } catch (error) {
         console.error('Create Quiz - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const createQuestion = async (req, res) => {
+    const newQuestionData = req.body;
+    try {
+        if (newQuestionData.qnsImg) {
+            newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
+        }
+        const question = await Quiz.createQuestion(newQuestionData);
+        if (!question) {
+            return res.status(400).json({ message: "Failed to create question" });
+        }
+        return res.status(201).json({ message: "Question created successfully",question });
+    } catch (error) {
+        console.error('Error creating question:', error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -199,6 +217,7 @@ module.exports = {
     updateQuiz,
     deleteQuiz,
     getQuizWithQuestions,
+    createQuestion,
     getUserQuizResult,
     getAttemptCount,
     submitQuiz,
