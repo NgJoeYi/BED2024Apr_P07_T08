@@ -304,6 +304,11 @@ main {
     margin-bottom: 15px;  /* Space between form elements */
 }
 
+#update-quiz-form .button-container {  /* Container for buttons */
+    display: flex;
+    justify-content: space-between;
+}
+
 #update-quiz-form button {
     background-color: #d9aa52;  /* Gold background for button */
     color: #1b2b40;  /* Dark blue text for button */

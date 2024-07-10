@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const createQuizBtn = document.getElementById('create-quiz-btn');
     if (userRole !== 'lecturer') {
         createQuizBtn.style.display = 'none';
+        updateButton.style.display = 'none';
+
     }
 
     const quizModal = document.getElementById('quiz-modal');
@@ -62,6 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
         doneButton.addEventListener('click', () => {
             questionModal.style.display = 'none';
         });
+    }
+
+    const deleteQuizBtn = document.getElementById('delete-quiz-btn');
+    if (deleteQuizBtn) {
+        deleteQuizBtn.addEventListener('click', (event) => deleteQuiz(event));
     }
 });
 
@@ -140,13 +147,18 @@ function displayQuizzes(quizzes) {
             updateButton.className = 'fa fa-ellipsis-v';  
             updateButton.style.cursor = 'pointer';
             updateButton.onclick = () => openUpdateModal(quiz);
-            buttonContainer.appendChild(updateButton);  
+            buttonContainer.appendChild(updateButton);
     
-            quizCardContent.appendChild(buttonContainer);  
-            quizCard.appendChild(quizCardContent);
-            quizContainer.appendChild(quizCard);
-        });
-    }
+        // CHANGED: Check the role from session storage and show/hide the update button
+        if (sessionStorage.getItem('role') !== 'lecturer') {
+            updateButton.style.display = 'none';
+        }
+    
+        quizCardContent.appendChild(buttonContainer);  
+        quizCard.appendChild(quizCardContent);
+        quizContainer.appendChild(quizCard);
+    });
+}
 
 function arrayBufferToBase64(buffer) {
     let binary = '';
@@ -342,21 +354,21 @@ async function updateQuiz(event) {
 }
 
 
-async function handleImageUploadForUpdate(data) {
-    const imgFile = document.getElementById('update_quizImg').files[0];
-    if (imgFile) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            data['quizImg'] = reader.result.split(',')[1]; 
-            // console.log('Data with Image:', data);
-            await updateQuizRequest(data);
-        };
-        reader.readAsDataURL(imgFile);
-    } else {
-        console.log('Data without Image:', data);
-        await updateQuizRequest(data);
-    }
-}
+// async function handleImageUploadForUpdate(data) {
+//     const imgFile = document.getElementById('update_quizImg').files[0];
+//     if (imgFile) {
+//         const reader = new FileReader();
+//         reader.onloadend = async () => {
+//             data['quizImg'] = reader.result.split(',')[1]; 
+//             // console.log('Data with Image:', data);
+//             await updateQuizRequest(data);
+//         };
+//         reader.readAsDataURL(imgFile);
+//     } else {
+//         console.log('Data without Image:', data);
+//         await updateQuizRequest(data);
+//     }
+// }
 
 async function updateQuizRequest(data) {
     const token = sessionStorage.getItem('token');
@@ -387,4 +399,29 @@ function handleUpdateQuizResponse(response, body) {
     } else {  
         alert(`Failed to update quiz: ${body.message}`);  
     }  
+}
+
+// ------------------------------- DELETE QUIZ -------------------------------
+
+async function deleteQuiz(event) {
+    event.preventDefault();
+    const quizId = document.getElementById('update_quiz_id').value;
+    const token = sessionStorage.getItem('token');
+    try {
+        const response = await fetch(`/quizzes/${quizId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.message);
+
+        alert('Quiz successfully deleted');
+        document.getElementById('update-modal').style.display = 'none';
+        fetchQuizzes(); // Refresh the quizzes list
+    } catch (error) {
+        console.error('Error deleting quiz:', error);
+        alert(`Error deleting quiz: ${error.message}`);
+    }
 }

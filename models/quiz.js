@@ -239,8 +239,31 @@ class Quiz {
                 await connection.close();
             }
         }
-    }           
-
+    }        
+    
+    static async deleteQuestion(quizId){
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            DELETE FROM Questions WHERE quiz_id=@inputQuizId
+            `;
+            const request = connection.request();
+            request.input('inputQuizId', quizId);
+            const result = await request.query(sqlQuery);
+            if (result.rowsAffected[0] === 0) {
+                return null;
+            }
+            return result.rowsAffected[0] > 0; // returns true
+        } catch (error) {
+            console.error('Error deleting question:', error);
+            throw new Error("Error deleting question");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }    
 
 
         
