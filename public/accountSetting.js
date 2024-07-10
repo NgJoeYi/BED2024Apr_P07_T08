@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 async function fetchUserQuizResults() {
   const token = getToken();
   try {
-      const response = await fetch('/quizResults', {
+      const response = await fetch('/account/quizResults', {
           headers: {
               'Authorization': `Bearer ${token}`
           }
