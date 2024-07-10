@@ -147,8 +147,6 @@ async function run() {
             attempt_date DATETIME DEFAULT GETDATE(),
             score INT,
             time_taken INT, -- Time taken in seconds
-            total_questions INT,
-            total_marks INT,
             passed BIT,
             FOREIGN KEY (user_id) REFERENCES Users(id),
             FOREIGN KEY (quiz_id) REFERENCES Quizzes(quiz_id)
@@ -385,11 +383,11 @@ async function run() {
         await request.query(insertQuestions);
 
         const insertUserQuizAttempts = `
-        INSERT INTO UserQuizAttempts (user_id, quiz_id, attempt_date, score, time_taken, total_questions, total_marks, passed) VALUES
-        (1, 1, GETDATE(), 80, 300, 5, 100, 1),
-        (3, 2, GETDATE(), 60, 400, 5, 100, 0),
-        (4, 3, GETDATE(), 90, 350, 5, 100, 1),
-        (2, 4, GETDATE(), 70, 320, 5, 100, 1);
+        INSERT INTO UserQuizAttempts (user_id, quiz_id, attempt_date, score, time_taken, passed) VALUES
+        (1, 1, GETDATE(), 80, 300, 1),
+        (3, 2, GETDATE(), 60, 400, 0),
+        (4, 3, GETDATE(), 90, 350, 1),
+        (2, 4, GETDATE(), 70, 320, 1);
         `;
         await connection.request().query(insertUserQuizAttempts);
 
