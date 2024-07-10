@@ -488,6 +488,80 @@ class Quiz {
             }
         }
     }
+
+    static async deleteUserAttempts (quizId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            DELETE FROM UserQuizAttempts WHERE quiz_id=@inputQuizId
+            `;
+            const request = connection.request();
+            request.input('inputQuizId', quizId);
+            const result = await request.query(sqlQuery);
+            // if (result.rowsAffected[0] === 0){
+            //     return null;
+            // }
+            return result.rowsAffected[0] > 0; // returns true
+        } catch (error) {
+            console.error('Error deleting user quiz attempts:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    static async deleteUserResponses (quizId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            DELETE FROM UserResponses
+            WHERE question_id IN (SELECT question_id FROM Questions WHERE quiz_id = @inputQuizId)            
+            `;
+            const request = connection.request();
+            request.input('inputQuizId', quizId);
+            const result = await request.query(sqlQuery);
+            // if (result.rowsAffected[0] === 0){
+            //     return null;
+            // }
+            return result.rowsAffected[0] > 0; // returns true
+        } catch (error) {
+            console.error('Error deleting user response:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    static async deleteIncorrectAnswers (quizId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            DELETE FROM IncorrectAnswers
+            WHERE question_id IN (SELECT question_id FROM Questions WHERE quiz_id = @inputQuizId)           
+            `;
+            const request = connection.request();
+            request.input('inputQuizId', quizId);
+            const result = await request.query(sqlQuery);
+            if (result.rowsAffected[0] === 0){
+                return null;
+            }
+            return result.rowsAffected[0] > 0; // returns true
+        } catch (error) {
+            console.error('Error deleting incorrect answers:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 }
 
 module.exports= Quiz;

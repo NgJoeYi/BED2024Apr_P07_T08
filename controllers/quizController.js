@@ -143,10 +143,38 @@ const deleteQuiz = async (req, res) => {
             return res.status(403).json({ message: 'You are not authorized to delete this quiz' });
         }
 
+        /* ----------------------------------- DELETING FKs ----------------------------------- */
+        /*
+        Delete user responses related to the quiz.
+        Delete incorrect answers related to the quiz.
+        Delete user attempts related to the quiz.
+        Delete questions related to the quiz.
+        Finally, delete the quiz itself.
+        */ 
+        // changed it because users may not have attempts or may not have response
+        // const deleteUserResponses = await Quiz.deleteUserResponses(quizId);
+        // if (!deleteUserResponses) {
+        //     return res.status(400).json({ message: 'Failed to delete user responses related to the quiz' });
+        // }
+        await Quiz.deleteUserResponses(quizId);
+        await Quiz.deleteIncorrectAnswers(quizId);
+        await Quiz.deleteUserAttempts(quizId);
+
+        // const deleteIncorrectAnswers = await Quiz.deleteIncorrectAnswers(quizId);
+        // if (!deleteIncorrectAnswers) {
+        //     return res.status(400).json({ message: 'Failed to delete incorrect answers related to the quiz' });
+        // }
+
+        // const deleteUserAttempts = await Quiz.deleteUserAttempts(quizId);
+        // if (!deleteUserAttempts) {
+        //     return res.status(400).json({ message: 'Failed to delete user attempts related to the quiz' });
+        // }
+
         const deleteQns = await Quiz.deleteQuestion(quizId);
         if (!deleteQns) {
             return res.status(400).json({ message: 'Failed to delete questions related to the quiz' });
         }
+        /* ----------------------------------- DELETING FKs ----------------------------------- */
 
         const quiz = await Quiz.deleteQuiz(quizId);
         if (quiz) {
