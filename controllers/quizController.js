@@ -131,11 +131,23 @@ const updateQuiz = async (req, res) => {
 
 const deleteQuiz = async (req, res) => {
     const quizId = parseInt(req.params.id);
+    const userId = req.user.id;
     try {
         const checkQuiz = await Quiz.getQuizById(quizId);
         if (!checkQuiz) {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
+
+        // only users that created the quiz can delete the quiz
+        if (checkQuiz.created_by !== userId) {
+            return res.status(403).json({ message: 'You are not authorized to delete this quiz' });
+        }
+
+        const deleteQns = await Quiz.deleteQuestion(quizId);
+        if (!deleteQns) {
+            return res.status(400).json({ message: 'Failed to delete questions related to the quiz' });
+        }
+
         const quiz = await Quiz.deleteQuiz(quizId);
         if (quiz) {
             res.status(200).json({ message: 'Quiz successfully deleted' });
