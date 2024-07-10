@@ -1,6 +1,6 @@
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
-    checkUserRoleAndFetchCourses();
+    handleAddButtonVisibility();
     deleteCourseWithNoLectures();
 
     // Add click event listeners to course elements
@@ -95,16 +95,15 @@ function displayCourses(courses) {
     });
 }
 
-function checkUserRoleAndFetchCourses() {
+function handleAddButtonVisibility() {
     const userRole = sessionStorage.getItem('role');
-    console.log(userRole);
-    if (userRole === 'lecturer') {
+    const token = sessionStorage.getItem('token');
+
+    if (token && userRole === 'lecturer') {
         document.querySelector('.add-button').style.display = 'block';
     } else {
         document.querySelector('.add-button').style.display = 'none';
     }
-
-    fetchCourses(); // Fetch courses after checking user role
 }
 
 
