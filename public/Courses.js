@@ -101,8 +101,12 @@ function handleAddButtonVisibility() {
 
     if (token && userRole === 'lecturer') {
         document.querySelector('.add-button').style.display = 'block';
+        document.querySelector('.delete-course').style.display = 'block';
+        document.querySelector('.edit-course').style.display = 'block';
     } else {
         document.querySelector('.add-button').style.display = 'none';
+        document.querySelector('.delete-course').style.display = 'none';
+        document.querySelector('.edit-course').style.display = 'none';
     }
 }
 
