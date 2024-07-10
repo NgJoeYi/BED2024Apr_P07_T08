@@ -1,15 +1,13 @@
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', function() {
     handleAddButtonVisibility();
-    deleteCourseWithNoLectures();
     fetchCourses();
 
-    // Add click event listeners to course elements
+    // To GET INTO SPECIFIC COURSE PAGE
     const courseElements = document.querySelectorAll('.course-cd-unique a');
     courseElements.forEach(courseElement => {
         courseElement.addEventListener('click', function(event) {
             const courseID = this.closest('.course-cd-unique').dataset.courseId;
-            // Pass the course ID in the URL as a query parameter
             this.href = `lecture.html?courseID=${courseID}`;
         });
     });
@@ -25,10 +23,12 @@ async function fetchCourses() {
         const courses = await response.json();
         console.log('Fetched courses:', courses); // Log the fetched courses
         displayCourses(courses);
+        deleteCourseWithNoLectures();
     } catch (error) {
         console.error('Error fetching courses:', error);
     }
 }
+
 // DELETING COURSES WITH NO LECTURES 
 async function deleteCourseWithNoLectures() {
     try {
@@ -39,9 +39,13 @@ async function deleteCourseWithNoLectures() {
                 'Authorization': `Bearer ${token}`
             }
         });
+
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            const errorMessage = await response.text();
+            console.error('Network response was not ok:', errorMessage);
+            throw new Error(`Network response was not ok: ${errorMessage}`);
         }
+
         console.log('Deleted courses with no lectures'); // Log success
         fetchCourses(); // Refresh the courses list
     } catch (error) {
