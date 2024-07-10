@@ -12,27 +12,27 @@ class Quiz {
         this.quizImg = quizImg;
     }
 
-    static async createQuiz(newQuizData) {
+    static async createQuiz(userId, newQuizData) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
             INSERT INTO Quizzes (title, description, total_questions, total_marks, created_by, quizImg)
             VALUES (@inputTitle, @inputDescription, @inputTotal_questions, @inputTotal_marks, @inputCreated_by, @inputQuizImg);
-            SELECT SCOPE_IDENTITY AS quiz_id
+            SELECT SCOPE_IDENTITY() AS quiz_id
             `;
             const request = connection.request();
             request.input('inputTitle', newQuizData.title);
             request.input('inputDescription', newQuizData.description);
             request.input('inputTotal_questions', newQuizData.total_questions);
             request.input('inputTotal_marks', newQuizData.total_marks);
-            request.input('inputCreated_by', newQuizData.created_by);
+            request.input('inputCreated_by', userId);
             request.input('inputQuizImg', sql.VarBinary, newQuizData.quizImg);
             const result = await request.query(sqlQuery);
             if (result.rowsAffected[0] === 0) {
                 return null;
             }
-            return await getQuizById(result.recordset[0].quiz_id);
+            return await this.getQuizById(result.recordset[0].quiz_id);
         } catch (error) {
             console.error('Error creating quiz:', error);
             throw error;
@@ -229,6 +229,42 @@ class Quiz {
         }
     }
 
+        // so i have to find a way to get the quiz id when the user tries to create a quiz 
+        static async createQuestion(newQuestionData) {
+            let connection;
+            try {
+                connection = await sql.connect(dbConfig);
+                const sqlQuery = `
+                INSERT INTO Questions 
+                (quiz_id, question_text, qnsImg, option_1, option_2, option_3, option_4, correct_option) 
+                VALUES (@quiz_id, @question_text, @qnsImg, @option_1, @option_2, @option_3, @option_4, @correct_option);
+                SELECT SCOPE_IDENTITY() AS question_id
+                `;
+                const request = connection.request();
+                request.input('quiz_id', newQuestionData.quiz_id);
+                request.input('question_text', newQuestionData.question_text);
+                request.input('qnsImg', sql.VarBinary, newQuestionData.qnsImg || null);
+                request.input('option_1', newQuestionData.option_1);
+                request.input('option_2',newQuestionData.option_2);
+                request.input('option_3', newQuestionData.option_3);
+                request.input('option_4', newQuestionData.option_4);
+                request.input('correct_option', newQuestionData.correct_option);
+        
+                const result = await request.query(sqlQuery);
+                if (result.rowsAffected[0] === 0) {
+                    console.log('No rows affected');
+                    return null;
+                }
+                return result.recordset[0].question_id; // returning the created question_id
+            } catch (error) {
+                console.error('Error creating question:', error);
+                throw new Error("Error creating questions");
+            } finally {
+                if (connection) {
+                    await connection.close();
+                }
+            }
+        }           
 
     // ----------------------------------- START OF MY CODE FOR USER QUIZ RESULTS RELATED
 
