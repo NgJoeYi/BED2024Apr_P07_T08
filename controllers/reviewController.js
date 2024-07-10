@@ -50,15 +50,28 @@ async function updateReview(req, res) {
 }
 
 async function createReview(req, res) {
-    const { review_text, rating } = req.body;
+    const { review_text, rating, courseId } = req.body;
     const userId = req.user.id;
+
+    if (!courseId || isNaN(courseId)) {
+        return res.status(400).json({ error: 'Course ID is required and must be a valid number' });
+    }
+
+    if (!review_text || !rating || !userId) {
+        return res.status(400).json({ error: 'Review text, rating, and user ID are required' });
+    }
+
+    console.log(`Creating review: userId=${userId}, review_text=${review_text}, rating=${rating}, courseId=${courseId}`);
+
     try {
-        await reviewModel.createReview(userId, review_text, rating);
+        await reviewModel.createReview(userId, review_text, rating, parseInt(courseId, 10));
         res.status(201).json({ message: 'Review created successfully' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error creating review:', err); // Detailed error logging
+        res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
     }
 }
+
 
 async function deleteReview(req, res) {
     const { id } = req.params;

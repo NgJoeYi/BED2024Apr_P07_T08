@@ -2,12 +2,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get('courseID'); 
+
+    // Log the courseId for debugging purposes
+    console.log('Retrieved courseId:', courseId);
      
-    if (courseId) {
+    if (courseId && !isNaN(courseId)) {
         fetchReviews(courseId);
     } else {
-        console.error('courseId is not defined');
-    }
+        console.error('courseId is not defined or is invalid');
+    }    
 
     const token = sessionStorage.getItem('token'); // Get the token from session storage
     // const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
@@ -94,14 +97,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // document.getElementById('filter').addEventListener('change', () => {
+    //     fetchReviews(courseId);
+    // });
+
+    // document.getElementById('sort').addEventListener('change', () => {
+    //     fetchReviews(courseId);
+    // });
+
+    // document.getElementById('sort').value = 'mostRecent';
+
     document.getElementById('filter').addEventListener('change', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('courseID');
         fetchReviews(courseId);
     });
-
+    
     document.getElementById('sort').addEventListener('change', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('courseID');
         fetchReviews(courseId);
     });
-
+    
     document.getElementById('sort').value = 'mostRecent';
 });
 
@@ -159,15 +176,19 @@ async function deleteReview(button) {
 }
 
 function postReview() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = parseInt(urlParams.get('courseID'), 10); // Ensure courseId is an integer
+
     const reviewText = document.getElementById('review-text').value;
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
     const token = sessionStorage.getItem('token');
-    // const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
 
-    if (!reviewText || !rating || !token) {
-        alert('Please log in or sign up to add reviews.');
+    if (!reviewText || !rating || !token || isNaN(courseId)) {
+        alert('Please log in or sign up to add reviews and ensure all fields are filled.');
         return;
     }
+
+    console.log(`Posting review: { reviewText: ${reviewText}, rating: ${rating}, courseId: ${courseId}, token: ${token} }`);
 
     fetch('http://localhost:3000/reviews', {
         method: 'POST',
@@ -175,15 +196,23 @@ function postReview() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ review_text: reviewText, rating: rating }) // Include userId - no more aft jwt
+        body: JSON.stringify({ review_text: reviewText, rating: rating, courseId: courseId }) // Ensure courseId is passed as an integer
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
     .then(data => {
         alert(data.message);
         closePopup();
-        fetchReviews();
+        fetchReviews(courseId); // Ensure courseId is passed to fetchReviews
     })
-    .catch(error => console.error('Error posting review:', error));
+    .catch(error => {
+        console.error('Error posting review:', error);
+        alert(`Error posting review: ${error.message || 'Internal Server Error'}`);
+    });
 }
 
 function editReview(button) {
@@ -239,6 +268,7 @@ function editReview(button) {
 }
 
 function fetchReviews(courseId) {
+    console.log('Course Id in fetchReviews(courseId)', courseId);
     if (isNaN(courseId)) {
         console.error('Invalid course ID');
         return;
