@@ -27,18 +27,19 @@
         <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
     </nav>
 </header>
-    <main>
-        <section id="quiz-questions">
-            <div id="questions-container">
-                <!-- Questions will be dynamically inserted here -->
-            </div>
-            <div id="navigation-buttons">
-                <button id="prev-button" onclick="prevQuestion()">Previous</button>
-                <button id="next-button" onclick="nextQuestion()">Next</button>
-            </div>
-            <button id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
-        </section>
-    </main>
-    <script src="question.js"></script>
+<main>
+    <section id="quiz-questions">
+        <div id="timer" style="font-size: 24px; font-weight: bold;"></div> <!-- Timer display -->
+        <div id="questions-container">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+        <div id="navigation-buttons">
+            <button id="prev-button" onclick="prevQuestion()">Previous</button>
+            <button id="next-button" onclick="nextQuestion()">Next</button>
+        </div>
+        <button id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
+    </section>
+</main>
+<script src="question.js"></script>
 </body>
 </html>
