@@ -13,8 +13,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }    
 
     const token = sessionStorage.getItem('token'); // Get the token from session storage
+    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
     // const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
     // console.log('Current User ID:', currentUserId); // Debug log
+
+    // Hide "Add Review" button if the user is not logged in
+    if (!token) {
+        const addReviewBtn = document.getElementById('addReviewBtn');
+        if (addReviewBtn) {
+            addReviewBtn.style.display = 'none';
+        }
+    }
 
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
@@ -276,6 +285,8 @@ function fetchReviews(courseId) {
 
     const filter = document.getElementById('filter').value;
     const sort = document.getElementById('sort').value;
+    const token = sessionStorage.getItem('token'); // Get the token from session storage
+    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
 
     fetch(`http://localhost:3000/reviews?courseId=${courseId}&filter=${filter}&sort=${sort}`)
         .then(response => response.json())
@@ -294,6 +305,13 @@ function fetchReviews(courseId) {
                 reviewElement.setAttribute('data-id', review.review_id);
                 reviewElement.setAttribute('data-user-id', review.user_id);
                 reviewElement.setAttribute('data-date', review.review_date);
+
+                // Add buttons conditionally based on user login and ownership
+                const reviewActions = token && review.user_id === currentUserId ? `
+                    <button onclick="editReview(this)">Edit</button>
+                    <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
+                ` : '';
+
                 reviewElement.innerHTML = `
                     <div class="review-content">
                         <div class="review-author">
@@ -309,13 +327,17 @@ function fetchReviews(courseId) {
                         </div>
                     </div>
                     <div class="review-actions">
-                        <button onclick="editReview(this)">Edit</button>
-                        <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
-                        <button class="helpful">👍 Helpful</button>
+                        ${reviewActions}
                     </div>
                 `;
                 reviewsContainer.appendChild(reviewElement);
             });
         })
         .catch(error => console.error('Error fetching reviews:', error));
+}
+
+function getUserIdFromToken(token) {
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id;
 }
