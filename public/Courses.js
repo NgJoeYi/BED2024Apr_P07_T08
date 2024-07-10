@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     handleAddButtonVisibility();
     deleteCourseWithNoLectures();
+    fetchCourses();
 
     // Add click event listeners to course elements
     const courseElements = document.querySelectorAll('.course-cd-unique a');
@@ -81,7 +82,8 @@ function displayCourses(courses) {
                         <button class="delete-course" data-course-id="${course.courseID}" onclick="deleteCourse(event, this)">Delete</button>
                         <button class="edit-course"  data-course-id="${course.courseID}" onclick="editCourse(event, this)">Edit</button>           
                     </div>
-                    ` : ''}
+                    ` 
+                    : ''}
                     <div class="reviews-count-container">
                         <span id="review-count-${course.courseID}" class="review-count">💬 0 Reviews</span>
                     </div>
