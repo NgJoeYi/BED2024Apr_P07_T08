@@ -7,12 +7,13 @@ function base64ToBuffer(base64) {
 
 const createQuiz = async (req, res) => {
     const newQuizData = req.body;
+    const userId = req.user.id;
     try {
         // Convert img_url to buffer if it's a base64 string
         if (newQuizData.quizImg) {
             newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg);
         }
-        const quiz = await Quiz.createQuiz(newQuizData);
+        const quiz = await Quiz.createQuiz(userId, newQuizData);
         if (!quiz) {
             return res.status(400).json({ message: 'Failed to create a new quiz' });
         }
@@ -20,6 +21,23 @@ const createQuiz = async (req, res) => {
     } catch (error) {
         console.error('Create Quiz - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const createQuestion = async (req, res) => {
+    const newQuestionData = req.body;
+    try {
+        if (newQuestionData.qnsImg) {
+            newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
+        }
+        const question = await Quiz.createQuestion(newQuestionData);
+        if (!question) {
+            return res.status(400).json({ message: "Failed to create question" });
+        }
+        return res.status(201).json({ message: "Question created successfully",question });
+    } catch (error) {
+        console.error('Error creating question:', error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -116,6 +134,76 @@ const getQuizWithQuestions = async (req, res) => {
     }
 };
 
+
+
+
+// flow of content for below so i dont get confused
+// 1. user submit quiz
+// 2. when user submit quiz count how many attempt the user has 
+// 3. display the result to the user
+// 4. also display it in the user's profile page
+
+
+
+
+
+const submitQuiz = async (req, res) => {
+    const { quizId, responses, timeTaken } = req.body;
+    const userId = req.user.id;
+    let totalScore = 0;
+
+    try {
+        // Fetch the quiz details including total marks and total questions
+        const quizDetails = await Quiz.getQuizById(quizId);
+        if (!quizDetails) {
+            return res.status(404).json({ message: 'Quiz not found' });
+        }
+        const totalMarks = quizDetails.total_marks; // need total marks to determine whether pass or fail 
+        const totalQuestions = quizDetails.total_questions;
+
+        // Create the quiz attempt record before saving responses
+        const attemptId = await Quiz.createQuizAttempt(userId, quizId, totalScore, false, timeTaken);
+
+        // Save each user response
+        for (const response of responses) {
+            const { question_id, selected_option } = response;
+            await Quiz.saveUserResponse(attemptId, question_id, selected_option);
+
+            // Check each answer and calculate the total score
+            const isCorrect = await Quiz.isCorrectAnswer(question_id, selected_option);
+            if (isCorrect) {
+                totalScore++;
+            }
+        }
+
+        // Calculate score percentage
+        const scorePercentage = (totalScore / totalQuestions) * 100;
+
+        const passingScore = totalMarks * 0.5; // need to get at least half of the total marks to pass
+        const passed = totalScore >= passingScore; // if total score is more than half of the total marks = pass
+
+        // Update the quiz attempt record with the calculated score and passing status
+        await Quiz.updateQuizAttempt(attemptId, scorePercentage, passed);
+
+        res.status(200).json({ attemptId });
+    } catch (error) {
+        console.error('Error submitting quiz:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+
+const getAttemptCount = async (req, res) => { // so i can display number of attempts to user
+    const userId = req.user.id;
+    try {
+        const count = await Quiz.getAttemptCount(userId);
+        res.status(200).json({ attemptCount: count });
+    } catch (error) {
+        console.error('Get Attempt Count - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
 const getUserQuizResult = async (req, res) => {
     const userId = req.user.id;
     const attemptId = parseInt(req.params.attemptId);
@@ -131,50 +219,7 @@ const getUserQuizResult = async (req, res) => {
     }
 };
 
-const getAttemptCount = async (req, res) => {
-    const userId = req.user.id;
-    try {
-        const count = await Quiz.getAttemptCount(userId);
-        res.status(200).json({ attemptCount: count });
-    } catch (error) {
-        console.error('Get Attempt Count - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
-    }
-};
-
-const submitQuiz = async (req, res) => {
-    const { quizId, responses } = req.body;
-    const userId = req.user.id;
-    let totalScore = 0;
-    let totalQuestions = responses.length;
-
-    try {
-        const attemptId = await Quiz.createQuizAttempt(userId, quizId, totalQuestions, totalQuestions, totalScore, false);
-
-        for (const response of responses) {
-            const { question_id, selected_option } = response;
-            await Quiz.saveUserResponse(attemptId, question_id, selected_option);
-            const isCorrect = await Quiz.isCorrectAnswer(question_id, selected_option);
-            if (isCorrect) {
-                totalScore++;
-            }
-        }
-
-        const totalMarks = totalQuestions;
-        const passingScore = totalMarks * 0.5;
-        const passed = totalScore >= passingScore;
-
-        // Update the attempt with the final score and pass status
-        await Quiz.updateQuizAttempt(attemptId, totalQuestions, totalMarks, totalScore, passed);
-
-        res.status(200).json({ attemptId });
-    } catch (error) {
-        console.error('Error submitting quiz:', error);
-        res.status(500).json({ message: 'Server error. Please try again later.' });
-    }
-};
-
-const getAllQuizResultsForUser = async (req, res) => {
+const getAllQuizResultsForUser = async (req, res) => { // for account page
     const userId = req.user.id;
     try {
         const results = await Quiz.getAllQuizResultsForUser(userId);
@@ -189,9 +234,6 @@ const getAllQuizResultsForUser = async (req, res) => {
 };
 
 
-
-
-
 module.exports = {
     createQuiz,
     getQuizById,
@@ -199,8 +241,9 @@ module.exports = {
     updateQuiz,
     deleteQuiz,
     getQuizWithQuestions,
+    createQuestion,
+    getAllQuizResultsForUser,
     getUserQuizResult,
     getAttemptCount,
-    submitQuiz,
-    getAllQuizResultsForUser
+    submitQuiz
 }
