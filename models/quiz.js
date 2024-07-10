@@ -99,7 +99,7 @@ class Quiz {
             const sqlQuery = `
             UPDATE Quizzes 
             SET title=@inputTitle, description=@inputDescription, total_questions=@inputTotal_questions, 
-            total_marks=@inputTotal_marks, created_by=@inputCreated_by, quizImg=@inputQuizImg
+            total_marks=@inputTotal_marks, quizImg=@inputQuizImg
             WHERE quiz_id=@inputQuiz_id;
             `;
             const request = connection.request();
