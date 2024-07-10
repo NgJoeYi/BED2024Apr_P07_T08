@@ -26,7 +26,8 @@ async function getReviews(req, res) {
 
 async function updateReview(req, res) {
     const { id } = req.params;
-    const { review_text, rating, userId } = req.body;
+    const { review_text, rating } = req.body;
+    const userId = req.user.id;
     let connection;
     try {
         connection = await sql.connect(dbConfig);
@@ -49,7 +50,8 @@ async function updateReview(req, res) {
 }
 
 async function createReview(req, res) {
-    const { review_text, rating, userId } = req.body;
+    const { review_text, rating } = req.body;
+    const userId = req.user.id;
     try {
         await reviewModel.createReview(userId, review_text, rating);
         res.status(201).json({ message: 'Review created successfully' });
@@ -60,7 +62,7 @@ async function createReview(req, res) {
 
 async function deleteReview(req, res) {
     const { id } = req.params;
-    const { userId } = req.body;
+    const userId = req.user.id;
     let connection;
     try {
         connection = await sql.connect(dbConfig);

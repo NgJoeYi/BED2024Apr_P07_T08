@@ -30,8 +30,11 @@ function verifyJWT(req, res, next) {
             'GET /discussions': ['student', 'lecturer'],
             'GET /discussions/:id': ['student', 'lecturer'],
             'POST /discussions': ['student', 'lecturer'],
+            'POST /discussions/:discussionId/like': ['student', 'lecturer'],
+            'POST /discussions/:discussionId/dislike': ['student', 'lecturer'],
             'PUT /discussions/:id': ['student', 'lecturer'],
             'DELETE /discussions/:id': ['student', 'lecturer'],
+            
 
             'GET /comments': ['student', 'lecturer'],
             'PUT /comments/:id': ['student', 'lecturer'],
@@ -55,6 +58,16 @@ function verifyJWT(req, res, next) {
             'POST /courses': ['student', 'lecturer'],
             'DELETE /courses/:id': ['student', 'lecturer'],
             'DELETE /courses/noLectures': ['student', 'lecturer'],
+
+            'GET /lectures/last-chapter/:id': ['lecturer'],
+            'POST /lectures': ['lecturer'],
+            'PUT /lectures/:id': ['lecturer'],
+            'DELETE /lectures/:id': ['lecturer'],
+            'DELETE /lectures/course/:courseID/chapter/:chapterName': ['lecturer'],
+
+            'PUT /reviews/:id': ['student', 'lecturer'],
+            'POST /reviews': ['student', 'lecturer'],
+            'DELETE /reviews/:id': ['student', 'lecturer'],
         };
         // ************************************** ADD ROUTES HERE **************************************
 
