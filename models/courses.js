@@ -91,22 +91,36 @@ class Courses {
         }
     }
 
-    static async deleteCourseWithNoLectures(){
-        let connection = await sql.connect(dbConfig);
-        try{
+    static async deleteCourseWithNoLectures() {
+        console.log('DELETE COURSE MODEL:');
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            DELETE FROM Courses
-            WHERE CourseID NOT IN (SELECT DISTINCT CourseID FROM Lectures);`
+                DELETE FROM Courses
+                WHERE CourseID NOT IN (SELECT DISTINCT CourseID FROM Lectures);
+            `;
             const result = await connection.request().query(sqlQuery);
-            const rowsAffected = result.rowsAffected.reduce((acc, val) => acc + val, 0);
-            return rowsAffected>0;
-        }catch (error) {
+    
+            // Check if rowsAffected is not undefined or null
+            if (result && result.rowsAffected) {
+                const rowsAffected = result.rowsAffected.reduce((acc, val) => acc + val, 0);
+                console.log('Rows affected by delete operation:', rowsAffected); // Log rows affected
+                return rowsAffected > 0;
+            } else {
+                console.log('No rows affected by delete operation.');
+                return false;
+            }
+        } catch (error) {
             console.error('Error deleting course:', error);
             throw error;
         } finally {
-            if (pool) await pool.close();
+            if (connection) await connection.close();
         }
     }
+    
+    
+    
     static async deleteCourse(id) {
         let pool;
         try {
@@ -119,7 +133,6 @@ class Courses {
             request.input('id', sql.Int, id);
             const result = await request.query(sqlQuery);
             const rowsAffected = result.rowsAffected.reduce((acc, val) => acc + val, 0);
-            console.log('DELETE COURSE MODEL OUTPUT: ', rowsAffected > 0);
             return rowsAffected > 0;
         } catch (error) {
             console.error('Error deleting course:', error);
@@ -128,7 +141,7 @@ class Courses {
             if (pool) await pool.close();
         }
     }
-        static async createCourse(newCourseData) {
+        static async createCourse(newCourseData,id) {
         const connection = await sql.connect(dbConfig);
         try {
             const sqlQuery = `
@@ -137,7 +150,7 @@ class Courses {
                 SELECT SCOPE_IDENTITY() AS CourseID;
             `;
             const request = connection.request();
-            request.input("UserID", sql.Int, newCourseData.userID);
+            request.input("UserID", sql.Int, id);
             request.input("Title", sql.NVarChar, newCourseData.title);
             request.input("Description", sql.NVarChar, newCourseData.description);
             request.input("Category", sql.NVarChar, newCourseData.category);
@@ -159,6 +172,7 @@ class Courses {
     }    
     static async getCourseImage(id){
         const connection = await sql.connect(dbConfig);
+        
         try{
             const sqlQuery = `SELECT CourseImage FROM Courses WHERE CourseID = @id`;
             const request = connection.request();
