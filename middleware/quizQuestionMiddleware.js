@@ -8,8 +8,8 @@ const validateCreateQuiz = (req, res, next) => {
     total_questions: Joi.number().integer().required(),
     total_marks: Joi.number().integer().required(),
     // created_by: Joi.number().integer().required(),
-    quizImg: Joi.string().base64().allow(null, ''),
-  });
+    quizImg: Joi.string().base64().required(), // Require quizImg
+    });
 
 const validation = schema.validate(req.body, { abortEarly: false });
 
@@ -34,8 +34,8 @@ const validateCreateQuestion = (req, res, next) => {
       option_3: Joi.string().required(),
       option_4: Joi.string().required(),
       correct_option: Joi.string().valid(Joi.ref('option_1'), Joi.ref('option_2'), Joi.ref('option_3'), Joi.ref('option_4')).required(),
-      qnsImg: Joi.string().base64().allow(null, ''), // yes can be null
-  }).custom((value, helpers) => {
+      qnsImg: Joi.string().base64().allow('', null).optional(), // Allow empty string, null, or base64 string
+    }).custom((value, helpers) => {
       const options = [value.option_1, value.option_2, value.option_3, value.option_4];
       const uniqueOptions = new Set(options);
       if (uniqueOptions.size !== options.length) {
@@ -47,10 +47,11 @@ const validateCreateQuestion = (req, res, next) => {
   const validation = schema.validate(req.body, { abortEarly: false });
 
   if (validation.error) {
-      const errors = validation.error.details.map((error) => error.message);
-      res.status(400).json({ message: "Validation error", errors });
-      return;
-  }
+    const errors = validation.error.details.map((error) => error.message);
+    console.log('Validation errors:', errors); // Log the validation errors to the console
+    res.status(400).json({ message: "Validation error", errors });
+    return;
+}
 
   next();
 };
