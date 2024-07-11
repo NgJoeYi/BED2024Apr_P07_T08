@@ -12,11 +12,19 @@ const createQuiz = async (req, res) => {
     const newQuizData = req.body;
     const userId = req.user.id;
     try {
+
+        // ----------------------------- DONE USING JOI INSTEAD -----------------------------
+        /* VALIDATED TO MAKE SURE:
+        1. all required fields are filled 
+        */
+
+        newQuizData.created_by = userId;
+
         // Convert img_url to buffer if it's a base64 string
         if (newQuizData.quizImg) {
             newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg);
         }
-        const quiz = await Quiz.createQuiz(userId, newQuizData);
+        const quiz = await Quiz.createQuiz(newQuizData);
         if (!quiz) {
             return res.status(400).json({ message: 'Failed to create a new quiz' });
         }
@@ -35,20 +43,10 @@ const createQuestion = async (req, res) => {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
 
-        // Validate required fields
-        if (!newQuestionData.question_text || !newQuestionData.option_1 || !newQuestionData.option_2 || !newQuestionData.option_3 || !newQuestionData.option_4 || !newQuestionData.correct_option) {
-            return res.status(400).json({ message: 'Missing required fields' });
-        }
-
-        // Validate correct option
-        const options = [newQuestionData.option_1, newQuestionData.option_2, newQuestionData.option_3, newQuestionData.option_4];
-        if (!options.includes(newQuestionData.correct_option)) {
-            return res.status(400).json({ message: 'Correct option must be one of the provided options.' });
-        }
-
         if (newQuestionData.qnsImg) {
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
+        
         const question = await Quiz.createQuestion(newQuestionData);
         if (!question) {
             return res.status(400).json({ message: "Failed to create question" });

@@ -315,6 +315,7 @@ async function handleImageUploadForQuestion(data) {
         reader.readAsDataURL(imgFile);
     } else {
         console.log('Data without Image:', data);
+        data['qnsImg'] = null;
         await createQuestionRequest(data);
     }
 }
