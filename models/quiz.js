@@ -322,21 +322,17 @@ class Quiz {
         }
     }     
     
-    static async deleteQuestion(quizId, qnsId){
+    static async deleteQuestionByQuizId(quizId){
         let connection;
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            DELETE FROM Questions WHERE quiz_id=@inputQuizId AND question_id=@inputQuestionId
+            DELETE FROM Questions WHERE quiz_id=@inputQuizId
             `;
             const request = connection.request();
             request.input('inputQuizId', quizId);
-            request.input('inputQuestionId', qnsId);
             const result = await request.query(sqlQuery);
-            if (result.rowsAffected[0] === 0) {
-                return null;
-            }
-            return result.rowsAffected[0] > 0; // returns true
+            return result.rowsAffected[0] > 0; // returns true if any rows were deleted
         } catch (error) {
             console.error('Error deleting question:', error);
             throw new Error("Error deleting question");
@@ -345,7 +341,29 @@ class Quiz {
                 await connection.close();
             }
         }
-    }    
+    }  
+
+
+    static async deleteQuestionByQuestionId(qnsId){
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            DELETE FROM Questions WHERE question_id=@inputQuestionId
+            `;
+            const request = connection.request();
+            request.input('inputQuestionId', qnsId);
+            const result = await request.query(sqlQuery);
+            return result.rowsAffected[0] > 0; // returns true if any rows were deleted
+        } catch (error) {
+            console.error('Error deleting question:', error);
+            throw new Error("Error deleting question");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }  
 
     static async deleteUserResponsesByQuestionId(qnsId) {
         let connection;

@@ -82,41 +82,15 @@
     <div id="question-modal" class="modal">
         <div class="modal-content">
             <span class="close-question-modal-btn">&times;</span>
-            <h2>Create a New Question</h2>
+            <h2>Create Questions</h2>
             <form id="question-form">
                 <input type="hidden" id="quiz_id" name="quiz_id">
-                <div>
-                    <label for="question_text">Question Text:</label>
-                    <textarea id="question_text" name="question_text" required></textarea>
+                <div id="questions-container"></div>
+                <div class="navigation-buttons">
+                    <button type="button" id="prev-question" disabled>Previous</button>
+                    <button type="button" id="next-question">Next</button>
                 </div>
-                <div>
-                    <label for="qnsImg">Question Image:</label>
-                    <input type="file" id="qnsImg" name="qnsImg" accept="image/*">
-                </div>
-                <div>
-                    <label for="option_1">Option 1:</label>
-                    <input type="text" id="option_1" name="option_1" required>
-                </div>
-                <div>
-                    <label for="option_2">Option 2:</label>
-                    <input type="text" id="option_2" name="option_2" required>
-                </div>
-                <div>
-                    <label for="option_3">Option 3:</label>
-                    <input type="text" id="option_3" name="option_3" required>
-                </div>
-                <div>
-                    <label for="option_4">Option 4:</label>
-                    <input type="text" id="option_4" name="option_4" required>
-                </div>
-                <div>
-                    <label for="correct_option">Correct Option:</label>
-                    <input type="text" id="correct_option" name="correct_option" required>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <button type="button" id="done-btn">Done</button>
-                    <button type="submit">Add Question</button>
-                </div>
+                <button type="submit" id="submit-questions" style="display:none;">Submit Questions</button>
             </form>
         </div>
     </div>

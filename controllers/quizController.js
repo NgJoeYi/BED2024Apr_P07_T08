@@ -168,7 +168,7 @@ const deleteQuiz = async (req, res) => {
         //     return res.status(400).json({ message: 'Failed to delete user attempts related to the quiz' });
         // }
 
-        const deleteQns = await Quiz.deleteQuestion(quizId);
+        const deleteQns = await Quiz.deleteQuestionByQuizId(quizId);
         if (!deleteQns) {
             return res.status(400).json({ message: 'Failed to delete questions related to the quiz' });
         }
@@ -236,6 +236,8 @@ const updateQuestion = async (req, res) => { // get back to here
     }
 };
 
+// FOR DELETE QUESTION, WHEN I DELETE QUESTION I MUST ALSO UPDATE THE TOTAL QUESTION IN QUIZZES
+// if user wants to delete one last question, also prompt them if they want to delete the quiz -------------------------------------
 const deleteQuestion = async (req, res) => {
     const qnsId = req.params.questionId;
     const quizId = req.params.quizId;
@@ -272,9 +274,24 @@ const deleteQuestion = async (req, res) => {
         /* ----------------------------------- DELETING FKs ----------------------------------- */
 
         // Delete the question
-        const deleteQns = await Quiz.deleteQuestion(quizId, qnsId);
+        const deleteQns = await Quiz.deleteQuestionByQuestionId(qnsId);
         if (!deleteQns) {
             return res.status(400).json({ message: 'Could not delete question' });
+        }
+
+        // ------------------------ update the total question here --------------------
+        const updatedQuizData = {
+            title: checkQuiz.title,
+            description: checkQuiz.description,
+            total_questions: checkQuiz.total_questions - 1,
+            total_marks: checkQuiz.total_marks,
+            created_by: checkQuiz.created_by,
+            quizImg: checkQuiz.quizImg
+        };
+
+        const updateTotalQuestion = await Quiz.updateQuiz(quizId, updatedQuizData);
+        if (!updateTotalQuestion) {
+            return res.status(400).json({ message: 'Could not update total questions in the quiz' });
         }
 
         res.status(200).json({ message: 'Question deleted successfully' });

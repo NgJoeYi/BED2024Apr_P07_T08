@@ -173,7 +173,11 @@ async function saveChanges() {
 
     for (const question of editQuestions) {
         const questionId = question.question_id; // Use correct ID field
-        const questionText = document.querySelector(`textarea[data-question-id="${questionId}"]`).value;
+        const questionTextElement = document.querySelector(`textarea[data-question-id="${questionId}"]`);
+        if (!questionTextElement) {
+            continue;
+        }
+        const questionText = questionTextElement.value;
         const options = [];
         for (let i = 0; i < 4; i++) {
             options.push(document.querySelector(`input[data-question-id="${questionId}"][data-option-index="${i}"]`).value);
