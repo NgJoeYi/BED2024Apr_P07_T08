@@ -4,16 +4,48 @@ const reviewModel = require('../models/Review');
 
 async function getReviews(req, res) {
     const { courseId, filter = 'all', sort = 'mostRecent' } = req.query;
-    if (!courseId || isNaN(courseId)) {
-        return res.status(400).json({ error: 'Course ID is required and must be a valid number' });
-    }
     
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const reviews = await reviewModel.getAllReviews(connection, parseInt(courseId, 10), filter, sort);
-        console.log('Reviews:', reviews); // Add this line to log the reviews
-        res.status(200).json(reviews);
+        
+        let query = `
+            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
+            FROM user_reviews ur
+            JOIN Users u ON ur.user_id = u.id
+            LEFT JOIN ProfilePic p ON u.id = p.user_id
+        `;
+        
+        // Add WHERE clause if courseId is provided
+        if (courseId && !isNaN(courseId)) {
+            query += ` WHERE ur.course_id = @course_id `;
+        }
+        
+        if (filter !== 'all') {
+            query += ` AND ur.rating = @filter `;
+        }
+        
+        if (sort === 'highestRating') {
+            query += ` ORDER BY ur.rating DESC `;
+        } else if (sort === 'lowestRating') {
+            query += ` ORDER BY ur.rating ASC `;
+        } else {
+            query += ` ORDER BY ur.review_date DESC `;
+        }
+        
+        const request = connection.request();
+        
+        if (courseId && !isNaN(courseId)) {
+            request.input('course_id', sql.Int, parseInt(courseId, 10));
+        }
+        
+        if (filter !== 'all') {
+            request.input('filter', sql.Int, filter);
+        }
+        
+        const result = await request.query(query);
+        console.log('Reviews:', result.recordset); // Add this line to log the reviews
+        res.status(200).json(result.recordset);
     } catch (err) {
         console.error('Server error:', err.message); // Add this line to log errors
         res.status(500).json({ error: err.message });
