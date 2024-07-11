@@ -8,6 +8,12 @@ const validateDiscussion = [
     check('description').isLength({ min: 10 }).withMessage('Description must be at least 10 characters long')
 ];
 
+// Validation rules for updating a discussion
+const validateUpdateDiscussion = [
+    check('category').notEmpty().withMessage('Category is required'),
+    check('description').isLength({ min: 10 }).withMessage('Description must be at least 10 characters long')
+];
+
 const getDiscussions = async (req, res) => {
     try {
         const { category = 'all', sort = 'most-recent' } = req.query;
@@ -90,6 +96,7 @@ const getDiscussionsByUser = async (req, res) => {
 const updateDiscussion = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        console.error('Validation errors:', errors.array());
         return res.status(400).json({ success: false, errors: errors.array() });
     }
 
@@ -97,6 +104,9 @@ const updateDiscussion = async (req, res) => {
         const discussionId = req.params.id;
         const { description, category } = req.body;
         const userId = req.user.id;
+
+        console.log('Request payload:', { discussionId, description, category, userId });
+
         const success = await discussionModel.updateDiscussion(discussionId, description, category, userId);
         if (success) {
             res.json({ success: true });
@@ -108,6 +118,8 @@ const updateDiscussion = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
+
+
 
 const deleteDiscussion = async (req, res) => {
     try {
@@ -134,5 +146,6 @@ module.exports = {
     getDiscussionsByUser,
     updateDiscussion,
     deleteDiscussion,
-    validateDiscussion
+    validateDiscussion,
+    validateUpdateDiscussion
 };
