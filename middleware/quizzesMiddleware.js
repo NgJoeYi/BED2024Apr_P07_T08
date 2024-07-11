@@ -56,9 +56,31 @@ const validateCreateQuestion = (req, res, next) => {
   next();
 };
 
+const validateUpdateQuiz = (req, res, next) => {
+  const schema = Joi.object({
+    title: Joi.string().required(),
+    description: Joi.string().allow(null, ''),
+    total_questions: Joi.number().integer().required(),
+    total_marks: Joi.number().integer().required(),
+    quizImg: Joi.string().base64().allow(null, ''), // can be null or empty cos in controller i will reassign the current image. because when the edit modal pops up, the field is empty and not prefilled with the image
+  }).unknown(true); // unknown fields can pass through
+
+  const validation = schema.validate(req.body, { abortEarly: false });
+
+  if (validation.error) {
+    const errors = validation.error.details.map((error) => error.message);
+    console.log('Validation errors:', errors); // Log the validation errors to the console
+    res.status(400).json({ message: "Validation error", errors });
+    return;
+  }
+
+  next();
+};
+
 module.exports = {
   validateCreateQuestion,
-  validateCreateQuiz
+  validateCreateQuiz,
+  validateUpdateQuiz
 };
 // note: 
 // - joi.ref is used to create a reference to another key in the same schema. so in this case,
