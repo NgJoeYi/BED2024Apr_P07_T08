@@ -265,47 +265,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Log in can see all buttons, not logged in see no buttons
-    // function displayComments(comments) {
-    //     const commentsSection = document.querySelector('.comments-section');
-    //     commentsSection.innerHTML = ''; // Clear existing comments
-    //     const token = getToken();
-    
-    //     comments.forEach(comment => {
-    //         const formattedUsername = formatUsername(comment.username);
-    //         const commentElement = document.createElement('div');
-    //         commentElement.classList.add('comment');
-    //         commentElement.dataset.id = comment.id;
-    //         commentElement.dataset.userId = comment.user_id;
-    
-    //         commentElement.innerHTML = `
-    //             <div class="user-info">
-    //                 <div class="avatar">
-    //                     <img src="${comment.profilePic || 'images/profilePic.jpeg'}" alt="User Avatar">
-    //                 </div>
-    //                 <div class="username">${formattedUsername}</div>
-    //             </div>
-    //             <div class="comment-content">${comment.content}</div>
-    //             <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
-    //             <div class="comment-actions">
-    //                 ${token ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
-    //                            <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
-    //             </div>
-    //         `;
-    //         commentsSection.appendChild(commentElement);
-    //     });
-    // }    
-
     function displayComments(comments) {
         const commentsSection = document.querySelector('.comments-section');
         commentsSection.innerHTML = ''; // Clear existing comments
         const token = getToken();
         const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-
+    
         // Sort comments so newest comment appears at top
         comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
         comments.forEach(comment => {
+            console.log(comment); // Log each comment to check if role is present
+    
             const formattedUsername = formatUsername(comment.username);
             const commentElement = document.createElement('div');
             commentElement.classList.add('comment');
@@ -318,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${comment.profilePic || 'images/profilePic.jpeg'}" alt="User Avatar">
                     </div>
                     <div class="username">${formattedUsername}</div>
+                    <div class="role"> (${comment.role || 'Role not found'})</div> 
                 </div>
                 <div class="comment-content">${comment.content}</div>
                 <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
@@ -329,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
             commentsSection.appendChild(commentElement);
         });
     }
-
+        
     function formatUsername(username) {
         return username.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
