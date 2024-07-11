@@ -2,14 +2,13 @@ const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
 class Lectures {
-    constructor(lectureID, courseID, userID, title, description, video, lectureImage, duration, position, createdAt, chapterName) {
+    constructor(lectureID, courseID, userID, title, description, video, duration, position, createdAt, chapterName) {
         this.lectureID = lectureID;
         this.courseID = courseID;
         this.userID = userID;
         this.title = title;
         this.description = description;
         this.video = video;
-        this.lectureImage = lectureImage;
         this.duration = duration;
         this.position = position;
         this.createdAt = createdAt;
@@ -28,7 +27,6 @@ class Lectures {
                 row.Title,
                 row.Description,
                 row.Video,
-                row.LectureImage,
                 row.Duration,
                 row.Position,
                 row.CreatedAt,
@@ -62,7 +60,6 @@ class Lectures {
                 lecture.Title,
                 lecture.Description,
                 lecture.Video,
-                lecture.LectureImage,
                 lecture.Duration,
                 lecture.Position,
                 lecture.CreatedAt,
@@ -86,7 +83,6 @@ class Lectures {
                 Title = @title,
                 Description = @description,
                 Video = @video,
-                LectureImage = @lectureImage,
                 Duration = @duration,
                 Position = @position,
                 ChapterName = @chapterName
@@ -99,7 +95,6 @@ class Lectures {
             request.input('title', sql.NVarChar, newLectureData.Title);
             request.input('description', sql.NVarChar, newLectureData.Description);
             request.input('video', sql.VarBinary, newLectureData.Video);
-            request.input('lectureImage', sql.VarBinary, newLectureData.LectureImage);
             request.input('duration', sql.Int, newLectureData.Duration);
             request.input('position', sql.Int, newLectureData.Position);
             request.input('chapterName', sql.NVarChar, newLectureData.ChapterName);
@@ -135,21 +130,22 @@ class Lectures {
         try {
             pool = await sql.connect(dbConfig);
             const sqlQuery = `
-                INSERT INTO Lectures (CourseID, UserID, Title, Description, Video, LectureImage, Duration, Position, ChapterName)
-                VALUES (@CourseID, @UserID, @Title, @Description, @Video, @LectureImage, @Duration, @Position, @ChapterName);
+                INSERT INTO Lectures (CourseID, UserID, Title, Description, Video, Duration, Position, ChapterName)
+                VALUES (@CourseID, @UserID, @Title, @Description, @Video, @Duration, @Position, @ChapterName);
                 SELECT SCOPE_IDENTITY() AS LectureID;
             `;
             const request = pool.request();
-            request.input('CourseID', sql.Int, id);
-            request.input('UserID', sql.Int, newLectureData.UserID);
+            request.input('CourseID', sql.Int, newLectureData.CourseID);
+            request.input('UserID', sql.Int, id);
             request.input('Title', sql.NVarChar, newLectureData.Title);
             request.input('Description', sql.NVarChar, newLectureData.Description);
             request.input('Video', sql.VarBinary, newLectureData.Video);
-            request.input('LectureImage', sql.VarBinary, newLectureData.LectureImage);
             request.input('Duration', sql.Int, newLectureData.Duration);
             request.input('Position', sql.Int, newLectureData.Position);
             request.input('ChapterName', sql.NVarChar, newLectureData.ChapterName);
-    
+
+            console.log('MODEL ID:', newLectureData.id);
+            console.log('MODEL ID:', newLectureData.Title);
             const result = await request.query(sqlQuery);
             const newLectureID = result.recordset[0].LectureID;
             return newLectureID;
@@ -201,11 +197,12 @@ class Lectures {
             await connection.close();
         }
     }
+
+     // for editing lecture
     static async getLectureVideoByID(lectureID) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
-            console.log(`Executing query to fetch video for LectureID: ${lectureID}`);
             const result = await connection.request()
                 .input('lectureID', sql.Int, lectureID)
                 .query('SELECT Video FROM Lectures WHERE LectureID = @lectureID');
@@ -224,6 +221,7 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
+
     static async getLecturesByCourseID(courseID) {
         let connection;
         try {

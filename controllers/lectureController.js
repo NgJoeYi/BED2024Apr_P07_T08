@@ -103,7 +103,6 @@ const createLecture = async (req, res) => {
     }
 
     const video = req.files.Video[0].buffer;
-    const lectureImage = req.files.LectureImage[0].buffer;
 
     try {
         const Position = await Lectures.getCurrentPositionInChapter(ChapterName);
@@ -117,9 +116,7 @@ const createLecture = async (req, res) => {
             Position,
             ChapterName,
             Video: video,
-            LectureImage: lectureImage
         }
-
         const newLectureID = await Lectures.createLecture(UserID, newLectureData);
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
@@ -138,7 +135,6 @@ const getLectureVideoByID = async (req, res) => {
     }
 
     try {
-        console.log(`Fetching video for lecture ID: ${lectureID}`);
         const videoData = await Lectures.getLectureVideoByID(lectureID);
         if (videoData) {
             res.writeHead(200, {

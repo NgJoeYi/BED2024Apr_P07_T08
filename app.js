@@ -111,7 +111,7 @@ app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
 app.get('/lectures/:id', lectureController.getLectureByID); // Fix here
-app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
+app.get('/video/:lectureID', lectureController.getLectureVideoByID); // for updating lecture
 app.put('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.updateLecture); 
 app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 

@@ -278,7 +278,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     const urlParams = new URLSearchParams(window.location.search);
     const lectureID = urlParams.get('lectureID');
     const courseID = urlParams.get('courseID');
-    console.log('LECTURE AND COURSE ID ',lectureID, courseID);
 
     if (lectureID && courseID) {
         try {
@@ -327,6 +326,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('Form Data:', Object.fromEntries(formData.entries()));
 
         try {
+            const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
+            if (!token) {
+                alert('User not authenticated. Please log in.');
+                return;
+            }
             const response = await fetch(`/lectures/${lectureID}`, {
                 method: 'PUT',
                 body: formData,
