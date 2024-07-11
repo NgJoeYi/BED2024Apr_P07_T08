@@ -218,7 +218,20 @@ class Quiz {
             if (result.recordset.length === 0) {
                 return null;
             }
-            return result ; // _________________________________________________________________ COME BACK TO THIS
+            const questionData = result.recordset[0];
+
+            // returning structured object
+            return {
+                questionId: questionData.question_id,
+                quizId: questionData.quiz_id,
+                questionText: questionData.question_text,
+                qnsImg: questionData.qnsImg,
+                option1: questionData.option_1,
+                option2: questionData.option_2,
+                option3: questionData.option_3,
+                option4: questionData.option_4,
+                correctOption: questionData.correct_option
+            };
         } catch (error) {
             console.error(error);
             throw new Error("Error fetching question by ID");
