@@ -146,9 +146,15 @@ function deleteQuestion(questionId) {
             'Authorization': `Bearer ${token}`
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server responded with status ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data.success) {
+        console.log('Delete response data:', data);
+        if (data.message === 'Question deleted successfully') {
             alert('Question deleted successfully');
             // Remove the question from the UI
             const questionCard = document.querySelector(`textarea[data-question-id="${questionId}"]`).parentElement;
