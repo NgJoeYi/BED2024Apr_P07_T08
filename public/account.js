@@ -15,7 +15,9 @@ window.onclick = function(event) {
   }
 };
 
-// Fetch and display reviews
+
+// --------------------------------------reviews-----------------------------
+
 async function fetchAndDisplayReviews() {
   const token = getToken();
   try {
@@ -304,24 +306,26 @@ function addUserDiscussionToFeed(discussion) {
   const capitalizedUsername = capitalizeFirstLetter(discussion.username);
 
   post.innerHTML = `
-    <div class="post-header">
-      <div class="profile-pic">
-        <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
-      </div>
-      <div class="username">${capitalizedUsername}</div>
+  <div class="post-header">
+    <div class="profile-pic">
+      <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
     </div>
-    <div class="post-meta">
-      <span class="category">Category: ${discussion.category}</span>
-      <span class="posted-date-activity">${new Date(discussion.posted_date).toLocaleDateString()}</span>
-    </div>
-    <div class="post-content">
-      <p>${discussion.description}</p>
-    </div>
-    <div class="post-footer">
-      <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
-      <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
-    </div>
-  `;
+    <div class="username">${capitalizedUsername}</div>
+  </div>
+  <div class="post-meta">
+    <span class="category">Category: ${discussion.category}</span>
+    <span class="posted-date-activity">${new Date(discussion.posted_date).toLocaleDateString()}</span>
+  </div>
+  <div class="post-content">
+    <p>${discussion.description}</p>
+  </div>
+  <div class="post-footer">
+    <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
+    <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
+  </div>
+`;
+
+
 
   feed.appendChild(post);
 
@@ -348,6 +352,10 @@ async function saveEdit(discussionId) {
   const description = document.getElementById('editText').value;
   const category = document.getElementById('editCategory').value;
 
+  console.log('Saving edit for discussion ID:', discussionId);
+  console.log('Description:', description);
+  console.log('Category:', category);
+
   try {
     const token = getToken();
     const response = await fetch(`/discussions/${discussionId}`, {
@@ -358,36 +366,66 @@ async function saveEdit(discussionId) {
       },
       body: JSON.stringify({ description, category })
     });
+
+    const responseData = await response.json();
+
     if (!response.ok) {
+      console.error('Error response from server:', responseData);
       throw new Error('Failed to update discussion');
     }
+
     alert('Discussion updated successfully');
     fetchUserDiscussions();
     closeEditModal();
   } catch (error) {
     console.error('Error updating discussion:', error);
+    alert('Error updating discussion: ' + error.message);
   }
 }
 
+// Delete Modal functions
 function openDeleteModal(discussionId) {
   console.log('Opening delete modal for discussion ID:', discussionId);
-  document.getElementById('deleteDiscussionModal').style.display = 'block';
+  const deleteModal = document.getElementById('deleteDiscussionModal');
+  if (deleteModal) {
+    deleteModal.style.display = 'block';
+  } else {
+    console.error('Delete modal not found');
+  }
 
   const confirmButton = document.getElementById('confirmDelete');
-  confirmButton.onclick = function () {
-    console.log('Confirm delete clicked for discussion ID:', discussionId);
-    deleteDiscussion(discussionId);
-  };
+  if (confirmButton) {
+    confirmButton.onclick = function () {
+      console.log('Confirm delete clicked for discussion ID:', discussionId);
+      deleteDiscussion(discussionId);
+    };
+  } else {
+    console.error('Confirm button not found');
+  }
 
   const closeButton = document.getElementById('closeDeleteModal');
+  if (closeButton) {
+    closeButton.onclick = closeDeleteModal;
+  } else {
+    console.error('Close button not found');
+  }
+
   const cancelButton = document.getElementById('cancelDeleteModal');
-  closeButton.onclick = closeDeleteModal;
-  cancelButton.onclick = closeDeleteModal;
+  if (cancelButton) {
+    cancelButton.onclick = closeDeleteModal;
+  } else {
+    console.error('Cancel button not found');
+  }
 }
 
 function closeDeleteModal() {
   console.log('Closing delete modal');
-  document.getElementById('deleteDiscussionModal').style.display = 'none';
+  const deleteModal = document.getElementById('deleteDiscussionModal');
+  if (deleteModal) {
+    deleteModal.style.display = 'none';
+  } else {
+    console.error('Delete modal not found');
+  }
 }
 
 async function deleteDiscussion(discussionId) {
@@ -418,5 +456,8 @@ async function deleteDiscussion(discussionId) {
 }
 
 function getToken() {
-  return sessionStorage.getItem('token');
+  // Implementation for fetching the token goes here
+  // For example, it could be fetched from local storage
+  return localStorage.getItem('token');
 }
+
