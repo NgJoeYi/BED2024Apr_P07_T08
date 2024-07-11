@@ -237,6 +237,7 @@ const updateQuestion = async (req, res) => { // get back to here
 };
 
 // FOR DELETE QUESTION, WHEN I DELETE QUESTION I MUST ALSO UPDATE THE TOTAL QUESTION IN QUIZZES
+// if user wants to delete one last question, also prompt them if they want to delete the quiz -------------------------------------
 const deleteQuestion = async (req, res) => {
     const qnsId = req.params.questionId;
     const quizId = req.params.quizId;
@@ -273,7 +274,7 @@ const deleteQuestion = async (req, res) => {
         /* ----------------------------------- DELETING FKs ----------------------------------- */
 
         // Delete the question
-        const deleteQns = await Quiz.deleteQuestionByQuestionId(quizId, qnsId);
+        const deleteQns = await Quiz.deleteQuestionByQuestionId(qnsId);
         if (!deleteQns) {
             return res.status(400).json({ message: 'Could not delete question' });
         }
