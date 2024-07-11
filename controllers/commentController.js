@@ -93,26 +93,12 @@ async function deleteComment(req, res) {
 
 async function getCommentCount(req, res) {
     const { discussionId } = req.query;
-    let connection;
     try {
-        connection = await sql.connect(dbConfig);
-        let countQuery = `SELECT COUNT(*) AS count FROM user_comments`;
-        if (discussionId) {
-            countQuery += ` WHERE discussion_id = @discussionId`;
-        }
-        const request = new sql.Request(connection);
-        if (discussionId) {
-            request.input('discussionId', sql.Int, discussionId);
-        }
-        const result = await request.query(countQuery);
-        res.json({ count: result.recordset[0].count });
+        const count = await commentModel.getCommentCount(discussionId);
+        res.json({ count });
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching comment count");
-    } finally {
-        if (connection) {
-            await connection.close();
-        }
     }
 }
 
