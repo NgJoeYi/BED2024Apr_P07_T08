@@ -72,19 +72,27 @@ async function updateReview(connection, id, review_text, rating) {
     }
 }
 
-async function createReview(userId, review_text, rating) {
+async function createReview(userId, review_text, rating, courseId) {
+    let pool;
     try {
-        const pool = await sql.connect(dbConfig);
+        pool = await sql.connect(dbConfig);
+        console.log(`Executing query to create review with userId: ${userId}, review_text: ${review_text}, rating: ${rating}, courseId: ${courseId}`);
         await pool.request()
             .input('user_id', sql.Int, userId)
             .input('review_text', sql.NVarChar, review_text)
             .input('rating', sql.Int, rating)
+            .input('course_id', sql.Int, courseId)
             .query(`
-                INSERT INTO user_reviews (user_id, review_text, rating, review_date)
-                VALUES (@user_id, @review_text, @rating, GETDATE())
+                INSERT INTO user_reviews (user_id, review_text, rating, review_date, course_id)
+                VALUES (@user_id, @review_text, @rating, GETDATE(), @course_id)
             `);
     } catch (err) {
+        console.error('SQL Error:', err); // Detailed SQL error logging
         throw new Error('Error creating review: ' + err.message);
+    } finally {
+        if (pool) {
+            pool.close();
+        }
     }
 }
 

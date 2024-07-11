@@ -2,16 +2,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get('courseID'); 
+
+    // Log the courseId for debugging purposes
+    console.log('Retrieved courseId:', courseId);
      
-    if (courseId) {
+    if (courseId && !isNaN(courseId)) {
         fetchReviews(courseId);
     } else {
-        console.error('courseId is not defined');
-    }
+        console.error('courseId is not defined or is invalid');
+    }    
 
     const token = sessionStorage.getItem('token'); // Get the token from session storage
+    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
     // const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
     // console.log('Current User ID:', currentUserId); // Debug log
+
+    // Hide "Add Review" button if the user is not logged in
+    if (!token) {
+        const addReviewBtn = document.getElementById('addReviewBtn');
+        if (addReviewBtn) {
+            addReviewBtn.style.display = 'none';
+        }
+    }
 
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
@@ -94,14 +106,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // document.getElementById('filter').addEventListener('change', () => {
+    //     fetchReviews(courseId);
+    // });
+
+    // document.getElementById('sort').addEventListener('change', () => {
+    //     fetchReviews(courseId);
+    // });
+
+    // document.getElementById('sort').value = 'mostRecent';
+
     document.getElementById('filter').addEventListener('change', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('courseID');
         fetchReviews(courseId);
     });
-
+    
     document.getElementById('sort').addEventListener('change', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('courseID');
         fetchReviews(courseId);
     });
-
+    
     document.getElementById('sort').value = 'mostRecent';
 });
 
@@ -159,15 +185,19 @@ async function deleteReview(button) {
 }
 
 function postReview() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = parseInt(urlParams.get('courseID'), 10); // Ensure courseId is an integer
+
     const reviewText = document.getElementById('review-text').value;
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
     const token = sessionStorage.getItem('token');
-    // const userId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
 
-    if (!reviewText || !rating || !token) {
-        alert('Please log in or sign up to add reviews.');
+    if (!reviewText || !rating || !token || isNaN(courseId)) {
+        alert('Please log in or sign up to add reviews and ensure all fields are filled.');
         return;
     }
+
+    console.log(`Posting review: { reviewText: ${reviewText}, rating: ${rating}, courseId: ${courseId}, token: ${token} }`);
 
     fetch('http://localhost:3000/reviews', {
         method: 'POST',
@@ -175,15 +205,23 @@ function postReview() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ review_text: reviewText, rating: rating }) // Include userId - no more aft jwt
+        body: JSON.stringify({ review_text: reviewText, rating: rating, courseId: courseId }) // Ensure courseId is passed as an integer
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
     .then(data => {
         alert(data.message);
         closePopup();
-        fetchReviews();
+        fetchReviews(courseId); // Ensure courseId is passed to fetchReviews
     })
-    .catch(error => console.error('Error posting review:', error));
+    .catch(error => {
+        console.error('Error posting review:', error);
+        alert(`Error posting review: ${error.message || 'Internal Server Error'}`);
+    });
 }
 
 function editReview(button) {
@@ -239,6 +277,7 @@ function editReview(button) {
 }
 
 function fetchReviews(courseId) {
+    console.log('Course Id in fetchReviews(courseId)', courseId);
     if (isNaN(courseId)) {
         console.error('Invalid course ID');
         return;
@@ -246,6 +285,8 @@ function fetchReviews(courseId) {
 
     const filter = document.getElementById('filter').value;
     const sort = document.getElementById('sort').value;
+    const token = sessionStorage.getItem('token'); // Get the token from session storage
+    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
 
     fetch(`http://localhost:3000/reviews?courseId=${courseId}&filter=${filter}&sort=${sort}`)
         .then(response => response.json())
@@ -264,6 +305,13 @@ function fetchReviews(courseId) {
                 reviewElement.setAttribute('data-id', review.review_id);
                 reviewElement.setAttribute('data-user-id', review.user_id);
                 reviewElement.setAttribute('data-date', review.review_date);
+
+                // Add buttons conditionally based on user login and ownership
+                const reviewActions = token && review.user_id === currentUserId ? `
+                    <button onclick="editReview(this)">Edit</button>
+                    <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
+                ` : '';
+
                 reviewElement.innerHTML = `
                     <div class="review-content">
                         <div class="review-author">
@@ -279,13 +327,17 @@ function fetchReviews(courseId) {
                         </div>
                     </div>
                     <div class="review-actions">
-                        <button onclick="editReview(this)">Edit</button>
-                        <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
-                        <button class="helpful">👍 Helpful</button>
+                        ${reviewActions}
                     </div>
                 `;
                 reviewsContainer.appendChild(reviewElement);
             });
         })
         .catch(error => console.error('Error fetching reviews:', error));
+}
+
+function getUserIdFromToken(token) {
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id;
 }

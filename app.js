@@ -57,19 +57,19 @@ app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController
 app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
 app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
-app.get('/quizResults', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser);
+app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser); // question related
+
 
 // Add Routes for quizzes
 app.get('/quizzes', quizController.getAllQuizWithCreatorName);
-app.get('/quizzes/:id', quizController.getQuizById);
-app.post('/quizzes', quizController.createQuiz);
-app.put('/quizzes/:id', quizController.updateQuiz);
-app.delete('/quizzes/:id', quizController.deleteQuiz);
-// Add Routes for quiz questions 
-app.get('/quizzes/:id/questions', quizController.getQuizWithQuestions);
-app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz);
-app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult);
-
+app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);
+app.post('/quizzes', jwtAuthorization.verifyJWT, quizController.createQuiz);
+app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.updateQuiz);
+app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
+app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
+app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
+app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
+app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.createQuestion); // question related
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);

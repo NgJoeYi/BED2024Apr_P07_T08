@@ -6,19 +6,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentComment = null;
     let currentCommentId = null;
     const token = getToken();
+    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
     //const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
 
     // console.log('Current User ID:', currentUserId); // Debug log
 
     closePopupBtn.addEventListener('click', closePopup);
 
-    addCommentBtn.addEventListener('click', () => {
-        if (token) {
+    // addCommentBtn.addEventListener('click', () => {
+    //     if (token) {
+    //         showPopup('add');
+    //     } else {
+    //         alert('Please log in or sign up to add comments.');
+    //     }
+    // });
+
+    if (token) {
+        addCommentBtn.addEventListener('click', () => {
             showPopup('add');
-        } else {
-            alert('Please log in or sign up to add comments.');
-        }
-    });
+        });
+    } else {
+        addCommentBtn.style.display = 'none';
+    }
 
     function showPopup(type) {
         const popupTitle = popup.querySelector('h2');
@@ -256,19 +265,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Log in can see all buttons, not logged in see no buttons
+    // function displayComments(comments) {
+    //     const commentsSection = document.querySelector('.comments-section');
+    //     commentsSection.innerHTML = ''; // Clear existing comments
+    //     const token = getToken();
+    
+    //     comments.forEach(comment => {
+    //         const formattedUsername = formatUsername(comment.username);
+    //         const commentElement = document.createElement('div');
+    //         commentElement.classList.add('comment');
+    //         commentElement.dataset.id = comment.id;
+    //         commentElement.dataset.userId = comment.user_id;
+    
+    //         commentElement.innerHTML = `
+    //             <div class="user-info">
+    //                 <div class="avatar">
+    //                     <img src="${comment.profilePic || 'images/profilePic.jpeg'}" alt="User Avatar">
+    //                 </div>
+    //                 <div class="username">${formattedUsername}</div>
+    //             </div>
+    //             <div class="comment-content">${comment.content}</div>
+    //             <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
+    //             <div class="comment-actions">
+    //                 ${token ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
+    //                            <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
+    //             </div>
+    //         `;
+    //         commentsSection.appendChild(commentElement);
+    //     });
+    // }    
+
     function displayComments(comments) {
         const commentsSection = document.querySelector('.comments-section');
         commentsSection.innerHTML = ''; // Clear existing comments
+        const token = getToken();
+        const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
 
+        // Sort comments so newest comment appears at top
+        comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
         comments.forEach(comment => {
             const formattedUsername = formatUsername(comment.username);
             const commentElement = document.createElement('div');
-
             commentElement.classList.add('comment');
             commentElement.dataset.id = comment.id;
-            commentElement.dataset.userId = comment.user_id; // Add user ID to comment element
-            console.log(`Comment ID: ${comment.id}, User ID: ${comment.user_id}`); // Debug log for each comment
-            // hi i change this 
+            commentElement.dataset.userId = comment.user_id;
+    
             commentElement.innerHTML = `
                 <div class="user-info">
                     <div class="avatar">
@@ -279,8 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="comment-content">${comment.content}</div>
                 <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
                 <div class="comment-actions">
-                    <button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
-                    <button class="edit-btn btn" onclick="editComment(this)">Edit</button>
+                    ${token && comment.user_id === currentUserId ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
+                                                                    <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
                 </div>
             `;
             commentsSection.appendChild(commentElement);
@@ -306,4 +349,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function getToken() {
     return sessionStorage.getItem('token');
-  }
+}
+
+  function getUserIdFromToken(token) {
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id;
+}

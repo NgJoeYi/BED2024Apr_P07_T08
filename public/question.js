@@ -2,14 +2,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('quizId');
     fetchQuizWithQuestions(quizId);
+    startTimer();
 });
 
 let currentQuestionIndex = 0;
 let questions = [];
 let userResponses = {};
+let timerInterval; // Timer interval variable
+let totalSeconds = 0; // Total time elapsed in seconds
+
+function startTimer() {
+    const timerElement = document.getElementById('timer');
+    timerInterval = setInterval(() => {
+        totalSeconds++;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        timerElement.innerText = `Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    console.log(`Total time taken: ${totalSeconds} seconds`); // Log the total time taken
+}
+
+function getToken() {
+    return sessionStorage.getItem('token');
+  }
 
 function fetchQuizWithQuestions(quizId) {
-    fetch(`/quizzes/${quizId}/questions`)
+    const token = getToken()
+    fetch(`/quizzes/${quizId}/questions`, {
+        headers: 
+        {
+            'Authorization': `Bearer ${token}`
+        }
+    })
         .then(response => response.json())
         .then(quiz => {
             if (quiz) {
@@ -95,6 +123,7 @@ function saveCurrentResponse() {
 
 function submitQuiz() {
     saveCurrentResponse();
+    stopTimer(); // Stop the timer when the quiz is submitted
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('quizId');
 
@@ -107,11 +136,12 @@ function submitQuiz() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            'Authorization': `Bearer ${getToken()}`
         },
         body: JSON.stringify({
             quizId,
-            responses: userResponsesArray
+            responses: userResponsesArray,
+            timeTaken: totalSeconds // Include the total time taken
         })
     })
     .then(response => response.json())
@@ -124,6 +154,7 @@ function submitQuiz() {
     })
     .catch(error => console.error('Error submitting quiz:', error));
 }
+
 
 function arrayBufferToBase64(buffer) {
     let binary = '';

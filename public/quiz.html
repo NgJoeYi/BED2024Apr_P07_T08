@@ -6,34 +6,181 @@
     <title>Quiz Application</title>
     <link rel="stylesheet" href="navbar.css">
     <link rel="stylesheet" href="quiz.css">
+    <!-- Linking to external stylesheets for icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
 </head>
 <body>
-<!-- navbar -->
-<header>
-    <nav class="navbar">
-        <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
-        <ul class="menu-links" id="menu-links">
-            <li><a href="Index.html">HOME</a></li>
-            <li><a href="ContactUs.html">CONTACT US</a></li>
-            <li><a href="quiz.html">QUIZ</a></li>
-            <li><a href="Courses.html" id="nav-courses" style="display: none;">COURSES</a></li>
-            <li><a href="activityfeed.html" id="nav-activityfeed" style="display: none;">ACTIVITYFEED</a></li>
-            <li><a href="account.html" id="nav-account" style="display: none;">ACCOUNT</a></li>
-        </ul>
-        <div class="auth-links" id="auth-links">
-            <a href="Login.html" id="navbar-login">LOG IN</a>
-            <a href="Register.html" id="navbar-signup">SIGN UP</a>
-        </div>
-        <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
-    </nav>
-</header>
+    <!-- navbar -->
+    <header>
+        <nav class="navbar">
+            <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
+            <ul class="menu-links" id="menu-links">
+                <li><a href="Index.html">HOME</a></li>
+                <li><a href="ContactUs.html">CONTACT US</a></li>
+                <li><a href="quiz.html">QUIZ</a></li>
+                <li><a href="Courses.html" id="nav-courses" style="display: none;">COURSES</a></li>
+                <li><a href="activityfeed.html" id="nav-activityfeed" style="display: none;">ACTIVITYFEED</a></li>
+                <li><a href="account.html" id="nav-account" style="display: none;">ACCOUNT</a></li>
+            </ul>
+            <div class="auth-links" id="auth-links">
+                <a href="Login.html" id="navbar-login">LOG IN</a>
+                <a href="Register.html" id="navbar-signup">SIGN UP</a>
+            </div>
+            <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
+        </nav>
+    </header>
+
     <main>
+        <button id="create-quiz-btn" class="create-quiz-btn">+ Create Quiz</button>
         <section id="quiz-list">
             <div id="quiz-container">
                 <!-- Quizzes will be dynamically inserted here -->
             </div>
         </section>
     </main>
+
+    <!-- Quiz Creation Modal -->
+    <div id="quiz-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-quiz-modal-btn">&times;</span>
+            <h2>Create a New Quiz</h2>
+            <form id="quiz-form">
+                <div>
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div>
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" required></textarea>
+                </div>
+                <div>
+                    <label for="total_questions">Total Questions:</label>
+                    <input type="number" id="total_questions" name="total_questions" required>
+                </div>
+                <div>
+                    <label for="total_marks">Total Marks:</label>
+                    <input type="number" id="total_marks" name="total_marks" required>
+                </div>
+                <div>
+                    <label for="quizImg">Quiz Image:</label>
+                    <input type="file" id="quizImg" name="quizImg" accept="image/*">
+                </div>
+                <button type="submit">Create Quiz</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Question Creation Modal -->
+    <div id="question-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-question-modal-btn">&times;</span>
+            <h2>Create a New Question</h2>
+            <form id="question-form">
+                <input type="hidden" id="quiz_id" name="quiz_id">
+                <div>
+                    <label for="question_text">Question Text:</label>
+                    <textarea id="question_text" name="question_text" required></textarea>
+                </div>
+                <div>
+                    <label for="qnsImg">Question Image:</label>
+                    <input type="file" id="qnsImg" name="qnsImg" accept="image/*">
+                </div>
+                <div>
+                    <label for="option_1">Option 1:</label>
+                    <input type="text" id="option_1" name="option_1" required>
+                </div>
+                <div>
+                    <label for="option_2">Option 2:</label>
+                    <input type="text" id="option_2" name="option_2" required>
+                </div>
+                <div>
+                    <label for="option_3">Option 3:</label>
+                    <input type="text" id="option_3" name="option_3" required>
+                </div>
+                <div>
+                    <label for="option_4">Option 4:</label>
+                    <input type="text" id="option_4" name="option_4" required>
+                </div>
+                <div>
+                    <label for="correct_option">Correct Option:</label>
+                    <input type="text" id="correct_option" name="correct_option" required>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <button type="button" id="done-btn">Done</button>
+                    <button type="submit">Add Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Update Quiz Modal -->  
+<div id="update-modal" class="update-modal">  
+    <div class="update-modal-content">  
+        <span class="close-update-modal-btn">&times;</span>  
+        <h2>Update Quiz Details</h2>  
+        <form id="update-quiz-form">  
+            <input type="hidden" id="update_quiz_id" name="quiz_id">  
+            <!-- Hidden input to store the current image data -->
+            <input type="hidden" id="current_quiz_img" name="current_quiz_img">
+            <div>  
+                <label for="update_title">Title:</label>  
+                <input type="text" id="update_title" name="title" required>  
+            </div>  
+            <div>  
+                <label for="update_description">Description:</label>  
+                <textarea id="update_description" name="description" required></textarea>  
+            </div>  
+            <div>  
+                <label for="update_total_questions">Total Questions:</label>  
+                <input type="number" id="update_total_questions" name="total_questions" required>  
+            </div>  
+            <div>  
+                <label for="update_total_marks">Total Marks:</label>  
+                <input type="number" id="update_total_marks" name="total_marks" required>  
+            </div>  
+            <div>  
+                <label for="update_quizImg">Quiz Image:</label>  
+                <input type="file" id="update_quizImg" name="quizImg" accept="image/*">  
+                <!-- Image preview element -->
+                <img id="update_quiz_img_preview" style="display:none;" alt="Quiz Image Preview" />
+            </div>  
+            <div class="button-container">
+                <button type="submit">Update Quiz</button>  
+                <button type="button" id="delete-quiz-btn" class="delete-btn">Delete Quiz</button>
+            </div>
+        </form>  
+    </div>  
+</div>  
+
+
+
+    <!--Footer-->
+<footer>
+    <div class="footer">
+        <div class="row">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-youtube"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+        </div>
+        <div class="row">
+            <ul>
+                <li><a href="#">Contact us</a></li>
+                <li><a href="#">Our Services</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms & Conditions</a></li>
+                <li><a href="#">Career</a></li>
+            </ul>
+        </div>
+        <div class="row">
+            EduHelper Copyright © 2024 Saturday.- All rights reserved 
+        </div>
+    </div>
+</footer>
+
     <script src="quiz.js"></script>
 </body>
 </html>

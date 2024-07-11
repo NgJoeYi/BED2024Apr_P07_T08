@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 async function fetchUserQuizResults() {
   const token = getToken();
   try {
-      const response = await fetch('/quizResults', {
+      const response = await fetch('/account/quizResult', {
           headers: {
               'Authorization': `Bearer ${token}`
           }
@@ -346,15 +346,19 @@ function createQuizResultCard(result, quizResultsContainer) {
   quizResultCard.className = 'quiz-result-card';
   quizResultCard.setAttribute('data-quiz-id', result.AttemptID);
 
+  const attemptDate = new Date(result.AttemptDate);
+  const formattedDate = `${attemptDate.getDate().toString().padStart(2, '0')}/${(attemptDate.getMonth() + 1).toString().padStart(2, '0')}/${attemptDate.getFullYear()} ${attemptDate.getHours().toString().padStart(2, '0')}:${attemptDate.getMinutes().toString().padStart(2, '0')}`;
+
   quizResultCard.innerHTML = `
       <div class="quiz-result-header">
           <span class="quiz-title">${result.QuizTitle}</span>
-          <span class="quiz-date">${new Date(result.AttemptDate).toLocaleDateString()}</span>
+          <span class="quiz-date">${formattedDate}</span>
       </div>
       <div class="quiz-result-details">
-          <p><strong>Score:</strong> ${result.Score}</p>
+          <p><strong>Score:</strong> ${result.Score}%</p> <!-- CHANGED: Added percentage -->
           <p><strong>Total Questions:</strong> ${result.TotalQuestions}</p>
           <p><strong>Total Marks:</strong> ${result.TotalMarks}</p>
+          <p><strong>Time Taken:</strong> ${result.TimeTaken ? result.TimeTaken + ' seconds' : 'N/A'}</p> <!-- CHANGED: Display time taken -->
           <p><strong>Passed:</strong> ${result.Passed ? 'Yes' : 'No'}</p>
       </div>
   `;
