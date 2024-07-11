@@ -70,6 +70,8 @@ app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.get
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
 app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.createQuestion); // question related
+app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
+app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
