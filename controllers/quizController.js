@@ -156,8 +156,8 @@ const deleteQuiz = async (req, res) => {
         // if (!deleteUserResponses) {
         //     return res.status(400).json({ message: 'Failed to delete user responses related to the quiz' });
         // }
-        await Quiz.deleteUserResponses(quizId);
-        await Quiz.deleteIncorrectAnswers(quizId);
+        await Quiz.deleteUserResponsesByQuizId(quizId);
+        await Quiz.deleteIncorrectAnswersByQuizId(quizId);
         await Quiz.deleteUserAttempts(quizId);
 
         // const deleteIncorrectAnswers = await Quiz.deleteIncorrectAnswers(quizId);
@@ -254,6 +254,24 @@ const deleteQuestion = async (req, res) => {
         if (!checkQns) {
             return res.status(404).json({ message: 'Question does not exist' });
         }
+
+        /* ----------------------------------- DELETING FKs ----------------------------------- */
+
+        // Delete related user responses
+        // const deleteUserResponses = await Quiz.deleteUserResponsesByQuestionId(qnsId);
+        // if (!deleteUserResponses) {
+        //     return res.status(400).json({ message: 'Could not delete user responses related to the question' });
+        // }
+
+        await Quiz.deleteUserResponsesByQuestionId(qnsId);
+        await Quiz.deleteIncorrectAnswersByQuestionId(qnsId);
+        // Delete related incorrect answers
+        // const deleteIncorrectAnswers = await Quiz.deleteIncorrectAnswersByQuestionId(qnsId);
+        // if (!deleteIncorrectAnswers) {
+        //     return res.status(400).json({ message: 'Could not delete incorrect answers related to the question' });
+        // }
+
+        /* ----------------------------------- DELETING FKs ----------------------------------- */
 
         // Delete the question
         const deleteQns = await Quiz.deleteQuestion(quizId, qnsId);
