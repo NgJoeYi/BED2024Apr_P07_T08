@@ -59,11 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
         questionForm.addEventListener('submit', createQuestion);
     }
 
-    const doneButton = document.getElementById('done-btn');
-    if (doneButton) {
-        doneButton.addEventListener('click', () => {
-            questionModal.style.display = 'none';
-        });
+    const prevButton = document.getElementById('prev-question');
+    if (prevButton) {
+        prevButton.addEventListener('click', showPreviousQuestion);
+    }
+
+    const nextButton = document.getElementById('next-question');
+    if (nextButton) {
+        nextButton.addEventListener('click', showNextQuestion);
     }
 
     const deleteQuizBtn = document.getElementById('delete-quiz-btn');
@@ -266,9 +269,9 @@ function handleQuizCreationResponse(data) {
         document.getElementById('quiz_id').value = data.quiz.quiz_id;
         document.getElementById('quiz-modal').style.display = 'none';
         document.getElementById('question-modal').style.display = 'block';
-        fetchQuizzes();
-        const quizForm = document.getElementById('quiz-form');
-        quizForm.reset();
+        currentQuestionIndex = 0; // Initialize the current question index
+        totalQuestions = parseInt(data.quiz.total_questions); // Get the total questions
+        createQuestionForm();
     } else {
         alert('Failed to create quiz');
     }
@@ -276,29 +279,68 @@ function handleQuizCreationResponse(data) {
 
 // ------------------------------- CREATE QUESTION -------------------------------
 
-async function createQuestion(event) {
+let currentQuestionIndex = 0;
+let totalQuestions = 0;
+
+function createQuestionForm() {
+    const questionsContainer = document.getElementById('questions-container');
+    questionsContainer.innerHTML = `
+        <div>
+            <label for="question_text">Question:</label>
+            <input type="text" id="question_text" name="question_text" required>
+        </div>
+        <div>
+            <label for="option_1">Option 1:</label>
+            <input type="text" id="option_1" name="option_1" required>
+        </div>
+        <div>
+            <label for="option_2">Option 2:</label>
+            <input type="text" id="option_2" name="option_2" required>
+        </div>
+        <div>
+            <label for="option_3">Option 3:</label>
+            <input type="text" id="option_3" name="option_3" required>
+        </div>
+        <div>
+            <label for="option_4">Option 4:</label>
+            <input type="text" id="option_4" name="option_4" required>
+        </div>
+        <div>
+            <label for="correct_option">Correct Option:</label>
+            <input type="text" id="correct_option" name="correct_option" required>
+        </div>
+        <div>
+            <label for="qnsImg">Question Image:</label>
+            <input type="file" id="qnsImg" name="qnsImg" accept="image/*">
+        </div>
+    `;
+    document.getElementById('prev-question').disabled = currentQuestionIndex === 0;
+    document.getElementById('next-question').style.display = currentQuestionIndex < totalQuestions - 1 ? 'inline-block' : 'none';
+    document.getElementById('submit-questions').style.display = currentQuestionIndex === totalQuestions - 1 ? 'inline-block' : 'none';
+}
+
+
+async function createQuestion(event) { // CHANGED FOR CREATION: Modify to handle "Next" button click
     event.preventDefault();
     const formData = new FormData(event.target);
     const questionData = Object.fromEntries(formData.entries());
     const quizId = document.getElementById('quiz_id').value;
-    console.log('************** QUIZ ID:',quizId);
+    console.log('************** QUIZ ID:', quizId);
     questionData.quiz_id = quizId;
 
+    // // Validate correct option
+    // const options = [questionData.option_1, questionData.option_2, questionData.option_3, questionData.option_4];
+    // if (!options.includes(questionData.correct_option)) {
+    //     alert("Correct option must be one of the provided options.");
+    //     return;
+    // }
 
-    // Validate correct option
-    const options = [questionData.option_1, questionData.option_2, questionData.option_3, questionData.option_4];
-    if (!options.includes(questionData.correct_option)) {
-        alert("Correct option must be one of the provided options.");
-        return;
-    }
-
-    // Validate uniqueness of options
-    const uniqueOptions = new Set(options);
-    if (uniqueOptions.size !== options.length) {
-        alert("All options must be unique.");
-        return;
-    }
-
+    // // Validate uniqueness of options
+    // const uniqueOptions = new Set(options);
+    // if (uniqueOptions.size !== options.length) {
+    //     alert("All options must be unique.");
+    //     return;
+    // }
 
     await handleImageUploadForQuestion(questionData);
 }
@@ -343,13 +385,29 @@ async function createQuestionRequest(data) {
 
 function handleQuestionCreationResponse(response, body) {
     if (response.ok) {
-        alert(`${body.message}`);
-        // Reset the form for new question
-        const questionForm = document.getElementById('question-form');
-        questionForm.reset();
+        if (currentQuestionIndex < totalQuestions - 1) {
+            currentQuestionIndex++;
+            createQuestionForm();
+        } else {
+            alert('All questions have been created successfully.');
+            document.getElementById('question-modal').style.display = 'none';
+            fetchQuizzes();
+        }
     } else {
         alert(`Failed to create question: ${body.message}`);
     }
+}
+
+function showPreviousQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        createQuestionForm();
+    }
+}
+
+function showNextQuestion() {
+    const questionForm = document.getElementById('question-form');
+    questionForm.dispatchEvent(new Event('submit'));
 }
 
 // ------------------------------- UPDATE QUIZ -------------------------------
