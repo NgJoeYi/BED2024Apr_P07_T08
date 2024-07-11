@@ -301,6 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
         commentsSection.innerHTML = ''; // Clear existing comments
         const token = getToken();
         const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
+
+        // Sort comments so newest comment appears at top
+        comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
         comments.forEach(comment => {
             const formattedUsername = formatUsername(comment.username);
