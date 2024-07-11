@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 // multer is for file uploading 
 const multer = require('multer');
 
+
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -77,11 +79,11 @@ app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT,
 app.get('/discussions', discussionController.getDiscussions);
 app.get('/discussions/user', jwtAuthorization.verifyJWT, discussionController.getDiscussionsByUser);
 app.get('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.getDiscussionById);
-app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.createDiscussion);
-app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.updateDiscussion);
+app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.validateDiscussion, discussionController.createDiscussion);  //add validation for create 
+app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.validateDiscussion, discussionController.updateDiscussion);
 app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.deleteDiscussion);
 app.post('/discussions/:discussionId/like', jwtAuthorization.verifyJWT, discussionController.incrementLikes);
-app.post('/discussions/:discussionId/dislike',  jwtAuthorization.verifyJWT, discussionController.incrementDislikes);
+app.post('/discussions/:discussionId/dislike', jwtAuthorization.verifyJWT, discussionController.incrementDislikes);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);

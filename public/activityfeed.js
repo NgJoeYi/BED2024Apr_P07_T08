@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         console.log('Submitting form with data:', data);
+        displayLoading(true);
 
         fetch('/discussions', {
             method: 'POST',
@@ -44,14 +45,17 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.success) {
                 addDiscussionToFeed(data.discussion);
                 closePopup();
+                document.getElementById('addDiscussionForm').reset(); // Clear form fields
             } else {
                 console.error('Error submitting discussion:', data);
-                alert('Error submitting discussion.');
+                alert('Error submitting discussion: ' + (data.errors ? data.errors.map(e => e.msg).join(', ') : 'Unknown error'));
             }
+            displayLoading(false);
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Error adding discussion.');
+            displayLoading(false);
         });
     });
 });
@@ -69,6 +73,8 @@ function fetchDiscussions() {
     const category = document.getElementById('filter-category').value;
     const sort = document.getElementById('sort-date').value;
 
+    displayLoading(true);
+
     fetch(`/discussions?category=${category}&sort=${sort}`)
         .then(response => response.json())
         .then(data => {
@@ -82,10 +88,12 @@ function fetchDiscussions() {
                 console.error('Error fetching discussions:', data.error);
                 alert('Error fetching discussions.');
             }
+            displayLoading(false);
         })
         .catch(error => {
             console.error('Network or server error:', error);
             alert('Error fetching discussions.');
+            displayLoading(false);
         });
 }
 
@@ -167,7 +175,6 @@ function addDiscussionToFeed(discussion) {
         window.location.href = `comment.html?discussionId=${discussionId}`;
     });
 }
-
 
 function fetchCommentCountForDiscussion(discussionId) {
     fetch(`/comments/count?discussionId=${discussionId}`)
@@ -268,5 +275,13 @@ function closePopup() {
 window.onclick = function(event) {
     if (event.target == document.getElementById("popup")) {
         document.getElementById("popup").style.display = "none";
+    }
+}
+
+// Helper function to show/hide loading indicator
+function displayLoading(show) {
+    const loadingElement = document.getElementById('loading');
+    if (loadingElement) {
+        loadingElement.style.display = show ? 'block' : 'none';
     }
 }
