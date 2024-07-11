@@ -1,8 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Other initialization code
-    // Fetch and display reviews and lectures
-});
-
 function triggerFileUpload() {
     document.getElementById('newFileModal').style.display = 'block';
 }
@@ -12,18 +7,19 @@ function closeModal() {
 }
 
 async function fetchLastChapterName() {
-    const userID = sessionStorage.getItem('userId'); 
-    console.log("Fetching chapter for user ID:", userID);
-    if (!userID) {
-        console.error("User ID not found in sessionStorage.");
-        return null; 
+    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
+    if (!token) {
+        alert('User not authenticated. Please log in.');
+        return;
     }
-    console.log('USER ID: ',userID);
     try {
-        const response = await fetch(`/lectures/last-chapter/${userID}`);
+        const response = await fetch(`/lectures/last-chapter`,{
+            headers: {
+                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
+            }
+        });
         if (response.ok) {
             const data = await response.json();
-            console.log("Fetched last chapter name:", data.chapterName);
             return data.chapterName;
         } else {
             console.error("Failed to fetch last chapter name. Status:", response.status);
@@ -35,7 +31,14 @@ async function fetchLastChapterName() {
     }
 }
 
+// UPLOAD LECTURES
 async function addFiles() {
+    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
+    if (!token) {
+        alert('User not authenticated. Please log in.');
+        return;
+    }
+
     const previousChapterName = await fetchLastChapterName();
     const chapterNameInput = document.getElementById('chapterName').value.trim();
     const title = document.getElementById('lectureName').value.trim();
@@ -48,14 +51,6 @@ async function addFiles() {
     console.log("Title:", title);
     console.log("Duration:", duration);
     console.log("Description:", description);
-
-    const userID = sessionStorage.getItem('userId');
-    console.log("userID from Session:", userID);
-
-    if (!userID) {
-        alert('User ID not found. Please log in again.');
-        return;
-    }
 
     if (!title || !duration || !description || videoFileInput.files.length === 0 || imageFileInput.files.length === 0) {
         alert('Please fill in all fields and select at least one file.');
@@ -72,12 +67,14 @@ async function addFiles() {
     try {
         // Fetch the max course ID
         const courseIDResponse = await fetch('/lectures/max-course-id');
+        if (!courseIDResponse.ok) {
+            throw new Error('Failed to fetch max course ID');
+        }
         const courseIDData = await courseIDResponse.json();
         const courseID = courseIDData.maxCourseID;
-        console.log("courseID from Server:", courseID);
+        console.log("courseID from Server:", courseID); // Ensure this logs
 
         const formData = new FormData();
-        formData.append('UserID', userID);
         formData.append('CourseID', courseID);
         formData.append('ChapterName', chapterName);
         formData.append('Title', title);
@@ -88,6 +85,9 @@ async function addFiles() {
 
         const response = await fetch('/lectures', {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
+            },
             body: formData
         });
 
@@ -104,6 +104,7 @@ async function addFiles() {
         alert('Error saving the lecture.');
     }
 }
+
 
 function displayNewLecture(newLecture, videoFiles, imageFiles) {
     const courseArrangement = document.getElementById('course-arrangement');
@@ -162,7 +163,12 @@ function resetForm() {
 }
 
 async function addCourses() {
-    const userID = sessionStorage.getItem('userId');
+    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
+    if (!token) {
+        alert('User not authenticated. Please log in.');
+        return;
+    }
+
     const title = document.getElementById('course-name-text').textContent.trim();
     const description = document.getElementById('course-details').textContent.trim();
     const category = document.getElementById('category').value.trim();
@@ -170,13 +176,12 @@ async function addCourses() {
     const duration = document.getElementById('duration').value.trim();
     const courseImageInput = document.getElementById('imageFile');
 
-    if (!userID || !title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
+    if (!title || !description || !category || !level || !duration || courseImageInput.files.length === 0) {
         alert('Please complete entering course information and select an image.');
         return;
     }
 
     const formData = new FormData();
-    formData.append('userID', userID);
     formData.append('title', title);
     formData.append('description', description);
     formData.append('category', category);
@@ -187,6 +192,9 @@ async function addCourses() {
     try {
         const response = await fetch('/courses', {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
+            },
             body: formData
         });
 
@@ -236,3 +244,4 @@ async function cancelCourse() {
         return;
     }
 }
+

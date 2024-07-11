@@ -24,7 +24,7 @@ const getLectureByID = async (req, res) => {
 };
 
 const updateLecture = async (req, res) => {
-    const id = parseInt(req.params.id);
+    const id = req.user.id;
     const newLectureData = req.body;
     try {
         const updateLecture = await Lectures.updateLecture(id, newLectureData);
@@ -67,9 +67,9 @@ const deletingChapterName = async (req, res) => {
 }
 
 const getLastChapterName = async (req, res) => {
-    const lecturerID = parseInt(req.params.id);
+    const userID = req.user.id;
     try {
-        const chapterName = await Lectures.getLastChapterName(lecturerID);
+        const chapterName = await Lectures.getLastChapterName(userID);
         if (!chapterName) {
             return res.status(404).send('Chapter name not found');
         }
@@ -92,14 +92,11 @@ const getMaxCourseID = async (req, res) => {
 const createLecture = async (req, res) => {
     const { Title, Duration, Description, ChapterName, CourseID } = req.body;
     const UserID = req.user.id;
-    console.log('UserID from request body:', UserID); 
-    console.log('CourseID from request body:', CourseID); 
 
     if (!UserID) {
         console.error("UserID not provided");
         return res.status(400).send("UserID not provided");
     }
-
     if (!CourseID) {
         console.error("CourseID not provided");
         return res.status(400).send("CourseID not provided");
@@ -121,20 +118,19 @@ const createLecture = async (req, res) => {
             ChapterName,
             Video: video,
             LectureImage: lectureImage
-        };
+        }
 
-        const newLectureID = await Lectures.createLecture(newLectureData);
+        const newLectureID = await Lectures.createLecture(UserID, newLectureData);
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
         console.error('Error creating lecture:', error);
         res.status(500).send('Error creating lecture');
     }
 };
+
  
 const getLectureVideoByID = async (req, res) => {
     const lectureID = parseInt(req.params.lectureID, 10);
-    console.log(`Received lectureID: ${req.params.lectureID}`);
-    console.log(`Parsed lectureID: ${lectureID}`);
 
     if (isNaN(lectureID)) {
         console.error('Invalid lectureID:', req.params.lectureID);
