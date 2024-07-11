@@ -101,21 +101,21 @@ app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.updateCourse);
 app.post('/courses', jwtAuthorization.verifyJWT, upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
-app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
 app.delete('/courses/noLectures', jwtAuthorization.verifyJWT, courseController.deleteCourseWithNoLectures);
+app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
 
 
 // Add Routes for lectures
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
+app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
+app.get('/lectures/last-chapter', jwtAuthorization.verifyJWT, lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
 app.get('/lectures/:id', lectureController.getLectureByID); // Fix here
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // Fetches the video for a specific lecture by lecture ID
-app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
 app.put('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.updateLecture); 
 app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 
 app.delete('/lectures/course/:courseID/chapter/:chapterName', jwtAuthorization.verifyJWT, lectureController.deletingChapterName); // Updated route
-app.get('/lectures/last-chapter/:id', jwtAuthorization.verifyJWT, lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
 
 
 

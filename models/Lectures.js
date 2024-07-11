@@ -120,6 +120,7 @@ class Lectures {
         try {
             connection = await sql.connect(dbConfig);
             const result = await connection.request().query('SELECT MAX(CourseID) AS MaxCourseID FROM Courses');
+            console.log('Max CourseID:', result.recordset[0].MaxCourseID); // Added logging
             return result.recordset[0].MaxCourseID ;
         } catch (error) {
             console.error('Error retrieving max CourseID:', error);
@@ -129,7 +130,7 @@ class Lectures {
         }
     }
 
-    static async createLecture(newLectureData) {
+    static async createLecture(id,newLectureData) {
         let pool;
         try {
             pool = await sql.connect(dbConfig);
@@ -139,7 +140,7 @@ class Lectures {
                 SELECT SCOPE_IDENTITY() AS LectureID;
             `;
             const request = pool.request();
-            request.input('CourseID', sql.Int, newLectureData.CourseID);
+            request.input('CourseID', sql.Int, id);
             request.input('UserID', sql.Int, newLectureData.UserID);
             request.input('Title', sql.NVarChar, newLectureData.Title);
             request.input('Description', sql.NVarChar, newLectureData.Description);
@@ -159,7 +160,7 @@ class Lectures {
             if (pool) pool.close();
         }
     }
-
+    
     static async getCurrentPositionInChapter(chapterName) {
         let connection = await sql.connect(dbConfig);
         try {
