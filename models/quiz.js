@@ -205,6 +205,43 @@ class Quiz {
         }
     }
 
+    static async getQuestionById(qnsId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT * FROM Questions WHERE question_id=@inputQnsId
+            `;
+            const request = connection.request();
+            request.input('inputQnsId', qnsId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            const questionData = result.recordset[0];
+
+            // returning structured object
+            return {
+                questionId: questionData.question_id,
+                quizId: questionData.quiz_id,
+                questionText: questionData.question_text,
+                qnsImg: questionData.qnsImg,
+                option1: questionData.option_1,
+                option2: questionData.option_2,
+                option3: questionData.option_3,
+                option4: questionData.option_4,
+                correctOption: questionData.correct_option
+            };
+        } catch (error) {
+            console.error(error);
+            throw new Error("Error fetching question by ID");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
     static async createQuestion(newQuestionData) {
         let connection;
         try {
@@ -240,6 +277,47 @@ class Quiz {
             }
         }
     }        
+
+    static async updateQuestion(quizId, qnsId, newQuestionData) {
+        let connection;
+        try {
+            connection = await sql.connect(sqlQuery);
+            const sqlQuery = `
+            UPDATE Questions
+            SET
+                question_text = @question_text,
+                qnsImg = @qnsImg,
+                option_1 = @option_1,
+                option_2 = @option_2,
+                option_3 = @option_3,
+                option_4 = @option_4,
+                correct_option = @correct_option
+            WHERE question_id = @question_id AND quiz_id = @quiz_id;
+            `;
+            const request = connection.request();
+            request.input('question_text', newQuestionData.question_text);
+            request.input('qnsImg', newQuestionData.qnsImg);
+            request.input('option_1', newQuestionData.option_1);
+            request.input('option_2', newQuestionData.option_2);
+            request.input('option_3', newQuestionData.option_3);
+            request.input('option_4', newQuestionData.option_4);
+            request.input('correct_option', newQuestionData.correct_option);
+            request.input('question_id', qnsId);
+            request.input('quiz_id', quizId);
+            const result = await request.query(sqlQuery);
+            if (result.rowsAffected[0] === 0) {
+                return null;
+            }
+            return result.recordset[0] > 0;
+        } catch (error) {
+            console.error('Error updating question:', error);
+            throw new Error("Error updating question");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }     
     
     static async deleteQuestion(quizId){
         let connection;

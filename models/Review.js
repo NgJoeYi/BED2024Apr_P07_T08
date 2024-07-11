@@ -5,7 +5,7 @@ const dbConfig = require('../dbConfig');
 async function getAllReviews(connection, courseId, filter = 'all', sort = 'mostRecent') {
     try {
         let query = `
-            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
+            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
             FROM user_reviews ur
             JOIN Users u ON ur.user_id = u.id
             LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -44,7 +44,7 @@ async function getReviewById(connection, id) {
         const result = await connection.request()
             .input('review_id', sql.Int, id)
             .query(`
-                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
+                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
                 FROM user_reviews ur
                 JOIN Users u ON ur.user_id = u.id
                 LEFT JOIN ProfilePic p ON u.id = p.user_id

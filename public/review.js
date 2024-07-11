@@ -317,8 +317,11 @@ function fetchReviews(courseId) {
                         <div class="review-author">
                             <img src="${review.profilePic || 'images/profilePic.jpeg'}" alt="Author Avatar" class="author-avatar">
                             <div class="review-details">
+                            <div class="author-info">
                                 <div class="author-name">${review.user_name}</div>
-                                <div class="rating">
+                                <div class="author-role">(${review.role || 'Role not found'})</div>
+                            </div>
+                            <div class="rating">
                                     ${[...Array(5)].map((_, i) => `<i class="fa fa-star ${i < review.rating ? 'selected' : ''}" data-value="${i + 1}"></i>`).join('')}
                                 </div>
                                 <p>${review.review_text}</p>

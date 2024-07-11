@@ -143,20 +143,63 @@ function displayQuizzes(quizzes) {
             startButton.onclick = () => window.location.href = `/question.html?quizId=${quiz.quiz_id}`;
             buttonContainer.appendChild(startButton);  
     
-            const updateButton = document.createElement('span');  
-            updateButton.className = 'fa fa-ellipsis-v';  
-            updateButton.style.cursor = 'pointer';
-            updateButton.onclick = () => openUpdateModal(quiz);
-            buttonContainer.appendChild(updateButton);
-    
-        // CHANGED: Check the role from session storage and show/hide the update button
-        if (sessionStorage.getItem('role') !== 'lecturer') {
-            updateButton.style.display = 'none';
-        }
-    
-        quizCardContent.appendChild(buttonContainer);  
+        // CHANGED FOR DROP DOWN: Add dropdown menu
+        const dropdown = document.createElement('div');
+        dropdown.className = 'dropdown';
+        const dropdownToggle = document.createElement('span');
+        dropdownToggle.className = 'fa fa-ellipsis-v dropdown-toggle';
+        dropdownToggle.style.cursor = 'pointer';
+        dropdown.appendChild(dropdownToggle);
+
+        const dropdownMenu = document.createElement('div');
+        dropdownMenu.className = 'dropdown-menu';
+        const editDeleteQuizLink = document.createElement('a');
+        editDeleteQuizLink.href = '#';
+        editDeleteQuizLink.className = 'edit-delete-quiz';
+        editDeleteQuizLink.innerText = 'Edit / Delete Quiz';
+        editDeleteQuizLink.onclick = (event) => {
+            event.preventDefault();
+            openUpdateModal(quiz);
+        };
+        dropdownMenu.appendChild(editDeleteQuizLink);
+
+        const editDeleteQuestionLink = document.createElement('a');
+        editDeleteQuestionLink.href = '#';
+        editDeleteQuestionLink.className = 'edit-delete-question';
+        editDeleteQuestionLink.innerText = 'Edit / Delete Question';
+
+
+        // editDeleteQuestionLink.onclick = (event) => {
+        //     event.preventDefault();
+        //     window.location.href = `Question.html?quizId=${quiz.quiz_id}`; // Navigate to Question.html with quizId
+        // };
+        // dropdownMenu.appendChild(editDeleteQuestionLink);       
+        
+        editDeleteQuestionLink.onclick = (event) => {
+            event.preventDefault();
+            window.location.href = `Question.html?quizId=${quiz.quiz_id}&edit-mode=true`; // Navigate to Question.html with quizId and edit-mode
+        };
+        dropdownMenu.appendChild(editDeleteQuestionLink);
+        
+
+        dropdown.appendChild(dropdownMenu);
+        buttonContainer.appendChild(dropdown);
+
+        quizCardContent.appendChild(buttonContainer);
         quizCard.appendChild(quizCardContent);
         quizContainer.appendChild(quizCard);
+    });
+
+    // CHANGED FOR DROP DOWN: Event delegation for dropdown toggles
+    document.addEventListener('click', (event) => {
+        const isDropdownToggle = event.target.matches('.dropdown-toggle');
+        if (!isDropdownToggle && event.target.closest('.dropdown-menu') == null) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+        }
+        if (isDropdownToggle) {
+            const dropdownMenu = event.target.nextElementSibling;
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        }
     });
 }
 

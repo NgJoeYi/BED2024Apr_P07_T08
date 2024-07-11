@@ -33,7 +33,6 @@ main {
     background-color: #d9aa52;
 }
 
-/* Quiz Card Styling */
 .quiz-card {
     background-color: #1b2b40;
     border-radius: 15px;
@@ -41,10 +40,11 @@ main {
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible; /* Ensure content isn't clipped */
     width: 100%; /* Make width 100% to fill grid column */
     max-width: 350px; /* Ensure the card doesn't exceed the max width */
 }
+
 
 .quiz-card:hover {
     transform: translateY(-10px);
@@ -321,4 +321,38 @@ main {
 
 #update-quiz-form button:hover {
     background-color: #b28f3e;  /* Darker gold on hover */
+}
+
+
+
+
+
+/* --------------------------------------- Dropdown Menu Styling --------------------------------------- */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #1b2b40; /* Dark blue background for the dropdown */
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1000; /* Ensures the dropdown is above other elements */
+    margin-top: 10px; /* Adjust to prevent clipping */
+    border-radius: 10px; /* Rounded corners for the dropdown */
+}
+
+.dropdown-menu a {
+    color: #d9aa52; /* Gold color for text */
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    border-radius: 5px; /* Slightly rounded corners for each link */
+}
+
+.dropdown-menu a:hover {
+    background-color: #b28f3e; /* Darker gold background on hover */
 }
