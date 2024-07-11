@@ -36,9 +36,7 @@ function fetchQuizWithQuestionsForEdit(quizId, isEditMode) {
     })
     .then(response => response.json())
     .then(quiz => {
-        // console.log('Quiz fetch response:', quiz);
         if (quiz && quiz.questions) {
-            // console.log('Quiz fetched:', quiz);
             editQuestions = quiz.questions;
             displayQuestionsForEdit(isEditMode);
         } else {
@@ -54,7 +52,6 @@ function displayQuestionsForEdit(isEditMode) {
     questionsContainer.innerHTML = '';
 
     editQuestions.forEach((question, index) => {
-        // console.log('Question:', question);
         const questionCard = document.createElement('div');
         questionCard.className = 'question-card';
 
@@ -64,7 +61,7 @@ function displayQuestionsForEdit(isEditMode) {
 
         const questionInput = document.createElement('textarea');
         questionInput.value = question.question_text;
-        questionInput.dataset.questionId = question._id; // Use correct ID field
+        questionInput.dataset.questionId = question.question_id; // Use correct ID field
         questionCard.appendChild(questionInput);
 
         if (question.qnsImg && question.qnsImg.data) {
@@ -75,7 +72,7 @@ function displayQuestionsForEdit(isEditMode) {
 
             const imageInput = document.createElement('input');
             imageInput.type = 'file';
-            imageInput.dataset.questionId = question._id; // Use correct ID field
+            imageInput.dataset.questionId = question.question_id; // Use correct ID field
             questionCard.appendChild(imageInput);
         }
 
@@ -84,7 +81,7 @@ function displayQuestionsForEdit(isEditMode) {
             const optionInput = document.createElement('input');
             optionInput.type = 'text';
             optionInput.value = option;
-            optionInput.dataset.questionId = question._id; // Use correct ID field
+            optionInput.dataset.questionId = question.question_id; // Use correct ID field
             optionInput.dataset.optionIndex = i;
             questionCard.appendChild(optionInput);
         });
@@ -92,17 +89,15 @@ function displayQuestionsForEdit(isEditMode) {
         const correctOptionInput = document.createElement('input');
         correctOptionInput.type = 'text';
         correctOptionInput.value = question.correct_option;
-        correctOptionInput.dataset.questionId = question._id; // Use correct ID field
+        correctOptionInput.dataset.questionId = question.question_id; // Use correct ID field
         correctOptionInput.dataset.correctOption = true;
         questionCard.appendChild(correctOptionInput);
 
         // Add Delete button in edit mode
         const deleteButton = document.createElement('button');
         deleteButton.innerText = 'Delete';
-        deleteButton.onclick = () => deleteQuestion(question._id); // Use correct ID field
+        deleteButton.onclick = () => deleteQuestion(question.question_id); // Use correct ID field
         questionCard.appendChild(deleteButton);
-
-        // console.log('Added Delete button');
 
         questionsContainer.appendChild(questionCard);
     });
@@ -139,7 +134,6 @@ function displayQuestionsForEdit(isEditMode) {
 }
 
 function deleteQuestion(questionId) {
-    // Logic to delete a question
     const token = getToken();
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('quizId');
@@ -152,9 +146,15 @@ function deleteQuestion(questionId) {
             'Authorization': `Bearer ${token}`
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server responded with status ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data.success) {
+        console.log('Delete response data:', data);
+        if (data.message === 'Question deleted successfully') {
             alert('Question deleted successfully');
             // Remove the question from the UI
             const questionCard = document.querySelector(`textarea[data-question-id="${questionId}"]`).parentElement;
@@ -166,13 +166,13 @@ function deleteQuestion(questionId) {
     .catch(error => console.error('Error deleting question:', error));
 }
 
-function saveChanges() {
+async function saveChanges() {
     const updatedQuestions = [];
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('quizId');
 
-    editQuestions.forEach(question => {
-        const questionId = question._id; // Use correct ID field
+    for (const question of editQuestions) {
+        const questionId = question.question_id; // Use correct ID field
         const questionText = document.querySelector(`textarea[data-question-id="${questionId}"]`).value;
         const options = [];
         for (let i = 0; i < 4; i++) {
@@ -180,45 +180,54 @@ function saveChanges() {
         }
         const correctOption = document.querySelector(`input[data-question-id="${questionId}"][data-correct-option="true"]`).value;
 
+        const imgFile = document.querySelector(`input[data-question-id="${questionId}"][type="file"]`).files[0];
+        let qnsImg = null;
+
+        if (imgFile) {
+            qnsImg = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    resolve(reader.result.split(',')[1]);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(imgFile);
+            });
+        } else {
+            qnsImg = question.qnsImg ? arrayBufferToBase64(question.qnsImg.data) : null;
+        }
+
         updatedQuestions.push({
             question_id: questionId,
             question_text: questionText,
+            qnsImg: qnsImg,
             option_1: options[0],
             option_2: options[1],
             option_3: options[2],
             option_4: options[3],
             correct_option: correctOption
         });
-    });
-
-    // console.log('Updated Questions:', updatedQuestions);
-
-    fetch(`/quizzes/${quizId}/questions`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
-        },
-        body: JSON.stringify({ questions: updatedQuestions })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Questions updated successfully');
-            window.location.href = `/quiz.html?quizId=${data.quizId}`;
-        } else {
-            console.error('Error updating questions:', data.message);
-        }
-    })
-    .catch(error => console.error('Error updating questions:', error));
-}
-
-function arrayBufferToBase64(buffer) {
-    let binary = '';
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
     }
-    return window.btoa(binary);
+
+    try {
+        for (const updatedQuestion of updatedQuestions) {
+            const response = await fetch(`/quizzes/${quizId}/questions/${updatedQuestion.question_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify(updatedQuestion)
+            });
+            const data = await response.json();
+            if (!data.success) {
+                console.error(`Error updating question ${updatedQuestion.question_id}:`, data.message);
+            } else {
+                console.log(`Question ${updatedQuestion.question_id} updated successfully`);
+            }
+        }
+        alert('Questions updated successfully');
+        window.location.href = `/quiz.html?quizId=${quizId}`;
+    } catch (error) {
+        console.error('Error saving changes:', error);
+    }
 }
