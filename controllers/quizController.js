@@ -1,8 +1,11 @@
 const Quiz = require('../models/quiz');
 
 // Function to convert base64 image data to buffer
-function base64ToBuffer(base64) {
-    return Buffer.from(base64, 'base64');
+function base64ToBuffer(base64String) {
+    if (!base64String) {
+        return null;
+    }
+    return Buffer.from(base64String, 'base64');
 }
 
 const createQuiz = async (req, res) => {
@@ -17,7 +20,7 @@ const createQuiz = async (req, res) => {
         if (!quiz) {
             return res.status(400).json({ message: 'Failed to create a new quiz' });
         }
-        res.status(201).json(quiz);
+        res.status(201).json({ message: 'Quiz created successfully', quiz });
     } catch (error) {
         console.error('Create Quiz - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
@@ -27,6 +30,22 @@ const createQuiz = async (req, res) => {
 const createQuestion = async (req, res) => {
     const newQuestionData = req.body;
     try {
+        const checkQuiz = await Quiz.getQuizById(newQuestionData.quiz_id);
+        if (!checkQuiz) {
+            return res.status(404).json({ message: 'Quiz does not exist' });
+        }
+
+        // Validate required fields
+        if (!newQuestionData.question_text || !newQuestionData.option_1 || !newQuestionData.option_2 || !newQuestionData.option_3 || !newQuestionData.option_4 || !newQuestionData.correct_option) {
+            return res.status(400).json({ message: 'Missing required fields' });
+        }
+
+        // Validate correct option
+        const options = [newQuestionData.option_1, newQuestionData.option_2, newQuestionData.option_3, newQuestionData.option_4];
+        if (!options.includes(newQuestionData.correct_option)) {
+            return res.status(400).json({ message: 'Correct option must be one of the provided options.' });
+        }
+
         if (newQuestionData.qnsImg) {
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
@@ -34,7 +53,7 @@ const createQuestion = async (req, res) => {
         if (!question) {
             return res.status(400).json({ message: "Failed to create question" });
         }
-        return res.status(201).json({ message: "Question created successfully",question });
+        return res.status(201).json({ message: "Question created successfully", question });
     } catch (error) {
         console.error('Error creating question:', error);
         return res.status(500).json({ message: "Internal Server Error" });
@@ -84,17 +103,26 @@ const getAllQuizWithCreatorName = async (req, res) => {
 const updateQuiz = async (req, res) => {
     const quizId = parseInt(req.params.id);
     const newQuizData = req.body;
+    const userId = req.user.id;
     try {
         const checkQuiz = await Quiz.getQuizById(quizId);
         if (!checkQuiz) {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
+
+        // only users that created the quiz can delete the quiz
+        if (checkQuiz.created_by !== userId){
+            return res.status(403).json({ message: 'You are not authorized to update this quiz' });
+        }
         // Convert img_url to buffer if it's a base64 string
         if (newQuizData.quizImg) {
             newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg);
+        } else {
+            // If no new image is provided, retain the existing image buffer
+            newQuizData.quizImg = checkQuiz.quizImg;
         }
         const quiz = await Quiz.updateQuiz(quizId, newQuizData);
-        res.status(200).json(quiz);
+        res.status(200).json({ message: 'successfully updated', quiz});
     } catch (error) {
         console.error('Update Quiz - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
@@ -103,11 +131,51 @@ const updateQuiz = async (req, res) => {
 
 const deleteQuiz = async (req, res) => {
     const quizId = parseInt(req.params.id);
+    const userId = req.user.id;
     try {
         const checkQuiz = await Quiz.getQuizById(quizId);
         if (!checkQuiz) {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
+
+        // only users that created the quiz can delete the quiz
+        if (checkQuiz.created_by !== userId) {
+            return res.status(403).json({ message: 'You are not authorized to delete this quiz' });
+        }
+
+        /* ----------------------------------- DELETING FKs ----------------------------------- */
+        /*
+        Delete user responses related to the quiz.
+        Delete incorrect answers related to the quiz.
+        Delete user attempts related to the quiz.
+        Delete questions related to the quiz.
+        Finally, delete the quiz itself.
+        */ 
+        // changed it because users may not have attempts or may not have response
+        // const deleteUserResponses = await Quiz.deleteUserResponses(quizId);
+        // if (!deleteUserResponses) {
+        //     return res.status(400).json({ message: 'Failed to delete user responses related to the quiz' });
+        // }
+        await Quiz.deleteUserResponses(quizId);
+        await Quiz.deleteIncorrectAnswers(quizId);
+        await Quiz.deleteUserAttempts(quizId);
+
+        // const deleteIncorrectAnswers = await Quiz.deleteIncorrectAnswers(quizId);
+        // if (!deleteIncorrectAnswers) {
+        //     return res.status(400).json({ message: 'Failed to delete incorrect answers related to the quiz' });
+        // }
+
+        // const deleteUserAttempts = await Quiz.deleteUserAttempts(quizId);
+        // if (!deleteUserAttempts) {
+        //     return res.status(400).json({ message: 'Failed to delete user attempts related to the quiz' });
+        // }
+
+        const deleteQns = await Quiz.deleteQuestion(quizId);
+        if (!deleteQns) {
+            return res.status(400).json({ message: 'Failed to delete questions related to the quiz' });
+        }
+        /* ----------------------------------- DELETING FKs ----------------------------------- */
+
         const quiz = await Quiz.deleteQuiz(quizId);
         if (quiz) {
             res.status(200).json({ message: 'Quiz successfully deleted' });
