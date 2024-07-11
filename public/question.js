@@ -1,8 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const quizId = urlParams.get('quizId');
-    fetchQuizWithQuestions(quizId);
-    startTimer();
+    const isEditMode = urlParams.get('edit-mode') === 'true'; // Check if edit mode is enabled
+    const stylesheetLink = document.getElementById('mode-stylesheet');
+    if (stylesheetLink) { // Check if the stylesheet link element exists
+        if (isEditMode) {
+            console.log('using edit css');
+            stylesheetLink.href = 'editQuestion.css'; // Load the edit mode stylesheet
+        } else {
+            console.log('using normal css');
+            stylesheetLink.href = 'question.css'; // Load the regular mode stylesheet
+        }
+    }
+
+    if (!isEditMode) {
+        const quizId = urlParams.get('quizId');
+        fetchQuizWithQuestions(quizId);
+        startTimer();
+    }
 });
 
 let currentQuestionIndex = 0;

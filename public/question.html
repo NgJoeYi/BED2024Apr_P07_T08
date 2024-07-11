@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Questions</title>
+    <title>EduHelper</title>
     <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="question.css">
+    <link id="mode-stylesheet" rel="stylesheet">
     <!-- Linking to external stylesheets for icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -34,10 +34,8 @@
 </header>
 <main>
     <section id="quiz-questions">
-        <div id="timer" style="font-size: 24px; font-weight: bold;"></div> <!-- Timer display -->
-        <div id="questions-container">
-            <!-- Questions will be dynamically inserted here -->
-        </div>
+        <div id="timer" style="font-size: 24px; font-weight: bold;"></div>
+        <div id="questions-container"></div>
         <div id="navigation-buttons">
             <button id="prev-button" onclick="prevQuestion()">Previous</button>
             <button id="next-button" onclick="nextQuestion()">Next</button>
@@ -70,6 +68,21 @@
     </div>
 </footer>
 
+
 <script src="question.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isEditMode = urlParams.get('edit-mode') === 'true';
+        if (isEditMode) {
+            const script = document.createElement('script');
+            script.src = 'editQuestion.js';
+            script.onload = () => {
+                initializeEditQuestion();
+            };
+            document.body.appendChild(script);
+        }
+    });
+</script>
 </body>
 </html>
