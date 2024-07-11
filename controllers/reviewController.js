@@ -4,55 +4,12 @@ const reviewModel = require('../models/Review');
 
 async function getReviews(req, res) {
     const { courseId, filter = 'all', sort = 'mostRecent' } = req.query;
-    
-    let connection;
     try {
-        connection = await sql.connect(dbConfig);
-        
-        let query = `
-            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
-            FROM user_reviews ur
-            JOIN Users u ON ur.user_id = u.id
-            LEFT JOIN ProfilePic p ON u.id = p.user_id
-        `;
-        
-        // Add WHERE clause if courseId is provided
-        if (courseId && !isNaN(courseId)) {
-            query += ` WHERE ur.course_id = @course_id `;
-        }
-        
-        if (filter !== 'all') {
-            query += ` AND ur.rating = @filter `;
-        }
-        
-        if (sort === 'highestRating') {
-            query += ` ORDER BY ur.rating DESC `;
-        } else if (sort === 'lowestRating') {
-            query += ` ORDER BY ur.rating ASC `;
-        } else {
-            query += ` ORDER BY ur.review_date DESC `;
-        }
-        
-        const request = connection.request();
-        
-        if (courseId && !isNaN(courseId)) {
-            request.input('course_id', sql.Int, parseInt(courseId, 10));
-        }
-        
-        if (filter !== 'all') {
-            request.input('filter', sql.Int, filter);
-        }
-        
-        const result = await request.query(query);
-        console.log('Reviews:', result.recordset); // Add this line to log the reviews
-        res.status(200).json(result.recordset);
+        const reviews = await reviewModel.getAllReviews(courseId, filter, sort);
+        res.status(200).json(reviews);
     } catch (err) {
-        console.error('Server error:', err.message); // Add this line to log errors
+        console.error('Server error:', err.message);
         res.status(500).json({ error: err.message });
-    } finally {
-        if (connection) {
-            await connection.close();
-        }
     }
 }
 
@@ -131,28 +88,15 @@ async function deleteReview(req, res) {
 
 async function getReviewCount(req, res) {
     const { courseId } = req.query;
-    let connection;
     try {
-        connection = await sql.connect(dbConfig);
-        let countQuery = `SELECT COUNT(*) AS count FROM user_reviews`;
-        if (courseId) {
-            countQuery += ` WHERE course_id = @courseId`;
-        }
-        const request = new sql.Request(connection);
-        if (courseId) {
-            request.input('courseId', sql.Int, courseId);
-        }
-        const result = await request.query(countQuery);
-        res.json({ count: result.recordset[0].count });
+        const count = await reviewModel.getReviewCount(courseId);
+        res.json({ count });
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching review count");
-    } finally {
-        if (connection) {
-            await connection.close();
-        }
     }
 }
+
 
 
 module.exports = {
