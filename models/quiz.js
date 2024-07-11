@@ -281,7 +281,7 @@ class Quiz {
     static async updateQuestion(quizId, qnsId, newQuestionData) {
         let connection;
         try {
-            connection = await sql.connect(sqlQuery);
+            connection = await sql.connect(dbConfig);
             const sqlQuery = `
             UPDATE Questions
             SET
@@ -305,10 +305,11 @@ class Quiz {
             request.input('question_id', qnsId);
             request.input('quiz_id', quizId);
             const result = await request.query(sqlQuery);
-            if (result.rowsAffected[0] === 0) {
+        
+            if (!result.rowsAffected || result.rowsAffected[0] === 0) {
                 return null;
             }
-            return result.recordset[0] > 0;
+            return result.recordset > 0;
         } catch (error) {
             console.error('Error updating question:', error);
             throw new Error("Error updating question");

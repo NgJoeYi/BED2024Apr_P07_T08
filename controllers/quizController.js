@@ -220,13 +220,20 @@ const updateQuestion = async (req, res) => { // get back to here
             return res.status(404).json({ message: 'Question does not exist' });
         }
 
-        const updateQns = await Quiz.updateQuestion(quizId, qnsId, newQuestionData);
-        if (!deleteQns) {
-            return res.status(400).json({ message: 'Could not delete question' });
+        if (newQuestionData.qnsImg) {
+            newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
+        } else {
+            // if no new image is provided, use the existing image from the database
+            newQuestionData.qnsImg = checkQns.qnsImg;
         }
-        res.status(200).json({ message: 'Question deleted successfully' });
+
+        const updateQns = await Quiz.updateQuestion(quizId, qnsId, newQuestionData);
+        if (!updateQns) {
+            return res.status(400).json({ message: 'Could not update question' });
+        }
+        res.status(200).json({ message: 'Question updated successfully' });
     } catch (error) {
-        console.error('Delete Questions - Server Error:', error); // Log error details
+        console.error('Update Question - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
