@@ -17,7 +17,7 @@ body {
 /* Header styling */
 header {
   width: 100%; /* Set the width to 100% */
-  height: auto;
+  height: atuo;
   background-color: #1b2b40; /* Set background color for the header */
 }
 
@@ -29,7 +29,7 @@ header .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 100px;
+  height: 130px;
   background-color: #1b2b40; /* Use the color scheme */
   color: black; /* Adjust text color if needed */
   padding: 0 20px;
@@ -40,6 +40,7 @@ header .navbar {
 /* Global Logo styling */
 .navbar .logo {
   color: #d9aa52; /* Default color */
+  font-weight: bold;
   font-size: 30px; /* Set font size for the logo */
   text-decoration: none; /* Remove underline from the logo text */
 }
