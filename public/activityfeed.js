@@ -94,6 +94,8 @@ function capitalizeFirstLetter(string) {
 }
 
 function addDiscussionToFeed(discussion) {
+    console.log(discussion); // Add this line to debug
+
     const feed = document.querySelector('.activity-feed');
     const post = document.createElement('div');
     post.classList.add('post');
@@ -117,6 +119,7 @@ function addDiscussionToFeed(discussion) {
                 <img src="${profilePicUrl}" alt="Profile Picture">
             </div>
             <div class="username">${capitalizedUsername}</div>
+            <div class="role">(${discussion.role})</div> <!-- Display the role -->
         </div>
         <div class="post-meta">
             <span class="category-discussion">Category: ${discussion.category}</span>
@@ -164,6 +167,7 @@ function addDiscussionToFeed(discussion) {
         window.location.href = `comment.html?discussionId=${discussionId}`;
     });
 }
+
 
 function fetchCommentCountForDiscussion(discussionId) {
     fetch(`/comments/count?discussionId=${discussionId}`)
