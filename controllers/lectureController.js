@@ -1,4 +1,10 @@
 const Lectures = require("../models/Lectures");
+const multer = require("multer");
+
+// Multer setup for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 
 const getAllLectures = async (req, res) => {
     try {
@@ -24,19 +30,47 @@ const getLectureByID = async (req, res) => {
 };
 
 const updateLecture = async (req, res) => {
-    const id = req.user.id;
-    const newLectureData = req.body;
+    const id = req.params.id;
+    const { title, description, chapterName, duration } = req.body;
+    let video = req.file ? req.file.buffer : null;
+
+    if (!video) {
+        // Fetch the existing video from the database if no new video is provided
+        try {
+            const existingLecture = await Lectures.getLectureByID(id);
+            if (existingLecture && existingLecture.Video) {
+                video = existingLecture.Video;
+            }
+        } catch (error) {
+            console.error('Error fetching existing lecture video:', error);
+            return res.status(500).send('Error fetching existing lecture video');
+        }
+    }
+
+    const newLectureData = {
+        Title: title,
+        Description: description,
+        ChapterName: chapterName,
+        Duration: duration,
+        Video: video
+    };
+
+    console.log('NEW LECTURE DATA: ', newLectureData);
+
     try {
-        const updateLecture = await Lectures.updateLecture(id, newLectureData);
-        if (!updateLecture) {
+        const updateResult = await Lectures.updateLecture(id, newLectureData);
+        if (!updateResult) {
             return res.status(404).send('Lecture not found!');
         }
-        res.json(updateLecture);
+        res.json({ message: 'Lecture updated successfully', data: updateResult });
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Error updating lecture");
+        console.error('Error updating lecture:', error);
+        res.status(500).send('Error updating lecture');
     }
 };
+
+
+
 
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);

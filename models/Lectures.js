@@ -78,30 +78,23 @@ class Lectures {
         try {
             const sqlQuery = `
                 UPDATE Lectures SET 
-                CourseID = @courseID,
-                UserID = @userID,
                 Title = @title,
                 Description = @description,
                 Video = @video,
                 Duration = @duration,
-                Position = @position,
                 ChapterName = @chapterName
                 WHERE LectureID = @id
             `;
             const request = connection.request();
             request.input('id', sql.Int, id);
-            request.input('courseID', sql.Int, newLectureData.CourseID);
-            request.input('userID', sql.Int, newLectureData.UserID);
             request.input('title', sql.NVarChar, newLectureData.Title);
             request.input('description', sql.NVarChar, newLectureData.Description);
             request.input('video', sql.VarBinary, newLectureData.Video);
             request.input('duration', sql.Int, newLectureData.Duration);
-            request.input('position', sql.Int, newLectureData.Position);
             request.input('chapterName', sql.NVarChar, newLectureData.ChapterName);
 
-            await request.query(sqlQuery);
-
-            return await this.getLectureByID(id);
+            const result = await request.query(sqlQuery);
+            return result.rowsAffected > 0;
         } catch (error) {
             console.error("Error updating lecture: ", error);
             throw error;
@@ -109,6 +102,8 @@ class Lectures {
             await connection.close();
         }
     }
+    
+
     // TO SET THE NEW COURSE ID 
     static async getMaxCourseID() {
         let connection;
