@@ -120,10 +120,10 @@ async function run() {
             quiz_id INT PRIMARY KEY IDENTITY(1,1),
             title NVARCHAR(255) NOT NULL,
             description NVARCHAR(MAX),
-            total_questions INT,
-            total_marks INT,
-            created_by INT,
-            quizImg VARBINARY(MAX),
+            total_questions INT NOT NULL,
+            total_marks INT NOT NULL,
+            created_by INT NOT NULL,
+            quizImg VARBINARY(MAX) NOT NULL,
             FOREIGN KEY (created_by) REFERENCES Users(id)
         );
 
