@@ -12,7 +12,7 @@ class Quiz {
         this.quizImg = quizImg;
     }
 
-    static async createQuiz(userId, newQuizData) {
+    static async createQuiz(newQuizData) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
@@ -26,7 +26,7 @@ class Quiz {
             request.input('inputDescription', newQuizData.description);
             request.input('inputTotal_questions', newQuizData.total_questions);
             request.input('inputTotal_marks', newQuizData.total_marks);
-            request.input('inputCreated_by', userId);
+            request.input('inputCreated_by', newQuizData.created_by);
             request.input('inputQuizImg', sql.VarBinary, newQuizData.quizImg);
             const result = await request.query(sqlQuery);
             if (result.rowsAffected[0] === 0) {

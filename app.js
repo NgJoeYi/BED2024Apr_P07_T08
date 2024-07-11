@@ -21,6 +21,7 @@ const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
+const quizQuestionValidation = require('./middleware/quizQuestionMiddleware');
 const jwtAuthorization = require('./middleware/authMiddleware');
 
 const app = express();
@@ -61,17 +62,16 @@ app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser); // question related
 
-
 // Add Routes for quizzes
 app.get('/quizzes', quizController.getAllQuizWithCreatorName);
 app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);
-app.post('/quizzes', jwtAuthorization.verifyJWT, quizController.createQuiz);
+app.post('/quizzes', jwtAuthorization.verifyJWT, quizQuestionValidation.validateCreateQuiz, quizController.createQuiz);
 app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.updateQuiz);
 app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
 app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
-app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.createQuestion); // question related
+app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizQuestionValidation.validateCreateQuestion, quizController.createQuestion); // question related
 app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 
