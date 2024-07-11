@@ -1,4 +1,4 @@
-require('dotenv').config();
+//require('dotenv').config();
 
 const dbConfig = {
   user: process.env.DB_USER,
@@ -7,7 +7,7 @@ const dbConfig = {
   database: process.env.DB_DATABASE,
   trustServerCertificate: true,
   options: {
-      port: process.env.DB_PORT || 1433,
+      port: 1433,
       connectionTimeout: 60000,
   },
 };
