@@ -273,7 +273,7 @@ const deleteQuestion = async (req, res) => {
         /* ----------------------------------- DELETING FKs ----------------------------------- */
 
         // Delete the question
-        const deleteQns = await Quiz.deleteQuestionByQuestionId(quizId, qnsId);
+        const deleteQns = await Quiz.deleteQuestionByQuestionId(qnsId);
         if (!deleteQns) {
             return res.status(400).json({ message: 'Could not delete question' });
         }
