@@ -12,7 +12,7 @@ class Discussion {
         this.dislikes = dislikes;
         this.username = username;
         this.profilePic = profilePic;
-        this.role = role; // Ensure role is included
+        this.role = role; 
     }
 
     // Updated getDiscussions method in the Discussion model
@@ -59,9 +59,10 @@ static async getDiscussions(category, sort) {
             const result = await pool.request()
                 .input('discussionId', sql.Int, discussionId)
                 .query(`
-                    SELECT d.*, u.name AS username 
-                    FROM Discussions d 
-                    JOIN Users u ON d.user_id = u.id 
+                    SELECT d.*, u.name AS username, p.img AS profilePic
+                    FROM Discussions d
+                    JOIN Users u ON d.user_id = u.id
+                    LEFT JOIN ProfilePic p ON u.id = p.user_id
                     WHERE d.id = @discussionId
                 `);
             const row = result.recordset[0];
@@ -72,6 +73,7 @@ static async getDiscussions(category, sort) {
             throw new Error(`Error fetching discussion details: ${err.message}`);
         }
     }
+    
 
     // Create a new discussion
     static async createDiscussion(title, category, description, userId) {
@@ -154,9 +156,10 @@ static async getDiscussions(category, sort) {
             const result = await pool.request()
                 .input('userId', sql.Int, userId)
                 .query(`
-                    SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username
+                    SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username, p.img AS profilePic
                     FROM Discussions d
                     LEFT JOIN Users u ON d.user_id = u.id
+                    LEFT JOIN ProfilePic p ON u.id = p.user_id
                     WHERE d.user_id = @userId
                     ORDER BY d.posted_date DESC
                 `);
@@ -167,11 +170,14 @@ static async getDiscussions(category, sort) {
             throw new Error(`Error getting user discussions: ${err.message}`);
         }
     }
+    
 
     // Update discussion
     static async updateDiscussion(discussionId, description, category, userId) {
         try {
+            console.log('Connecting to the database...');
             const pool = await sql.connect(dbConfig);
+            console.log('Connected to the database. Executing update query...');
             await pool.request()
                 .input('discussionId', sql.Int, discussionId)
                 .input('description', sql.NVarChar, description)
@@ -182,8 +188,10 @@ static async getDiscussions(category, sort) {
                     SET description = @description, category = @category
                     WHERE id = @discussionId AND user_id = @userId
                 `);
+            console.log('Update query executed successfully.');
             return true;
         } catch (err) {
+            console.error('Error updating discussion:', err);
             throw new Error(`Error updating discussion: ${err.message}`);
         }
     }
