@@ -68,14 +68,12 @@ const deletingChapterName = async (req, res) => {
 
 const getLastChapterName = async (req, res) => {
     const userID = req.user.id;
-    console.log('GET LAST CHAPT USERID :',userID);
     try {
         const chapterName = await Lectures.getLastChapterName(userID);
         if (!chapterName) {
             return res.status(404).send('Chapter name not found');
         }
         res.status(200).json({ chapterName: chapterName });
-        console.error(error);
     } catch (error) {
         console.error(error);
         res.status(500).send('Error getting chapter name');
@@ -83,9 +81,7 @@ const getLastChapterName = async (req, res) => {
 };
 const getMaxCourseID = async (req, res) => {
     try {
-        console.log('HII');
         const maxCourseID = await Lectures.getMaxCourseID();
-        console.log("Max Course ID from Server:", maxCourseID); // Added logging
         res.status(200).json({ maxCourseID });
     } catch (error) {
         console.error('Error retrieving max CourseID:', error);
@@ -122,9 +118,7 @@ const createLecture = async (req, res) => {
             ChapterName,
             Video: video,
             LectureImage: lectureImage
-        };
-
-        console.log('New Lecture Data:', newLectureData);  // Added logging
+        }
 
         const newLectureID = await Lectures.createLecture(UserID, newLectureData);
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
@@ -137,8 +131,6 @@ const createLecture = async (req, res) => {
  
 const getLectureVideoByID = async (req, res) => {
     const lectureID = parseInt(req.params.lectureID, 10);
-    console.log(`Received lectureID: ${req.params.lectureID}`);
-    console.log(`Parsed lectureID: ${lectureID}`);
 
     if (isNaN(lectureID)) {
         console.error('Invalid lectureID:', req.params.lectureID);

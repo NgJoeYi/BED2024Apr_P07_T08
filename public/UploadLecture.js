@@ -12,12 +12,14 @@ async function fetchLastChapterName() {
         alert('User not authenticated. Please log in.');
         return;
     }
-
     try {
-        const response = await fetch(`/lectures/last-chapter`);
+        const response = await fetch(`/lectures/last-chapter`,{
+            headers: {
+                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
+            }
+        });
         if (response.ok) {
             const data = await response.json();
-            console.log("Fetched last chapter name:", data.chapterName);
             return data.chapterName;
         } else {
             console.error("Failed to fetch last chapter name. Status:", response.status);
