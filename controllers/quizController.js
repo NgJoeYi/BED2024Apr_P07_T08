@@ -202,6 +202,65 @@ const getQuizWithQuestions = async (req, res) => {
     }
 };
 
+const updateQuestion = async (req, res) => { // get back to here
+    const qnsId = req.params.questionId;
+    const quizId = req.params.quizId;
+    const newQuestionData = req.body;
+    try {
+
+        // Check if the quiz exists
+        const checkQuiz = await Quiz.getQuizById(quizId);
+        if (!checkQuiz) {
+            return res.status(404).json({ message: 'Quiz does not exist' });
+        }
+
+        // Check if the question exists
+        const checkQns = await Quiz.getQuestionById(qnsId);
+        if (!checkQns) {
+            return res.status(404).json({ message: 'Question does not exist' });
+        }
+
+        const updateQns = await Quiz.updateQuestion(quizId, qnsId, newQuestionData);
+        if (!deleteQns) {
+            return res.status(400).json({ message: 'Could not delete question' });
+        }
+        res.status(200).json({ message: 'Question deleted successfully' });
+    } catch (error) {
+        console.error('Delete Questions - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const deleteQuestion = async (req, res) => {
+    const qnsId = req.params.questionId;
+    const quizId = req.params.quizId;
+    try {
+
+        // Check if the quiz exists
+        const checkQuiz = await Quiz.getQuizById(quizId);
+        if (!checkQuiz) {
+            return res.status(404).json({ message: 'Quiz does not exist' });
+        }
+        
+        // Check if the question exists
+        const checkQns = await Quiz.getQuestionById(qnsId);
+        if (!checkQns) {
+            return res.status(404).json({ message: 'Question does not exist' });
+        }
+
+        // Delete the question
+        const deleteQns = await Quiz.deleteQuestion(quizId, qnsId);
+        if (!deleteQns) {
+            return res.status(400).json({ message: 'Could not delete question' });
+        }
+
+        res.status(200).json({ message: 'Question deleted successfully' });
+    } catch (error) {
+        console.error('Delete Questions - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
 
 
 
@@ -313,5 +372,7 @@ module.exports = {
     getAllQuizResultsForUser,
     getUserQuizResult,
     getAttemptCount,
-    submitQuiz
+    submitQuiz,
+    updateQuestion,
+    deleteQuestion
 }
