@@ -66,7 +66,7 @@ app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAll
 app.get('/quizzes', quizController.getAllQuizWithCreatorName);
 app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);
 app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuiz);
-app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.updateQuiz);
+app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuiz, quizController.updateQuiz); // edit quiz
 app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
 app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
