@@ -169,14 +169,7 @@ function displayQuizzes(quizzes) {
         const editDeleteQuestionLink = document.createElement('a');
         editDeleteQuestionLink.href = '#';
         editDeleteQuestionLink.className = 'edit-delete-question';
-        editDeleteQuestionLink.innerText = 'Edit / Delete Question';
-
-
-        // editDeleteQuestionLink.onclick = (event) => {
-        //     event.preventDefault();
-        //     window.location.href = `Question.html?quizId=${quiz.quiz_id}`; // Navigate to Question.html with quizId
-        // };
-        // dropdownMenu.appendChild(editDeleteQuestionLink);       
+        editDeleteQuestionLink.innerText = 'Edit / Delete Question';   
         
         editDeleteQuestionLink.onclick = (event) => {
             event.preventDefault();
@@ -437,6 +430,7 @@ async function updateQuiz(event) {
     const formData = new FormData(event.target);  
     const quizData = Object.fromEntries(formData.entries());  
     delete quizData.created_by; // don't need to send this to back end
+    console.log('********************* quiz data:',quizData);
 
     // CHANGED FOR IMAGE: Check if a new image file is selected
     const imgFile = document.getElementById('update_quizImg').files[0];
