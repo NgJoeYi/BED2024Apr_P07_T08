@@ -3,7 +3,6 @@
 
 /* Hero section styling */
 .hero {
-  
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -12,10 +11,23 @@
   color: #1b2b40; /* Hero section text color */
 }
 
-.hero-content {
-  margin: 50px;
-  max-width: 50%;
+.hero-content, .hero-image {
+  flex: 1; /* Each child element will take up equal space */
+  margin: 50px; /* Margin to add spacing */
+  max-width: 100%;
 }
+
+.hero-image {
+  flex: 1; /* Allow the image to take up equal space */
+  display: flex;
+  justify-content: center; /* Center the image horizontally within its container */
+}
+
+.hero-image img {
+  margin-left: 40px;
+  max-width: 180%; 
+}
+
 
 .hero h1 {
   font-size: 3em;
@@ -41,10 +53,6 @@
   color: white;
 }
 
-.hero-image img {
-  margin-right: 150px;
-  max-width: 100%;
-}
 
 
 /* course grid in index.html */
