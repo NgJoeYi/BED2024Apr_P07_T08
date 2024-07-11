@@ -306,7 +306,7 @@ class Quiz {
             request.input('quiz_id', quizId);
             const result = await request.query(sqlQuery);
         
-            if (!result.rowsAffected || result.rowsAffected[0] === 0) {
+            if (result.rowsAffected[0] === 0) {  
                 return null;
             }
             return result.recordset > 0;
