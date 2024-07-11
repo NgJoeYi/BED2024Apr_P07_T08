@@ -2,11 +2,9 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 async function getAllComments(connection) {
-    // hi i change this 
     const query = `
-    
         SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, u.id AS user_id, u.name AS username,
-               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic 
+               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role 
         FROM user_comments uc
         JOIN Users u ON uc.user_id = u.id
         LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -20,10 +18,9 @@ async function getAllComments(connection) {
 }
 
 async function getCommentById(connection, id) {
-    // hi i change this 
     const query = `
         SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, uc.user_id, u.name AS username,
-               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic 
+               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role 
         FROM user_comments uc
         JOIN Users u ON uc.user_id = u.id
         LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -40,10 +37,9 @@ async function getCommentById(connection, id) {
 }
 
 async function getCommentsByDiscussionId(connection, discussionId) {
-    // hi i change this 
     const query = `
         SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, u.id AS user_id, u.name AS username,
-               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic 
+               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role 
         FROM user_comments uc
         JOIN Users u ON uc.user_id = u.id
         LEFT JOIN ProfilePic p ON u.id = p.user_id
