@@ -271,19 +271,22 @@ async function editLecture(button) {
     const courseID = new URLSearchParams(window.location.search).get('courseID');
 
     // Redirect to edit lecture page with lectureID and courseID as query parameters
-    window.location.href = `editLecture.html?courseID=${courseID}&lectureID=${lectureID}`;
+    window.location.href = `editLecture.html?courseID=${courseID}&userID=${lectureID}`;
 }
 // EDIT LECTURE
 document.addEventListener('DOMContentLoaded', async function() {
     const urlParams = new URLSearchParams(window.location.search);
     const lectureID = urlParams.get('lectureID');
     const courseID = urlParams.get('courseID');
-    // const userID = sessionStorage.getItem('userId');
-    const token = sessionStorage.getItem('token');
-    // console.log('USER ID UPDATE LECTURE: ', userID);
+    console.log('LECTURE AND COURSE ID ',lectureID, courseID);
 
     if (lectureID && courseID) {
         try {
+            const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
+            if (!token) {
+                alert('User not authenticated. Please log in.');
+                return;
+            }
             const response = await fetch(`/lectures/${lectureID}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
