@@ -43,20 +43,10 @@ const createQuestion = async (req, res) => {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
 
-        // Validate required fields
-        if (!newQuestionData.question_text || !newQuestionData.option_1 || !newQuestionData.option_2 || !newQuestionData.option_3 || !newQuestionData.option_4 || !newQuestionData.correct_option) {
-            return res.status(400).json({ message: 'Missing required fields' });
-        }
-
-        // Validate correct option
-        const options = [newQuestionData.option_1, newQuestionData.option_2, newQuestionData.option_3, newQuestionData.option_4];
-        if (!options.includes(newQuestionData.correct_option)) {
-            return res.status(400).json({ message: 'Correct option must be one of the provided options.' });
-        }
-
         if (newQuestionData.qnsImg) {
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
+        
         const question = await Quiz.createQuestion(newQuestionData);
         if (!question) {
             return res.status(400).json({ message: "Failed to create question" });
