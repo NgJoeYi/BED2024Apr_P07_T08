@@ -84,16 +84,22 @@ async function deleteLecture(button) {
 async function deleteChapter(button) {
     const chapterName = button.dataset.chapterName;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
-    const token = sessionStorage.getItem('token');
 
     if (!confirm(`Are you sure you want to delete the entire chapter: ${chapterName}?`)) {
+        return;
+    }
+    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
+    if (!token) {
+        alert('User not authenticated. Please log in.');
         return;
     }
 
     try {
         const response = await fetch(`/lectures/course/${courseID}/chapter/${chapterName}`, { 
             method: 'DELETE',
-            'Authorization': `Bearer ${token}`
+            headers: {
+                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
+            }
         });
 
         if (response.ok) {
