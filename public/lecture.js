@@ -1,9 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     getLecturesByCourse();
 
-    // const currentUserId = sessionStorage.getItem('userId');
-    // console.log('Current User ID:', currentUserId); // Debug log
-
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => {
         title.addEventListener('click', () => {
@@ -155,7 +152,7 @@ async function getLecturesByCourse() {
         const response = await fetch(`/lectures/course/${courseID}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const lectures = await response.json();
-        console.log('Fetched lectures:', lectures);
+        console.log('Fetched lectures: 2', lectures);
         displayLectures(lectures);
     } catch (error) {
         console.error('Error fetching lectures:', error);
@@ -164,6 +161,10 @@ async function getLecturesByCourse() {
 
 function displayLectures(lectures) {
     const sidebar = document.querySelector('.sidebar .nav');
+    if (!sidebar) {
+        console.error('Sidebar element not found.');
+        return;
+    }
     sidebar.innerHTML = ''; // Clear existing content
 
     const groupedLectures = {};
@@ -272,14 +273,15 @@ async function setVideo(lectureID) {
     }
 }
 
+// EDIT LECTURE
 async function editLecture(button) {
     const lectureID = button.dataset.lectureId;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
 
     // Redirect to edit lecture page with lectureID and courseID as query parameters
-    window.location.href = `editLecture.html?courseID=${courseID}&userID=${lectureID}`;
+    window.location.href = `editLecture.html?courseID=${courseID}&lectureID=${lectureID}`;
 }
-// EDIT LECTURE
+
 document.addEventListener('DOMContentLoaded', async function() {
     const urlParams = new URLSearchParams(window.location.search);
     const lectureID = urlParams.get('lectureID');
@@ -317,19 +319,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         formData.append('description', document.getElementById('lectureDescription').value);
         formData.append('chapterName', document.getElementById('lectureChapterName').value);
         formData.append('duration', document.getElementById('lectureDuration').value);
-        const lectureImageInput = document.getElementById('lectureImageInput');
         const lectureVideoInput = document.getElementById('lectureVideoInput');
 
-        if (lectureImageInput.files.length > 0) {
-            formData.append('lectureImage', lectureImageInput.files[0]);
-        }
         if (lectureVideoInput.files.length > 0) {
             formData.append('lectureVideo', lectureVideoInput.files[0]);
         }
-        // formData.append('userID', sessionStorage.getItem('userId'));
-
-        // Log form data before sending
-        console.log('Form Data:', Object.fromEntries(formData.entries()));
 
         try {
             const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
@@ -340,7 +334,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const response = await fetch(`/lectures/${lectureID}`, {
                 method: 'PUT',
                 body: formData,
-                header: {
+                headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
@@ -363,19 +357,6 @@ function populateLectureDetails(lecture) {
     document.getElementById('lectureDescription').value = lecture.description || '';
     document.getElementById('lectureChapterName').value = lecture.chapterName || '';
     document.getElementById('lectureDuration').value = lecture.duration || '';
-
-    const lectureImageElement = document.getElementById('lectureImage');
-    const lectureImageInputElement = document.getElementById('lectureImageInput');
-
-    if (lectureImageElement && lecture.lectureImage) {
-        const imageUrl = `/lectures/image/${lecture.lectureID}`;
-        lectureImageElement.src = imageUrl;
-        lectureImageElement.alt = "Lecture Image";
-        lectureImageElement.style.display = 'block';
-        lectureImageInputElement.value = '';
-    } else {
-        lectureImageElement.style.display = 'none';
-    }
 
     const lectureVideoElement = document.getElementById('lectureVideo');
     const lectureVideoInputElement = document.getElementById('lectureVideoInput');
