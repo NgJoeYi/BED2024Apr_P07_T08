@@ -40,10 +40,16 @@ const upload = multer({ storage: storage });
 const multiUpload = upload.fields([
     { name: 'lectureVideo', maxCount: 1 },
     { name: 'LectureImage', maxCount: 1 },
-    { name: 'courseImage', maxCount: 1 }
+    { name: 'courseImage', maxCount: 1 },
+    { name: 'videoFiles' , maxCount : 1 },
+    { name: 'Video', maxCount: 1 },
 ]);
 
-
+// const multiUpload = upload.fields([
+//     { name: 'Video', maxCount: 1 },
+//     { name: 'LectureImage', maxCount: 1 },
+//     {name : 'courseImage', maxCount : 1}
+// ]);
 
 // Middleware to ignore favicon requests
 app.get('/favicon.ico', (req, res) => res.status(204));
@@ -125,6 +131,7 @@ app.put('/lectures/:id', jwtAuthorization.verifyJWT, (req, res, next) => {
     next();
 }, multiUpload, lectureController.updateLecture);app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
 
+app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 
 app.delete('/lectures/course/:courseID/chapter/:chapterName', jwtAuthorization.verifyJWT, lectureController.deletingChapterName); // Updated route
 
