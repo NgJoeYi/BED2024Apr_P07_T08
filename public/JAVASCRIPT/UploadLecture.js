@@ -45,14 +45,13 @@ async function addFiles() {
     const duration = document.getElementById('duration-lecture').value.trim();
     const description = document.getElementById('description').value.trim();
     const videoFileInput = document.getElementById('videoFiles');
-    const imageFileInput = document.getElementById('lectureImage');
 
     console.log("Chapter Name Input:", chapterNameInput);
     console.log("Title:", title);
     console.log("Duration:", duration);
     console.log("Description:", description);
 
-    if (!title || !duration || !description || videoFileInput.files.length === 0 || imageFileInput.files.length === 0) {
+    if (!title || !duration || !description || videoFileInput.files.length === 0 ) {
         alert('Please fill in all fields and select at least one file.');
         return;
     }
@@ -81,7 +80,6 @@ async function addFiles() {
         formData.append('Duration', duration);
         formData.append('Description', description);
         Array.from(videoFileInput.files).forEach(file => formData.append('Video', file));
-        Array.from(imageFileInput.files).forEach(file => formData.append('LectureImage', file));
 
         const response = await fetch('/lectures', {
             method: 'POST',
@@ -93,7 +91,7 @@ async function addFiles() {
 
         if (response.ok) {
             const newLecture = await response.json();
-            displayNewLecture(newLecture, videoFileInput.files, imageFileInput.files);
+            displayNewLecture(newLecture, videoFileInput.files);
             closeModal();
             console.log("Lecture added successfully");
         } else {
@@ -106,7 +104,7 @@ async function addFiles() {
 }
 
 
-function displayNewLecture(newLecture, videoFiles, imageFiles) {
+function displayNewLecture(newLecture, videoFiles) {
     const courseArrangement = document.getElementById('course-arrangement');
 
     const newChapterDiv = document.createElement('div');
@@ -130,15 +128,6 @@ function displayNewLecture(newLecture, videoFiles, imageFiles) {
         <p>Description: ${newLecture.Description}</p>
     `;
 
-    const imageFile = imageFiles[0];
-    const imageURL = URL.createObjectURL(imageFile);
-    const imageElement = document.createElement('img');
-    imageElement.src = imageURL;
-    imageElement.alt = 'Lecture Image';
-    imageElement.width = 200;
-    imageElement.height = 200;
-    lectureDetails.appendChild(imageElement);
-
     const videoFileNames = Array.from(videoFiles).map(file => file.name).join(', ');
     const videoElement = document.createElement('p');
     videoElement.textContent = `Lecture Video: ${videoFileNames}`;
@@ -158,7 +147,6 @@ function resetForm() {
     document.getElementById('duration').value = '';
     document.getElementById('description').value = '';
     document.getElementById('videoFiles').value = '';
-    document.getElementById('lectureImage').value = '';
     console.log("Form reset completed");
 }
 
