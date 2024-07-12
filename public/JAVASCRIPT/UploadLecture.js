@@ -144,7 +144,7 @@ function displayNewLecture(newLecture, videoFiles) {
 function resetForm() {
     document.getElementById('chapterName').value = '';
     document.getElementById('lectureName').value = '';
-    document.getElementById('duration').value = '';
+    document.getElementById('duration-lecture').value = '';
     document.getElementById('description').value = '';
     document.getElementById('videoFiles').value = '';
     console.log("Form reset completed");
