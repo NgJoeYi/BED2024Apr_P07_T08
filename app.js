@@ -24,7 +24,7 @@ const updateValidation = require('./middleware/updateValidation');
 const quizValidation = require('./middleware/quizzesMiddleware');
 const jwtAuthorization = require('./middleware/authMiddleware');
 const commentValidation = require('./middleware/commentValidation');
-// const reviewValidation = require('./middleware/reviewValidation');
+const reviewValidation = require('./middleware/reviewValidation'); 
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -99,10 +99,8 @@ app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.delete
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews); //Filtering & Sorting is done here also done using route, using this.
 app.get('/reviews/count', reviewController.getReviewCount); 
-// app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview); // -- jwt
-// app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview); // -- jwt
-app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.updateReview); // -- jwt
-app.post('/reviews', jwtAuthorization.verifyJWT, reviewController.createReview); // -- jwt
+app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview);
+app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview);
 app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt
 
 // Add Routes for courses

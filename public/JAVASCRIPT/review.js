@@ -234,8 +234,22 @@ function postReview() {
 
     console.log('Posting review with courseId:', courseId, 'reviewText:', reviewText, 'rating:', rating, 'token:', token); // Debug log
 
-    if (!reviewText || !rating || !token || isNaN(courseId)) {
-        alert('Please log in or sign up to add reviews and ensure all fields are filled.');
+    const wordCount = reviewText.trim().split(/\s+/).length;
+
+    if (!reviewText.trim()) {
+        alert('Reviews cannot be empty.');
+        return;
+    }
+    if (/^[\p{P}\s]+$/u.test(reviewText)) {
+        alert('Reviews cannot consist solely of punctuation.');
+        return;
+    }
+    if (rating < 1) {
+        alert('Reviews must have a minimum of 1 star.');
+        return;
+    }
+    if (wordCount > 250) {
+        alert('Reviews cannot exceed 250 words.');
         return;
     }
 
@@ -264,6 +278,7 @@ function postReview() {
         alert(`Error posting review: ${error.message || 'Internal Server Error'}`);
     });
 }
+
 
 function editReview(button) {
     const review = button.closest('.review');
@@ -304,13 +319,34 @@ function editReview(button) {
 
         console.log('Updating review with ID:', reviewId, 'updatedText:', updatedText, 'updatedRating:', updatedRating); // Debug log
 
+        const wordCount = updatedText.trim().split(/\s+/).length;
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = parseInt(urlParams.get('courseID'), 10); // Ensure courseId is an integer
+
+        if (!updatedText.trim()) {
+            alert('Reviews cannot be empty.');
+            return;
+        }
+        if (/^[\p{P}\s]+$/u.test(updatedText)) {
+            alert('Reviews cannot consist solely of punctuation.');
+            return;
+        }
+        if (updatedRating < 1) {
+            alert('Reviews must have a minimum of 1 star.');
+            return;
+        }
+        if (wordCount > 250) {
+            alert('Reviews cannot exceed 250 words.');
+            return;
+        }
+
         fetch(`http://localhost:3000/reviews/${reviewId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ review_text: updatedText, rating: updatedRating }) // Ensure correct JSON structure
+            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId }) // Ensure correct JSON structure
         })
         .then(response => {
             if (!response.ok) {
@@ -324,8 +360,6 @@ function editReview(button) {
             closePopup();
 
             // Fetch the courseId from the URL and ensure it is passed to fetchReviews
-            const urlParams = new URLSearchParams(window.location.search);
-            const courseId = parseInt(urlParams.get('courseID'), 10);
             console.log('Fetching reviews after update with courseId:', courseId); // Debug log
             fetchReviews(courseId);
         })
