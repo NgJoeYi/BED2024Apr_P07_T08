@@ -26,14 +26,15 @@ async function getComments(req, res) {
 
 async function createComment(req, res) {
     const { content, discussionId } = req.body;
-    const userId = req.user.id; // -- jwt implementation
+    const userId = req.user.id;
+    console.log('Creating comment:', { content, discussionId, userId }); // Log the request data
     let connection;
     try {
         connection = await sql.connect(dbConfig);
         const result = await commentModel.createComment(connection, content, userId, discussionId);
         res.status(201).json(result);
     } catch (err) {
-        console.error(err);
+        console.error('Error creating comment:', err.message);
         res.status(500).send("Error creating comment");
     } finally {
         if (connection) {
