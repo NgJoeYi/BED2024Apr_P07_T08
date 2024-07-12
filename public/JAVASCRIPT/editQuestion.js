@@ -102,11 +102,23 @@ function displayQuestionsForEdit(isEditMode) {
         questionsContainer.appendChild(questionCard);
     });
 
+    // Add button container
+    const buttonContainer = document.createElement('div'); // *********************
+    buttonContainer.style.display = 'flex'; // *********************
+    buttonContainer.style.gap = '10px'; // *********************
+    questionsContainer.appendChild(buttonContainer); // *********************
+
+    // Add Create Question button
+    const createQuestionButton = document.createElement('button'); // *********************
+    createQuestionButton.id = 'create-question'; // *********************
+    createQuestionButton.innerText = 'Create Question'; // *********************
+    buttonContainer.appendChild(createQuestionButton); // *********************
+
     const saveButton = document.createElement('button');
     saveButton.id = 'save-changes'; // Make sure the button has this ID
     saveButton.innerText = 'Save Changes';
     saveButton.onclick = saveChanges;
-    questionsContainer.appendChild(saveButton);
+    buttonContainer.appendChild(saveButton); // *********************
 
     // Hide or remove the submit quiz button in edit mode
     const submitQuizButton = document.getElementById('submit-quiz');
