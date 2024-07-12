@@ -156,10 +156,10 @@ function deleteQuestion(questionId) {
             // Remove the question from the UI
             const questionCard = document.querySelector(`textarea[data-question-id="${questionId}"]`).parentElement;
             questionCard.remove();
-        } else if (data.confirmDeleteQuiz) { // CHANGED FOR QUIZ QUESTION DELETION
+        } else if (data.confirmDeleteQuiz) { 
             const confirmDelete = confirm(data.message);
             if (confirmDelete) {
-                deleteQuizById(quizId); // CHANGED FOR QUIZ QUESTION DELETION
+                deleteQuizById(quizId);
             }
         } else {
             console.error('Error deleting question:', data.message);
@@ -168,7 +168,7 @@ function deleteQuestion(questionId) {
     .catch(error => console.error('Error deleting question:', error));
 }
 
-function deleteQuizById(quizId) { // CHANGED FOR QUIZ QUESTION DELETION
+function deleteQuizById(quizId) {
     const token = getToken();
     fetch(`/quizzes/${quizId}`, {
         method: 'DELETE',
@@ -180,7 +180,7 @@ function deleteQuizById(quizId) { // CHANGED FOR QUIZ QUESTION DELETION
     .then(data => {
         if (data.message === 'Quiz successfully deleted') {
             alert('Quiz deleted successfully');
-            window.location.href = '/quiz.html'; // Redirect to quizzes list or appropriate page
+            window.location.href = '/quiz.html'; // Redirect to quizzes list
         } else {
             console.error('Error deleting quiz:', data.message);
         }
