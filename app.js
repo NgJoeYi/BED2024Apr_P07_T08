@@ -35,11 +35,12 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const multiUpload = upload.fields([
-    {name : 'lectureVideo', maxCount : 1},
-    {name:'currentLectureVideo', maxCount: 1},
+    { name: 'lectureVideo', maxCount: 1 },
     { name: 'LectureImage', maxCount: 1 },
-    {name : 'courseImage', maxCount : 1}
+    { name: 'courseImage', maxCount: 1 }
 ]);
+
+
 
 // Middleware to ignore favicon requests
 app.get('/favicon.ico', (req, res) => res.status(204));
@@ -113,8 +114,13 @@ app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
 app.get('/lectures/:id', lectureController.getLectureByID); 
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // for updating lecture
-app.put('/lectures/:id', jwtAuthorization.verifyJWT, multiUpload,lectureController.updateLecture); 
-app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
+
+app.put('/lectures/:id', jwtAuthorization.verifyJWT, (req, res, next) => {
+    console.log('Received fields:', req.body);
+    console.log('Received files:', req.files);
+    next();
+}, multiUpload, lectureController.updateLecture);app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
+
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 
 app.delete('/lectures/course/:courseID/chapter/:chapterName', jwtAuthorization.verifyJWT, lectureController.deletingChapterName); // Updated route
 

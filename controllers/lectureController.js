@@ -29,17 +29,30 @@ const getLectureByID = async (req, res) => {
     }
 };
 
+const deleteLecture = async (req, res) => {
+    const lectureID = parseInt(req.params.id);
+    try {
+        const success = await Lectures.deleteLecture(lectureID);
+        if (!success) {
+            return res.status(404).send("Lecture not found");
+        }
+        res.status(204).send("Lecture successfully deleted");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error deleting lecture");
+    }
+};
+
 const updateLecture = async (req, res) => {
     const id = req.params.id;
     const { title, description, chapterName, duration } = req.body;
-    let video = req.file ? req.file.buffer : null;
+    let video = req.files['lectureVideo'] ? req.files['lectureVideo'][0].buffer : null;
 
     if (!video) {
-        // Fetch the existing video from the database if no new video is provided
         try {
             const existingLecture = await Lectures.getLectureByID(id);
-            if (existingLecture && existingLecture.Video) {
-                video = existingLecture.Video;
+            if (existingLecture && existingLecture.video) {
+                video = existingLecture.video;
             }
         } catch (error) {
             console.error('Error fetching existing lecture video:', error);
@@ -69,22 +82,6 @@ const updateLecture = async (req, res) => {
     }
 };
 
-
-
-
-const deleteLecture = async (req, res) => {
-    const lectureID = parseInt(req.params.id);
-    try {
-        const success = await Lectures.deleteLecture(lectureID);
-        if (!success) {
-            return res.status(404).send("Lecture not found");
-        }
-        res.status(204).send("Lecture successfully deleted");
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error deleting lecture");
-    }
-};
 
 const deletingChapterName = async (req, res) => {
     const { courseID, chapterName } = req.params;

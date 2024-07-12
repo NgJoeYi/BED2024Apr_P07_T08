@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
             if (!response.ok) throw new Error('Network response was not ok');
             const lecture = await response.json();
-            console.log('Fetched lecture:', lecture);
             populateLectureDetails(lecture);
         } catch (error) {
             console.error('Error fetching lecture details:', error);
@@ -88,7 +87,7 @@ function populateLectureDetails(lecture) {
     const lectureVideoInputElement = document.getElementById('lectureVideoInput');
 
     if (lectureVideoElement && lecture.video) {
-        const videoUrl = `/video/${lecture.LectureID}`;
+        const videoUrl = `/video/${lecture.lectureID}`;
         lectureVideoElement.src = videoUrl;
         lectureVideoElement.controls = true;
         lectureVideoElement.style.display = 'block';
