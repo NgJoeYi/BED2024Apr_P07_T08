@@ -191,6 +191,23 @@ const getCourseImage = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+const searchCourses = async (req, res) => {
+  try {
+    const searchTerm = req.query.term;
+    if (!searchTerm) {
+      return res.status(400).json({ message: 'Search term is required' });
+    }
+    const courses = await Courses.searchCourses(searchTerm);
+    if (!courses.length) {
+      return res.status(404).json({ message: 'No courses found' });
+    }
+    res.json(courses);
+} catch (error) {
+  console.error('Error searching for courses:', error);
+  res.status(500).json({ message: 'Error searching for courses' });
+}
+};
+
 
 module.exports = {
   getAllCourses,
@@ -203,5 +220,6 @@ module.exports = {
   updateCourse,
   deleteCourse,
   deleteCourseWithNoLectures,
-  getCourseImage
+  getCourseImage,
+  searchCourses
   }
