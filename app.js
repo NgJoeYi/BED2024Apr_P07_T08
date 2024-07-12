@@ -97,7 +97,12 @@ app.post('/comments', jwtAuthorization.verifyJWT, commentValidation, commentCont
 app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
 
 // Add Routes for reviews
-app.get('/reviews', reviewController.getReviews); //Filtering & Sorting is done here also done using route, using this.
+app.get('/reviews', reviewController.getReviews); //Here alr have default filter to ALL and default sort to MOST RECENT
+app.get('/reviews/rating/:rating', reviewController.getReviewsByRating); // Filter by specific rating
+app.get('/reviews/sort/:sort', reviewController.getReviewsSortedByRating); // Sort by specific rating
+app.get('/reviews/course/:courseId', reviewController.getReviewsByCourseId); // Filter by specific course ID
+app.get('/reviews/course/:courseId/rating/:rating', reviewController.getReviewsByCourseIdAndRating); // Filter by course ID and rating
+app.get('/reviews/course/:courseId/sort/:sort', reviewController.getReviewsByCourseIdAndSort); // Filter by course ID and sort
 app.get('/reviews/count', reviewController.getReviewCount); 
 app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview);
 app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview);

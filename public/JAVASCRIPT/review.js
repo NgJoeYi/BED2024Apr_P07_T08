@@ -109,13 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // document.getElementById('filter').addEventListener('change', () => {
     //     const urlParams = new URLSearchParams(window.location.search);
     //     const courseId = urlParams.get('courseID');
-    //     fetchReviews(courseId);
+    //     if (courseId && !isNaN(courseId)) {
+    //         fetchReviews(courseId);
+    //     } else {
+    //         console.error('Invalid course ID');
+    //     }
     // });
     
     // document.getElementById('sort').addEventListener('change', () => {
     //     const urlParams = new URLSearchParams(window.location.search);
     //     const courseId = urlParams.get('courseID');
-    //     fetchReviews(courseId);
+    //     if (courseId && !isNaN(courseId)) {
+    //         fetchReviews(courseId);
+    //     } else {
+    //         console.error('Invalid course ID');
+    //     }
     // });
 
     document.getElementById('filter').addEventListener('change', () => {
@@ -137,8 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Invalid course ID');
         }
     });
-
     
+
     document.getElementById('sort').value = 'mostRecent';
 });
 
@@ -382,9 +390,17 @@ function fetchReviews(courseId) {
     const token = sessionStorage.getItem('token'); // Get the token from session storage
     const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
 
-    console.log('Fetching reviews with courseId:', courseId, 'filter:', filter, 'sort:', sort); // Debug log
+    let url = `http://localhost:3000/reviews/course/${courseId}`;
+    if (filter !== 'all') {
+        url += `/rating/${filter}`;
+    }
+    if (sort !== 'mostRecent') {
+        url += `/sort/${sort}`;
+    }
 
-    fetch(`http://localhost:3000/reviews?courseId=${courseId}&filter=${filter}&sort=${sort}`)
+    console.log('Fetching reviews with URL:', url); // Debug log
+
+    fetch(url)
         .then(response => {
             if (!response.ok) {
                 console.error('Failed to fetch reviews:', response.statusText); // Debug log

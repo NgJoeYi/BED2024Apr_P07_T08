@@ -126,6 +126,61 @@ async function getReviewCount(req, res) {
 }
 
 
+async function getReviewsByRating(req, res) {
+    const { rating } = req.params;
+    try {
+        const reviews = await reviewModel.getAllReviews(null, rating);
+        res.status(200).json(reviews);
+    } catch (err) {
+        console.error('Server error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+}
+
+async function getReviewsSortedByRating(req, res) {
+    const { sort } = req.params;
+    try {
+        const reviews = await reviewModel.getAllReviews(null, 'all', sort);
+        res.status(200).json(reviews);
+    } catch (err) {
+        console.error('Server error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+}
+
+async function getReviewsByCourseId(req, res) {
+    const { courseId } = req.params;
+    try {
+        const reviews = await reviewModel.getAllReviews(courseId);
+        res.status(200).json(reviews);
+    } catch (err) {
+        console.error('Server error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+}
+
+async function getReviewsByCourseIdAndRating(req, res) {
+    const { courseId, rating } = req.params;
+    try {
+        const reviews = await reviewModel.getAllReviews(courseId, rating);
+        res.status(200).json(reviews);
+    } catch (err) {
+        console.error('Server error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+}
+
+async function getReviewsByCourseIdAndSort(req, res) {
+    const { courseId, sort } = req.params;
+    try {
+        const reviews = await reviewModel.getAllReviews(courseId, 'all', sort);
+        res.status(200).json(reviews);
+    } catch (err) {
+        console.error('Server error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+}
+
 
 module.exports = {
     getReviews,
@@ -133,4 +188,9 @@ module.exports = {
     createReview,
     deleteReview,
     getReviewCount,
+    getReviewsByRating,
+    getReviewsSortedByRating,
+    getReviewsByCourseId,
+    getReviewsByCourseIdAndRating,
+    getReviewsByCourseIdAndSort
 };
