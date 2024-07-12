@@ -2,7 +2,7 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 class Discussion {
-    constructor(id, title, description, category, posted_date, likes, dislikes, username, profilePic) {
+    constructor(id, title, description, category, posted_date, likes, dislikes, username, profilePic, role) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -12,43 +12,45 @@ class Discussion {
         this.dislikes = dislikes;
         this.username = username;
         this.profilePic = profilePic;
+        this.role = role; 
     }
 
-    static async getDiscussions(category, sort) {
-        try {
-            let query = `
-                SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username, 
-                       ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
-                FROM Discussions d
-                LEFT JOIN Users u ON d.user_id = u.id
-                LEFT JOIN ProfilePic p ON u.id = p.user_id
-            `;
+    // Updated getDiscussions method in the Discussion model
+static async getDiscussions(category, sort) {
+    try {
+        let query = `
+            SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username, 
+                   ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
+            FROM Discussions d
+            LEFT JOIN Users u ON d.user_id = u.id
+            LEFT JOIN ProfilePic p ON u.id = p.user_id
+        `;
 
-            if (category && category !== 'all') {
-                query += ` WHERE d.category = @category`;
-            }
-
-            if (sort === 'most-recent') {
-                query += ` ORDER BY d.posted_date DESC`;
-            } else if (sort === 'oldest') {
-                query += ` ORDER BY d.posted_date ASC`;
-            }
-
-            const pool = await sql.connect(dbConfig);
-            const request = pool.request();
-
-            if (category && category !== 'all') {
-                request.input('category', sql.NVarChar, category);
-            }
-
-            const result = await request.query(query);
-            return result.recordset.map(row => new Discussion(
-                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.username, row.profilePic
-            ));
-        } catch (err) {
-            throw new Error(`Error getting discussions: ${err.message}`);
+        if (category && category !== 'all') {
+            query += ` WHERE d.category = @category`;
         }
+
+        if (sort === 'most-recent') {
+            query += ` ORDER BY d.posted_date DESC`;
+        } else if (sort === 'oldest') {
+            query += ` ORDER BY d.posted_date ASC`;
+        }
+
+        const pool = await sql.connect(dbConfig);
+        const request = pool.request();
+
+        if (category && category !== 'all') {
+            request.input('category', sql.NVarChar, category);
+        }
+
+        const result = await request.query(query);
+        return result.recordset.map(row => new Discussion(
+            row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.username, row.profilePic, row.role
+        ));
+    } catch (err) {
+        throw new Error(`Error getting discussions: ${err.message}`);
     }
+}
 
     // Fetch a specific discussion by ID
     static async getDiscussionById(discussionId) {
@@ -57,9 +59,10 @@ class Discussion {
             const result = await pool.request()
                 .input('discussionId', sql.Int, discussionId)
                 .query(`
-                    SELECT d.*, u.name AS username 
-                    FROM Discussions d 
-                    JOIN Users u ON d.user_id = u.id 
+                    SELECT d.*, u.name AS username, p.img AS profilePic
+                    FROM Discussions d
+                    JOIN Users u ON d.user_id = u.id
+                    LEFT JOIN ProfilePic p ON u.id = p.user_id
                     WHERE d.id = @discussionId
                 `);
             const row = result.recordset[0];
@@ -70,6 +73,7 @@ class Discussion {
             throw new Error(`Error fetching discussion details: ${err.message}`);
         }
     }
+    
 
     // Create a new discussion
     static async createDiscussion(title, category, description, userId) {
@@ -152,9 +156,10 @@ class Discussion {
             const result = await pool.request()
                 .input('userId', sql.Int, userId)
                 .query(`
-                    SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username
+                    SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username, p.img AS profilePic
                     FROM Discussions d
                     LEFT JOIN Users u ON d.user_id = u.id
+                    LEFT JOIN ProfilePic p ON u.id = p.user_id
                     WHERE d.user_id = @userId
                     ORDER BY d.posted_date DESC
                 `);
@@ -165,11 +170,14 @@ class Discussion {
             throw new Error(`Error getting user discussions: ${err.message}`);
         }
     }
+    
 
     // Update discussion
     static async updateDiscussion(discussionId, description, category, userId) {
         try {
+            console.log('Connecting to the database...');
             const pool = await sql.connect(dbConfig);
+            console.log('Connected to the database. Executing update query...');
             await pool.request()
                 .input('discussionId', sql.Int, discussionId)
                 .input('description', sql.NVarChar, description)
@@ -180,8 +188,10 @@ class Discussion {
                     SET description = @description, category = @category
                     WHERE id = @discussionId AND user_id = @userId
                 `);
+            console.log('Update query executed successfully.');
             return true;
         } catch (err) {
+            console.error('Error updating discussion:', err);
             throw new Error(`Error updating discussion: ${err.message}`);
         }
     }

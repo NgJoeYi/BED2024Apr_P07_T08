@@ -59,11 +59,12 @@ body {
 
 /* General styling for the avatar container */
 .avatar {
-    width: 50px; /* Adjust the size as needed */
-    height: 50px; /* Adjust the size as needed */
-    overflow: hidden; /* Ensures the image does not overflow the container */
-    border-radius: 50%; /* Makes the container circular */
-    margin-right: 10px;
+  width: 65px;
+  height: 65px;
+  background-color: #aaa;
+  border-radius: 50%;
+  margin-left: 15px;
+  margin-top: 5px;
 }
 
 /* Styling for the image inside the avatar container */
@@ -84,6 +85,7 @@ body {
     margin-top: 10px;
     color: #546e7a;
     font-size: 20px;
+    
 }
 
 .post-actions, .comment-actions {
@@ -105,8 +107,9 @@ body {
 .comments-section {
     width: 90%;
     max-width: 1200px;
-    margin-top: 20px;
+    /* margin-top: 20px; */
     display: flex;
+    margin: 20px;
     flex-direction: column;
     align-items: center; /* Center-align the comments section */
 }
@@ -182,12 +185,11 @@ h3 {
 }
 
 .avatar {
-    width: 65px;
-    height: 65px;
-    background-color: #aaa;
-    border-radius: 50%;
-    margin-left: 15px;
-    margin-top: 5px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 20px;
 }
 
 .popup {
@@ -244,6 +246,11 @@ h3 {
     color: #bbb9b9;
     margin-top: 10px;
     font-size: 18px;
+}
+
+.role{
+  color: #bbb9b9;
+  margin-left: 10px;
 }
 
 

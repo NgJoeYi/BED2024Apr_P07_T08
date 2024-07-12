@@ -2,11 +2,9 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 async function getAllComments(connection) {
-    // hi i change this 
     const query = `
-    
         SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, u.id AS user_id, u.name AS username,
-               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic 
+               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role 
         FROM user_comments uc
         JOIN Users u ON uc.user_id = u.id
         LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -20,10 +18,9 @@ async function getAllComments(connection) {
 }
 
 async function getCommentById(connection, id) {
-    // hi i change this 
     const query = `
         SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, uc.user_id, u.name AS username,
-               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic 
+               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role 
         FROM user_comments uc
         JOIN Users u ON uc.user_id = u.id
         LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -40,10 +37,9 @@ async function getCommentById(connection, id) {
 }
 
 async function getCommentsByDiscussionId(connection, discussionId) {
-    // hi i change this 
     const query = `
         SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, u.id AS user_id, u.name AS username,
-               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic 
+               ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role 
         FROM user_comments uc
         JOIN Users u ON uc.user_id = u.id
         LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -109,22 +105,28 @@ async function deleteComment(connection, id) {
     }
 }
 
-function fetchCommentCountForDiscussion(discussionId) {
-    fetch(`/comments/count?discussionId=${discussionId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.count !== undefined) {
-                const commentCountElement = document.getElementById(`comment-count-${discussionId}`);
-                commentCountElement.textContent = `Total Comments: ${data.count}`;
-            } else {
-                console.error('Error fetching comment count for discussion:', data);
-                alert('Error fetching comment count.');
-            }
-        })
-        .catch(error => {
-            console.error('Network or server error:', error);
-            alert('Error fetching comment count.');
-        });
+async function getCommentCount(discussionId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        let countQuery = `SELECT COUNT(*) AS count FROM user_comments`;
+        if (discussionId) {
+            countQuery += ` WHERE discussion_id = @discussionId`;
+        }
+        const request = new sql.Request(connection);
+        if (discussionId) {
+            request.input('discussionId', sql.Int, discussionId);
+        }
+        const result = await request.query(countQuery);
+        return result.recordset[0].count;
+    } catch (err) {
+        console.error(err);
+        throw new Error('Error fetching comment count');
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
 }
 
 
@@ -135,6 +137,6 @@ module.exports = {
     createComment,
     updateComment,
     deleteComment,
-    fetchCommentCountForDiscussion
+    getCommentCount
     
 };

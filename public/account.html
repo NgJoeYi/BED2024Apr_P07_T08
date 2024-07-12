@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EduHelper | Account</title>
   <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
-  <link rel="stylesheet" href="account.css">
-  <link rel="stylesheet" href="navbar.css">
+  <link rel="stylesheet" href="CSS/account.css">
+  <link rel="stylesheet" href="CSS/navbar.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -24,16 +24,23 @@
         <li><a href="Courses.html">COURSES</a></li>
         <li><a href="activityfeed.html">ACTIVITY FEED</a></li>
         <li><a href="account.html">ACCOUNT</a></li>
+        <li><a href="quiz.html">QUIZ</a></li>
         <li><a href="ContactUs.html">CONTACT US</a></li>
       </ul>
+
+      <div class="auth-links" id="auth-links">
+        <a href="Login.html" id="navbar-login">LOG IN</a>
+        <a href="Register.html" id="navbar-signup">SIGN UP</a>
+    </div>
+
     </div>
   </header>
 
   <div class="main-content">
     <div class="top-navbar">
-      <span>Overview</span>
+      <span class="overview">Overview</span>
       <div class="search-bar">
-        <input type="text" placeholder="Search for your course">
+        <input type="text" placeholder="Search for your Review, Discussion and Quiz Taken">
       </div>
       <div class="user-info" onclick="toggleDropdown()">
         <div class="profile-image-container">
@@ -95,9 +102,10 @@
       <div>
         <h3 class="h3">Hi <span class="user-name">username</span>,</h3>
         <h2>Ready to learn something new?</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus iaculis mattis lorem quis volutpat, sed cursus.</p>
+        <p>
+          An educational website that provides a seamless navigation experience is essential for an engaging and effective learning journey. Imagine a platform where users can effortlessly browse through their activity feed, keeping up with the latest updates and interactions from peers and instructors.</p>
       </div>
-      <img src="images/welcome-image.jpg" alt="Welcome Image">
+      <img src="images/accountimagewelc.png" alt="Welcome Image" class="welcom">
     </div>
     <div class="course-stats">
       <div class="stat">
@@ -186,6 +194,7 @@
       </form>
     </div>
   </div>
+
   <div id="deleteDiscussionModal" class="modal-delete">
     <div class="modal-content-delete">
       <span class="close" onclick="closeDeleteModal()">&times;</span>
@@ -196,6 +205,24 @@
     </div>
   </div>
 </div>
+
+
+<!-- Confirmation modal for account deletion with password -->
+<div id="deleteModal" class="modal-delete">
+  <div class="modal-content">
+    <span class="close" onclick="closeDeleteModal()">&times;</span>
+    <h2>Confirm Account Deletion</h2>
+    <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+    <label for="delete-password">Enter your password:</label>
+    <input type="password" id="delete-password" required>
+    <button onclick="deleteAccount()">Yes, Delete</button>
+    <button onclick="closeDeleteModal()">Cancel</button>
+  </div>
+</div>
+
+
+
+
 
 <!-- Quiz Results Section -->
 <div class="section-container">
@@ -215,7 +242,8 @@
 
 
   <!-- External JavaScript files -->
-  <script src="account.js"></script>
-  <script src="accountSetting.js"></script>
+  <script src="JAVASCRIPT/account.js"></script>
+  <script src="JAVASCRIPT/accountSetting.js"></script>
+  <script src="JAVASCRIPT/script.js"></script>
 </body>
 </html>

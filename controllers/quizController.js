@@ -12,11 +12,19 @@ const createQuiz = async (req, res) => {
     const newQuizData = req.body;
     const userId = req.user.id;
     try {
+
+        // ----------------------------- DONE USING JOI INSTEAD -----------------------------
+        /* VALIDATED TO MAKE SURE:
+        1. all required fields are filled 
+        */
+
+        newQuizData.created_by = userId;
+
         // Convert img_url to buffer if it's a base64 string
         if (newQuizData.quizImg) {
             newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg);
         }
-        const quiz = await Quiz.createQuiz(userId, newQuizData);
+        const quiz = await Quiz.createQuiz(newQuizData);
         if (!quiz) {
             return res.status(400).json({ message: 'Failed to create a new quiz' });
         }
@@ -35,20 +43,10 @@ const createQuestion = async (req, res) => {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
 
-        // Validate required fields
-        if (!newQuestionData.question_text || !newQuestionData.option_1 || !newQuestionData.option_2 || !newQuestionData.option_3 || !newQuestionData.option_4 || !newQuestionData.correct_option) {
-            return res.status(400).json({ message: 'Missing required fields' });
-        }
-
-        // Validate correct option
-        const options = [newQuestionData.option_1, newQuestionData.option_2, newQuestionData.option_3, newQuestionData.option_4];
-        if (!options.includes(newQuestionData.correct_option)) {
-            return res.status(400).json({ message: 'Correct option must be one of the provided options.' });
-        }
-
         if (newQuestionData.qnsImg) {
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
+        
         const question = await Quiz.createQuestion(newQuestionData);
         if (!question) {
             return res.status(400).json({ message: "Failed to create question" });
@@ -156,8 +154,8 @@ const deleteQuiz = async (req, res) => {
         // if (!deleteUserResponses) {
         //     return res.status(400).json({ message: 'Failed to delete user responses related to the quiz' });
         // }
-        await Quiz.deleteUserResponses(quizId);
-        await Quiz.deleteIncorrectAnswers(quizId);
+        await Quiz.deleteUserResponsesByQuizId(quizId);
+        await Quiz.deleteIncorrectAnswersByQuizId(quizId);
         await Quiz.deleteUserAttempts(quizId);
 
         // const deleteIncorrectAnswers = await Quiz.deleteIncorrectAnswers(quizId);
@@ -170,7 +168,7 @@ const deleteQuiz = async (req, res) => {
         //     return res.status(400).json({ message: 'Failed to delete user attempts related to the quiz' });
         // }
 
-        const deleteQns = await Quiz.deleteQuestion(quizId);
+        const deleteQns = await Quiz.deleteQuestionByQuizId(quizId);
         if (!deleteQns) {
             return res.status(400).json({ message: 'Failed to delete questions related to the quiz' });
         }
@@ -198,6 +196,107 @@ const getQuizWithQuestions = async (req, res) => {
         res.status(200).json(quiz);
     } catch (error) {
         console.error('Get Quiz With Questions - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const updateQuestion = async (req, res) => { // get back to here
+    const qnsId = req.params.questionId;
+    const quizId = req.params.quizId;
+    const newQuestionData = req.body;
+    try {
+
+        // Check if the quiz exists
+        const checkQuiz = await Quiz.getQuizById(quizId);
+        if (!checkQuiz) {
+            return res.status(404).json({ message: 'Quiz does not exist' });
+        }
+
+        // Check if the question exists
+        const checkQns = await Quiz.getQuestionById(qnsId);
+        if (!checkQns) {
+            return res.status(404).json({ message: 'Question does not exist' });
+        }
+
+        if (newQuestionData.qnsImg) {
+            newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
+        } else {
+            // if no new image is provided, use the existing image from the database
+            newQuestionData.qnsImg = checkQns.qnsImg;
+        }
+
+        const updateQns = await Quiz.updateQuestion(quizId, qnsId, newQuestionData);
+        if (!updateQns) {
+            return res.status(400).json({ message: 'Could not update question' });
+        }
+        res.status(200).json({ message: 'Question updated successfully' });
+    } catch (error) {
+        console.error('Update Question - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+// FOR DELETE QUESTION, WHEN I DELETE QUESTION I MUST ALSO UPDATE THE TOTAL QUESTION IN QUIZZES
+// if user wants to delete one last question, also prompt them if they want to delete the quiz -------------------------------------
+const deleteQuestion = async (req, res) => {
+    const qnsId = req.params.questionId;
+    const quizId = req.params.quizId;
+    try {
+
+        // Check if the quiz exists
+        const checkQuiz = await Quiz.getQuizById(quizId);
+        if (!checkQuiz) {
+            return res.status(404).json({ message: 'Quiz does not exist' });
+        }
+        
+        // Check if the question exists
+        const checkQns = await Quiz.getQuestionById(qnsId);
+        if (!checkQns) {
+            return res.status(404).json({ message: 'Question does not exist' });
+        }
+
+        /* ----------------------------------- DELETING FKs ----------------------------------- */
+
+        // Delete related user responses
+        // const deleteUserResponses = await Quiz.deleteUserResponsesByQuestionId(qnsId);
+        // if (!deleteUserResponses) {
+        //     return res.status(400).json({ message: 'Could not delete user responses related to the question' });
+        // }
+
+        await Quiz.deleteUserResponsesByQuestionId(qnsId);
+        await Quiz.deleteIncorrectAnswersByQuestionId(qnsId);
+        // Delete related incorrect answers
+        // const deleteIncorrectAnswers = await Quiz.deleteIncorrectAnswersByQuestionId(qnsId);
+        // if (!deleteIncorrectAnswers) {
+        //     return res.status(400).json({ message: 'Could not delete incorrect answers related to the question' });
+        // }
+
+        /* ----------------------------------- DELETING FKs ----------------------------------- */
+
+        // Delete the question
+        const deleteQns = await Quiz.deleteQuestionByQuestionId(qnsId);
+        if (!deleteQns) {
+            return res.status(400).json({ message: 'Could not delete question' });
+        }
+
+        // ------------------------ update the total question here --------------------
+        const updatedQuizData = {
+            title: checkQuiz.title,
+            description: checkQuiz.description,
+            total_questions: checkQuiz.total_questions - 1,
+            total_marks: checkQuiz.total_marks,
+            created_by: checkQuiz.created_by,
+            quizImg: checkQuiz.quizImg
+        };
+
+        const updateTotalQuestion = await Quiz.updateQuiz(quizId, updatedQuizData);
+        if (!updateTotalQuestion) {
+            return res.status(400).json({ message: 'Could not update total questions in the quiz' });
+        }
+
+        res.status(200).json({ message: 'Question deleted successfully' });
+    } catch (error) {
+        console.error('Delete Questions - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
@@ -313,5 +412,7 @@ module.exports = {
     getAllQuizResultsForUser,
     getUserQuizResult,
     getAttemptCount,
-    submitQuiz
+    submitQuiz,
+    updateQuestion,
+    deleteQuestion
 }

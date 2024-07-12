@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses</title>
     <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/navbar.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -21,21 +21,24 @@
     <header>
         <nav class="navbar">
         <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
-        <ul class="menu-links">
+        <ul class="menu-links" >
             <span id="close-menu-btn" class="material-symbols-outlined">close</span>
-            <li><a href="Index.html">HOME</a></li>
+            <li ><a href="Index.html">HOME</a></li>
             <li><a href="Courses.html">COURSES</a></li>
             <!-- <li><a href="activityfeed.html">ACTIVITYFEED</a></li> -->
             <li><a href="activityfeed.html">ACTIVITYFEED</a></li>
-            <!-- <li><a href="comment.html">COMMENTS</a></li> -->
-            <!-- <li><a href="lecture.html">LECTURE</a></li> -->
-            <li><a href="ContactUs.html">CONTACT US</a></li>
+            <li><a href="quiz.html">QUIZ</a></li>
             <li><a href="account.html">ACCOUNT</a></li>
-            <li><a href="Login.html" id="navbar-login">LOG IN </a></li>
-            <li><a href="Register.html" id="navbar-signup">SIGN UP </a></li>
+            <li><a href="ContactUs.html">CONTACT US</a></li>
+        </ul>
+
+            <div class="auth-links" id="auth-links" >
+                <a href="Login.html" id="navbar-login">LOG IN</a>
+                <a href="Register.html" id="navbar-signup">SIGN UP</a>
+            </div>
             <!-- <li><a href="games.html" id="gamestoearn" style="display: none;"><i class="fa fa-gamepad" style="font-size: 15px;"></i></a></li>
             <li><a href="account.html" id="navbar-account" style="display: none;"><i class="fa fa-user" style="font-size: 15px;"></i></a></li> -->
-        </ul>
+       
         <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
         </nav>
     </header>
@@ -134,7 +137,8 @@
         </div>
     </footer>
 
-    <script src = "Courses.js"></script>
+    <script src = "JAVASCRIPT/Courses.js"></script>
+    <script src="JAVASCRIPT/script.js"></script>
     
 
 </body>

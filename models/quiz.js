@@ -12,7 +12,7 @@ class Quiz {
         this.quizImg = quizImg;
     }
 
-    static async createQuiz(userId, newQuizData) {
+    static async createQuiz(newQuizData) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
@@ -26,7 +26,7 @@ class Quiz {
             request.input('inputDescription', newQuizData.description);
             request.input('inputTotal_questions', newQuizData.total_questions);
             request.input('inputTotal_marks', newQuizData.total_marks);
-            request.input('inputCreated_by', userId);
+            request.input('inputCreated_by', newQuizData.created_by);
             request.input('inputQuizImg', sql.VarBinary, newQuizData.quizImg);
             const result = await request.query(sqlQuery);
             if (result.rowsAffected[0] === 0) {
@@ -205,6 +205,8 @@ class Quiz {
         }
     }
 
+    // ----------------------------------- QUESTIONS -----------------------------------
+
     static async createQuestion(newQuestionData) {
         let connection;
         try {
@@ -239,9 +241,88 @@ class Quiz {
                 await connection.close();
             }
         }
-    }        
+    }  
+
+    static async getQuestionById(qnsId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT * FROM Questions WHERE question_id=@inputQnsId
+            `;
+            const request = connection.request();
+            request.input('inputQnsId', qnsId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            const questionData = result.recordset[0];
+
+            // returning structured object
+            return {
+                questionId: questionData.question_id,
+                quizId: questionData.quiz_id,
+                questionText: questionData.question_text,
+                qnsImg: questionData.qnsImg,
+                option1: questionData.option_1,
+                option2: questionData.option_2,
+                option3: questionData.option_3,
+                option4: questionData.option_4,
+                correctOption: questionData.correct_option
+            };
+        } catch (error) {
+            console.error(error);
+            throw new Error("Error fetching question by ID");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }      
+
+    static async updateQuestion(quizId, qnsId, newQuestionData) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            UPDATE Questions
+            SET
+                question_text = @question_text,
+                qnsImg = @qnsImg,
+                option_1 = @option_1,
+                option_2 = @option_2,
+                option_3 = @option_3,
+                option_4 = @option_4,
+                correct_option = @correct_option
+            WHERE question_id = @question_id AND quiz_id = @quiz_id;
+            `;
+            const request = connection.request();
+            request.input('question_text', newQuestionData.question_text);
+            request.input('qnsImg', newQuestionData.qnsImg);
+            request.input('option_1', newQuestionData.option_1);
+            request.input('option_2', newQuestionData.option_2);
+            request.input('option_3', newQuestionData.option_3);
+            request.input('option_4', newQuestionData.option_4);
+            request.input('correct_option', newQuestionData.correct_option);
+            request.input('question_id', qnsId);
+            request.input('quiz_id', quizId);
+            const result = await request.query(sqlQuery);
+        
+            if (result.rowsAffected[0] === 0) {  
+                return null;
+            }
+            return result.recordset > 0;
+        } catch (error) {
+            console.error('Error updating question:', error);
+            throw new Error("Error updating question");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }     
     
-    static async deleteQuestion(quizId){
+    static async deleteQuestionByQuizId(quizId){
         let connection;
         try {
             connection = await sql.connect(dbConfig);
@@ -251,10 +332,7 @@ class Quiz {
             const request = connection.request();
             request.input('inputQuizId', quizId);
             const result = await request.query(sqlQuery);
-            if (result.rowsAffected[0] === 0) {
-                return null;
-            }
-            return result.rowsAffected[0] > 0; // returns true
+            return result.rowsAffected[0] > 0; // returns true if any rows were deleted
         } catch (error) {
             console.error('Error deleting question:', error);
             throw new Error("Error deleting question");
@@ -263,7 +341,77 @@ class Quiz {
                 await connection.close();
             }
         }
-    }    
+    }  
+
+
+    static async deleteQuestionByQuestionId(qnsId){
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            DELETE FROM Questions WHERE question_id=@inputQuestionId
+            `;
+            const request = connection.request();
+            request.input('inputQuestionId', qnsId);
+            const result = await request.query(sqlQuery);
+            return result.rowsAffected[0] > 0; // returns true if any rows were deleted
+        } catch (error) {
+            console.error('Error deleting question:', error);
+            throw new Error("Error deleting question");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }  
+
+    static async deleteUserResponsesByQuestionId(qnsId) {
+        let connection;
+        try{
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            DELETE FROM UserResponses WHERE question_id=@inputQuestionId
+            `;
+            const request = connection.request();
+            request.input('inputQuestionId', qnsId);
+            const result = await request.query(sqlQuery);
+            // if (result.rowsAffected[0] === 0) {           IF NO RESPONSE DONT NEED TO RETURN NULL SINCE WE JUST WANT TO GET RID OF IT
+            //     return null;
+            // }
+            return result.rowsAffected[0] > 0;
+        } catch (error) {
+            console.error('Error deleting user response by question ID:', error);
+            throw new Error("Error deleting user response");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    static async deleteIncorrectAnswersByQuestionId(qnsId) {
+        let connection;
+        try{
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            DELETE FROM IncorrectAnswers WHERE question_id=@inputQuestionId
+            `;
+            const request = connection.request();
+            request.input('inputQuestionId', qnsId);
+            const result = await request.query(sqlQuery);
+            // if (result.rowsAffected[0] === 0) {                 SAME FOR THIS ^^^
+            //     return null;
+            // }
+            return result.rowsAffected[0] > 0;
+        } catch (error) {
+            console.error('Error deleting incorrect answer by question ID:', error);
+            throw new Error("Error deleting incorrect answer");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 
 
         
@@ -513,7 +661,7 @@ class Quiz {
         }
     }
 
-    static async deleteUserResponses (quizId) {
+    static async deleteUserResponsesByQuizId (quizId) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
@@ -538,7 +686,7 @@ class Quiz {
         }
     }
 
-    static async deleteIncorrectAnswers (quizId) {
+    static async deleteIncorrectAnswersByQuizId (quizId) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);

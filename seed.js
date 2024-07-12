@@ -119,10 +119,10 @@ async function run() {
             quiz_id INT PRIMARY KEY IDENTITY(1,1),
             title NVARCHAR(255) NOT NULL,
             description NVARCHAR(MAX),
-            total_questions INT,
-            total_marks INT,
-            created_by INT,
-            quizImg VARBINARY(MAX),
+            total_questions INT NOT NULL,
+            total_marks INT NOT NULL,
+            created_by INT NOT NULL,
+            quizImg VARBINARY(MAX) NOT NULL,
             FOREIGN KEY (created_by) REFERENCES Users(id)
         );
 
@@ -293,6 +293,7 @@ async function run() {
             dyslexiaPlaceHolder: path.join(__dirname, 'public/Images/dyslexiaPlaceHolder.jpg'),
             depressionPlaceHolder: path.join(__dirname, 'public/Images/depressionPlaceHolder.jpg'),
             dysgraphiaPlaceHolder: path.join(__dirname, 'public/Images/dysgraphiaPlaceHolder.jpg'),
+            // RAEANN, WY, JY's
             colorBlindQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
             colorBlindQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
             colorBlindQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
@@ -314,6 +315,29 @@ async function run() {
             macularDegenerationQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
             macularDegenerationQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg')
         };
+
+            //AMELIA'S
+        //     colorBlindQns1: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     colorBlindQns2: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     colorBlindQns3: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     colorBlindQns4: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     colorBlindQns5: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     visualAcuityQns1: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     visualAcuityQns2: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     visualAcuityQns3: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     visualAcuityQns4: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     visualAcuityQns5: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     astigmatismQns1: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     astigmatismQns2: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     astigmatismQns3: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     astigmatismQns4: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     astigmatismQns5: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     macularDegenerationQns1: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     macularDegenerationQns2: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     macularDegenerationQns3: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     macularDegenerationQns4: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg'),
+        //     macularDegenerationQns5: path.join(__dirname, '../BED2024Apr_P07_T08-2/public/Images/colourBlindQns2.jpg')            
+        // };
 
         const imageBuffers = {};
         for (const [key, value] of Object.entries(imageFiles)) {

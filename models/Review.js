@@ -2,20 +2,27 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 
-async function getAllReviews(connection, courseId, filter = 'all', sort = 'mostRecent') {
+async function getAllReviews(courseId, filter = 'all', sort = 'mostRecent') {
+    let connection;
     try {
+        connection = await sql.connect(dbConfig);
+        
         let query = `
-            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
+            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
             FROM user_reviews ur
             JOIN Users u ON ur.user_id = u.id
             LEFT JOIN ProfilePic p ON u.id = p.user_id
-            WHERE ur.course_id = @course_id
         `;
-
+        
+        // Add WHERE clause if courseId is provided
+        if (courseId && !isNaN(courseId)) {
+            query += ` WHERE ur.course_id = @course_id `;
+        }
+        
         if (filter !== 'all') {
             query += ` AND ur.rating = @filter `;
         }
-
+        
         if (sort === 'highestRating') {
             query += ` ORDER BY ur.rating DESC `;
         } else if (sort === 'lowestRating') {
@@ -23,28 +30,37 @@ async function getAllReviews(connection, courseId, filter = 'all', sort = 'mostR
         } else {
             query += ` ORDER BY ur.review_date DESC `;
         }
-
-        const request = connection.request()
-            .input('course_id', sql.Int, courseId);
-
+        
+        const request = connection.request();
+        
+        if (courseId && !isNaN(courseId)) {
+            request.input('course_id', sql.Int, parseInt(courseId, 10));
+        }
+        
         if (filter !== 'all') {
             request.input('filter', sql.Int, filter);
         }
-
+        
         const result = await request.query(query);
-        console.log('Query Result:', result); // Add this line to log the result
         return result.recordset;
     } catch (err) {
-        throw new Error('Error fetching reviews: ' + err.message);
+        console.error('Error fetching reviews:', err.message);
+        throw new Error('Error fetching reviews');
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
     }
 }
 
-async function getReviewById(connection, id) {
+async function getReviewById(id) {
+    let connection;
     try {
+        connection = await sql.connect(dbConfig);
         const result = await connection.request()
             .input('review_id', sql.Int, id)
             .query(`
-                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic
+                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
                 FROM user_reviews ur
                 JOIN Users u ON ur.user_id = u.id
                 LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -52,7 +68,12 @@ async function getReviewById(connection, id) {
             `);
         return result.recordset[0];
     } catch (err) {
-        throw new Error('Error fetching review: ' + err.message);
+        console.error('Error fetching review:', err.message);
+        throw new Error('Error fetching review');
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
     }
 }
 
@@ -109,22 +130,28 @@ async function deleteReview(connection, id) {
     }
 }
 
-function fetchReviewCountForCourse(courseId) {
-    fetch(`/reviews/count?courseId=${courseId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.count !== undefined) {
-                const reviewCountElement = document.getElementById(`review-count-${courseId}`);
-                reviewCountElement.textContent = `Total Reviews: ${data.count}`;
-            } else {
-                console.error('Error fetching review count for course:', data);
-                alert('Error fetching review count.');
-            }
-        })
-        .catch(error => {
-            console.error('Network or server error:', error);
-            alert('Error fetching review count.');
-        });
+async function getReviewCount(courseId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        let countQuery = `SELECT COUNT(*) AS count FROM user_reviews`;
+        if (courseId) {
+            countQuery += ` WHERE course_id = @courseId`;
+        }
+        const request = new sql.Request(connection);
+        if (courseId) {
+            request.input('courseId', sql.Int, courseId);
+        }
+        const result = await request.query(countQuery);
+        return result.recordset[0].count;
+    } catch (err) {
+        console.error(err);
+        throw new Error('Error fetching review count');
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
 }
 
 
@@ -134,5 +161,5 @@ module.exports = {
     createReview,
     updateReview,
     deleteReview,
-    fetchReviewCountForCourse
+    getReviewCount
 };

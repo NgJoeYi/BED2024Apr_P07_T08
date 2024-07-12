@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Application</title>
-    <link rel="stylesheet" href="navbar.css">
-    <link rel="stylesheet" href="quiz.css">
+    <title>EduHelper.</title>
+    <link rel="stylesheet" href="CSS/navbar.css">
+    <link rel="stylesheet" href="CSS/quiz.css">
     <!-- Linking to external stylesheets for icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -16,20 +16,25 @@
     <!-- navbar -->
     <header>
         <nav class="navbar">
-            <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
-            <ul class="menu-links" id="menu-links">
-                <li><a href="Index.html">HOME</a></li>
-                <li><a href="ContactUs.html">CONTACT US</a></li>
-                <li><a href="quiz.html">QUIZ</a></li>
-                <li><a href="Courses.html" id="nav-courses" style="display: none;">COURSES</a></li>
-                <li><a href="activityfeed.html" id="nav-activityfeed" style="display: none;">ACTIVITYFEED</a></li>
-                <li><a href="account.html" id="nav-account" style="display: none;">ACCOUNT</a></li>
-            </ul>
-            <div class="auth-links" id="auth-links">
+        <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
+        <ul class="menu-links" >
+            <span id="close-menu-btn" class="material-symbols-outlined">close</span>
+            <li ><a href="Index.html">HOME</a></li>
+            <li><a href="Courses.html">COURSES</a></li>
+            <li><a href="activityfeed.html">ACTIVITYFEED</a></li>
+            <li><a href="quiz.html">QUIZ</a></li>
+            <li><a href="account.html">ACCOUNT</a></li>
+            <li><a href="ContactUs.html">CONTACT US</a></li>
+        </ul>
+
+            <div class="auth-links" id="auth-links" >
                 <a href="Login.html" id="navbar-login">LOG IN</a>
                 <a href="Register.html" id="navbar-signup">SIGN UP</a>
             </div>
-            <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
+            <!-- <li><a href="games.html" id="gamestoearn" style="display: none;"><i class="fa fa-gamepad" style="font-size: 15px;"></i></a></li>
+            <li><a href="account.html" id="navbar-account" style="display: none;"><i class="fa fa-user" style="font-size: 15px;"></i></a></li> -->
+       
+        <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
         </nav>
     </header>
 
@@ -77,41 +82,15 @@
     <div id="question-modal" class="modal">
         <div class="modal-content">
             <span class="close-question-modal-btn">&times;</span>
-            <h2>Create a New Question</h2>
+            <h2>Create Questions</h2>
             <form id="question-form">
                 <input type="hidden" id="quiz_id" name="quiz_id">
-                <div>
-                    <label for="question_text">Question Text:</label>
-                    <textarea id="question_text" name="question_text" required></textarea>
+                <div id="questions-container"></div>
+                <div class="navigation-buttons">
+                    <button type="button" id="prev-question" disabled>Previous</button>
+                    <button type="button" id="next-question">Next</button>
                 </div>
-                <div>
-                    <label for="qnsImg">Question Image:</label>
-                    <input type="file" id="qnsImg" name="qnsImg" accept="image/*">
-                </div>
-                <div>
-                    <label for="option_1">Option 1:</label>
-                    <input type="text" id="option_1" name="option_1" required>
-                </div>
-                <div>
-                    <label for="option_2">Option 2:</label>
-                    <input type="text" id="option_2" name="option_2" required>
-                </div>
-                <div>
-                    <label for="option_3">Option 3:</label>
-                    <input type="text" id="option_3" name="option_3" required>
-                </div>
-                <div>
-                    <label for="option_4">Option 4:</label>
-                    <input type="text" id="option_4" name="option_4" required>
-                </div>
-                <div>
-                    <label for="correct_option">Correct Option:</label>
-                    <input type="text" id="correct_option" name="correct_option" required>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <button type="button" id="done-btn">Done</button>
-                    <button type="submit">Add Question</button>
-                </div>
+                <button type="submit" id="submit-questions" style="display:none;">Submit Questions</button>
             </form>
         </div>
     </div>
@@ -156,6 +135,14 @@
 </div>  
 
 
+<div class="dropdown">
+    <span class="fa fa-ellipsis-v dropdown-toggle" style="cursor: pointer;"></span>
+    <div class="dropdown-menu">
+        <a href="#" class="edit-delete-quiz">Edit / Delete Quiz</a>
+        <a href="#" class="edit-delete-question">Edit / Delete Question</a>
+    </div>
+</div>
+
 
     <!--Footer-->
 <footer>
@@ -181,6 +168,8 @@
     </div>
 </footer>
 
-    <script src="quiz.js"></script>
+    <script src="JAVASCRIPT/quiz.js"></script>
+    <script src="JAVASCRIPT/script.js"></script> 
+    <!-- for hiding login/signin when use logged in  -->
 </body>
 </html>

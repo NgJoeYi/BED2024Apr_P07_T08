@@ -200,10 +200,21 @@ body {
     font-size: 18px;
 }
 
+.author-info{
+  display: flex;
+  align-items: center;
+}
+
 .author-name {
     font-weight: bold;
     font-size: 23px;
     margin-bottom: 7px;
+}
+
+.author-role{
+  color: #888;
+  margin-bottom: 5px;
+  margin-left: 10px;
 }
 
 .rating {

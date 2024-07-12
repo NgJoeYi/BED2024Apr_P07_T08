@@ -1,4 +1,18 @@
+const { validationResult, check } = require('express-validator');
 const discussionModel = require('../models/Discussion');
+
+// Validation rules
+const validateDiscussion = [
+    check('title').isLength({ min: 5 }).withMessage('Title must be at least 5 characters long'),
+    check('category').notEmpty().withMessage('Category is required'),
+    check('description').isLength({ min: 10 }).withMessage('Description must be at least 10 characters long')
+];
+
+// Validation rules for updating a discussion
+const validateUpdateDiscussion = [
+    check('category').notEmpty().withMessage('Category is required'),
+    check('description').isLength({ min: 10 }).withMessage('Description must be at least 10 characters long')
+];
 
 const getDiscussions = async (req, res) => {
     try {
@@ -27,8 +41,13 @@ const getDiscussionById = async (req, res) => {
 };
 
 const createDiscussion = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
     try {
-        const userId = req.user.id; 
+        const userId = req.user.id;
         if (!userId) {
             return res.status(401).json({ success: false, error: 'Unauthorized' });
         }
@@ -75,10 +94,19 @@ const getDiscussionsByUser = async (req, res) => {
 };
 
 const updateDiscussion = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.error('Validation errors:', errors.array());
+        return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
     try {
         const discussionId = req.params.id;
         const { description, category } = req.body;
         const userId = req.user.id;
+
+        console.log('Request payload:', { discussionId, description, category, userId });
+
         const success = await discussionModel.updateDiscussion(discussionId, description, category, userId);
         if (success) {
             res.json({ success: true });
@@ -90,6 +118,8 @@ const updateDiscussion = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
+
+
 
 const deleteDiscussion = async (req, res) => {
     try {
@@ -115,5 +145,7 @@ module.exports = {
     incrementDislikes,
     getDiscussionsByUser,
     updateDiscussion,
-    deleteDiscussion
+    deleteDiscussion,
+    validateDiscussion,
+    validateUpdateDiscussion
 };

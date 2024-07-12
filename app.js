@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 // multer is for file uploading 
 const multer = require('multer');
 
+
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -19,6 +21,7 @@ const courseController = require('./controllers/coursesController');
 const lectureController = require('./controllers/lectureController');
 const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
+const quizValidation = require('./middleware/quizzesMiddleware');
 const jwtAuthorization = require('./middleware/authMiddleware');
 
 const app = express();
@@ -61,27 +64,28 @@ app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser); // question related
 
-
 // Add Routes for quizzes
 app.get('/quizzes', quizController.getAllQuizWithCreatorName);
 app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);
-app.post('/quizzes', jwtAuthorization.verifyJWT, quizController.createQuiz);
-app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.updateQuiz);
+app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuiz);
+app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuiz, quizController.updateQuiz); // edit quiz
 app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
 app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
-app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.createQuestion); // question related
+app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestion);
+app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
+app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
 app.get('/discussions/user', jwtAuthorization.verifyJWT, discussionController.getDiscussionsByUser);
 app.get('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.getDiscussionById);
-app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.createDiscussion);
-app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.updateDiscussion);
+app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.validateDiscussion, discussionController.createDiscussion);  //add validation for create 
+app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.validateUpdateDiscussion, discussionController.updateDiscussion);   //add validation for update 
 app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.deleteDiscussion);
 app.post('/discussions/:discussionId/like', jwtAuthorization.verifyJWT, discussionController.incrementLikes);
-app.post('/discussions/:discussionId/dislike',  jwtAuthorization.verifyJWT, discussionController.incrementDislikes);
+app.post('/discussions/:discussionId/dislike', jwtAuthorization.verifyJWT, discussionController.incrementDislikes);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);

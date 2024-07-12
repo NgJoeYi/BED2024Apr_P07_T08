@@ -8,20 +8,26 @@
   height: 100vh;
   top: 0;
   left: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar .logo {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 30px;
+  text-decoration: none;
+  color: #d9aa52;
 }
 
 .sidebar .menu-links {
   list-style: none;
   padding: 0;
+  margin-top: 50px;
+  flex-grow: 1; /* Allow the menu to grow and take available space */
 }
 
 .sidebar .menu-links a {
@@ -37,6 +43,15 @@
   background-color: #d9aa52;
   color: #1b2b40;
 }
+
+.auth-links {
+  display: flex;
+ margin-left: 20px;
+ margin-right: 20px;
+  justify-content: space-between; /* Position the buttons side by side */
+  margin-top: auto; /* Push the auth links to the bottom */
+}
+
 
 /* Main Content Styles */
 .main-content {
@@ -62,7 +77,10 @@
   flex-grow: 1;
   margin-left: 20px;
   margin-right: 20px;
+  padding: 15px; /* Increase padding for thickness */
+  
 }
+
 
 .top-navbar .search-bar input {
   width: 100%;
@@ -71,12 +89,16 @@
   border: 1px solid #ddd;
 }
 
+.top-navbar .overview {
+  font-size: 20px;
+}
+
 .user-info {
   display: flex;
   align-items: center;
   gap: 10px;
   border: 1px solid #ddd;
-  padding: 5px;
+  padding: 8px;
   border-radius: 5px;
   position: relative;
   cursor: pointer;
@@ -119,8 +141,8 @@
 
 .dashboard {
   max-width: 80%;
-  margin-left: 250px;
-  margin-top: 50px; /* Adjust according to the height of the top navbar */
+  margin-left: 290px;
+  margin-top: 70px; /* Adjust according to the height of the top navbar */
   padding: 50px;
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -142,6 +164,11 @@
 .welcome-message h2,
 .welcome-message p {
   margin: 0;
+}
+
+.welcome-message img {
+  width: 40%;
+  height: 100%;
 }
 
 .course-stats {
@@ -181,167 +208,6 @@
   margin: 0;
   color: #888;
 }
-
-/* Modal for reviews and discussions */
-.modal-delete, .modal-edit, .modalreview {
-  display: none; 
-  position: fixed; 
-  z-index: 9999; 
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; /* enable scroll if needed */
-  background-color: rgb(0,0,0); 
-  background-color: rgba(0,0,0,0.4); 
-}
-
-/* Modal Content */
-.modal-content-delete, .modal-content-edit, .modal-content-review {
-  background-color: #fefefe;
-  margin: 10% auto; 
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; 
-  max-width: 500px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  border-radius: 10px;
-  text-align: center;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-textarea {
-  width: 100%;
-  height: 100px;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-#submitEditedReview {
-  background-color: #c48c7e;
-  color: white;
-  padding: 15px 20px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 16px;
-}
-
-#submitEditedReview:hover {
-  background-color: #a36d58;
-}
-
-/* Star rating styles */
-.stars i {
-  color: #ddd;
-  font-size: 24px;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.stars i:hover,
-.stars i.selected {
-  color: #FFD700; /* gold color */
-}
-
-.modal-content-review .stars {
-  margin-left: 0; 
-  margin-top: 10px; 
-  display: flex; 
-  justify-content: center;
-}
-
-.review-wrapper, .comments-wrapper {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.review-card, .comment-container, .post {
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  padding: 20px;
-  margin: 20px auto;
-  width: 80%;
-  max-width: 100%; /* Increased max-width to make the cards longer */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.review-header, .comment-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.profile-pic {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-}
-
-.review-info {
-  flex-grow: 1;
-  margin-left: 15px;
-}
-
-.stars {
-  display: flex;
-}
-
-.review-date, .comment-date {
-  font-size: 14px;
-  color: #666;
-}
-
-.review-content, .comment-body {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #333;
-}
-
-.review-actions, .comment-actions, .post-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-
-.btn, .action-btn, .save-btn, .cancel-btn {
-  background-color: #d18f7b;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  margin-left: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.btn:hover, .action-btn:hover, .save-btn:hover, .cancel-btn:hover {
-  background-color: white;
-  color: black;
-}
-
-
 
 /* Edit Account Details */
 .editaccountdetails {
@@ -414,7 +280,26 @@ textarea {
   background-color: #1b2b40;
 }
 
-/* User Discussions */
+/* ----------------------------------button for all----------------  */
+
+.btn {
+  color: #1b2b40;
+  border: none;
+  background-color: #d9aa52;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  }
+  
+  .btn:hover {
+    color: white;
+  background-color: #1b2b40;
+  }
+  
+
+/* -----------------------------------------Review---------------------------------------  */
+
 .title-container {
   grid-column: span 2;
   background-color: #fff;
@@ -432,13 +317,191 @@ textarea {
   color: #333;
   margin-bottom: 10px; /* Adjust this value as needed */
 }
-
-
-.DiscussionCol {
+.review-wrapper {
   display: flex;
-  justify-content: center;
-  padding: 20px;
+  flex-direction: row;
+  gap: 20px;
+  float: left;
 }
+
+/* Review Card */
+.review-card {
+  background-color: rgba(228, 179, 164, 0.8);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Review Header */
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Profile Picture */
+.profile-pic img {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+}
+
+/* Review Date */
+.review-date {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Review Content */
+.review-content {
+  font-size: 1rem;
+  color: #333;
+  margin-top: 10px;
+}
+
+/* Review Actions */
+.review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Stars */
+.stars i {
+  color: #ddd;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.stars i:hover,
+.stars i.selected {
+  color: #FFD700; /* gold color */
+}
+
+
+/* Common Modal Styles */
+.modalreview {
+  display: none; 
+  position: fixed; 
+  z-index: 9999; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; /* enable scroll if needed */
+  background-color: rgba(0,0,0,0.4); 
+}
+
+.modal-content-review {
+  background-color: #fefefe;
+  margin: 10% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; 
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#submitEditedReview {
+  background-color: #c48c7e;
+  color: white;
+  padding: 15px 20px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+#submitEditedReview:hover {
+  background-color: #a36d58;
+}
+
+/* Star rating styles */
+.stars i {
+  color: #ddd;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.stars i:hover,
+.stars i.selected {
+  color: #FFD700; /* gold color */
+}
+
+.modal-content-review .stars {
+  display: flex; 
+  justify-content: center;
+}
+
+#confirmReviewDelete {
+  background-color: #d9534f;
+  color: white;
+  padding: 15px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 30%;
+  font-size: 16px;
+}
+
+#cancelReviewDelete {
+  background-color: #1b2b40;
+  color: white;
+  padding: 15px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 30%;
+  font-size: 16px;
+}
+
+
+/* -----------------------------------------end of review--------------------------------- */
+
+
+
+/*------------------------------------------User Discussions------------------------------- */
+
 
 .user-discussions {
   display: flex;
@@ -453,7 +516,6 @@ textarea {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 20px;
-  margin: 20px auto;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -497,87 +559,9 @@ textarea {
   gap: 10px;
   margin-top: 10px;
   }
-  
- 
-/* deletion of account modal  */
-.modal {
-  display: none; 
-  position: fixed; 
-  z-index: 9999; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; /* enable scroll if needed */
-  background-color: rgb(0,0,0); 
-  background-color: rgba(0,0,0,0.4); 
-}
 
-/* Modal Content */
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; 
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; 
-  max-width: 500px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  border-radius: 10px;
-  text-align: center;
-}
+  /* modal for discussion  */
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.modal-content button {
-  margin: 10px;
-  padding: 10px 20px;
-  background-color: #d9534f; /* danger color */
-  border: none;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-}
-
-.modal-content button:hover {
-  background-color: #c9302c; 
-}
-
-.modal-content button.cancel {
-  background-color: #5bc0de; 
-}
-
-.modal-content button.cancel:hover {
-  background-color: #31b0d5; 
-}
-
-.modal-content input[type="password"] {
-  width: calc(100% - 20px);
-  padding: 10px;
-  margin: 10px 0;
-  box-sizing: border-box;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-
-/* modal for discussion  */
-
-/* Modal Styles */
 .modal-edit {
   display: none; 
   position: fixed; 
@@ -618,9 +602,8 @@ textarea {
   }
   
   
-  
   .no-discussions-message {
-  
+  margin-top: 30px;
   height: 150px; /* Adjust the height as needed */
   }
   
@@ -711,7 +694,7 @@ textarea {
   text-align: center;
   }
   
-  #closeDeleteModal {
+  .close {
     color: #aaa;
     float: right;
     font-size: 28px;
@@ -749,6 +732,87 @@ textarea {
     font-size: 16px;
   }
 
+/*--------------------------------------end of discussion------------------------------  */
+  
+ 
+/*--------------------------------------deletion of account modal------------------------ */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 9999; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; /* enable scroll if needed */
+  background-color: rgb(0,0,0); 
+  background-color: rgba(0,0,0,0.4); 
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; 
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; 
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-content button {
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #d9534f; /* danger color */
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button:hover {
+  background-color: #c9302c; 
+}
+
+.modal-content button.cancel {
+  background-color: #5bc0de; 
+}
+
+.modal-content button.cancel:hover {
+  background-color: #31b0d5; 
+}
+
+.modal-content input[type="password"] {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/*--------------------------------------end of account deletion modal-------------------------------  */
+
+
 
 
 
@@ -762,18 +826,20 @@ textarea {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+  margin-bottom: 8px;
 }
 
 .title-container {
   text-align: center;
   margin-bottom: 20px;
+  background-color: whitesmoke;
 }
 
 .title {
   font-size: 25px;
   font-weight: bold;
   color: #333;
+  
 }
 
 .review-wrapper, .user-discussions, .quiz-results {
@@ -781,11 +847,12 @@ textarea {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 25px;
+  
 }
 
 .review-card, .post, .quiz-result-card {
-  background-color: rgba(228, 179, 164, 0.8);
+  background-color: #ecf1f7;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 20px;
@@ -796,7 +863,7 @@ textarea {
 }
 
 .post .username {
-  margin-right: 85%;
+  margin-right: 80%;
 }
 
 /* Ensure quiz result cards have consistent styling */
