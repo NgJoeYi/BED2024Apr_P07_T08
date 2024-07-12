@@ -39,8 +39,9 @@ async function deleteCourseWithNoLectures() {
                 'Authorization': `Bearer ${token}`
             }
         });
-
-        if (!response.ok) {
+        if (response.status === 404) {
+            return;
+        } else if (!response.ok) {
             const errorMessage = await response.text();
             console.error('Network response was not ok:', errorMessage);
             throw new Error(`Network response was not ok: ${errorMessage}`);
@@ -52,6 +53,7 @@ async function deleteCourseWithNoLectures() {
         console.error('Error deleting courses with no lectures:', error);
     }
 }
+
 
 function displayCourses(courses) {
     const coursesGrid = document.querySelector('.courses-grid-unique');
@@ -216,55 +218,57 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     const form = document.getElementById('edit-course-form');
-    form.addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        const title = document.getElementById('courseTitle').value;
-        const description = document.getElementById('courseDescription').value;
-        const category = document.getElementById('courseCategory').value;
-        const level = document.getElementById('courseLevel').value;
-        const duration = document.getElementById('courseDuration').value;
-        const courseImageInput = document.getElementById('courseImageInput');
-
-        if (!title || !description || !category || !level || !duration) {
-            alert('Please fill all the required fields.');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('category', category);
-        formData.append('level', level);
-        formData.append('duration', duration);
-
-        if (courseImageInput.files.length > 0) {
-            formData.append('courseImage', courseImageInput.files[0]);
-        }
-        // Log form data before sending
-        formData.forEach((value, key) => {
-            console.log(`${key}: ${value}`);
-        });
-
-        try {
-            const token = sessionStorage.getItem('token');
-            const response = await fetch(`/courses/${courseID}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+    if (form){
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+    
+            const title = document.getElementById('courseTitle').value;
+            const description = document.getElementById('courseDescription').value;
+            const category = document.getElementById('courseCategory').value;
+            const level = document.getElementById('courseLevel').value;
+            const duration = document.getElementById('courseDuration').value;
+            const courseImageInput = document.getElementById('courseImageInput');
+    
+            if (!title || !description || !category || !level || !duration) {
+                alert('Please fill all the required fields.');
+                return;
             }
-            alert('Course updated successfully!');
-            window.location.href = 'courses.html';
-        } catch (error) {
-            console.error('Error updating course:', error);
-            alert('Error updating course.');
-        }
-    });
+    
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('description', description);
+            formData.append('category', category);
+            formData.append('level', level);
+            formData.append('duration', duration);
+    
+            if (courseImageInput.files.length > 0) {
+                formData.append('courseImage', courseImageInput.files[0]);
+            }
+            // Log form data before sending
+            formData.forEach((value, key) => {
+                console.log(`${key}: ${value}`);
+            });
+    
+            try {
+                const token = sessionStorage.getItem('token');
+                const response = await fetch(`/courses/${courseID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                alert('Course updated successfully!');
+                window.location.href = 'courses.html';
+            } catch (error) {
+                console.error('Error updating course:', error);
+                alert('Error updating course.');
+            }
+        });
+    }
 });
 
 function populateCourseDetails(course) {
