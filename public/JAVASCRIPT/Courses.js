@@ -11,7 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
             this.href = `lecture.html?courseID=${courseID}`;
         });
     });
+
+    // adding event listener for pagination
+    document.getElementById('prev-page').addEventListener('click', prevPage);
+    document.getElementById('next-page').addEventListener('click', nextPage);
 });
+
+const itemsPerPage = 6;
+let currentPage = 1;
+let totalPages = 1;
+let coursesData = [];
 
 // GETTING ALL COURSES
 async function fetchCourses() {
@@ -23,10 +32,12 @@ async function fetchCourses() {
             throw new Error('Network response was not ok');
         }
         const courses = await response.json();
-        console.log('Fetched courses:', courses); // Log the fetched courses
-        displayCourses(courses);
+        coursesData = courses;
+        console.log('Fetched courses:', courses); 
+        totalPages = Math.ceil(coursesData.length/ itemsPerPage);
+        console.log('TOTAL PAGES:',totalPages);
+        displayCourses();
         if(userRole && token === 'lecturer'){
-            console.log('HII');
             deleteCourseWithNoLectures();
         }
     } catch (error) {
@@ -59,14 +70,18 @@ async function deleteCourseWithNoLectures() {
     }
 }
 
-
-function displayCourses(courses) {
+// DISPLAYING COURSES   
+function displayCourses() {
     const coursesGrid = document.querySelector('.courses-grid-unique');
     coursesGrid.innerHTML = ''; // Clear any existing content
     const userRole = sessionStorage.getItem('role');
     const token = sessionStorage.getItem('token');
 
-    courses.forEach(course => {
+    const startIndex = (currentPage-1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, coursesData.length);
+    const currentCourses = coursesData.slice(startIndex,endIndex);
+
+    currentCourses.forEach(course => {
         const courseElement = document.createElement('div');
         courseElement.className = 'course-cd-unique';
         courseElement.dataset.category = course.category;
@@ -107,6 +122,31 @@ function displayCourses(courses) {
         // Fetch and display the review count for each course
         fetchReviewCountForCourse(course.courseID);
     });
+    updatePaginationControls();
+}
+
+// PAGINATION
+function updatePaginationControls(){
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const currentPageDisplay = document.getElementById('current-page');
+
+    currentPageDisplay.textContent = currentPage;
+    currentPage === 1 ? prevPageBtn.classList.add('disabled') : prevPageBtn.classList.remove('disabled');
+    currentPage === totalPages ? nextPageBtn.classList.add('disabled') : nextPageBtn.classList.remove('disabled');
+}
+
+function prevPage(){
+    if(currentPage > 1){
+        currentPage--;
+        displayCourses();
+    }
+}
+function nextPage(){
+    if(currentPage < totalPages){
+        currentPage++;
+        displayCourses();
+    }
 }
 
 function handleAddButtonVisibility() {
@@ -292,6 +332,7 @@ function populateCourseDetails(course) {
     }
 }
 
+// REVIEW
 function fetchReviewCountForCourse(courseId) {
     fetch(`/reviews/count?courseId=${courseId}`)
         .then(response => response.json())
