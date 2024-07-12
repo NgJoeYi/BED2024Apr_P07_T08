@@ -138,9 +138,7 @@ class Lectures {
             request.input('Duration', sql.Int, newLectureData.Duration);
             request.input('Position', sql.Int, newLectureData.Position);
             request.input('ChapterName', sql.NVarChar, newLectureData.ChapterName);
-
-            console.log('MODEL ID:', newLectureData.id);
-            console.log('MODEL ID:', newLectureData.Title);
+            
             const result = await request.query(sqlQuery);
             const newLectureID = result.recordset[0].LectureID;
             return newLectureID;

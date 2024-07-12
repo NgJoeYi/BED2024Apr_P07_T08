@@ -45,11 +45,6 @@ const multiUpload = upload.fields([
     { name: 'Video', maxCount: 1 },
 ]);
 
-// const multiUpload = upload.fields([
-//     { name: 'Video', maxCount: 1 },
-//     { name: 'LectureImage', maxCount: 1 },
-//     {name : 'courseImage', maxCount : 1}
-// ]);
 
 // Middleware to ignore favicon requests
 app.get('/favicon.ico', (req, res) => res.status(204));
