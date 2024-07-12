@@ -66,7 +66,7 @@
     margin-top: 20px;
 }
 
-.course-arrangement .chapter .delete-icon {
+.course-arrangement {
     float: right;
     cursor: pointer;
 }
@@ -112,7 +112,7 @@
     position: relative;
 }
 
-.files .file-item .delete-icon {
+.files .file-item  {
     display: none;
     position: absolute;
     right: 10px;
@@ -121,7 +121,7 @@
     cursor: pointer;
 }
 
-.files .file-item p:hover .delete-icon {
+.files .file-item p:hover  {
     display: inline-block;
 }
 
@@ -135,16 +135,9 @@ input[type="file" i]{
     flex-direction: column;
     margin-top: 10px;
 }
-.delete-icon {
-    display: none;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
 
-.file-item:hover .delete-icon {
+
+.file-item:hover {
     display: inline-block;
 }
   
@@ -175,13 +168,13 @@ button{
     position: relative;
 }
 
-.chapter-name .delete-chapter-icon {
+.chapter-name {
     display: none;
     cursor: pointer;
     margin-left: 10px;
 }
 
-.chapter-name:hover .delete-chapter-icon {
+.chapter-name:hover{
     display: inline-block;
 }
 
@@ -194,13 +187,13 @@ button{
     margin: 10px 0;
 }
 
-.file-item .delete-icon {
+.file-item  {
     display: none;
     cursor: pointer;
     margin-left: 10px;
 }
 
-.file-item:hover .delete-icon {
+.file-item:hover {
     display: inline-block;
 }
 /* course meta data styles*/
