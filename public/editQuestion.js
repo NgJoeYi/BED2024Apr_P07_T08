@@ -147,9 +147,6 @@ function deleteQuestion(questionId) {
         }
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error(`Server responded with status ${response.status}`);
-        }
         return response.json();
     })
     .then(data => {
@@ -159,11 +156,36 @@ function deleteQuestion(questionId) {
             // Remove the question from the UI
             const questionCard = document.querySelector(`textarea[data-question-id="${questionId}"]`).parentElement;
             questionCard.remove();
+        } else if (data.confirmDeleteQuiz) { // CHANGED FOR QUIZ QUESTION DELETION
+            const confirmDelete = confirm(data.message);
+            if (confirmDelete) {
+                deleteQuizById(quizId); // CHANGED FOR QUIZ QUESTION DELETION
+            }
         } else {
             console.error('Error deleting question:', data.message);
         }
     })
     .catch(error => console.error('Error deleting question:', error));
+}
+
+function deleteQuizById(quizId) { // CHANGED FOR QUIZ QUESTION DELETION
+    const token = getToken();
+    fetch(`/quizzes/${quizId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Quiz successfully deleted') {
+            alert('Quiz deleted successfully');
+            window.location.href = '/quiz.html'; // Redirect to quizzes list or appropriate page
+        } else {
+            console.error('Error deleting quiz:', data.message);
+        }
+    })
+    .catch(error => console.error('Error deleting quiz:', error));
 }
 
 async function saveChanges() {
