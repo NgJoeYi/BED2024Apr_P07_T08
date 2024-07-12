@@ -44,15 +44,11 @@ const deleteLecture = async (req, res) => {
 };
 
 const updateLecture = async (req, res) => {
-    console.log('HIIIIII');
     const userID = req.user.id; // user id that logged on now 
     // lecture id 
     const id = req.params.id;
     const { title, description, chapterName, duration } = req.body;
     let video = req.file ? req.file.buffer : null;
-
-    console.log(req.file);
-    console.log('Received files:', video);
 
     if (!video) {
         try {
