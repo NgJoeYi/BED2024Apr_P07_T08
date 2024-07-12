@@ -109,6 +109,7 @@ async function deleteChapter(button) {
 
             if (lectures.length === 0) {
                 // No more lectures, delete the course
+                console.log('NO MORE LECTURES');
                 const deleteCourseResponse = await fetch(`/courses/${courseID}`, { 
                     method: 'DELETE',
                     'Authorization': `Bearer ${token}`
@@ -122,6 +123,8 @@ async function deleteChapter(button) {
             } else {
                 // If there are remaining lectures, reload them
                 getLecturesByCourse();
+                console.log('comes here');
+                window.length.href=`lecture.html?courseID=${courseID}`
             }
         } else {
             console.error('Failed to delete chapter. Status:', response.status);
@@ -129,7 +132,7 @@ async function deleteChapter(button) {
         }
     } catch (error) {
         console.error('Error deleting chapter:', error);
-        alert('Error deleting chapter.');
+        alert('Error deleting chapter. 324324432');
     }
 }
 
@@ -152,7 +155,6 @@ async function getLecturesByCourse() {
         const response = await fetch(`/lectures/course/${courseID}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const lectures = await response.json();
-        console.log('Fetched lectures: 2', lectures);
         displayLectures(lectures);
     } catch (error) {
         console.error('Error fetching lectures:', error);
@@ -175,8 +177,6 @@ function displayLectures(lectures) {
         }
         groupedLectures[lecture.ChapterName].push(lecture);
     });
-
-    console.log('Grouped Lectures:', groupedLectures);
 
     const userRole = sessionStorage.getItem('role'); // Get user role
     console.log('USER ROLE:', userRole);
@@ -216,7 +216,6 @@ function displayLectures(lectures) {
                 `;
             }).join('');
 
-        console.log('Generated HTML:', subNavItems);
 
         navItem.innerHTML = `
             <div class="nav-title">
@@ -253,7 +252,6 @@ function displayLectures(lectures) {
 
     if (lectures.length > 0) {
         const firstLectureID = lectures[0].LectureID;
-        console.log(`Setting video for the first lecture: ${firstLectureID}`);
         setVideo(firstLectureID);
     }
 }
