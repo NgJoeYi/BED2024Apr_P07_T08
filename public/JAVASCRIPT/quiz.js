@@ -404,6 +404,7 @@ function showNextQuestion() {
 }
 
 // ------------------------------- UPDATE QUIZ -------------------------------
+
 function openUpdateModal(quiz) {  // prefill the modal fields
     document.getElementById('update_quiz_id').value = quiz.quiz_id;  
     document.getElementById('update_title').value = quiz.title;  
@@ -448,23 +449,6 @@ async function updateQuiz(event) {
         await updateQuizRequest(quizData);
     }
 }
-
-
-// async function handleImageUploadForUpdate(data) {
-//     const imgFile = document.getElementById('update_quizImg').files[0];
-//     if (imgFile) {
-//         const reader = new FileReader();
-//         reader.onloadend = async () => {
-//             data['quizImg'] = reader.result.split(',')[1]; 
-//             // console.log('Data with Image:', data);
-//             await updateQuizRequest(data);
-//         };
-//         reader.readAsDataURL(imgFile);
-//     } else {
-//         console.log('Data without Image:', data);
-//         await updateQuizRequest(data);
-//     }
-// }
 
 async function updateQuizRequest(data) {
     const token = sessionStorage.getItem('token');
