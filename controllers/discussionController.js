@@ -1,19 +1,50 @@
-const { validationResult, check } = require('express-validator');
+const Joi = require('joi');
 const discussionModel = require('../models/Discussion');
 
-// Validation rules
-const validateDiscussion = [
-    check('title').isLength({ min: 5 }).withMessage('Title must be at least 5 characters long'),
-    check('category').notEmpty().withMessage('Category is required'),
-    check('description').isLength({ min: 10 }).withMessage('Description must be at least 10 characters long')
-];
+// Joi validation schemas
+const discussionSchema = Joi.object({
+    title: Joi.string().min(5).required().messages({
+        'string.min': 'Title must be at least 5 characters long',
+        'any.required': 'Title is required'
+    }),
+    category: Joi.string().required().messages({
+        'any.required': 'Category is required'
+    }),
+    description: Joi.string().min(10).required().messages({
+        'string.min': 'Description must be at least 10 characters long',
+        'any.required': 'Description is required'
+    })
+});
 
-// Validation rules for updating a discussion
-const validateUpdateDiscussion = [
-    check('category').notEmpty().withMessage('Category is required'),
-    check('description').isLength({ min: 10 }).withMessage('Description must be at least 10 characters long')
-];
+const updateDiscussionSchema = Joi.object({
+    category: Joi.string().required().messages({
+        'any.required': 'Category is required'
+    }),
+    description: Joi.string().min(10).required().messages({
+        'string.min': 'Description must be at least 10 characters long',
+        'any.required': 'Description is required'
+    })
+});
 
+// Middleware to validate create discussion request
+const validateDiscussion = (req, res, next) => {
+    const { error } = discussionSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        return res.status(400).json({ success: false, errors: error.details.map(err => err.message) });
+    }
+    next();
+};
+
+// Middleware to validate update discussion request
+const validateUpdateDiscussion = (req, res, next) => {
+    const { error } = updateDiscussionSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+        return res.status(400).json({ success: false, errors: error.details.map(err => err.message) });
+    }
+    next();
+};
+
+// Controller functions
 const getDiscussions = async (req, res) => {
     try {
         const { category = 'all', sort = 'most-recent' } = req.query;
@@ -41,16 +72,11 @@ const getDiscussionById = async (req, res) => {
 };
 
 const createDiscussion = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
+    const userId = req.user.id;
+    if (!userId) {
+        return res.status(401).json({ success: false, error: 'Unauthorized' });
     }
-
     try {
-        const userId = req.user.id;
-        if (!userId) {
-            return res.status(401).json({ success: false, error: 'Unauthorized' });
-        }
         const { title, category, description } = req.body;
         const newDiscussion = await discussionModel.createDiscussion(title, category, description, userId);
         res.json({ success: true, discussion: newDiscussion });
@@ -94,18 +120,10 @@ const getDiscussionsByUser = async (req, res) => {
 };
 
 const updateDiscussion = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        console.error('Validation errors:', errors.array());
-        return res.status(400).json({ success: false, errors: errors.array() });
-    }
-
     try {
         const discussionId = req.params.id;
         const { description, category } = req.body;
         const userId = req.user.id;
-
-        console.log('Request payload:', { discussionId, description, category, userId });
 
         const success = await discussionModel.updateDiscussion(discussionId, description, category, userId);
         if (success) {
@@ -118,8 +136,6 @@ const updateDiscussion = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
-
-
 
 const deleteDiscussion = async (req, res) => {
     try {
