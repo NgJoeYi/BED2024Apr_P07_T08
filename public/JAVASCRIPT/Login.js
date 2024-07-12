@@ -1,3 +1,11 @@
+// document.addEventListener('DOMContentLoaded', function() {
+//     // Check if the user is already logged in when the page loads
+//     if (sessionStorage.getItem('token')) {
+//         alert('You are already logged in! Redirecting to the home page...');
+//         window.location.href = 'index.html';
+//     }
+// });
+
 document.getElementById('login-contact-form').addEventListener('submit', async function(event) {
     event.preventDefault(); // Prevents the page from reloading automatically
     const formData = new FormData(this);

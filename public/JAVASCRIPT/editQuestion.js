@@ -10,9 +10,9 @@ function initializeEditQuestion() {
     if (stylesheetLink) { // Check if the stylesheet link element exists
         if (isEditMode) {
             console.log('using edit css');
-            stylesheetLink.href = 'editQuestion.css'; // Load the edit mode stylesheet
+            stylesheetLink.href = '/CSS/editQuestion.css';
         } else {
-            stylesheetLink.href = 'question.css'; // Load the regular mode stylesheet
+            stylesheetLink.href = '/CSS/question.css';
         }
     }
 
@@ -102,11 +102,24 @@ function displayQuestionsForEdit(isEditMode) {
         questionsContainer.appendChild(questionCard);
     });
 
+    // Add button container
+    const buttonContainer = document.createElement('div'); // *********************
+    buttonContainer.style.display = 'flex'; // *********************
+    buttonContainer.style.gap = '10px'; // *********************
+    questionsContainer.appendChild(buttonContainer); // *********************
+
+    // Add Create Question button
+    const createQuestionButton = document.createElement('button'); // *********************
+    createQuestionButton.id = 'create-question'; // *********************
+    createQuestionButton.innerText = 'Create Question'; // *********************
+    createQuestionButton.onclick = createNewQuestionForm; // *********************
+    buttonContainer.appendChild(createQuestionButton); // *********************
+
     const saveButton = document.createElement('button');
     saveButton.id = 'save-changes'; // Make sure the button has this ID
     saveButton.innerText = 'Save Changes';
     saveButton.onclick = saveChanges;
-    questionsContainer.appendChild(saveButton);
+    buttonContainer.appendChild(saveButton); // *********************
 
     // Hide or remove the submit quiz button in edit mode
     const submitQuizButton = document.getElementById('submit-quiz');
@@ -133,6 +146,118 @@ function displayQuestionsForEdit(isEditMode) {
     }
 }
 
+// --------------------------------------------------------- CREATE QUESTION ---------------------------------------------------------
+
+function createNewQuestionForm() {
+    const questionsContainer = document.getElementById('questions-container');
+    const questionCard = document.createElement('div');
+    questionCard.className = 'question-card';
+    questionCard.style.position = 'relative'; // Ensure the card is positioned relative for the button to work
+
+    const closeButton = document.createElement('button');  
+    closeButton.innerText = 'X'; 
+    closeButton.style.position = 'absolute';  
+    closeButton.style.top = '5px';  
+    closeButton.style.right = '5px';  
+    closeButton.onclick = () => {  
+        questionCard.remove();  
+    };  
+    questionCard.appendChild(closeButton);
+
+    const questionTitle = document.createElement('h3');
+    questionTitle.innerText = `New Question:`;
+    questionCard.appendChild(questionTitle);
+
+    const questionInput = document.createElement('textarea');
+    questionInput.placeholder = 'Enter question text here';
+    questionCard.appendChild(questionInput);
+
+    const imageInput = document.createElement('input');
+    imageInput.type = 'file';
+    questionCard.appendChild(imageInput);
+
+    const optionInputs = [];
+    for (let i = 0; i < 4; i++) {
+        const optionInput = document.createElement('input');
+        optionInput.type = 'text';
+        optionInput.placeholder = `Option ${i + 1}`;
+        questionCard.appendChild(optionInput);
+        optionInputs.push(optionInput); // Collecting option inputs
+    }
+
+    const correctOptionInput = document.createElement('input');
+    correctOptionInput.type = 'text';
+    correctOptionInput.placeholder = 'Correct option';
+    questionCard.appendChild(correctOptionInput);
+
+    // Add save button to save the new question
+    const saveNewQuestionButton = document.createElement('button');
+    saveNewQuestionButton.innerText = 'Save Question';
+    saveNewQuestionButton.onclick = () => saveNewQuestion(questionCard, questionInput, imageInput, optionInputs, correctOptionInput);
+    questionCard.appendChild(saveNewQuestionButton);
+
+    questionsContainer.appendChild(questionCard);
+}
+
+async function saveNewQuestion(questionCard, questionInput, imageInput, optionInputs, correctOptionInput) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const quizId = urlParams.get('quizId');
+
+    const newQuestionData = {
+        quiz_id: quizId,
+        question_text: questionInput.value,
+        option_1: optionInputs[0].value,
+        option_2: optionInputs[1].value,
+        option_3: optionInputs[2].value,
+        option_4: optionInputs[3].value,
+        correct_option: correctOptionInput.value,
+        qnsImg: null
+    };
+
+    const imgFile = imageInput.files[0];
+    if (imgFile) {
+        newQuestionData.qnsImg = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                resolve(reader.result.split(',')[1]);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(imgFile);
+        });
+    }
+
+    const token = getToken();
+    try {
+        const response = await fetch(`/quizzes/${quizId}/questions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(newQuestionData)
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert('Question created successfully');
+            questionCard.remove(); // Optionally remove the form after submission
+            newQuestionData.question_id = data.question_id; // Assuming the server returns the new question_id
+            editQuestions.push(newQuestionData); // Add the new question to the list
+            displayQuestionsForEdit(true); // Refresh the questions list in edit mode
+        } else {
+            console.error('Failed to create question:', data.message);
+            alert(`Failed to create question: ${data.message}`);
+        }
+    } catch (error) {
+        console.error('Error creating question:', error);
+        alert('Error creating question');
+    }
+}
+
+
+
+// --------------------------------------------------------- DELETE QUESTION ---------------------------------------------------------
+
 function deleteQuestion(questionId) {
     const token = getToken();
     const urlParams = new URLSearchParams(window.location.search);
@@ -147,9 +272,6 @@ function deleteQuestion(questionId) {
         }
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error(`Server responded with status ${response.status}`);
-        }
         return response.json();
     })
     .then(data => {
@@ -159,11 +281,36 @@ function deleteQuestion(questionId) {
             // Remove the question from the UI
             const questionCard = document.querySelector(`textarea[data-question-id="${questionId}"]`).parentElement;
             questionCard.remove();
+        } else if (data.confirmDeleteQuiz) { 
+            const confirmDelete = confirm(data.message);
+            if (confirmDelete) {
+                deleteQuizById(quizId);
+            }
         } else {
             console.error('Error deleting question:', data.message);
         }
     })
     .catch(error => console.error('Error deleting question:', error));
+}
+
+function deleteQuizById(quizId) {
+    const token = getToken();
+    fetch(`/quizzes/${quizId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Quiz successfully deleted') {
+            alert('Quiz deleted successfully');
+            window.location.href = '/quiz.html'; // Redirect to quizzes list
+        } else {
+            console.error('Error deleting quiz:', data.message);
+        }
+    })
+    .catch(error => console.error('Error deleting quiz:', error));
 }
 
 async function saveChanges() {
@@ -184,7 +331,8 @@ async function saveChanges() {
         }
         const correctOption = document.querySelector(`input[data-question-id="${questionId}"][data-correct-option="true"]`).value;
 
-        const imgFile = document.querySelector(`input[data-question-id="${questionId}"][type="file"]`).files[0];
+        const imageInput = document.querySelector(`input[data-question-id="${questionId}"][type="file"]`); 
+        const imgFile = imageInput ? imageInput.files[0] : null; 
         let qnsImg = null;
 
         if (imgFile) {

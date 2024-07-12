@@ -35,6 +35,7 @@ const createQuiz = async (req, res) => {
     }
 };
 
+// users can add new questions in the edit mode too so i must make sure the total question is correct
 const createQuestion = async (req, res) => {
     const newQuestionData = req.body;
     try {
@@ -51,6 +52,21 @@ const createQuestion = async (req, res) => {
         if (!question) {
             return res.status(400).json({ message: "Failed to create question" });
         }
+
+        // ------------------------ update the total question here --------------------
+        const updatedQuizData = {
+            title: checkQuiz.title,
+            description: checkQuiz.description,
+            total_questions: checkQuiz.total_questions + 1,
+            total_marks: checkQuiz.total_marks,
+            created_by: checkQuiz.created_by,
+            quizImg: checkQuiz.quizImg
+        };
+        const updateTotalQuestion = await Quiz.updateQuiz(newQuestionData.quiz_id, updatedQuizData);
+        if (!updateTotalQuestion) {
+            return res.status(400).json({ message: 'Could not update total questions in the quiz' });
+        }
+
         return res.status(201).json({ message: "Question created successfully", question });
     } catch (error) {
         console.error('Error creating question:', error);
@@ -247,6 +263,15 @@ const deleteQuestion = async (req, res) => {
         const checkQuiz = await Quiz.getQuizById(quizId);
         if (!checkQuiz) {
             return res.status(404).json({ message: 'Quiz does not exist' });
+        }
+
+        // ------------ check whether the quiz has atleast 1 question ------------
+        if (checkQuiz.total_questions <= 1) {
+            // Prompt the user for confirmation to delete the quiz
+            return res.status(200).json({ 
+                message: 'This is the last question. Do you want to delete the entire quiz?', 
+                confirmDeleteQuiz: true 
+            });
         }
         
         // Check if the question exists
