@@ -114,10 +114,19 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const updatedUser = await response.json();
                 alert('User details updated successfully');
   
-                // Update displayed user info
-                document.querySelector('.profile-info .user-name').textContent = updatedUser.name;
+                const profileInfoUserName = document.querySelector('.profile-info .user-name');
+                if (profileInfoUserName) {
+                    profileInfoUserName.textContent = updatedUser.name;
+                } else {
+                    console.error('Profile info user name element not found');
+                }
+
                 document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
-                    element.textContent = updatedUser.name;
+                    if (element) {
+                        element.textContent = updatedUser.name;
+                    } else {
+                        console.error('Element for updating user name not found');
+                    }
                 });
                 window.location.reload();
                 

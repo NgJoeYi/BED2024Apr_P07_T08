@@ -162,6 +162,9 @@ async function getLecturesByCourse() {
 }
 
 function displayLectures(lectures) {
+    const userRole = sessionStorage.getItem('role');
+    const token = sessionStorage.getItem('token');
+
     const sidebar = document.querySelector('.sidebar .nav');
     if (!sidebar) {
         console.error('Sidebar element not found.');
@@ -178,9 +181,6 @@ function displayLectures(lectures) {
         groupedLectures[lecture.ChapterName].push(lecture);
     });
 
-    const userRole = sessionStorage.getItem('role'); // Get user role
-    console.log('USER ROLE:', userRole);
-
     // Check if there are any lectures
     if (Object.keys(groupedLectures).length === 0) {
         window.location.href = 'courses.html';
@@ -192,18 +192,18 @@ function displayLectures(lectures) {
         navItem.className = 'nav-item';
 
         const deleteChapterButton = 
-            userRole === 'lecturer'
+            token && userRole === 'lecturer'
             ? `<button class="delete-chapter" style="display:block;" data-chapter-name="${chapterName}" onclick="deleteChapter(this)">Delete Chapter</button>` 
             : '';
 
         const subNavItems = groupedLectures[chapterName]
             .map(lecture => {
                 const deleteButton = 
-                    userRole === 'lecturer'
+                     token && userRole === 'lecturer'
                     ? `<button class="delete-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>` 
                     : '';
                 const editButton = 
-                    userRole === 'lecturer'
+                     token && userRole === 'lecturer'
                     ? `<button class="edit-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="editLecture(this)">Edit</button>`
                     : '';
     
