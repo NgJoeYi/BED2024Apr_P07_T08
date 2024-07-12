@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     handleAddButtonVisibility();
     fetchCourses();
+    filter();
 
     // To GET INTO SPECIFIC COURSE PAGE
     const courseElements = document.querySelectorAll('.course-cd-unique a');
@@ -21,6 +22,35 @@ const itemsPerPage = 6;
 let currentPage = 1;
 let totalPages = 1;
 let coursesData = [];
+
+// ADDING CONTENT TO FILTER-CATEGORY 
+async function filter(){
+    try{
+        const response = await fetch('/courses/categories');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const categories = await response.json();
+        const filterCategory = document.getElementById('filter-category');
+
+        // Clear existing options
+        filterCategory.innerHTML = '';
+
+        // Appending new categories
+        categories.forEach(categoryContent =>{
+            console.log('CAT CONTENT:', categoryContent.Category);
+            const category = categoryContent.Category;
+            const optionElement = document.createElement('option');
+            optionElement.value = category;
+            optionElement.textContent = category;
+            filterCategory.appendChild(optionElement);
+        })
+
+    }catch(error){
+        console.error('Error fetching courses:', error);
+    }
+}
+
 
 // GETTING ALL COURSES
 async function fetchCourses() {

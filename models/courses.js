@@ -1,5 +1,6 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
+const { devNull } = require('os');
 
 class Courses {
     constructor(courseID, userID, title, description, category, level, duration, createdAt, courseImage) {
@@ -54,6 +55,22 @@ class Courses {
         } catch (error) {
             console.error('Error retrieving course:', error);
             throw error;
+        }finally{
+            await connection.close();
+        }
+    }
+
+    // for filtering 
+    static async getAllCategories(){
+        const connection = await sql.connect(dbConfig);
+        try{
+            const sqlQuery = `SELECT Category FROM Courses`;
+            const result = await connection.request().query(sqlQuery);
+            return result.recordset;
+        }catch(error){
+            console.error('Error retrieving categories of courses:', error);
+            throw error;
+
         }finally{
             await connection.close();
         }

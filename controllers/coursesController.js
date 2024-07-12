@@ -32,7 +32,18 @@ const getCoursesById = async (req, res) => {
   }
 };
 
-
+const getAllCategories = async (req,res) =>{
+  try{
+    const categories = await Courses.getAllCategories();
+    if(!categories){
+      return res.status(404).json({ message: "Categories not found" });
+    }
+    res.json(categories);
+  }catch(error){
+    console.error('Error retrieving categories:', error);
+    res.status(500).json({ message: "Error retrieving categories" });
+  }
+}
 
 const createCourse = async (req, res) => {
   const newCourse = req.body;
@@ -139,6 +150,7 @@ const getCourseImage = async (req, res) => {
 module.exports = {
   getAllCourses,
   getCoursesById,
+  getAllCategories,
   createCourse,
   updateCourse,
   deleteCourse,
