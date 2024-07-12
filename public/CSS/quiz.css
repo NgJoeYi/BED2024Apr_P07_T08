@@ -372,8 +372,8 @@ main {
 
 
 
-/* Add this CSS to your stylesheet */
+
 input[readonly] {
     cursor: not-allowed;
-    background-color: #f5f5f5; /* Optional: to visually indicate that the field is non-editable */
+    background-color: #f5f5f5;
 }
