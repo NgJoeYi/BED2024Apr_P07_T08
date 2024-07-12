@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add event listeners for filter and sort options
     document.getElementById('filter-category').addEventListener('change', fetchDiscussions);
     document.getElementById('sort-date').addEventListener('change', fetchDiscussions);
+    document.querySelector('.refresh-button').addEventListener('click', fetchDiscussions);
+    document.getElementById('clear-search').addEventListener('click', clearSearch);
 
     // Form submission handler to add a discussion
     document.getElementById('addDiscussionForm').addEventListener('submit', function (event) {
@@ -72,18 +74,28 @@ function getToken() {
 function fetchDiscussions() {
     const category = document.getElementById('filter-category').value;
     const sort = document.getElementById('sort-date').value;
+    const searchQuery = document.getElementById('search-input').value;
 
     displayLoading(true);
 
-    fetch(`/discussions?category=${category}&sort=${sort}`)
+    fetch(`/discussions?category=${category}&sort=${sort}&search=${searchQuery}`)
         .then(response => response.json())
         .then(data => {
+            const feed = document.querySelector('.activity-feed');
+            feed.innerHTML = ''; // Clear the feed
+
             if (data.success) {
-                const feed = document.querySelector('.activity-feed');
-                feed.innerHTML = ''; // Clear the feed
-                data.discussions.forEach(discussion => {
-                    addDiscussionToFeed(discussion);
-                });
+                if (data.discussions.length === 0) {
+                    // Display "No discussion found" message
+                    const noDiscussionMessage = document.createElement('div');
+                    noDiscussionMessage.classList.add('no-discussion-message');
+                    noDiscussionMessage.textContent = "No discussion found";
+                    feed.appendChild(noDiscussionMessage);
+                } else {
+                    data.discussions.forEach(discussion => {
+                        addDiscussionToFeed(discussion);
+                    });
+                }
             } else {
                 console.error('Error fetching discussions:', data.error);
                 alert('Error fetching discussions.');
@@ -95,6 +107,11 @@ function fetchDiscussions() {
             alert('Error fetching discussions.');
             displayLoading(false);
         });
+}
+
+function clearSearch() {
+    document.getElementById('search-input').value = '';
+    fetchDiscussions();
 }
 
 function capitalizeFirstLetter(string) {
