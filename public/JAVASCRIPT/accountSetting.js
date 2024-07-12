@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById('edit-icon').addEventListener('click', function () {
       if (!token) {
         alert('Please log in first to edit your account details.');
+        window.location.href = 'Login.html';
         return;
       }
       const editAccountDetails = document.getElementById('edit-account-details');
@@ -184,6 +185,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const token = getToken();
     if (!token) {
       alert('Please log in first to upload your profile picture.');
+      window.location.href = 'Login.html';
       return;
     }
     document.getElementById('file-input').click();
