@@ -356,3 +356,24 @@ main {
 .dropdown-menu a:hover {
     background-color: #b28f3e; /* Darker gold background on hover */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Add this CSS to your stylesheet */
+input[readonly] {
+    cursor: not-allowed;
+    background-color: #f5f5f5; /* Optional: to visually indicate that the field is non-editable */
+}
