@@ -61,6 +61,10 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body; // user filled in email and password field
     try {
+        // if (!password) {
+        //     return res.status(400).json({ message: 'Please enter your password' });
+        // }
+
         const loginSuccess = await User.getUserByEmail({ email });
         if (!loginSuccess) {
             return res.status(404).send( { message: 'Invalid email. No user found'} );
@@ -91,14 +95,14 @@ const updateUser = async (req, res) => {
         // get the current user 
         const user = await User.getUserById(userId);
         if (!user) {
-            return res.status(404).send('User does not exist');
+            return res.status(404).json({ message: 'User does not exist' });
         }
 
         // if there were changes made to the email, check if the email alr exists
         if (newUserData.email !== user.email) {
             const checkEmailExist = await User.getUserByEmail(newUserData);
             if (checkEmailExist) {
-                return res.status(400).json({ message: 'Email is already in use' });
+                return res.status(400).json({ message: 'Email is already in use' }); // -- checked message appears
             }
         }
 
@@ -108,7 +112,10 @@ const updateUser = async (req, res) => {
             }
             const isPasswordMatch = await bcrypt.compare(newUserData.currentPassword, user.password);
             if (!isPasswordMatch) {
-                return res.status(400).json({ message: 'Current password is incorrect' });
+                return res.status(400).json({ message: 'Current password is incorrect' }); // -- checked message appears
+            }
+            if (newUserData.newPassword === newUserData.currentPassword) {
+                return res.status(400).json({ message: 'New password cannot be the same as the current password' });
             }
             newUserData.password = await bcrypt.hash(newUserData.newPassword, 10);
         } else {
@@ -135,6 +142,10 @@ const deleteUser = async (req, res) => {
     const userId = req.user.id;
     const { password } = req.body;
     try {
+        if (!password) {
+            return res.status(400).json({ message: 'Please enter your password' }); // -- checked message appears
+        }
+
         const checkUser = await User.getUserById(userId);
         if (!checkUser) {
             return res.status(404).json({ message: 'User does not exist' });
@@ -143,7 +154,7 @@ const deleteUser = async (req, res) => {
         // Compare current password and the password in the database 
         const isPasswordMatch = await bcrypt.compare(password, checkUser.password);
         if (!isPasswordMatch) {
-            return res.status(400).json({ message: 'Password is incorrect' });
+            return res.status(400).json({ message: 'Password is incorrect' }); // -- checked message appears
         }
 
         const deleteFK = await User.deleteUtility();
@@ -154,7 +165,7 @@ const deleteUser = async (req, res) => {
         if (!userDeleted) {
             return res.status(500).json({ message: 'Failed to delete user' });
         }
-        res.status(200).json({ message: 'User successfully deleted' });
+        res.status(200).json({ message: 'Account deleted successfully' }); // -- checked message appears
     } catch (error) {
         console.error('Server error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
