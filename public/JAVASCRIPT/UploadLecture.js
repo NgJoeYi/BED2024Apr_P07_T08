@@ -144,7 +144,7 @@ function displayNewLecture(newLecture, videoFiles) {
 function resetForm() {
     document.getElementById('chapterName').value = '';
     document.getElementById('lectureName').value = '';
-    document.getElementById('duration').value = '';
+    document.getElementById('duration-lecture').value = '';
     document.getElementById('description').value = '';
     document.getElementById('videoFiles').value = '';
     console.log("Form reset completed");
@@ -189,9 +189,11 @@ async function addCourses() {
         if (response.ok) {
             const newCourse = await response.json();
             alert('Course saved successfully');
+            makeFieldsUneditable();
             document.getElementById('course-arrangement').style.display = 'block';
-            document.getElementById('submit-button').style.display = 'none';
-            document.getElementById('cancel-button').style.display = 'none';
+            // document.getElementById('submit-button').style.display = 'none';
+            // document.getElementById('cancel-button').style.display = 'none';
+           
         } else {
             const errorData = await response.json();
             alert(`Failed to save the course: ${errorData.message}`);
@@ -209,4 +211,18 @@ async function cancelCourse() {
       return;
     }
 }
+
+function makeFieldsUneditable() {
+    document.getElementById('level').setAttribute('disabled', 'disabled');
+    document.getElementById('duration').setAttribute('disabled', 'disabled');
+    document.getElementById('category').setAttribute('disabled', 'disabled');
+    document.getElementById('imageFile').setAttribute('disabled', 'disabled');
+    document.getElementById('submit-button').style.display = 'none';
+    document.getElementById('cancel-button').style.display = 'none';
+
+    // Make course name and description uneditable
+    document.getElementById('course-name-text').setAttribute('contenteditable', 'false');
+    document.getElementById('course-details').setAttribute('contenteditable', 'false');
+}
+
 
