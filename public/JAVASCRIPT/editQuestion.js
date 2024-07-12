@@ -10,9 +10,9 @@ function initializeEditQuestion() {
     if (stylesheetLink) { // Check if the stylesheet link element exists
         if (isEditMode) {
             console.log('using edit css');
-            stylesheetLink.href = 'editQuestion.css'; // Load the edit mode stylesheet
+            stylesheetLink.href = '/CSS/editQuestion.css';
         } else {
-            stylesheetLink.href = 'question.css'; // Load the regular mode stylesheet
+            stylesheetLink.href = '/CSS/question.css';
         }
     }
 
