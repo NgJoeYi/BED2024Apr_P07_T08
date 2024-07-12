@@ -75,6 +75,21 @@ class Courses {
             await connection.close();
         }
     }
+    static async filterByCategory(category) {
+        const connection = await sql.connect(dbConfig);
+        try {
+          const sqlQuery = `SELECT * FROM Courses WHERE Category = @category`;
+          const request = await connection.request();
+          request.input('category', sql.NVarChar, category);
+          const result = await request.query(sqlQuery);
+          return result.recordset;
+        } catch (error) {
+          console.error('Error retrieving courses by category:', error);
+          throw error;
+        } finally {
+          await connection.close();
+        }
+    }      
 
     // for filtering by most recent on top
     static async getMostRecentCourses(){

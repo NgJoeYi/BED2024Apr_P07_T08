@@ -33,18 +33,32 @@ const getCoursesById = async (req, res) => {
 };
 
 // for filtering  by category
-const getAllCategories = async (req,res) =>{
-  try{
+const getAllCategories = async (req, res) => {
+  try {
     const categories = await Courses.getAllCategories();
-    if(!categories){
+    if (!categories) {
       return res.status(404).json({ message: "Categories not found" });
     }
     res.json(categories);
-  }catch(error){
+  } catch (error) {
     console.error('Error retrieving categories:', error);
     res.status(500).json({ message: "Error retrieving categories" });
   }
-}
+};
+
+const filterByCategory = async (req, res) => {
+  try {
+    const { category } = req.query;
+    const courses = await Courses.filterByCategory(category);
+    if (!courses) {
+      return res.status(404).json({ message: "Courses not found" });
+    }
+    res.json(courses);
+  } catch (error) {
+    console.error('Error retrieving courses by category:', error);
+    res.status(500).json({ message: "Error retrieving courses by category" });
+  }
+};
 
  // for filtering by most recent on top
 const getMostRecentCourses = async(req,res)=>{
@@ -182,6 +196,7 @@ module.exports = {
   getAllCourses,
   getCoursesById,
   getAllCategories,
+  filterByCategory,
   getMostRecentCourses,
   getEarliestCourses,
   createCourse,

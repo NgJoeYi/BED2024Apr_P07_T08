@@ -107,9 +107,10 @@ app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteRe
 
 // Add Routes for courses
 app.get('/courses', courseController.getAllCourses);
-app.get('/courses/categories',courseController.getAllCategories); // for filtering by category
-app.get('/courses/mostRecent',courseController.getMostRecentCourses);
-app.get('/courses/earliest',courseController.getEarliestCourses);
+app.get('/courses/categories',courseController.getAllCategories); // for filtering by category4
+app.get('/courses/filter', courseController.filterByCategory);
+app.get('/courses/mostRecent',courseController.getMostRecentCourses); // for filtering by most recent made courses
+app.get('/courses/earliest',courseController.getEarliestCourses); // for filtering by earliest made courses
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
 app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.updateCourse);
