@@ -105,10 +105,9 @@ const deleteCourse = async (req, res) => {
 };
 
 const deleteCourseWithNoLectures = async (req, res) => {
-  console.log('HII');
   try {
     const success = await Courses.deleteCourseWithNoLectures();
-    console.log('SUCCESS', success);
+    console.log('success of deleting courses with no lectures:', success);
     if (!success) {
       console.log('No courses were deleted.'); // Log if no courses were deleted
       return res.status(404).json({ message: 'No courses with no lectures found.' });

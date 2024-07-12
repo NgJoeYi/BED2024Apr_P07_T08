@@ -29,7 +29,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             event.preventDefault();
 
             const formData = new FormData(form);
+            // new lecture video 
             const lectureVideoInput = document.getElementById('lectureVideoInput');
+
+            // current lecture video 
             const presentVideoElement = document.getElementById('lectureVideo');
 
             if (lectureVideoInput.files.length > 0) {

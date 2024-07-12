@@ -92,7 +92,6 @@ class Courses {
     }
 
     static async deleteCourseWithNoLectures() {
-        console.log('DELETE COURSE MODEL:');
         let connection;
         try {
             connection = await sql.connect(dbConfig);

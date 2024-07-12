@@ -44,12 +44,14 @@ const deleteLecture = async (req, res) => {
 };
 
 const updateLecture = async (req, res) => {
+    console.log('HIIIIII');
+    // lecture id 
     const id = req.params.id;
     const { title, description, chapterName, duration } = req.body;
     let video = req.files['lectureVideo'] ? req.files['lectureVideo'][0].buffer : null;
 
     // Debug: Log req.files to verify the uploaded files
-    console.log('Received files:', req.files['lectureVideo']);
+    console.log('Received files:', video);
 
     if (!video) {
         try {
