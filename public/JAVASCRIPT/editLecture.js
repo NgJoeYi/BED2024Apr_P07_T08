@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     const form = document.getElementById('edit-lecture-form');
     if (form) {
-        console.log('form found');
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
 
@@ -34,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const presentVideoElement = document.getElementById('lectureVideo');
 
             if (lectureVideoInput.files.length > 0) {
-                formData.append('lectureVideo', lectureVideoInput.files[0]);
+                Array.from(lectureVideoInput.files).forEach(file => formData.append('lectureVideo', file));
             } else if (presentVideoElement.src) {
                 const response = await fetch(presentVideoElement.src);
                 const blob = await response.blob();
@@ -50,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     alert('User not authenticated. Please log in.');
                     return;
                 }
-                console.log('FORM DATA', Array.from(formData.entries()));
+                console.log('FORM DATA', Array.from(formData.entries())); // Log form data before sending
                 const response = await fetch(`/lectures/${lectureID}`, {
                     method: 'PUT',
                     body: formData,
@@ -64,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     throw new Error('Network response was not ok');
                 }
                 const responseData = await response.json();
-                console.log('Updated Lecture Data:', responseData.data); // Log the updated lecture data
+                console.log('Updated Lecture Data:', responseData.data);
                 alert('Lecture updated successfully!');
                 window.location.href = `lecture.html?courseID=${courseID}`;
             } catch (error) {

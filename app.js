@@ -120,11 +120,11 @@ app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
 app.get('/lectures/:id', lectureController.getLectureByID); 
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // for updating lecture
 
-app.put('/lectures/:id', jwtAuthorization.verifyJWT, (req, res, next) => {
+app.put('/lectures/:id', jwtAuthorization.verifyJWT, multiUpload, (req, res, next) => {
     console.log('Received fields:', req.body);
     console.log('Received files:', req.files);
     next();
-}, multiUpload, lectureController.updateLecture);app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
+}, lectureController.updateLecture);
 
 app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 
