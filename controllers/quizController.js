@@ -248,6 +248,15 @@ const deleteQuestion = async (req, res) => {
         if (!checkQuiz) {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
+
+        // ------------ check whether the quiz has atleast 1 question ------------
+        if (checkQuiz.total_questions <= 1) {
+            // Prompt the user for confirmation to delete the quiz
+            return res.status(200).json({ 
+                message: 'This is the last question. Do you want to delete the entire quiz?', 
+                confirmDeleteQuiz: true 
+            });
+        }
         
         // Check if the question exists
         const checkQns = await Quiz.getQuestionById(qnsId);

@@ -104,6 +104,26 @@ main {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add a shadow on hover */
 }
 
+
+#create-question {
+    background-color: #d9aa52;
+    color: #1b2b40;
+    border: none;
+    border-radius: 30px;
+    padding: 15px 30px; /* Increased padding for better usability */
+    font-size: 18px; /* Slightly larger font size */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover state */
+    margin: 20px auto; /* Center the button and add margin */
+    display: block; /* Make the button a block element */
+}
+
+#create-question:hover {
+    background-color: #b28f3e;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add a shadow on hover */
+}
+
 #navigation-buttons {
     display: flex;
     justify-content: space-between; /* Distribute buttons evenly */

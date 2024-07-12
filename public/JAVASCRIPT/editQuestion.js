@@ -10,9 +10,9 @@ function initializeEditQuestion() {
     if (stylesheetLink) { // Check if the stylesheet link element exists
         if (isEditMode) {
             console.log('using edit css');
-            stylesheetLink.href = 'editQuestion.css'; // Load the edit mode stylesheet
+            stylesheetLink.href = '/CSS/editQuestion.css';
         } else {
-            stylesheetLink.href = 'question.css'; // Load the regular mode stylesheet
+            stylesheetLink.href = '/CSS/question.css';
         }
     }
 
@@ -102,11 +102,23 @@ function displayQuestionsForEdit(isEditMode) {
         questionsContainer.appendChild(questionCard);
     });
 
+    // Add button container
+    const buttonContainer = document.createElement('div'); // *********************
+    buttonContainer.style.display = 'flex'; // *********************
+    buttonContainer.style.gap = '10px'; // *********************
+    questionsContainer.appendChild(buttonContainer); // *********************
+
+    // Add Create Question button
+    const createQuestionButton = document.createElement('button'); // *********************
+    createQuestionButton.id = 'create-question'; // *********************
+    createQuestionButton.innerText = 'Create Question'; // *********************
+    buttonContainer.appendChild(createQuestionButton); // *********************
+
     const saveButton = document.createElement('button');
     saveButton.id = 'save-changes'; // Make sure the button has this ID
     saveButton.innerText = 'Save Changes';
     saveButton.onclick = saveChanges;
-    questionsContainer.appendChild(saveButton);
+    buttonContainer.appendChild(saveButton); // *********************
 
     // Hide or remove the submit quiz button in edit mode
     const submitQuizButton = document.getElementById('submit-quiz');
@@ -147,9 +159,6 @@ function deleteQuestion(questionId) {
         }
     })
     .then(response => {
-        if (!response.ok) {
-            throw new Error(`Server responded with status ${response.status}`);
-        }
         return response.json();
     })
     .then(data => {
@@ -159,11 +168,36 @@ function deleteQuestion(questionId) {
             // Remove the question from the UI
             const questionCard = document.querySelector(`textarea[data-question-id="${questionId}"]`).parentElement;
             questionCard.remove();
+        } else if (data.confirmDeleteQuiz) { 
+            const confirmDelete = confirm(data.message);
+            if (confirmDelete) {
+                deleteQuizById(quizId);
+            }
         } else {
             console.error('Error deleting question:', data.message);
         }
     })
     .catch(error => console.error('Error deleting question:', error));
+}
+
+function deleteQuizById(quizId) {
+    const token = getToken();
+    fetch(`/quizzes/${quizId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Quiz successfully deleted') {
+            alert('Quiz deleted successfully');
+            window.location.href = '/quiz.html'; // Redirect to quizzes list
+        } else {
+            console.error('Error deleting quiz:', data.message);
+        }
+    })
+    .catch(error => console.error('Error deleting quiz:', error));
 }
 
 async function saveChanges() {
