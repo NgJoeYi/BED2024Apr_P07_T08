@@ -42,36 +42,31 @@
             <form id="edit-lecture-form" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="lectureTitle">Lecture Title:</label>
-                    <input type="text" id="lectureTitle" name="lectureTitle" required>
+                    <input type="text" id="lectureTitle" name="title" required>
                 </div>
                 <div class="form-group">
                     <label for="lectureDescription">Lecture Description:</label>
-                    <textarea id="lectureDescription" name="lectureDescription" required></textarea>
+                    <textarea id="lectureDescription" name="description" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="lectureChapterName">Chapter Name:</label>
-                    <input type="text" id="lectureChapterName" name="lectureChapterName" required>
+                    <input type="text" id="lectureChapterName" name="chapterName" required>
                 </div>
                 <div class="form-group">
                     <label for="lectureDuration">Lecture Duration (minutes):</label>
-                    <input type="number" id="lectureDuration" name="lectureDuration" required>
-                </div>
-                <div class="form-group">
-                    <label for="lectureImageInput">Lecture Image:</label>
-                    <input type="file" id="lectureImageInput" name="lectureImage">
-                    <img id="lectureImage" src="" alt="No Image Available" style="display: block; margin-top: 10px; max-width: 200px;">
+                    <input type="number" id="lectureDuration" name="duration" required>
                 </div>
                 <div class="form-group">
                     <label for="lectureVideoInput">Lecture Video:</label>
-                    <input type="file" id="lectureVideoInput" name="lectureVideo">
-                    <video id="lectureVideo" style="display: block; margin-top: 10px; max-width: 400px;" controls>
+                    <input type="file" id="lectureVideoInput" name="lectureVideo" accept="video/*">
+                    <!--plays current video-->
+                    <video id="lectureVideo" name = "lectureVideo" style="display: block; margin-top: 10px; max-width: 400px;" controls>
                         <source src="" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                 </div>
-                
                 <button type="submit">Save Changes</button>
-            </form>
+            </form>                                                            
         </main>
     </div>
     <footer>
@@ -97,6 +92,7 @@
         </div>
     </footer>
 
-    <script src="JAVASCRIPT/lecture.js"></script>
+    <script src="JAVASCRIPT/editLecture.js"></script>
+
 </body>
 </html>

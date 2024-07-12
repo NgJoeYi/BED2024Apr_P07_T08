@@ -18,29 +18,33 @@ window.onclick = function(event) {
 
 // --------------------------------------reviews-----------------------------
 
+document.addEventListener('DOMContentLoaded', function() {
+  fetchAndDisplayReviews();
+});
+
 async function fetchAndDisplayReviews() {
   const token = getToken();
   try {
-    const response = await fetch('/reviews', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!response.ok) throw new Error('Failed to fetch reviews');
+      const response = await fetch('/reviews', {
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!response.ok) throw new Error('Failed to fetch reviews');
 
-    const reviews = await response.json();
-    const userId = getUserIdFromToken(token); // Assuming a function to decode user ID from token
-    const reviewWrapper = document.querySelector('.review-wrapper');
-    reviewWrapper.innerHTML = '';
+      const reviews = await response.json();
+      const userId = getUserIdFromToken(token); // Use the new function
+      const reviewWrapper = document.querySelector('.review-wrapper');
+      reviewWrapper.innerHTML = '';
 
-    const userReviews = reviews.filter(review => review.user_id === userId);
+      const userReviews = reviews.filter(review => review.user_id === userId);
 
-    if (userReviews.length === 0) {
-      reviewWrapper.innerHTML = '<p>No reviews found for this user.</p>';
-      return;
-    }
+      if (userReviews.length === 0) {
+          reviewWrapper.innerHTML = '<p>No reviews found for this user.</p>';
+          return;
+      }
 
-    userReviews.forEach(review => createReviewCard(review, reviewWrapper));
+      userReviews.forEach(review => createReviewCard(review, reviewWrapper));
   } catch (error) {
-    console.error('Error fetching reviews:', error);
+      console.error('Error fetching reviews:', error);
   }
 }
 
@@ -53,7 +57,7 @@ function createReviewCard(review, reviewWrapper) {
   reviewHeader.className = 'review-header';
 
   const profilePic = document.createElement('img');
-  profilePic.src = 'images/profilePic.jpeg';
+  profilePic.src = review.profilePic; // Use review.profilePic
   profilePic.alt = 'profile image';
   profilePic.className = 'profile-pic';
 
@@ -105,16 +109,16 @@ function createStars(rating) {
   const stars = document.createElement('div');
   stars.className = 'stars';
   for (let i = 0; i < rating; i++) {
-    const star = document.createElement('i');
-    star.className = 'fa-solid fa-star';
-    star.style.color = '#FFD43B';
-    stars.appendChild(star);
+      const star = document.createElement('i');
+      star.className = 'fa-solid fa-star';
+      star.style.color = '#FFD43B';
+      stars.appendChild(star);
   }
   for (let i = rating; i < 5; i++) {
-    const star = document.createElement('i');
-    star.className = 'fa-solid fa-star';
-    star.style.color = '#ccc';
-    stars.appendChild(star);
+      const star = document.createElement('i');
+      star.className = 'fa-solid fa-star';
+      star.style.color = '#ccc';
+      stars.appendChild(star);
   }
   return stars;
 }
@@ -129,29 +133,29 @@ function createButton(text, onClick) {
 
 async function deleteReview(reviewId) {
   try {
-    const token = getToken();
-    const response = await fetch(`/reviews/${reviewId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (!response.ok) throw new Error('Failed to delete review');
-    
-    alert('Review deleted successfully');
-    closeDeleteModal();
-    fetchAndDisplayReviews();
+      const token = getToken();
+      const response = await fetch(`/reviews/${reviewId}`, {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          }
+      });
+      if (!response.ok) throw new Error('Failed to delete review');
+      
+      alert('Review deleted successfully');
+      closeDeleteModal();
+      fetchAndDisplayReviews();
   } catch (error) {
-    console.error('Error deleting review:', error);
-    alert('Error deleting review: ' + error.message);
+      console.error('Error deleting review:', error);
+      alert('Error deleting review: ' + error.message);
   }
 }
 
 function openDeleteModal(reviewId) {
   document.getElementById('deleteReviewModal').style.display = 'block';
   document.getElementById('confirmReviewDelete').onclick = function () {
-    deleteReview(reviewId);
+      deleteReview(reviewId);
   };
 }
 
@@ -170,7 +174,7 @@ function openEditReviewModal(reviewId, currentText, currentRating) {
   setRatingStars(currentRating);
 
   document.getElementById('submitEditedReview').onclick = function () {
-    submitEditedReview(reviewId);
+      submitEditedReview(reviewId);
   };
 }
 
@@ -181,8 +185,8 @@ function closeEditReviewModal() {
 function setRatingStars(rating) {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
   stars.forEach((star, index) => {
-    star.classList.remove('selected');
-    if (index < rating) star.classList.add('selected');
+      star.classList.remove('selected');
+      if (index < rating) star.classList.add('selected');
   });
 }
 
@@ -191,28 +195,56 @@ async function submitEditedReview(reviewId) {
   const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
 
   if (newText && newRating >= 1 && newRating <= 5) {
-    try {
-      const token = getToken();
-      const response = await fetch(`/reviews/${reviewId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ review_text: newText, rating: newRating })
-      });
-      if (!response.ok) throw new Error('Failed to update review');
-      
-      alert('Review updated successfully');
-      closeEditReviewModal();
-      fetchAndDisplayReviews();
-    } catch (error) {
-      console.error('Error updating review:', error);
-    }
+      try {
+          const token = getToken();
+          const response = await fetch(`/reviews/${reviewId}`, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ review_text: newText, rating: newRating })
+          });
+          if (!response.ok) throw new Error('Failed to update review');
+          
+          alert('Review updated successfully');
+          closeEditReviewModal();
+          fetchAndDisplayReviews();
+      } catch (error) {
+          console.error('Error updating review:', error);
+      }
   } else {
-    alert('Invalid input');
+      alert('Invalid input');
+  }
+}async function submitEditedReview(reviewId) {
+  const newText = document.getElementById('editReviewText').value;
+  const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
+
+  if (newText && newRating >= 1 && newRating <= 5) {
+      try {
+          const token = getToken();
+          const response = await fetch(`/reviews/${reviewId}`, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ review_text: newText, rating: newRating })
+          });
+          if (!response.ok) throw new Error('Failed to update review');
+
+          alert('Review updated successfully');
+          closeEditReviewModal();
+          fetchAndDisplayReviews();
+      } catch (error) {
+          console.error('Error updating review:', error);
+          alert('Error updating review: ' + error.message);
+      }
+  } else {
+      alert('Invalid input');
   }
 }
+
 
 document.querySelectorAll('#editReviewModal .stars .fa-star').forEach((star, index) => {
   star.addEventListener('click', () => updateStarSelection(index));
@@ -223,16 +255,16 @@ document.querySelectorAll('#editReviewModal .stars .fa-star').forEach((star, ind
 function updateStarSelection(index) {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
   stars.forEach((star, i) => {
-    if (i <= index) star.classList.add('selected');
-    else star.classList.remove('selected');
+      if (i <= index) star.classList.add('selected');
+      else star.classList.remove('selected');
   });
 }
 
 function highlightStars(index) {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
   stars.forEach((star, i) => {
-    if (i <= index) star.classList.add('hover');
-    else star.classList.remove('hover');
+      if (i <= index) star.classList.add('hover');
+      else star.classList.remove('hover');
   });
 }
 
@@ -240,6 +272,24 @@ function resetStars() {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
   stars.forEach(star => star.classList.remove('hover'));
 }
+
+function getToken() {
+  return localStorage.getItem('token'); // Adjust this according to your storage method
+}
+
+function getUserIdFromToken(token) {
+  if (!token) {
+      throw new Error('No token provided');
+  }
+  
+  const payloadBase64 = token.split('.')[1];
+  const decodedPayload = atob(payloadBase64);
+  const payload = JSON.parse(decodedPayload);
+  
+  return payload.id;
+}
+
+
 
 // accountSetting.js
 

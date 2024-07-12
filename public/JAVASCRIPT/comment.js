@@ -56,40 +56,105 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -- this requires jwt
+    // async function saveComment() {
+    //     const commentText = document.getElementById('comment-text').value;
+    //     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
+    //     console.log('Discussion ID:', discussionId); // Debug log
+    
+    //     if (!commentText.trim()) {  // Check if commentText is empty or whitespace
+    //         alert('Comments cannot be empty.');
+    //         return;
+    //     }
+    
+    //     if (/^[\p{P}\p{S}]+$/u.test(commentText)) {  // Check if commentText consists solely of punctuation or symbols
+    //         alert('Comments cannot consist solely of punctuations.');
+    //         return;
+    //     }
+    
+    //     const wordCount = commentText.trim().split(/\s+/).length;
+    //     if (wordCount > 150) {  // Check if commentText exceeds 150 words
+    //         alert('Comments cannot exceed 150 words.');
+    //         return;
+    //     }
+    
+    //     if (editMode && currentComment) {
+    //         try {
+    //             const response = await fetch(`/comments/${currentCommentId}`, {
+    //                 method: 'PUT',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'Authorization': `Bearer ${token}`
+    //                 },
+    //                 body: JSON.stringify({ content: commentText })
+    //             });
+    //             if (response.ok) {
+    //                 currentComment.querySelector('.comment-content').textContent = commentText;
+    //                 closePopup();
+    //                 alert('Comment updated successfully!');
+    //             } else {
+    //                 console.error('Failed to update comment:', response.statusText);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error:', error);
+    //         }
+    //     } else {
+    //         await postComment(commentText, discussionId);
+    //         closePopup();
+    //     }
+    // }
+
     async function saveComment() {
         const commentText = document.getElementById('comment-text').value;
         const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
         console.log('Discussion ID:', discussionId); // Debug log
-
-        if (commentText) {
-            if (editMode && currentComment) {
-                try {
-                    const response = await fetch(`/comments/${currentCommentId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ content: commentText })
-                    });
-                    if (response.ok) {
-                        currentComment.querySelector('.comment-content').textContent = commentText;
-                        closePopup();
-                        alert('Comment updated successfully!');
-                    } else {
-                        console.error('Failed to update comment:', response.statusText);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
+    
+        if (!commentText.trim()) {  // Check if commentText is empty or whitespace
+            alert('Comments cannot be empty.');
+            return;
+        }
+    
+        if (/^[\p{P}\p{S}]+$/u.test(commentText)) {  // Check if commentText consists solely of punctuation or symbols
+            alert('Comments cannot consist solely of punctuations.');
+            return;
+        }
+    
+        const wordCount = commentText.trim().split(/\s+/).length;
+        if (wordCount > 150) {  // Check if commentText exceeds 150 words
+            alert('Comments cannot exceed 150 words.');
+            return;
+        }
+    
+        console.log('Comment Text:', commentText); // Log comment text
+    
+        if (editMode && currentComment) {
+            try {
+                const response = await fetch(`/comments/${currentCommentId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
+                });
+                if (response.ok) {
+                    currentComment.querySelector('.comment-content').textContent = commentText;
+                    closePopup();
+                    alert('Comment updated successfully!');
+                } else {
+                    const errorData = await response.json();
+                    console.error('Failed to update comment:', errorData.error || response.statusText);
                 }
-            } else {
-                await postComment(commentText, discussionId);
-                closePopup();
+            } catch (error) {
+                console.error('Error:', error);
             }
+        } else {
+            await postComment(commentText, discussionId);
+            closePopup();
         }
     }
-
-    // -- this requires jwt
+    
+            
+    //This requires jwt
     async function postComment(text, discussionId) {
         console.log('Posting Comment:', text); // Debug log
         console.log('Discussion ID:', discussionId); // Debug log
@@ -101,19 +166,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ content: text, discussionId: discussionId })
+                body: JSON.stringify({ content: text, discussionId: parseInt(discussionId, 10) }) // Ensure discussionId is an integer
             });
             if (response.ok) {
                 alert('Comment posted successfully!');
                 fetchComments(discussionId); // Refresh comments for the specific discussion
             } else {
-                console.error('Failed to post comment:', response.statusText);
+                const errorData = await response.json();
+                if (errorData.error === 'Comments cannot consist solely of punctuations.') {
+                    alert(errorData.error);
+                } else {
+                    console.error('Failed to post comment:', errorData.error || response.statusText);
+                }
             }
         } catch (error) {
             console.error('Error:', error);
         }
     }
-    
+                
     // -- this requires jwt
     window.deleteComment = async function(button) {
         const comment = button.closest('.comment');

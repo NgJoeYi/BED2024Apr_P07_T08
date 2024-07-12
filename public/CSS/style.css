@@ -9,6 +9,7 @@
   padding: 100px 20px;
   background-color: white; /* Hero section background color */
   color: #1b2b40; /* Hero section text color */
+  overflow: hidden;
 }
 
 .hero-content, .hero-image {
