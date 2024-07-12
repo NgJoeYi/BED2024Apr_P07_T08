@@ -83,6 +83,7 @@
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
     <h2>Add New Lecture</h2>
+    <h3>If you do not enter chapter name it will be saved under the previous chapter</h3>
     <label for="chapterName">Chapter Name:</label>
     <input type="text" id="chapterName" placeholder="Enter chapter name" >
     <br>
@@ -91,11 +92,7 @@
     <br>
     <div id="fileInputContainer">
       <label for="videoFiles">Upload Video Files:</label>
-      <input type="file" id="videoFiles" name="videoFiles" accept="video/*" multiple required>
-    </div>
-    <div id="fileInputContainer">
-      <label for="lectureImage">Upload Lecture Image File:</label>
-      <input type="file" id="lectureImage" name="lectureImage" accept="image/*" multiple required>
+      <input type="file" id="videoFiles" name="Video" accept="video/*" multiple required>
     </div>
     <br>
     <label for="duration">Duration</label>

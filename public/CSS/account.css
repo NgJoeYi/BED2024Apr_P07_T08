@@ -932,3 +932,11 @@ textarea {
   font-weight: bold;
   cursor: pointer;
 }
+
+
+
+
+input[readonly] {
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}

@@ -1,4 +1,10 @@
 const Lectures = require("../models/Lectures");
+const multer = require("multer");
+
+// Multer setup for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 
 const getAllLectures = async (req, res) => {
     try {
@@ -23,21 +29,6 @@ const getLectureByID = async (req, res) => {
     }
 };
 
-const updateLecture = async (req, res) => {
-    const id = req.user.id;
-    const newLectureData = req.body;
-    try {
-        const updateLecture = await Lectures.updateLecture(id, newLectureData);
-        if (!updateLecture) {
-            return res.status(404).send('Lecture not found!');
-        }
-        res.json(updateLecture);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error updating lecture");
-    }
-};
-
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
     try {
@@ -51,6 +42,46 @@ const deleteLecture = async (req, res) => {
         res.status(500).send("Error deleting lecture");
     }
 };
+
+const updateLecture = async (req, res) => {
+    const userID = req.user.id; // user id that logged on now 
+    // lecture id 
+    const id = req.params.id;
+    const { title, description, chapterName, duration } = req.body;
+    let video = req.file ? req.file.buffer : null;
+
+    if (!video) {
+        try {
+            const existingLecture = await Lectures.getLectureByID(id);
+            if (existingLecture && existingLecture.video) {
+                video = existingLecture.video;
+            }
+        } catch (error) {
+            console.error('Error fetching existing lecture video:', error);
+            return res.status(500).send('Error fetching existing lecture video');
+        }
+    }
+
+    const newLectureData = {
+        Title: title,
+        Description: description,
+        ChapterName: chapterName,
+        Duration: duration,
+        Video: video
+    };
+    try {
+        const updateResult = await Lectures.updateLecture(id, newLectureData);
+        if (!updateResult) {
+            return res.status(404).send('Lecture not found!');
+        }
+        res.json({ message: 'Lecture updated successfully', data: updateResult });
+    } catch (error) {
+        console.error('Error updating lecture:', error);
+        res.status(500).send('Error updating lecture');
+    }
+};
+
+
 
 const deletingChapterName = async (req, res) => {
     const { courseID, chapterName } = req.params;
@@ -103,7 +134,6 @@ const createLecture = async (req, res) => {
     }
 
     const video = req.files.Video[0].buffer;
-    const lectureImage = req.files.LectureImage[0].buffer;
 
     try {
         const Position = await Lectures.getCurrentPositionInChapter(ChapterName);
@@ -117,9 +147,7 @@ const createLecture = async (req, res) => {
             Position,
             ChapterName,
             Video: video,
-            LectureImage: lectureImage
         }
-
         const newLectureID = await Lectures.createLecture(UserID, newLectureData);
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
@@ -138,7 +166,6 @@ const getLectureVideoByID = async (req, res) => {
     }
 
     try {
-        console.log(`Fetching video for lecture ID: ${lectureID}`);
         const videoData = await Lectures.getLectureVideoByID(lectureID);
         if (videoData) {
             res.writeHead(200, {
