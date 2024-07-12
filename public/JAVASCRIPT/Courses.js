@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // GETTING ALL COURSES
 async function fetchCourses() {
     try {
+        const token = sessionStorage.getItem('token');
+        const userRole = sessionStorage.getItem('role');
         const response = await fetch('/courses'); // -- jwt, no token required, users that are not logged in can view the courses
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -23,7 +25,10 @@ async function fetchCourses() {
         const courses = await response.json();
         console.log('Fetched courses:', courses); // Log the fetched courses
         displayCourses(courses);
-        deleteCourseWithNoLectures();
+        if(userRole && token === 'lecturer'){
+            console.log('HII');
+            deleteCourseWithNoLectures();
+        }
     } catch (error) {
         console.error('Error fetching courses:', error);
     }
@@ -59,6 +64,7 @@ function displayCourses(courses) {
     const coursesGrid = document.querySelector('.courses-grid-unique');
     coursesGrid.innerHTML = ''; // Clear any existing content
     const userRole = sessionStorage.getItem('role');
+    const token = sessionStorage.getItem('token');
 
     courses.forEach(course => {
         const courseElement = document.createElement('div');
@@ -83,7 +89,7 @@ function displayCourses(courses) {
                         <p class="posted-date">Posted on: ${new Date(course.createdAt).toLocaleDateString()}</p>
                         <p>${course.level}</p>
                     </div>
-                    ${userRole === 'lecturer' ? `
+                    ${token && userRole === 'lecturer'  ? `
                     <div class="delete-button-container">
                         <button class="delete-course" data-course-id="${course.courseID}" onclick="deleteCourse(event, this)">Delete</button>
                         <button class="edit-course"  data-course-id="${course.courseID}" onclick="editCourse(event, this)">Edit</button>           
