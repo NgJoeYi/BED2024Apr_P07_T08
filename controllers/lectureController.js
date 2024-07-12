@@ -45,12 +45,13 @@ const deleteLecture = async (req, res) => {
 
 const updateLecture = async (req, res) => {
     console.log('HIIIIII');
+    const userID = req.user.id; // user id that logged on now 
     // lecture id 
     const id = req.params.id;
     const { title, description, chapterName, duration } = req.body;
-    let video = req.files['lectureVideo'] ? req.files['lectureVideo'][0].buffer : null;
+    let video = req.file ? req.file.buffer : null;
 
-    // Debug: Log req.files to verify the uploaded files
+    console.log(req.file);
     console.log('Received files:', video);
 
     if (!video) {
@@ -72,10 +73,6 @@ const updateLecture = async (req, res) => {
         Duration: duration,
         Video: video
     };
-
-    // Debug: Log newLectureData to verify the data before updating
-    console.log('NEW LECTURE DATA: ', newLectureData);
-
     try {
         const updateResult = await Lectures.updateLecture(id, newLectureData);
         if (!updateResult) {

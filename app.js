@@ -116,8 +116,8 @@ app.get('/lectures/last-chapter', jwtAuthorization.verifyJWT, lectureController.
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID
 app.get('/lectures/course/:courseID', lectureController.getLecturesByCourseID);
-app.put('/lectures/:id', jwtAuthorization.verifyJWT, upload.single('lectureVideo', lectureController.updateLecture));
 app.get('/lectures/:id', lectureController.getLectureByID); 
+app.put('/lectures/:id', jwtAuthorization.verifyJWT, upload.single('lectureVideo'), lectureController.updateLecture);
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // for updating lecture
 app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 

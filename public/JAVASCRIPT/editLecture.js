@@ -27,44 +27,45 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (form) {
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
-
+    
             const formData = new FormData(form);
-            // new lecture video 
             const lectureVideoInput = document.getElementById('lectureVideoInput');
-
-            // current lecture video 
             const presentVideoElement = document.getElementById('lectureVideo');
-
+    
+            console.log('FormData before appending:', Array.from(formData.entries()));
+    
             if (lectureVideoInput.files.length > 0) {
-                Array.from(lectureVideoInput.files).forEach(file => formData.append('lectureVideo', file));
+                console.log('New lecture video selected:', lectureVideoInput.files[0]);
+                 // Remove existing 'lectureVideo' field if present
+                formData.delete('lectureVideo');
+                formData.append('lectureVideo', lectureVideoInput.files[0]);
             } else if (presentVideoElement.src) {
-                const response = await fetch(presentVideoElement.src);
-                const blob = await response.blob();
-                const file = new File([blob], 'existingVideo.mp4', { type: 'video/mp4' });
-                formData.append('lectureVideo', file);
-            } else {
-                console.log('No new video provided and no existing video found.');
+                console.log('Using existing lecture video:', presentVideoElement.src);
             }
-
+    
             try {
                 const token = sessionStorage.getItem('token');
                 if (!token) {
                     alert('User not authenticated. Please log in.');
                     return;
                 }
-                console.log('FORM DATA', Array.from(formData.entries())); // Log form data before sending
+    
+                console.log('Final FormData:', Array.from(formData.entries())); // Log final FormData before sending
+    
                 const response = await fetch(`/lectures/${lectureID}`, {
                     method: 'PUT',
-                    body: formData,
                     headers: {
                         'Authorization': `Bearer ${token}`
-                    }
+                    },
+                    body: formData
                 });
+    
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Error response text:', errorText);
                     throw new Error('Network response was not ok');
                 }
+    
                 const responseData = await response.json();
                 console.log('Updated Lecture Data:', responseData.data);
                 alert('Lecture updated successfully!');
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         });
     }
+    
 });
 
 function populateLectureDetails(lecture) {
