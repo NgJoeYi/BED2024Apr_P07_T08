@@ -255,5 +255,20 @@ class Courses {
         }
           
     }
+    static async searchCourses(searchTerm) {
+        const connection = await sql.connect(dbConfig);
+        try {
+            const sqlQuery = `SELECT * FROM Courses WHERE Title LIKE @searchTerm`;
+            const request = await connection.request();
+            request.input('searchTerm', sql.NVarChar, `%${searchTerm}%`);
+            const result = await request.query(sqlQuery);
+            return result.recordset;
+        } catch (error) {
+            console.error('Error searching for courses:', error);
+            throw error;
+        } finally {
+            await connection.close();
+        }
+    }
 }
 module.exports = Courses;

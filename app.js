@@ -111,10 +111,12 @@ app.get('/courses/mostRecent',courseController.getMostRecentCourses); // for fil
 app.get('/courses/earliest',courseController.getEarliestCourses); // for filtering by earliest made courses
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
+app.get('/courses/search', courseController.searchCourses);
 app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.updateCourse);
 app.post('/courses', jwtAuthorization.verifyJWT, upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/noLectures', jwtAuthorization.verifyJWT, courseController.deleteCourseWithNoLectures);
 app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
+
 
 
 // Add Routes for lectures
