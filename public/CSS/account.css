@@ -720,7 +720,7 @@
   
  
 /*--------------------------------------deletion of account modal------------------------ */
-.modal {
+.modal-delete {
   display: none; 
   position: fixed; 
   z-index: 9999; /* Sit on top */
