@@ -32,6 +32,7 @@ const getCoursesById = async (req, res) => {
   }
 };
 
+// for filtering  by category
 const getAllCategories = async (req,res) =>{
   try{
     const categories = await Courses.getAllCategories();
@@ -43,6 +44,36 @@ const getAllCategories = async (req,res) =>{
     console.error('Error retrieving categories:', error);
     res.status(500).json({ message: "Error retrieving categories" });
   }
+}
+
+ // for filtering by most recent on top
+const getMostRecentCourses = async(req,res)=>{
+  try{
+    const categories = await Courses.getMostRecentCourses();
+    if(!categories){
+      return res.status(404).json({ message: "Most recent courses not found" });
+    }
+    res.json(categories);
+  }catch(error){
+    console.error('Error retrieving recent courses:', error);
+    res.status(500).json({ message: "Error retrieving recent courses" });
+  }
+
+}
+
+ // for filtering by earliest on top 
+const getEarliestCourses = async(req,res)=>{
+  try{
+    const categories = await Courses.getEarliestCourses();
+    if(!categories){
+      return res.status(404).json({ message: "Most earliest courses not found" });
+    }
+    res.json(categories);
+  }catch(error){
+    console.error('Error earliest recent courses:', error);
+    res.status(500).json({ message: "Error earliest recent courses" });
+  }
+
 }
 
 const createCourse = async (req, res) => {
@@ -151,6 +182,8 @@ module.exports = {
   getAllCourses,
   getCoursesById,
   getAllCategories,
+  getMostRecentCourses,
+  getEarliestCourses,
   createCourse,
   updateCourse,
   deleteCourse,
