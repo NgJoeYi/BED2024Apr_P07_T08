@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Set active state based on the current page
+    const quizButton = document.getElementById('quiz-button');
+    const statisticsButton = document.getElementById('statistics-button');
+
+    quizButton.classList.add('active');
+    quizButton.classList.remove('inactive');
+    statisticsButton.classList.remove('active');
+    statisticsButton.classList.add('inactive');
+
+    quizButton.addEventListener('click', () => {
+        window.location.href = 'quiz.html'; // Navigate to quiz.html
+    });
+
+    statisticsButton.addEventListener('click', () => {
+        window.location.href = 'statistics.html'; // Navigate to statistics.html
+    });
+
     // checkSessionToken();
     fetchQuizzes();
 
@@ -73,26 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (deleteQuizBtn) {
         deleteQuizBtn.addEventListener('click', (event) => deleteQuiz(event));
     }
-
-    const quizButton = document.getElementById('quiz-button');
-    const statisticsButton = document.getElementById('statistics-button');
-    const mainElement = document.querySelector('main');
-
-    quizButton.addEventListener('click', () => {
-        mainElement.classList.add('active-quiz');
-        mainElement.classList.remove('active-statistics');
-        quizButton.classList.add('active');
-        statisticsButton.classList.remove('active');
-        window.location.href = 'quiz.html'; // Navigate to quiz.html
-    });
-
-    statisticsButton.addEventListener('click', () => {
-        mainElement.classList.add('active-statistics');
-        mainElement.classList.remove('active-quiz');
-        quizButton.classList.remove('active');
-        statisticsButton.classList.add('active');
-        window.location.href = 'statistics.html'; // Navigate to statistics.html
-    });
 });
 
 // function checkSessionToken() {

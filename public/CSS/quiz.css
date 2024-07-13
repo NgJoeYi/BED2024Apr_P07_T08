@@ -10,7 +10,6 @@ main {
 }
 
 .left-button {
-    background-color: #1b2b40;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -28,28 +27,22 @@ main {
     color: #1b2b40;
 }
 
-.active-quiz #statistics-button {
+.left-button.active:hover {
+    background-color: #1b2b40;
+    color: #fff;
+}
+
+.left-button.inactive {
     background-color: transparent;
     color: #1b2b40;
     border: 2px solid #1b2b40;
 }
 
-.active-quiz #statistics-button:hover {
+.left-button.inactive:hover {
     background-color: #1b2b40;
     color: #fff;
+    border: 2px solid #d9aa52;
 }
-
-.active-statistics #quiz-button {
-    background-color: transparent;
-    color: #1b2b40;
-    border: 2px solid #1b2b40;
-}
-
-.active-statistics #quiz-button:hover {
-    background-color: #1b2b40;
-    color: #fff;
-}
-
 
 #quiz-container {
     display: grid;
