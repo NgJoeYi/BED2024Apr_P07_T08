@@ -216,7 +216,10 @@ async function submitEditedReview(reviewId) {
   } else {
       alert('Invalid input');
   }
-}async function submitEditedReview(reviewId) {
+}
+
+
+async function submitEditedReview(reviewId) {
   const newText = document.getElementById('editReviewText').value;
   const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
 
@@ -441,6 +444,7 @@ function openDeleteModal(discussionId) {
     deleteModal.style.display = 'block';
   } else {
     console.error('Delete modal not found');
+    return; // Exit function if modal is not found
   }
 
   const confirmButton = document.getElementById('confirmDelete');
@@ -468,7 +472,7 @@ function openDeleteModal(discussionId) {
   }
 }
 
-function closeDeleteModal() {
+function closeDeleteModalDis() {
   console.log('Closing delete modal');
   const deleteModal = document.getElementById('deleteDiscussionModal');
   if (deleteModal) {
@@ -497,8 +501,9 @@ async function deleteDiscussion(discussionId) {
     }
 
     alert('Discussion and associated comments deleted successfully');
+    closeDeleteModalDis(); // Close the modal after deleting
     fetchUserDiscussions();
-    closeDeleteModal();
+    
   } catch (error) {
     console.error('Error deleting discussion:', error);
     alert('Error deleting discussion: ' + error.message);

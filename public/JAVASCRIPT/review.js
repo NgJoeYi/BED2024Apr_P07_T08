@@ -107,27 +107,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // document.getElementById('filter').addEventListener('change', () => {
-    //     fetchReviews(courseId);
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     const courseId = urlParams.get('courseID');
+    //     if (courseId && !isNaN(courseId)) {
+    //         fetchReviews(courseId);
+    //     } else {
+    //         console.error('Invalid course ID');
+    //     }
     // });
-
+    
     // document.getElementById('sort').addEventListener('change', () => {
-    //     fetchReviews(courseId);
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     const courseId = urlParams.get('courseID');
+    //     if (courseId && !isNaN(courseId)) {
+    //         fetchReviews(courseId);
+    //     } else {
+    //         console.error('Invalid course ID');
+    //     }
     // });
-
-    // document.getElementById('sort').value = 'mostRecent';
 
     document.getElementById('filter').addEventListener('change', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('courseID');
-        fetchReviews(courseId);
+        if (courseId && !isNaN(courseId)) {
+            fetchReviews(courseId);
+        } else {
+            console.error('Invalid course ID');
+        }
     });
     
     document.getElementById('sort').addEventListener('change', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('courseID');
-        fetchReviews(courseId);
+        if (courseId && !isNaN(courseId)) {
+            fetchReviews(courseId);
+        } else {
+            console.error('Invalid course ID');
+        }
     });
     
+
     document.getElementById('sort').value = 'mostRecent';
 });
 
@@ -153,12 +172,42 @@ function closePopup() {
     popup.style.display = 'none';
 }
 
+// async function deleteReview(button) {
+//     const review = button.closest('.review');
+//     const reviewId = review.getAttribute('data-id');
+//     const token = sessionStorage.getItem('token');
+//     // const userId = sessionStorage.getItem('userId');
+//     console.log(`Attempting to delete review with ID: ${reviewId} by user with token: ${token}`); // Debug log
+
+//     try {
+//         const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
+//             method: 'DELETE',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${token}`
+//             }
+//         });
+
+//         if (response.ok) {
+//             alert('Review deleted successfully!');
+//             review.remove();
+//         } else {
+//             const errorMessage = await response.text();
+//             console.error('Failed to delete review:', errorMessage);
+//             alert('You can only delete your own reviews');
+//         }
+//     } catch (error) {
+//         console.error('Error deleting review:', error);
+//         alert('Error deleting review');
+//     }
+// }
+
 async function deleteReview(button) {
     const review = button.closest('.review');
     const reviewId = review.getAttribute('data-id');
     const token = sessionStorage.getItem('token');
-    // const userId = sessionStorage.getItem('userId');
-    // console.log(`Attempting to delete review with ID: ${reviewId} by user ID: ${userId}`);
+
+    console.log(`Attempting to delete review with ID: ${reviewId} by user with token: ${token}`);
 
     try {
         const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
@@ -166,8 +215,7 @@ async function deleteReview(button) {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
-            },
-            // body: JSON.stringify({ userId }) // Include userId in the body
+            }
         });
 
         if (response.ok) {
@@ -192,12 +240,26 @@ function postReview() {
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
     const token = sessionStorage.getItem('token');
 
-    if (!reviewText || !rating || !token || isNaN(courseId)) {
-        alert('Please log in or sign up to add reviews and ensure all fields are filled.');
+    console.log('Posting review with courseId:', courseId, 'reviewText:', reviewText, 'rating:', rating, 'token:', token); // Debug log
+
+    const wordCount = reviewText.trim().split(/\s+/).length;
+
+    if (!reviewText.trim()) {
+        alert('Reviews cannot be empty.');
         return;
     }
-
-    console.log(`Posting review: { reviewText: ${reviewText}, rating: ${rating}, courseId: ${courseId}, token: ${token} }`);
+    if (/^[\p{P}\s]+$/u.test(reviewText)) {
+        alert('Reviews cannot consist solely of punctuation.');
+        return;
+    }
+    if (rating < 1) {
+        alert('Reviews must have a minimum of 1 star.');
+        return;
+    }
+    if (wordCount > 250) {
+        alert('Reviews cannot exceed 250 words.');
+        return;
+    }
 
     fetch('http://localhost:3000/reviews', {
         method: 'POST',
@@ -214,6 +276,7 @@ function postReview() {
         return response.json();
     })
     .then(data => {
+        console.log('Review posted successfully:', data); // Debug log
         alert(data.message);
         closePopup();
         fetchReviews(courseId); // Ensure courseId is passed to fetchReviews
@@ -224,16 +287,19 @@ function postReview() {
     });
 }
 
+
 function editReview(button) {
     const review = button.closest('.review');
     const reviewUserId = parseInt(review.dataset.userId, 10); // Get the user ID from the review
     const token = sessionStorage.getItem('token');
-    // const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage
+    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
 
-    // if (reviewUserId !== currentUserId) {
-    //     alert('You can only edit your own reviews.');
-    //     return;
-    // }
+    console.log('Editing review with ID:', review.getAttribute('data-id'), 'by user ID:', reviewUserId); // Debug log
+
+    if (reviewUserId !== currentUserId) {
+        alert('You can only edit your own reviews.');
+        return;
+    }
 
     const reviewText = review.querySelector('.review-details p').textContent;
     const reviewStars = review.querySelectorAll('.fa-star');
@@ -257,29 +323,65 @@ function editReview(button) {
     postButton.onclick = () => {
         const updatedText = document.getElementById('review-text').value;
         const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
+        const reviewId = review.getAttribute('data-id');
 
-        fetch(`http://localhost:3000/reviews/${review.getAttribute('data-id')}`, {
+        console.log('Updating review with ID:', reviewId, 'updatedText:', updatedText, 'updatedRating:', updatedRating); // Debug log
+
+        const wordCount = updatedText.trim().split(/\s+/).length;
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = parseInt(urlParams.get('courseID'), 10); // Ensure courseId is an integer
+
+        if (!updatedText.trim()) {
+            alert('Reviews cannot be empty.');
+            return;
+        }
+        if (/^[\p{P}\s]+$/u.test(updatedText)) {
+            alert('Reviews cannot consist solely of punctuation.');
+            return;
+        }
+        if (updatedRating < 1) {
+            alert('Reviews must have a minimum of 1 star.');
+            return;
+        }
+        if (wordCount > 250) {
+            alert('Reviews cannot exceed 250 words.');
+            return;
+        }
+
+        fetch(`http://localhost:3000/reviews/${reviewId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ review_text: updatedText, rating: updatedRating }) // Include userId - no more aft jwt
+            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId }) // Ensure correct JSON structure
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Review updated successfully:', data); // Debug log
             alert(data.message);
             closePopup();
-            fetchReviews();
+
+            // Fetch the courseId from the URL and ensure it is passed to fetchReviews
+            console.log('Fetching reviews after update with courseId:', courseId); // Debug log
+            fetchReviews(courseId);
         })
-        .catch(error => console.error('Error updating review:', error));
+        .catch(error => {
+            console.error('Error updating review:', error);
+            alert(`Error updating review: ${error.message || 'Internal Server Error'}`);
+        });
     };
 }
 
 function fetchReviews(courseId) {
-    console.log('Course Id in fetchReviews(courseId)', courseId);
+    console.log('Course Id in fetchReviews(courseId):', courseId);
     if (isNaN(courseId)) {
-        console.error('Invalid course ID');
+        console.error('Invalid course ID:', courseId); // Debug log
         return;
     }
 
@@ -288,8 +390,24 @@ function fetchReviews(courseId) {
     const token = sessionStorage.getItem('token'); // Get the token from session storage
     const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
 
-    fetch(`http://localhost:3000/reviews?courseId=${courseId}&filter=${filter}&sort=${sort}`)
-        .then(response => response.json())
+    let url = `http://localhost:3000/reviews/course/${courseId}`;
+    if (filter !== 'all') {
+        url += `/rating/${filter}`;
+    }
+    if (sort !== 'mostRecent') {
+        url += `/sort/${sort}`;
+    }
+
+    console.log('Fetching reviews with URL:', url); // Debug log
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                console.error('Failed to fetch reviews:', response.statusText); // Debug log
+                throw new Error('Failed to fetch reviews');
+            }
+            return response.json();
+        })
         .then(reviews => {
             console.log('Fetched Reviews:', reviews); // Log the fetched reviews
             if (!Array.isArray(reviews)) {
@@ -340,7 +458,11 @@ function fetchReviews(courseId) {
 }
 
 function getUserIdFromToken(token) {
-    if (!token) return null;
+    if (!token) {
+        console.log('No token found'); // Debug log
+        return null;
+    }
     const payload = JSON.parse(atob(token.split('.')[1]));
+    console.log('Payload from token:', payload); // Debug log
     return payload.id;
 }

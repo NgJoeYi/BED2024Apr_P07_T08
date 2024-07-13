@@ -47,14 +47,15 @@ const validateUpdateDiscussion = (req, res, next) => {
 // Controller functions
 const getDiscussions = async (req, res) => {
     try {
-        const { category = 'all', sort = 'most-recent' } = req.query;
-        const discussions = await discussionModel.getDiscussions(category, sort);
+        const { category = 'all', sort = 'most-recent', search = '' } = req.query;
+        const discussions = await discussionModel.getDiscussions(category, sort, search);
         res.json({ success: true, discussions });
     } catch (err) {
         console.error('Error getting discussions:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 };
+
 
 const getDiscussionById = async (req, res) => {
     const discussionId = req.params.id;

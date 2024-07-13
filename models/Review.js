@@ -54,9 +54,8 @@ async function getAllReviews(courseId, filter = 'all', sort = 'mostRecent') {
 }
 
 async function getReviewById(id) {
-    let connection;
     try {
-        connection = await sql.connect(dbConfig);
+        const connection = await sql.connect(dbConfig);
         const result = await connection.request()
             .input('review_id', sql.Int, id)
             .query(`
@@ -70,15 +69,14 @@ async function getReviewById(id) {
     } catch (err) {
         console.error('Error fetching review:', err.message);
         throw new Error('Error fetching review');
-    } finally {
-        if (connection) {
-            await connection.close();
-        }
     }
 }
 
 async function updateReview(connection, id, review_text, rating) {
     try {
+        console.log('Executing update query for review ID:', id);
+        console.log('Update values - review_text:', review_text, ', rating:', rating);
+        
         await connection.request()
             .input('review_id', sql.Int, id)
             .input('review_text', sql.NVarChar, review_text)
@@ -88,7 +86,10 @@ async function updateReview(connection, id, review_text, rating) {
                 SET review_text = @review_text, rating = @rating
                 WHERE review_id = @review_id
             `);
+
+        console.log('Review update query executed successfully');
     } catch (err) {
+        console.error('Error executing update query:', err.message);
         throw new Error('Error updating review: ' + err.message);
     }
 }
@@ -125,10 +126,13 @@ async function deleteReview(connection, id) {
                 DELETE FROM user_reviews
                 WHERE review_id = @review_id
             `);
+        console.log('Review deleted successfully for ID:', id);
     } catch (err) {
+        console.error('Error executing delete query:', err.message);
         throw new Error('Error deleting review: ' + err.message);
     }
 }
+
 
 async function getReviewCount(courseId) {
     let connection;

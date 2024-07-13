@@ -1,5 +1,6 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
+const { devNull } = require('os');
 
 class Courses {
     constructor(courseID, userID, title, description, category, level, duration, createdAt, courseImage) {
@@ -54,6 +55,71 @@ class Courses {
         } catch (error) {
             console.error('Error retrieving course:', error);
             throw error;
+        }finally{
+            await connection.close();
+        }
+    }
+
+    // for filtering  by category
+    static async getAllCategories(){
+        const connection = await sql.connect(dbConfig);
+        try{
+            const sqlQuery = `SELECT Category FROM Courses`;
+            const result = await connection.request().query(sqlQuery);
+            return result.recordset;
+        }catch(error){
+            console.error('Error retrieving categories of courses:', error);
+            throw error;
+
+        }finally{
+            await connection.close();
+        }
+    }
+    static async filterByCategory(category) {
+        const connection = await sql.connect(dbConfig);
+        try {
+          const sqlQuery = `SELECT * FROM Courses WHERE Category = @category`;
+          const request = await connection.request();
+          request.input('category', sql.NVarChar, category);
+          const result = await request.query(sqlQuery);
+          return result.recordset;
+        } catch (error) {
+          console.error('Error retrieving courses by category:', error);
+          throw error;
+        } finally {
+          await connection.close();
+        }
+    }      
+
+    // for filtering by most recent on top
+    static async getMostRecentCourses(){
+        const connection = await sql.connect(dbConfig);
+        try{
+            const sqlQuery  = `select * from Courses ORDER BY CreatedAt DESC`
+            const result = await connection.request().query(sqlQuery);
+            return result.recordset;
+
+        }catch(error){
+            console.error('Error retrieving most recent courses', error);
+            throw error;
+
+        }finally{
+            await connection.close();
+        }
+    }
+
+       // for filtering by earliest on top 
+       static async getEarliestCourses(){
+        const connection = await sql.connect(dbConfig);
+        try{
+            const sqlQuery  = `select * from Courses ORDER BY CreatedAt ASC`
+            const result = await connection.request().query(sqlQuery);
+            return result.recordset;
+
+        }catch(error){
+            console.error('Error retrieving most earliest courses', error);
+            throw error;
+
         }finally{
             await connection.close();
         }
@@ -188,6 +254,21 @@ class Courses {
             await connection.close();
         }
           
+    }
+    static async searchCourses(searchTerm) {
+        const connection = await sql.connect(dbConfig);
+        try {
+            const sqlQuery = `SELECT * FROM Courses WHERE Title LIKE @searchTerm`;
+            const request = await connection.request();
+            request.input('searchTerm', sql.NVarChar, `%${searchTerm}%`);
+            const result = await request.query(sqlQuery);
+            return result.recordset;
+        } catch (error) {
+            console.error('Error searching for courses:', error);
+            throw error;
+        } finally {
+            await connection.close();
+        }
     }
 }
 module.exports = Courses;

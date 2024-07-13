@@ -16,41 +16,51 @@ class Discussion {
     }
 
     // Updated getDiscussions method in the Discussion model
-static async getDiscussions(category, sort) {
-    try {
-        let query = `
-            SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username, 
-                   ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
-            FROM Discussions d
-            LEFT JOIN Users u ON d.user_id = u.id
-            LEFT JOIN ProfilePic p ON u.id = p.user_id
-        `;
-
-        if (category && category !== 'all') {
-            query += ` WHERE d.category = @category`;
+    static async getDiscussions(category, sort, search) {
+        try {
+            let query = `
+                SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, u.name AS username, 
+                       ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
+                FROM Discussions d
+                LEFT JOIN Users u ON d.user_id = u.id
+                LEFT JOIN ProfilePic p ON u.id = p.user_id
+                WHERE 1=1
+            `;
+    
+            if (category && category !== 'all') {
+                query += ` AND d.category = @category`;
+            }
+    
+            if (search) {
+                query += ` AND (d.title LIKE @search OR d.description LIKE @search)`;
+            }
+    
+            if (sort === 'most-recent') {
+                query += ` ORDER BY d.posted_date DESC`;
+            } else if (sort === 'oldest') {
+                query += ` ORDER BY d.posted_date ASC`;
+            }
+    
+            const pool = await sql.connect(dbConfig);
+            const request = pool.request();
+    
+            if (category && category !== 'all') {
+                request.input('category', sql.NVarChar, category);
+            }
+    
+            if (search) {
+                request.input('search', sql.NVarChar, `%${search}%`);
+            }
+    
+            const result = await request.query(query);
+            return result.recordset.map(row => new Discussion(
+                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.username, row.profilePic, row.role
+            ));
+        } catch (err) {
+            throw new Error(`Error getting discussions: ${err.message}`);
         }
-
-        if (sort === 'most-recent') {
-            query += ` ORDER BY d.posted_date DESC`;
-        } else if (sort === 'oldest') {
-            query += ` ORDER BY d.posted_date ASC`;
-        }
-
-        const pool = await sql.connect(dbConfig);
-        const request = pool.request();
-
-        if (category && category !== 'all') {
-            request.input('category', sql.NVarChar, category);
-        }
-
-        const result = await request.query(query);
-        return result.recordset.map(row => new Discussion(
-            row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.username, row.profilePic, row.role
-        ));
-    } catch (err) {
-        throw new Error(`Error getting discussions: ${err.message}`);
     }
-}
+    
 
     // Fetch a specific discussion by ID
     static async getDiscussionById(discussionId) {

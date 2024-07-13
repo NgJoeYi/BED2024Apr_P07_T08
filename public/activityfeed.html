@@ -46,10 +46,12 @@
     <div class="question-section">
         <div class="search-container">
             <i class="fa fa-search search-icon"></i>
-            <input type="text" placeholder="Search.." class="question-input" style="padding-left:30px;">
+            <input type="text" id="search-input" placeholder="Search.." class="question-input" style="padding-left:30px;">
+            <button id="clear-search" class="clear-search-button" onclick="clearSearch()">✖</button>
         </div>
+        <button class="refresh-button" onclick="fetchDiscussions()">Search</button>
         <button class="add-button-activity" onclick="openPopup()">+</button>
-        <button class="refresh-button" onclick="fetchDiscussions()">Refresh</button>
+        
     </div>
 
     <div class="filter-sort-unique">
