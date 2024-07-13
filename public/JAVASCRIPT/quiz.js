@@ -117,8 +117,7 @@ function displayQuizzes(quizzes) {
             quizImage.src = `data:image/jpeg;base64,${base64String}`;
             // console.log('Base64 Image String:', base64String); // Log the base64 image string
         } else {
-            console.log('Using default placeholder image');
-            quizImage.src = 'default_placeholder_image.jpg'; // Path to default placeholder image
+            console.log('cannot get image.....');
         }
         quizCard.appendChild(quizImage);
 
