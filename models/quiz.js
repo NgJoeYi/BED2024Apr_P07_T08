@@ -2,15 +2,17 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 class Quiz {
-    constructor(quiz_id, title, description, total_questions, total_marks, created_by, creator_name, quizImg) {
+    constructor(quiz_id, title, description, total_questions, total_marks, created_by, quizImg, creator_name = null) {
         this.quiz_id = quiz_id;
         this.title = title;
         this.description = description;
         this.total_questions = total_questions;
         this.total_marks = total_marks;
         this.created_by = created_by;
-        this.creator_name = creator_name;
         this.quizImg = quizImg;
+        if (creator_name) {
+            this.creator_name = creator_name;
+        }
     }
 
     static async createQuiz(newQuizData) {
@@ -85,7 +87,7 @@ class Quiz {
             //result.recordset.forEach(quiz => console.log(quiz.created_by));
             return result.recordset.map(quiz => 
                 new Quiz(quiz.quiz_id, quiz.title, quiz.description, quiz.total_questions, 
-                    quiz.total_marks, quiz.created_by, quiz.creator_name, quiz.quizImg));
+                    quiz.total_marks, quiz.created_by, quiz.quizImg, quiz.creator_name));
         } catch (error) {
             console.error('Error retrieving quizzes:', error);
             throw error;
