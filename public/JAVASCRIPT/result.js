@@ -25,8 +25,18 @@ function fetchQuizResult(attemptId) {
 
 function displayResult(result) {
     const resultContainer = document.getElementById('result-container');
-    const attemptDate = new Date(result.AttemptDate);
-    const formattedDate = `${attemptDate.getDate().toString().padStart(2, '0')}/${(attemptDate.getMonth() + 1).toString().padStart(2, '0')}/${attemptDate.getFullYear()} ${attemptDate.getHours().toString().padStart(2, '0')}:${attemptDate.getMinutes().toString().padStart(2, '0')}:${attemptDate.getSeconds().toString().padStart(2, '0')}`;
+
+    const attemptDateStr = result.AttemptDate;
+
+    // Split the date string into date and time parts
+    const [datePart, timePart] = attemptDateStr.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hour, minute, second] = timePart.split(':');
+
+    // Reformat the date and time parts
+    const formattedDate = `${day}/${month}/${year} ${hour}:${minute}:${second.slice(0, 2)}`;
+
+
 
     resultContainer.innerHTML = `
         <div class="result-card">
