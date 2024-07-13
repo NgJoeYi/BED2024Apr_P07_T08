@@ -1,0 +1,17 @@
+.chart-container {
+    padding-top: 50px; /* Ensure content is below the navbar */
+    width: 80%;
+    height: 60vh;
+    margin: 0 auto;
+    padding-bottom: 100px; /* Ensure content is below the navbar */
+}
+
+.inspirational-text {
+    padding-top: 220px; /* Ensure content is below the navbar */
+    text-align: center; /* Center align the text */
+    font-size: 1.2em; /* Adjust font size as needed */
+    margin-top: 20px; /* Add space above the text */
+    margin-bottom: 20px; /* Add space below the text */
+    color: #333; /* Text color */
+    font-weight: bold; /* Make the text bold */
+}
