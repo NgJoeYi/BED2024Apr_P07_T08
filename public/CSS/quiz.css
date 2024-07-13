@@ -9,6 +9,27 @@ main {
     align-items: center; /* Center align items */
 }
 
+.left-buttons-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    gap: 10px; /* Space between buttons */
+    margin-bottom: 20px; /* Space below the buttons */
+}
+
+.left-button {
+    background-color: #1b2b40;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.left-button:hover {
+    background-color: #d9aa52;
+}
+
 #quiz-container {
     display: grid;
     grid-template-columns: repeat(4, 1fr); /* Ensure four quizzes per row */
