@@ -2,13 +2,14 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 class Quiz {
-    constructor(quiz_id, title, description, total_questions, total_marks, created_by, quizImg) {
+    constructor(quiz_id, title, description, total_questions, total_marks, created_by, creator_name, quizImg) {
         this.quiz_id = quiz_id;
         this.title = title;
         this.description = description;
         this.total_questions = total_questions;
         this.total_marks = total_marks;
         this.created_by = created_by;
+        this.creator_name = creator_name;
         this.quizImg = quizImg;
     }
 
@@ -73,7 +74,7 @@ class Quiz {
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            SELECT Quizzes.quiz_id, Quizzes.title, Quizzes.description, Quizzes.total_questions, Quizzes.total_marks, Quizzes.quizImg, Users.name AS 'creator_name' 
+            SELECT Quizzes.quiz_id, Quizzes.title, Quizzes.description, Quizzes.total_questions, Quizzes.total_marks, Quizzes.quizImg, Quizzes.created_by, Users.name AS 'creator_name' 
             FROM Quizzes INNER JOIN Users ON Quizzes.created_by = Users.id
             `;
             const request = connection.request();
@@ -81,7 +82,10 @@ class Quiz {
             if (result.recordset.length === 0) {
                 return null;
             }
-            return result.recordset.map(quiz => new Quiz(quiz.quiz_id , quiz.title, quiz.description, quiz.total_questions, quiz.total_marks, quiz.creator_name, quiz.quizImg));
+            //result.recordset.forEach(quiz => console.log(quiz.created_by));
+            return result.recordset.map(quiz => 
+                new Quiz(quiz.quiz_id, quiz.title, quiz.description, quiz.total_questions, 
+                    quiz.total_marks, quiz.created_by, quiz.creator_name, quiz.quizImg));
         } catch (error) {
             console.error('Error retrieving quizzes:', error);
             throw error;
