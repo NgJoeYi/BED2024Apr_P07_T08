@@ -34,38 +34,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function renderPassFailStatistics(statistics) {
-    const ctx = document.getElementById('passFailChart').getContext('2d');
-    const labels = statistics.map(stat => stat.title);
-    const passCounts = statistics.map(stat => stat.PassCount);
-    const failCounts = statistics.map(stat => stat.FailCount);
+    const chartContainer = document.querySelector('.chart-container');
+    chartContainer.innerHTML = ''; // Clear previous charts if any
 
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: labels.flatMap(label => [`${label} Pass`, `${label} Fail`]),
-            datasets: [{
-                label: 'Pass/Fail Statistics',
-                data: statistics.flatMap(stat => [stat.PassCount, stat.FailCount]),
-                backgroundColor: [
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(255, 99, 132, 0.2)',
-                ],
-                borderColor: [
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(255, 99, 132, 1)',
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                },
+    statistics.forEach(stat => {
+        const chartDiv = document.createElement('div');
+        chartDiv.className = 'chart';
+        const canvas = document.createElement('canvas');
+        chartDiv.appendChild(canvas);
+        chartContainer.appendChild(chartDiv);
+
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [`${stat.title} Pass`, `${stat.title} Fail`],
+                datasets: [{
+                    label: `${stat.title} Pass/Fail Statistics`,
+                    data: [stat.PassCount, stat.FailCount],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)',
+                    ],
+                    borderWidth: 1
+                }]
             },
-        }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                },
+            }
+        });
     });
 }
