@@ -24,7 +24,7 @@ const updateValidation = require('./middleware/updateValidation');
 const quizValidation = require('./middleware/quizzesMiddleware');
 const jwtAuthorization = require('./middleware/authMiddleware');
 const commentValidation = require('./middleware/commentValidation');
-// const reviewValidation = require('./middleware/reviewValidation');
+const reviewValidation = require('./middleware/reviewValidation'); 
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -97,22 +97,31 @@ app.post('/comments', jwtAuthorization.verifyJWT, commentValidation, commentCont
 app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
 
 // Add Routes for reviews
-app.get('/reviews', reviewController.getReviews); //Filtering & Sorting is done here also done using route, using this.
+app.get('/reviews', reviewController.getReviews); //Here alr have default filter to ALL and default sort to MOST RECENT
+app.get('/reviews/rating/:rating', reviewController.getReviewsByRating); // Filter by specific rating
+app.get('/reviews/sort/:sort', reviewController.getReviewsSortedByRating); // Sort by specific rating
+app.get('/reviews/course/:courseId', reviewController.getReviewsByCourseId); // Filter by specific course ID
+app.get('/reviews/course/:courseId/rating/:rating', reviewController.getReviewsByCourseIdAndRating); // Filter by course ID and rating
+app.get('/reviews/course/:courseId/sort/:sort', reviewController.getReviewsByCourseIdAndSort); // Filter by course ID and sort
 app.get('/reviews/count', reviewController.getReviewCount); 
-// app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview); // -- jwt
-// app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview); // -- jwt
-app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.updateReview); // -- jwt
-app.post('/reviews', jwtAuthorization.verifyJWT, reviewController.createReview); // -- jwt
+app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview);
+app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview);
 app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt
 
 // Add Routes for courses
 app.get('/courses', courseController.getAllCourses);
+app.get('/courses/categories',courseController.getAllCategories); // for filtering by category4
+app.get('/courses/filter', courseController.filterByCategory);
+app.get('/courses/mostRecent',courseController.getMostRecentCourses); // for filtering by most recent made courses
+app.get('/courses/earliest',courseController.getEarliestCourses); // for filtering by earliest made courses
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
+app.get('/courses/search', courseController.searchCourses);
 app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.updateCourse);
 app.post('/courses', jwtAuthorization.verifyJWT, upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/noLectures', jwtAuthorization.verifyJWT, courseController.deleteCourseWithNoLectures);
 app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
+
 
 
 // Add Routes for lectures

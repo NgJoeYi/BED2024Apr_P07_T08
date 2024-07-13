@@ -100,6 +100,9 @@ function fetchQuizzes() {
 function displayQuizzes(quizzes) {
     const quizContainer = document.getElementById('quiz-container');
     quizContainer.innerHTML = '';
+    const userId = parseInt(sessionStorage.getItem('userId')); // current user's ID from session storage
+    // console.log('userId:', userId);
+
 
     quizzes.forEach(quiz => {
         // console.log('Quiz data:', quiz); // Log quiz data to check if quizImg is present
@@ -114,8 +117,7 @@ function displayQuizzes(quizzes) {
             quizImage.src = `data:image/jpeg;base64,${base64String}`;
             // console.log('Base64 Image String:', base64String); // Log the base64 image string
         } else {
-            console.log('Using default placeholder image');
-            quizImage.src = 'default_placeholder_image.jpg'; // Path to default placeholder image
+            console.log('cannot get image.....');
         }
         quizCard.appendChild(quizImage);
 
@@ -146,40 +148,42 @@ function displayQuizzes(quizzes) {
             startButton.onclick = () => window.location.href = `/question.html?quizId=${quiz.quiz_id}`;
             buttonContainer.appendChild(startButton);  
     
-        // CHANGED FOR DROP DOWN: Add dropdown menu
-        const dropdown = document.createElement('div');
-        dropdown.className = 'dropdown';
-        const dropdownToggle = document.createElement('span');
-        dropdownToggle.className = 'fa fa-ellipsis-v dropdown-toggle';
-        dropdownToggle.style.cursor = 'pointer';
-        dropdown.appendChild(dropdownToggle);
+        // Add dropdown menu only if the current user is the creator of the quiz
+        console.log('Comparing userId:', userId, 'with quiz.created_by:', quiz.created_by);
+        if (userId === quiz.created_by) {
+            const dropdown = document.createElement('div');
+            dropdown.className = 'dropdown';
+            const dropdownToggle = document.createElement('span');
+            dropdownToggle.className = 'fa fa-ellipsis-v dropdown-toggle';
+            dropdownToggle.style.cursor = 'pointer';
+            dropdown.appendChild(dropdownToggle);
 
-        const dropdownMenu = document.createElement('div');
-        dropdownMenu.className = 'dropdown-menu';
-        const editDeleteQuizLink = document.createElement('a');
-        editDeleteQuizLink.href = '#';
-        editDeleteQuizLink.className = 'edit-delete-quiz';
-        editDeleteQuizLink.innerText = 'Edit / Delete Quiz';
-        editDeleteQuizLink.onclick = (event) => {
-            event.preventDefault();
-            openUpdateModal(quiz);
-        };
-        dropdownMenu.appendChild(editDeleteQuizLink);
+            const dropdownMenu = document.createElement('div');
+            dropdownMenu.className = 'dropdown-menu';
+            const editDeleteQuizLink = document.createElement('a');
+            editDeleteQuizLink.href = '#';
+            editDeleteQuizLink.className = 'edit-delete-quiz';
+            editDeleteQuizLink.innerText = 'Edit / Delete Quiz';
+            editDeleteQuizLink.onclick = (event) => {
+                event.preventDefault();
+                openUpdateModal(quiz);
+            };
+            dropdownMenu.appendChild(editDeleteQuizLink);
 
-        const editDeleteQuestionLink = document.createElement('a');
-        editDeleteQuestionLink.href = '#';
-        editDeleteQuestionLink.className = 'edit-delete-question';
-        editDeleteQuestionLink.innerText = 'Edit / Delete Question';   
-        
-        editDeleteQuestionLink.onclick = (event) => {
-            event.preventDefault();
-            window.location.href = `Question.html?quizId=${quiz.quiz_id}&edit-mode=true`; // Navigate to Question.html with quizId and edit-mode
-        };
-        dropdownMenu.appendChild(editDeleteQuestionLink);
-        
+            const editDeleteQuestionLink = document.createElement('a');
+            editDeleteQuestionLink.href = '#';
+            editDeleteQuestionLink.className = 'edit-delete-question';
+            editDeleteQuestionLink.innerText = 'Edit / Delete Question';   
 
-        dropdown.appendChild(dropdownMenu);
-        buttonContainer.appendChild(dropdown);
+            editDeleteQuestionLink.onclick = (event) => {
+                event.preventDefault();
+                window.location.href = `Question.html?quizId=${quiz.quiz_id}&edit-mode=true`; // Navigate to Question.html with quizId and edit-mode
+            };
+            dropdownMenu.appendChild(editDeleteQuestionLink);
+
+            dropdown.appendChild(dropdownMenu);
+            buttonContainer.appendChild(dropdown);
+        }
 
         quizCardContent.appendChild(buttonContainer);
         quizCard.appendChild(quizCardContent);

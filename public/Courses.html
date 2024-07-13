@@ -64,12 +64,7 @@
             <div class="filter-unique">
                 Filter by: 
                 <select id="filter-category">
-                    <option value="all">All</option>
-                    <option value="math">Math</option>
-                    <option value="coding">Coding</option>
-                    <option value="english">English</option>
-                    <option value="microsoft">Microsoft</option>
-                    <!-- Add more categories as needed -->
+                    <!-- populate from backend code  -->
                 </select>
             </div>
             <div class="sort-unique">
@@ -105,11 +100,9 @@
             <!-- Repeat course-cd-unique for more courses -->
         </div>
         <div class="pagination-unique">
-          <span>&lt;</span>
-          <span>1</span>
-          <span>2</span>
-          <span>3</span>
-          <span>&gt;</span>
+          <span id = "prev-page">&lt;</span>
+          <span id="current-page">1</span>
+          <span id="next-page">&gt;</span>
           <!-- Pagination buttons -->
         </div>
       </div>
