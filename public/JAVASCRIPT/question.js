@@ -143,7 +143,7 @@ function submitQuiz() {
 
     const userResponsesArray = questions.map((question) => ({
         question_id: question.question_id,
-        selected_option: userResponses[question.question_id] || null
+        selected_option: userResponses[question.question_id]
     }));
 
     fetch(`/submitQuiz`, {
@@ -158,15 +158,21 @@ function submitQuiz() {
             timeTaken: totalSeconds // Include the total time taken
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.attemptId) {
-            window.location.href = `/result.html?attemptId=${data.attemptId}`;
+    .then(response => {
+        return response.json().then(data => ({ status: response.status, body: data }));
+    })
+    .then(({ status, body }) => {
+        if (status === 200) {
+            window.location.href = `/result.html?attemptId=${body.attemptId}`;
         } else {
-            console.error('Error submitting quiz:', data.message);
+            console.error('Error submitting quiz:', body.message);
+            alert(body.message); // Display the backend error message
         }
     })
-    .catch(error => console.error('Error submitting quiz:', error));
+    .catch(error => {
+        console.error('Error submitting quiz:', error);
+        alert('An error occurred while submitting the quiz. Please try again later.');
+    });
 }
 
 

@@ -338,7 +338,7 @@ const deleteQuestion = async (req, res) => {
 
 
 
-
+// check if all qns r attempted
 const submitQuiz = async (req, res) => {
     const { quizId, responses, timeTaken } = req.body;
     const userId = req.user.id;
@@ -352,6 +352,11 @@ const submitQuiz = async (req, res) => {
         }
         const totalMarks = quizDetails.total_marks; // need total marks to determine whether pass or fail 
         const totalQuestions = quizDetails.total_questions;
+
+        // Check if all questions have responses
+        if (responses.length < totalQuestions || responses.some(response => response.selected_option === null)) {
+            return res.status(400).json({ message: 'All questions must be answered.' });
+        }
 
         // Create the quiz attempt record before saving responses
         const attemptId = await Quiz.createQuizAttempt(userId, quizId, totalScore, false, timeTaken);
