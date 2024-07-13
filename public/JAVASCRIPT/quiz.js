@@ -137,7 +137,7 @@ function displayQuizzes(quizzes) {
         quizDetails.innerHTML = `
             <strong>Total Questions:</strong> ${quiz.total_questions} | 
             <strong>Total Marks:</strong> ${quiz.total_marks} | 
-            <strong>Created By:</strong> ${quiz.created_by}`;
+            <strong>Created By:</strong> ${quiz.creator_name}`;
             quizCardContent.appendChild(quizDetails);
 
             const buttonContainer = document.createElement('div');  
