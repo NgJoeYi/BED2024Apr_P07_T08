@@ -394,7 +394,7 @@ const getAttemptCount = async (req, res) => { // so i can display number of atte
     const userId = req.user.id;
     try {
         const count = await Quiz.getAttemptCount(userId);
-        res.status(200).json({ attemptCount: count });
+        res.status(200).json(count);
     } catch (error) {
         console.error('Get Attempt Count - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
