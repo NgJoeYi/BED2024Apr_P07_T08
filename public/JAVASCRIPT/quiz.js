@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Set active state based on the current page
+    const quizButton = document.getElementById('quiz-button');
+    const statisticsButton = document.getElementById('statistics-button');
+
+    quizButton.classList.add('active');
+    quizButton.classList.remove('inactive');
+    statisticsButton.classList.remove('active');
+    statisticsButton.classList.add('inactive');
+
+    quizButton.addEventListener('click', () => {
+        window.location.href = 'quiz.html'; // Navigate to quiz.html
+    });
+
+    statisticsButton.addEventListener('click', () => {
+        window.location.href = 'statistics.html'; // Navigate to statistics.html
+    });
+
     // checkSessionToken();
     fetchQuizzes();
 

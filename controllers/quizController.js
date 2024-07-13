@@ -450,6 +450,16 @@ const getAllQuizResultsForUser = async (req, res) => { // for account page
     }
 };
 
+const getQuizPassFailStatistics = async (req, res) => {
+    try {
+        const stats = await Quiz.getQuizPassFailStatistics();
+        res.status(200).json(stats);
+    } catch (error) {
+        console.error('Error fetching pass/fail statistics:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 
 module.exports = {
     createQuiz,
@@ -464,5 +474,6 @@ module.exports = {
     getAttemptCount,
     submitQuiz,
     updateQuestion,
-    deleteQuestion
+    deleteQuestion,
+    getQuizPassFailStatistics
 }

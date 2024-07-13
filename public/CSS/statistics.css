@@ -1,0 +1,77 @@
+.chart-container {
+    padding-top: 50px; /* Ensure content is below the navbar */
+    width: 80%;
+    margin: 0 auto;
+    padding-bottom: 50px; /* Add some padding at the bottom */
+}
+
+.chart {
+    width: 100%;
+    height: 400px; /* Adjust height as needed */
+    margin-bottom: 50px; /* Add space between charts */
+}
+
+.inspirational-text {
+    padding-top: 150px; /* Ensure content is below the navbar */
+    text-align: center; /* Center align the text */
+    font-size: 1.2em; /* Adjust font size as needed */
+    margin-top: 20px; /* Add space above the text */
+    margin-bottom: 20px; /* Add space below the text */
+    color: #333; /* Text color */
+    font-weight: bold; /* Make the text bold */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---------------- button css dont touch ---------------- */
+
+.left-buttons-container {
+    padding-top: 10px; /* Ensure content is below the navbar */
+    margin-top: 20px; /* Adjust as needed */
+    text-align: center; /* Center align the buttons */
+}
+
+.left-button {
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.left-button:hover {
+    background-color: #d9aa52;
+}
+
+.left-button.active {
+    background-color: #d9aa52;
+    color: #1b2b40;
+}
+
+.left-button.active:hover {
+    background-color: #1b2b40;
+    color: #fff;
+}
+
+.left-button.inactive {
+    background-color: transparent;
+    color: #1b2b40;
+    border: 2px solid #1b2b40;
+}
+
+.left-button.inactive:hover {
+    background-color: #1b2b40;
+    color: #fff;
+    border: 2px solid #d9aa52;
+}

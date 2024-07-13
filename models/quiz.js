@@ -746,6 +746,31 @@ class Quiz {
             }
         }
     }
+
+    // ------- pass fail stats
+    static async getQuizPassFailStatistics() {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT Quizzes.quiz_id, Quizzes.title,
+            (SELECT COUNT(*) FROM UserQuizAttempts WHERE quiz_id = Quizzes.quiz_id) AS TotalAttempts,
+            (SELECT COUNT(*) FROM UserQuizAttempts WHERE quiz_id = Quizzes.quiz_id AND passed = 1) AS PassCount,
+            (SELECT COUNT(*) FROM UserQuizAttempts WHERE quiz_id = Quizzes.quiz_id AND passed = 0) AS FailCount
+            FROM Quizzes;
+            `;
+            const request = connection.request();
+            const result = await request.query(sqlQuery);
+            return result.recordset;
+        } catch (error) {
+            console.error('Error fetching pass/fail statistics:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 }
 
 module.exports= Quiz;
