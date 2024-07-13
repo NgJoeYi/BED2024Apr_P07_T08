@@ -9,12 +9,7 @@ main {
     align-items: center; /* Center align items */
 }
 
-.left-buttons-container {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    gap: 10px; /* Space between buttons */
-    margin-bottom: 20px; /* Space below the buttons */
-}
+/* Existing CSS */
 
 .left-button {
     background-color: #1b2b40;
@@ -29,6 +24,34 @@ main {
 .left-button:hover {
     background-color: #d9aa52;
 }
+
+.left-button.active {
+    background-color: #d9aa52;
+    color: #1b2b40;
+}
+
+.active-quiz #statistics-button {
+    background-color: transparent;
+    color: #1b2b40;
+    border: 2px solid #1b2b40;
+}
+
+.active-quiz #statistics-button:hover {
+    background-color: #1b2b40;
+    color: #fff;
+}
+
+.active-statistics #quiz-button {
+    background-color: transparent;
+    color: #1b2b40;
+    border: 2px solid #1b2b40;
+}
+
+.active-statistics #quiz-button:hover {
+    background-color: #1b2b40;
+    color: #fff;
+}
+
 
 #quiz-container {
     display: grid;
