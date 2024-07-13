@@ -216,6 +216,7 @@ const getQuizWithQuestions = async (req, res) => {
     }
 };
 
+// need to check if the correct option updated is the same with one of the options given
 const updateQuestion = async (req, res) => { // get back to here
     const qnsId = req.params.questionId;
     const quizId = req.params.quizId;
@@ -232,6 +233,23 @@ const updateQuestion = async (req, res) => { // get back to here
         const checkQns = await Quiz.getQuestionById(qnsId);
         if (!checkQns) {
             return res.status(404).json({ message: 'Question does not exist' });
+        }
+
+        // Validate that the correct option is one of the provided options
+        const options = [
+            newQuestionData.option_1.toLowerCase(),
+            newQuestionData.option_2.toLowerCase(),
+            newQuestionData.option_3.toLowerCase(),
+            newQuestionData.option_4.toLowerCase()
+        ];
+
+        const correctOptionExists = options.includes(newQuestionData.correct_option.toLowerCase()); // compare options in lower case
+        if (!correctOptionExists) {
+            return res.status(400).json({ message: 'Correct option must be one of the given options' });
+        }
+
+        if (newQuestionData.question_text) { // make sure sentences starts with caps 
+            newQuestionData.question_text = newQuestionData.question_text.charAt(0).toUpperCase() + newQuestionData.question_text.slice(1);
         }
 
         if (newQuestionData.qnsImg) {
@@ -336,7 +354,7 @@ const deleteQuestion = async (req, res) => {
 // 4. also display it in the user's profile page
 
 
-
+// maybe for incorrect answers table, can use it to create pie chart to represent statistics of ppl's score
 
 // check if all qns r attempted
 const submitQuiz = async (req, res) => {
@@ -367,9 +385,11 @@ const submitQuiz = async (req, res) => {
             await Quiz.saveUserResponse(attemptId, question_id, selected_option);
 
             // Check each answer and calculate the total score
-            const isCorrect = await Quiz.isCorrectAnswer(question_id, selected_option);
-            if (isCorrect) {
+            const correctOption = await Quiz.isCorrectAnswer(question_id); // getting the correct option
+            if (correctOption.toLowerCase() === selected_option.toLowerCase()) {
                 totalScore++;
+            } else {
+                await Quiz.saveIncorrectAnswer(attemptId, question_id, selected_option, correctOption);
             }
         }
 

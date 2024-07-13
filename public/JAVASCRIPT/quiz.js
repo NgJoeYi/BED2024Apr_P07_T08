@@ -137,7 +137,7 @@ function displayQuizzes(quizzes) {
         quizDetails.innerHTML = `
             <strong>Total Questions:</strong> ${quiz.total_questions} | 
             <strong>Total Marks:</strong> ${quiz.total_marks} | 
-            <strong>Created By:</strong> ${quiz.created_by}`;
+            <strong>Created By:</strong> ${quiz.creator_name}`;
             quizCardContent.appendChild(quizDetails);
 
             const buttonContainer = document.createElement('div');  
@@ -437,7 +437,7 @@ async function updateQuiz(event) {
     delete quizData.created_by; // don't need to send this to back end
     console.log('********************* quiz data:',quizData);
 
-    // CHANGED FOR IMAGE: Check if a new image file is selected
+    // Check if a new image file is selected
     const imgFile = document.getElementById('update_quizImg').files[0];
     if (imgFile) {
         // If a new image is provided, read it
