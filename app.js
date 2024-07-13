@@ -64,6 +64,7 @@ app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController
 app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
 app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
+app.get('/account/quizAttemptCount', jwtAuthorization.verifyJWT, quizController.getAttemptCount);  // quiz related
 app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser); // question related
 
 // Add Routes for quizzes
