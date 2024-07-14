@@ -18,6 +18,27 @@ document.addEventListener('DOMContentLoaded', function() {
   fetchAndDisplayReviews();
 });
 
+async function isValidCourseId(courseId) {
+  console.log('Validating Course ID:', courseId); // Log the course ID being validated
+
+  try {
+    const response = await fetch(`/courses/${courseId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const responseData = await response.json();
+    console.log('Validation Response Data:', responseData); // Log the validation response data
+
+    return response.ok;
+  } catch (error) {
+    console.error('Error validating course ID:', error);
+    return false;
+  }
+}
+
 async function fetchAndDisplayReviews() {
   const token = getToken();
   console.log('Token retrieved from sessionStorage:', token); // Debug log
@@ -33,11 +54,15 @@ async function fetchAndDisplayReviews() {
     if (!response.ok) throw new Error('Failed to fetch reviews');
 
     const reviews = await response.json();
-    const userId = getUserIdFromToken(token); // Use the new function
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
+    console.log('Current User ID:', currentUserId); // Debug log
+    console.log('Fetched Reviews:', reviews); // Debug log
+
     const reviewWrapper = document.querySelector('.review-wrapper');
     reviewWrapper.innerHTML = '';
 
-    const userReviews = reviews.filter(review => review.user_id === userId);
+    const userReviews = reviews.filter(review => review.user_id === currentUserId);
+    console.log('Filtered User Reviews:', userReviews); // Debug log
 
     if (userReviews.length === 0) {
       reviewWrapper.innerHTML = '<p>No reviews found for this user.</p>';
@@ -211,9 +236,15 @@ function openEditReviewModal(reviewId, currentText, currentRating, courseId) {
   document.getElementById('editReviewText').value = currentText;
   setRatingStars(currentRating);
 
-  // Ensure courseId is valid or set to null
-  const numericCourseId = courseId !== null && !isNaN(Number(courseId)) ? Number(courseId) : null;
+  // Ensure courseId is valid or set to 1 (default valid course ID)
+  const numericCourseId = courseId !== null && !isNaN(Number(courseId)) ? Number(courseId) : 1;
   modal.setAttribute('data-course-id', numericCourseId !== null ? numericCourseId : 'null');
+
+  console.log('Opening Edit Modal:');
+  console.log('Review ID:', reviewId);
+  console.log('Current Text:', currentText);
+  console.log('Current Rating:', currentRating);
+  console.log('Course ID:', numericCourseId);
 
   document.getElementById('submitEditedReview').onclick = function () {
     submitEditedReview(reviewId);
@@ -236,7 +267,14 @@ async function submitEditedReview(reviewId) {
   const newText = document.getElementById('editReviewText').value;
   const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
   const modal = document.getElementById('editReviewModal');
-  const courseId = modal.getAttribute('data-course-id');
+  const courseIdAttr = modal.getAttribute('data-course-id');
+  const courseId = courseIdAttr !== 'null' ? Number(courseIdAttr) : 1; // Default to a valid course ID (1)
+
+  console.log('Submitting edited review:');
+  console.log('Review ID:', reviewId);
+  console.log('New Text:', newText);
+  console.log('New Rating:', newRating);
+  console.log('Course ID:', courseId);
 
   // Check if newText is valid
   if (!newText) {
@@ -250,13 +288,24 @@ async function submitEditedReview(reviewId) {
     return;
   }
 
+  // Validate courseId
+  if (courseId !== 1) {
+    const isValid = await isValidCourseId(courseId);
+    if (!isValid) {
+      alert('Course ID does not exist.');
+      return;
+    }
+  }
+
   try {
     const token = getToken();
     const body = {
       review_text: newText,
       rating: newRating,
-      courseId: courseId !== 'null' ? Number(courseId) : 0 // Use 0 as a placeholder for no course
+      courseId: courseId // Always include courseId
     };
+
+    console.log('Request Body:', body); // Log the request body
 
     const response = await fetch(`/reviews/${reviewId}`, {
       method: 'PUT',
@@ -267,9 +316,12 @@ async function submitEditedReview(reviewId) {
       body: JSON.stringify(body)
     });
 
+    const responseData = await response.json();
+    console.log('Response Data:', responseData); // Log the response data
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to update review');
+      console.error('Error response from server:', responseData);
+      throw new Error(responseData.error || 'Failed to update review');
     }
 
     alert('Review updated successfully');
@@ -277,7 +329,7 @@ async function submitEditedReview(reviewId) {
     fetchAndDisplayReviews();
   } catch (error) {
     console.error('Error updating review:', error);
-    alert('Error updating review: ' + error.message);
+    alert(error.message);
   }
 }
 
@@ -311,11 +363,6 @@ function resetStars() {
 // Change made: Use sessionStorage instead of localStorage to get the token
 function getToken() {
   return sessionStorage.getItem('token');
-}
-
-function getUserIdFromToken(token) {
-  // Return the token directly as per user request
-  return token;
 }
 
 // Fetch user discussions on DOM load
