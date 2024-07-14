@@ -16,7 +16,8 @@ async function fetchWithAuth(url, options = {}) {
         'Authorization': `Bearer ${token}`,
     };
 
-    // If FormData is being used, do not set Content-Type to application/json
+    // If FormData is being used, do not set Content-Type to application/json cos browser already handles this
+    // for form data, browser uses multi part/ formdata
     if (!(options.body instanceof FormData)) {
         options.headers['Content-Type'] = 'application/json';
     }
