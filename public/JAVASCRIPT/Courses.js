@@ -195,15 +195,11 @@ async function deleteCourse(event, button) {
   }
 
   try {
-    const token = sessionStorage.getItem('token');
-    const response = await fetch(`/courses/${courseID}`, {
-      method: 'DELETE',
-      headers: {  // -- jwt implementation
-        'Authorization': `Bearer ${token}` // -- jwt implementation
-      }  // -- jwt implementation
+    const response = await fetchWithAuth(`/courses/${courseID}`, { // ------------------------------------------------- headers in jwtutility.js
+      method: 'DELETE'
     });
     console.log('PASSED HERE ');
-    if (response.ok) {
+    if (response.ok) { // response && response.ok
       if (response.status === 204) {
         alert('Course deleted successfully!');
         button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
@@ -229,17 +225,12 @@ async function editCourse(event, button) {
   event.preventDefault();
 
   const courseID = button.dataset.courseId;
-  const token = sessionStorage.getItem('token'); // Get the JWT token from sessionStorage
   if (!courseID) {
     alert('Course ID not found.');
     return;
   }
   try {
-    const response = await fetch(`/courses/${courseID}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
+    const response = await fetchWithAuth(`/courses/${courseID}`); // ------------------------------------------------- headers in jwtutility.js
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
