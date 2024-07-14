@@ -74,25 +74,28 @@ async function getReviewById(id) {
     }
 }
 
-async function updateReview(connection, id, review_text, rating) {
+async function updateReview(id, review_text, rating, courseId) {
     try {
-        console.log('Executing update query for review ID:', id);
-        console.log('Update values - review_text:', review_text, ', rating:', rating);
-        
-        await connection.request()
-            .input('review_id', sql.Int, id)
+        const pool = await sql.connect(dbConfig);
+        const result = await pool.request()
+            .input('review_id', sql.Int, id) // Correctly declare the variable here
             .input('review_text', sql.NVarChar, review_text)
             .input('rating', sql.Int, rating)
+            .input('course_id', sql.Int, courseId)
             .query(`
                 UPDATE user_reviews
-                SET review_text = @review_text, rating = @rating
+                SET review_text = @review_text, rating = @rating, course_id = @course_id
                 WHERE review_id = @review_id
             `);
 
-        console.log('Review update query executed successfully');
+        if (result.rowsAffected[0] === 0) {
+            throw new Error('Review not found or no changes made');
+        }
+
+        return result;
     } catch (err) {
-        console.error('Error executing update query:', err.message);
-        throw new Error('Error updating review: ' + err.message);
+        console.error('SQL error:', err.message);
+        throw err;
     }
 }
 
