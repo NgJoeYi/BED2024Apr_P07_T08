@@ -22,11 +22,8 @@ async function isValidCourseId(courseId) {
   console.log('Validating Course ID:', courseId); // Log the course ID being validated
 
   try {
-    const response = await fetch(`/courses/${courseId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    const response = await fetchWithAuth(`/courses/${courseId}`, { // ------------------------------------------------- headers in jwtutility.js
+      method: 'GET'
     });
 
     const responseData = await response.json();
@@ -40,18 +37,10 @@ async function isValidCourseId(courseId) {
 }
 
 async function fetchAndDisplayReviews() {
-  const token = getToken();
-  console.log('Token retrieved from sessionStorage:', token); // Debug log
-  if (!token) {
-    console.error('No token found in sessionStorage');
-    return;
-  }
-  
   try {
-    const response = await fetch('/reviews', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!response.ok) throw new Error('Failed to fetch reviews');
+    const response = await fetchWithAuth('/reviews'); // ------------------------------------------------- headers in jwtutility.js
+    // if (!response.ok) throw new Error('Failed to fetch reviews');
+    if (!response) return; // *************** changes for jwt
 
     const reviews = await response.json();
     const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
@@ -193,13 +182,8 @@ document.getElementById('confirmReviewDelete').addEventListener('click', functio
 async function deleteReview(reviewId) {
   console.log('Deleting review with ID:', reviewId); // Log review ID
   try {
-    const token = getToken();
-    const response = await fetch(`/reviews/${reviewId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+    const response = await fetchWithAuth(`/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
+      method: 'DELETE'
     });
 
     // Log response status and response
@@ -277,7 +261,6 @@ async function submitEditedReview(reviewId) {
   console.log('Course ID:', courseId);
 
   try {
-    const token = getToken();
     const body = {
       review_text: newText,
       rating: newRating,
@@ -286,12 +269,8 @@ async function submitEditedReview(reviewId) {
 
     console.log('Request Body:', body); // Log the request body
 
-    const response = await fetch(`/reviews/${reviewId}`, {
+    const response = await fetchWithAuth(`/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
       body: JSON.stringify(body)
     });
 
@@ -368,34 +347,18 @@ function resetStars() {
   stars.forEach(star => star.classList.remove('hover'));
 }
 
-// Change made: Use sessionStorage instead of localStorage to get the token
-function getToken() {
-  return sessionStorage.getItem('token');
-}
-
-// Fetch user discussions on DOM load
 // Fetch user discussions on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   fetchUserDiscussions();
 });
 
 async function fetchUserDiscussions() {
-  const token = getToken();
-  if (!token) {
-    console.error('No user token found');
-    return;
-  }
-
   try {
-    const response = await fetch(`/discussions/user`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch user discussions');
-    }
+    const response = await fetchWithAuth(`/discussions/user`); // ------------------------------------------------- headers in jwtutility.js
+    if (!response) return; // *************** changes for jwt
+    // if (!response.ok) {
+    //   throw new Error('Failed to fetch user discussions');
+    // }
 
     const data = await response.json();
     console.log('Fetched discussions data:', data);
@@ -490,13 +453,8 @@ async function saveEdit(discussionId) {
   console.log('Category:', category);
 
   try {
-    const token = getToken();
-    const response = await fetch(`/discussions/${discussionId}`, {
+    const response = await fetchWithAuth(`/discussions/${discussionId}`, { // ------------------------------------------------- headers in jwtutility.js
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
       body: JSON.stringify({ description, category })
     });
 
@@ -564,15 +522,8 @@ function closeDeleteModalDis() {
 
 async function deleteDiscussion(discussionId) {
   try {
-    const token = getToken();
-    console.log('Deleting discussion with ID:', discussionId, 'for user ID:', token);
-
-    const response = await fetch(`/discussions/${discussionId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+    const response = await fetchWithAuth(`/discussions/${discussionId}`, { // ------------------------------------------------- headers in jwtutility.js
+      method: 'DELETE'
     });
 
     if (!response.ok) {
@@ -626,8 +577,3 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log(`Clicked first tab: ${firstTab.textContent}`); // Debug log
   }
 });
-
-// Change made: Use sessionStorage instead of localStorage to get the token
-function getToken() {
-  return sessionStorage.getItem('token');
-}
