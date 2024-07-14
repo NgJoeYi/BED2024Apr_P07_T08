@@ -108,4 +108,4 @@ module.exports = { verifyJWT };
 // - users that are not logged in can view comments 
 // - users that are not logged in can view courses 
 // - users that are not logged in can view discussions
-// -- users that are not logged in can attempt the quizzes // maybe...
+// -- users that are not logged in can view quizzes
