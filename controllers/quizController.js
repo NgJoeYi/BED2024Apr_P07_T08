@@ -337,6 +337,37 @@ const deleteQuestion = async (req, res) => {
             return res.status(400).json({ message: 'Could not update total questions in the quiz' });
         }
 
+        // ------------------------ retrieiving the users response to recalc the score to be displayed to the user ------------------------
+
+        /* if user got 1st question correct and the other 4 questions wrong 
+        the percentage score would be 20% but if all the other 4 questions were deleted, 
+        the total percentage should become 100% since there is only one question left in 
+        the quiz and the question left was the one that the user got it right */
+
+        // Retrieve all quiz attempts for the quiz
+        const userAttempts = await Quiz.getAllQuizResultsByQuizId(quizId);
+        if (userAttempts) {
+            for (const attempt of userAttempts) {
+                // Retrieve the user's responses for the current attempt
+                const userResponses = await Quiz.getUserResponsesByAttemptId(attempt.attempt_id);
+
+                // Recalculate the score
+                let newScore = 0;
+                for (const response of userResponses) {
+                    const correctOption = await Quiz.isCorrectAnswer(response.question_id);
+                    if (response.selected_option === correctOption) {
+                        newScore += 1;
+                    }
+                }
+                const totalQuestions = userResponses.length;
+                const newPercentage = (newScore / totalQuestions) * 100;
+
+                // Update the user's quiz attempt with the new score
+                await Quiz.updateQuizAttempt(attempt.attempt_id, newPercentage, newPercentage >= 50);
+            }
+        }
+
+
         res.status(200).json({ message: 'Question deleted successfully' });
     } catch (error) {
         console.error('Delete Questions - Server Error:', error); // Log error details
