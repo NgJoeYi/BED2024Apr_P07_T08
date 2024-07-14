@@ -270,5 +270,6 @@ class Courses {
             await connection.close();
         }
     }
+
 }
 module.exports = Courses;
