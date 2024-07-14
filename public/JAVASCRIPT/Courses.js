@@ -246,11 +246,9 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       const { course, userID: courseCreatorUserID } = await response.json();
   
-      // Decode the JWT to get the user ID of the logged-in user
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      const loggedInUserID = decodedToken.id;
-      console.log(courseCreatorUserID);
-      if (courseCreatorUserID !== loggedInUserID) {
+      const userId = parseInt(sessionStorage.getItem('userId')); // current user's ID from session storage
+
+      if (courseCreatorUserID !== userId) {
         alert('You do not have permission to edit this course.');
         return;
       }
