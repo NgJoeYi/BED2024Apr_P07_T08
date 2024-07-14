@@ -276,27 +276,6 @@ async function submitEditedReview(reviewId) {
   console.log('New Rating:', newRating);
   console.log('Course ID:', courseId);
 
-  // Check if newText is valid
-  if (!newText) {
-    alert('Review text is required.');
-    return;
-  }
-
-  // Check if newRating is valid
-  if (newRating < 1 || newRating > 5) {
-    alert('Rating must be between 1 and 5.');
-    return;
-  }
-
-  // Validate courseId
-  if (courseId !== 1) {
-    const isValid = await isValidCourseId(courseId);
-    if (!isValid) {
-      alert('Course ID does not exist.');
-      return;
-    }
-  }
-
   try {
     const token = getToken();
     const body = {
@@ -321,15 +300,15 @@ async function submitEditedReview(reviewId) {
 
     if (!response.ok) {
       console.error('Error response from server:', responseData);
-      throw new Error(responseData.error || 'Failed to update review');
+      alert(responseData.error); // Show JOI validation error as alert
+    } else {
+      alert('Review updated successfully');
+      closeEditReviewModal();
+      fetchAndDisplayReviews();
     }
-
-    alert('Review updated successfully');
-    closeEditReviewModal();
-    fetchAndDisplayReviews();
   } catch (error) {
     console.error('Error updating review:', error);
-    alert(error.message);
+    alert('Error updating review: ' + error.message); // Show generic error message
   }
 }
 
@@ -339,12 +318,41 @@ document.querySelectorAll('#editReviewModal .stars .fa-star').forEach((star, ind
   star.addEventListener('mouseout', () => resetStars());
 });
 
+// function updateStarSelection(index) {
+//   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
+//   if (index === 0) {
+//     // If the first star is clicked, set rating to 0 and remove all selected stars
+//     stars.forEach(star => star.classList.remove('selected'));
+//   } else {
+//     stars.forEach((star, i) => {
+//       if (i <= index) star.classList.add('selected');
+//       else star.classList.remove('selected');
+//     });
+//   }
+// }
+
 function updateStarSelection(index) {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
-  stars.forEach((star, i) => {
-    if (i <= index) star.classList.add('selected');
-    else star.classList.remove('selected');
-  });
+  const firstStarSelected = stars[0].classList.contains('selected');
+
+  if (index === 0) {
+    // If the first star is clicked and it is already selected, deselect it
+    if (firstStarSelected) {
+      stars.forEach(star => star.classList.remove('selected'));
+    } else {
+      // Select only the first star
+      stars.forEach((star, i) => {
+        if (i === 0) star.classList.add('selected');
+        else star.classList.remove('selected');
+      });
+    }
+  } else {
+    // For other stars, update the selection as usual
+    stars.forEach((star, i) => {
+      if (i <= index) star.classList.add('selected');
+      else star.classList.remove('selected');
+    });
+  }
 }
 
 function highlightStars(index) {
