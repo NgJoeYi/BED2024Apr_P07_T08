@@ -1,5 +1,3 @@
-// account.js
-
 // Toggle dropdown
 function toggleDropdown() {
   const dropdown = document.querySelector('.dropdown');
@@ -15,7 +13,6 @@ window.onclick = function(event) {
   }
 };
 
-
 // --------------------------------------reviews-----------------------------
 document.addEventListener('DOMContentLoaded', function() {
   fetchAndDisplayReviews();
@@ -23,30 +20,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function fetchAndDisplayReviews() {
   const token = getToken();
+  console.log('Token retrieved from sessionStorage:', token); // Debug log
+  if (!token) {
+    console.error('No token found in sessionStorage');
+    return;
+  }
+  
   try {
-      const response = await fetch('/reviews', {
-          headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error('Failed to fetch reviews');
+    const response = await fetch('/reviews', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch reviews');
 
-      const reviews = await response.json();
-      const userId = getUserIdFromToken(token); // Use the new function
-      const reviewWrapper = document.querySelector('.review-wrapper');
-      reviewWrapper.innerHTML = '';
+    const reviews = await response.json();
+    const userId = getUserIdFromToken(token); // Use the new function
+    const reviewWrapper = document.querySelector('.review-wrapper');
+    reviewWrapper.innerHTML = '';
 
-      const userReviews = reviews.filter(review => review.user_id === userId);
+    const userReviews = reviews.filter(review => review.user_id === userId);
 
-      if (userReviews.length === 0) {
-          reviewWrapper.innerHTML = '<p>No reviews found for this user.</p>';
-          return;
-      }
+    if (userReviews.length === 0) {
+      reviewWrapper.innerHTML = '<p>No reviews found for this user.</p>';
+      return;
+    }
 
-      userReviews.forEach(review => {
-          console.log('Review Object:', review); // Debug log
-          createReviewCard(review, reviewWrapper);
-      });
+    userReviews.forEach(review => {
+      console.log('Review Object:', review); // Debug log
+      createReviewCard(review, reviewWrapper);
+    });
   } catch (error) {
-      console.error('Error fetching reviews:', error);
+    console.error('Error fetching reviews:', error);
   }
 }
 
@@ -92,7 +95,7 @@ function createReviewCard(review, reviewWrapper) {
   reviewActions.appendChild(editBtn);
 
   const deleteBtn = createButton('Delete', () => openDeleteReviewModal(review.review_id));
-  reviewActions.appendChild(deleteBtn);  
+  reviewActions.appendChild(deleteBtn);
 
   reviewInfo.appendChild(userName);
   reviewInfo.appendChild(stars);
@@ -114,16 +117,16 @@ function createStars(rating) {
   const stars = document.createElement('div');
   stars.className = 'stars';
   for (let i = 0; i < rating; i++) {
-      const star = document.createElement('i');
-      star.className = 'fa-solid fa-star';
-      star.style.color = '#FFD43B';
-      stars.appendChild(star);
+    const star = document.createElement('i');
+    star.className = 'fa-solid fa-star';
+    star.style.color = '#FFD43B';
+    stars.appendChild(star);
   }
   for (let i = rating; i < 5; i++) {
-      const star = document.createElement('i');
-      star.className = 'fa-solid fa-star';
-      star.style.color = '#ccc';
-      stars.appendChild(star);
+    const star = document.createElement('i');
+    star.className = 'fa-solid fa-star';
+    star.style.color = '#ccc';
+    stars.appendChild(star);
   }
   return stars;
 }
@@ -162,36 +165,6 @@ document.getElementById('confirmReviewDelete').addEventListener('click', functio
   }
 });
 
-// async function deleteReview(reviewId) {
-//   console.log('Deleting review with ID:', reviewId); // Log review ID
-//   try {
-//     const token = getToken();
-//     const response = await fetch(`/reviews/${reviewId}`, {
-//       method: 'DELETE',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'Authorization': `Bearer ${token}`
-//       }
-//     });
-
-//     // Log response status and response
-//     console.log('Delete response status:', response.status); // Log response status
-//     const result = await response.json();
-//     console.log('Delete response result:', result); // Log response result
-
-//     if (!response.ok || result.error) {
-//       throw new Error(result.error || 'Failed to delete review');
-//     }
-    
-//     alert('Review deleted successfully');
-//     closeDeleteModal();
-//     fetchAndDisplayReviews();
-//   } catch (error) {
-//     console.error('Error deleting review:', error);
-//     alert('Error deleting review: ' + error.message);
-//   }
-// }
-
 async function deleteReview(reviewId) {
   console.log('Deleting review with ID:', reviewId); // Log review ID
   try {
@@ -212,7 +185,7 @@ async function deleteReview(reviewId) {
     if (!response.ok || result.error) {
       throw new Error(result.error || 'Failed to delete review');
     }
-    
+
     alert('Review deleted successfully');
     closeDeleteReviewModal();
 
@@ -243,7 +216,7 @@ function openEditReviewModal(reviewId, currentText, currentRating, courseId) {
   modal.setAttribute('data-course-id', numericCourseId !== null ? numericCourseId : 'null');
 
   document.getElementById('submitEditedReview').onclick = function () {
-      submitEditedReview(reviewId);
+    submitEditedReview(reviewId);
   };
 }
 
@@ -254,8 +227,8 @@ function closeEditReviewModal() {
 function setRatingStars(rating) {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
   stars.forEach((star, index) => {
-      star.classList.remove('selected');
-      if (index < rating) star.classList.add('selected');
+    star.classList.remove('selected');
+    if (index < rating) star.classList.add('selected');
   });
 }
 
@@ -267,44 +240,44 @@ async function submitEditedReview(reviewId) {
 
   // Check if newText is valid
   if (!newText) {
-      alert('Review text is required.');
-      return;
+    alert('Review text is required.');
+    return;
   }
 
   // Check if newRating is valid
   if (newRating < 1 || newRating > 5) {
-      alert('Rating must be between 1 and 5.');
-      return;
+    alert('Rating must be between 1 and 5.');
+    return;
   }
 
   try {
-      const token = getToken();
-      const body = {
-          review_text: newText,
-          rating: newRating,
-          courseId: courseId !== 'null' ? Number(courseId) : 0 // Use 0 as a placeholder for no course
-      };
+    const token = getToken();
+    const body = {
+      review_text: newText,
+      rating: newRating,
+      courseId: courseId !== 'null' ? Number(courseId) : 0 // Use 0 as a placeholder for no course
+    };
 
-      const response = await fetch(`/reviews/${reviewId}`, {
-          method: 'PUT',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(body)
-      });
+    const response = await fetch(`/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(body)
+    });
 
-      if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to update review');
-      }
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update review');
+    }
 
-      alert('Review updated successfully');
-      closeEditReviewModal();
-      fetchAndDisplayReviews();
+    alert('Review updated successfully');
+    closeEditReviewModal();
+    fetchAndDisplayReviews();
   } catch (error) {
-      console.error('Error updating review:', error);
-      alert('Error updating review: ' + error.message);
+    console.error('Error updating review:', error);
+    alert('Error updating review: ' + error.message);
   }
 }
 
@@ -317,16 +290,16 @@ document.querySelectorAll('#editReviewModal .stars .fa-star').forEach((star, ind
 function updateStarSelection(index) {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
   stars.forEach((star, i) => {
-      if (i <= index) star.classList.add('selected');
-      else star.classList.remove('selected');
+    if (i <= index) star.classList.add('selected');
+    else star.classList.remove('selected');
   });
 }
 
 function highlightStars(index) {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
   stars.forEach((star, i) => {
-      if (i <= index) star.classList.add('hover');
-      else star.classList.remove('hover');
+    if (i <= index) star.classList.add('hover');
+    else star.classList.remove('hover');
   });
 }
 
@@ -335,25 +308,17 @@ function resetStars() {
   stars.forEach(star => star.classList.remove('hover'));
 }
 
+// Change made: Use sessionStorage instead of localStorage to get the token
 function getToken() {
-  return localStorage.getItem('token');
+  return sessionStorage.getItem('token');
 }
 
 function getUserIdFromToken(token) {
-  if (!token) {
-      throw new Error('No token provided');
-  }
-  
-  const payloadBase64 = token.split('.')[1];
-  const decodedPayload = atob(payloadBase64);
-  const payload = JSON.parse(decodedPayload);
-  
-  return payload.id;
+  // Return the token directly as per user request
+  return token;
 }
 
-
-// accountSetting.js
-
+// Fetch user discussions on DOM load
 // Fetch user discussions on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   fetchUserDiscussions();
@@ -382,6 +347,7 @@ async function fetchUserDiscussions() {
 
     const discussionsContainer = document.querySelector('.user-discussions');
     const noDiscussionsMessage = document.querySelector('.no-discussions-message');
+    const totalDiscussionsElement = document.getElementById('total-discussions'); // Add this line
     
     discussionsContainer.innerHTML = '';
 
@@ -394,6 +360,8 @@ async function fetchUserDiscussions() {
           addUserDiscussionToFeed(discussion);
         });
       }
+      // Update the total discussions count
+      totalDiscussionsElement.textContent = data.discussions.length; // Add this line
     } else {
       console.log(data.success);
       alert('Error fetching user discussions.');
@@ -436,13 +404,12 @@ function addUserDiscussionToFeed(discussion) {
   </div>
 `;
 
-
-
   feed.appendChild(post);
 
   post.querySelector('.edit-btn').addEventListener('click', () => openEditModal(discussion.id, discussion.description, discussion.category));
   post.querySelector('.delete-btn').addEventListener('click', () => openDeleteDiscussionModal(discussion.id));
 }
+
 
 // Edit Modal functions
 function openEditModal(discussionId, description, category) {
@@ -568,31 +535,44 @@ async function deleteDiscussion(discussionId) {
   }
 }
 
-function showSection(sectionId) {
+
+function showSection(sectionId, event) {
+  console.log(`Showing section: ${sectionId}`); // Debug log
+
   // Hide all tab contents
   const tabContents = document.querySelectorAll('.tab-content');
-  tabContents.forEach(content => content.classList.remove('active'));
+  tabContents.forEach(content => {
+    content.classList.remove('active');
+    console.log(`Removed active class from content: ${content.id}`); // Debug log
+  });
 
   // Remove active class from all tabs
   const tabs = document.querySelectorAll('.tab');
-  tabs.forEach(tab => tab.classList.remove('active'));
+  tabs.forEach(tab => {
+    tab.classList.remove('active');
+    console.log(`Removed active class from tab: ${tab.textContent}`); // Debug log
+  });
 
   // Show the selected tab content
-  document.getElementById(sectionId).classList.add('active');
+  const activeContent = document.getElementById(sectionId);
+  activeContent.classList.add('active');
+  console.log(`Added active class to content: ${sectionId}`); // Debug log
 
   // Add active class to the clicked tab
   event.target.classList.add('active');
+  console.log(`Added active class to tab: ${event.target.textContent}`); // Debug log
 }
 
 // Set the default tab to be active
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelector('.tab').click();
+  const firstTab = document.querySelector('.tab');
+  if (firstTab) {
+    firstTab.click();
+    console.log(`Clicked first tab: ${firstTab.textContent}`); // Debug log
+  }
 });
 
-
+// Change made: Use sessionStorage instead of localStorage to get the token
 function getToken() {
-  // Implementation for fetching the token goes here
-  // For example, it could be fetched from local storage
-  return localStorage.getItem('token');
+  return sessionStorage.getItem('token');
 }
-

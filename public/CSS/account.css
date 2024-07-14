@@ -907,7 +907,7 @@ input[readonly] {
 }
 
 
-whole-container {
+.whole-container {
   width: 100%;
 }
 .tab-container {
