@@ -268,75 +268,9 @@ function postReview() {
     })
     .catch(error => {
         console.error('Error posting review:', error);
-        alert(`Error posting review: ${error.error || 'Internal Server Error'}`);
+        alert(`${error.error || 'Internal Server Error'}`);
     });
 }
-
-// function editReview(button) {
-//     const review = button.closest('.review');
-//     const reviewUserId = parseInt(review.dataset.userId, 10); // Get the user ID from the review
-//     const reviewId = review.getAttribute('data-id'); // Get review ID
-//     const token = sessionStorage.getItem('token');
-//     const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-
-//     console.log('Editing review with ID:', reviewId, 'by user ID:', reviewUserId); // Debug log
-
-//     if (reviewUserId !== currentUserId) {
-//         alert('You can only edit your own reviews.');
-//         return;
-//     }
-
-//     const reviewText = review.querySelector('.review-details p').textContent;
-//     const reviewStars = review.querySelectorAll('.fa-star');
-//     const popupStars = document.querySelectorAll('.popup .fa-star');
-
-//     document.getElementById('review-text').value = reviewText;
-
-//     const rating = Array.from(reviewStars).filter(star => star.classList.contains('selected')).length;
-
-//     popupStars.forEach(star => {
-//         if (star.getAttribute('data-value') <= rating) {
-//             star.classList.add('selected');
-//         } else {
-//             star.classList.remove('selected');
-//         }
-//     });
-
-//     showPopup('edit');
-
-//     const postButton = document.querySelector('.popup-content button');
-//     postButton.onclick = () => {
-//         const updatedText = document.getElementById('review-text').value;
-//         const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
-
-//         console.log('Updating review with ID:', reviewId, 'updatedText:', updatedText, 'updatedRating:', updatedRating); // Debug log
-
-//         fetch(`http://localhost:3000/reviews/${reviewId}`, {
-//             method: 'PUT',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Authorization': `Bearer ${token}`
-//             },
-//             body: JSON.stringify({ review_text: updatedText, rating: updatedRating })
-//         })
-//         .then(response => {
-//             if (!response.ok) {
-//                 return response.json().then(err => { throw err; });
-//             }
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('Review updated successfully:', data); // Debug log
-//             alert(data.message);
-//             closePopup();
-//             fetchReviews(courseId);
-//         })
-//         .catch(error => {
-//             console.error('Error updating review:', error);
-//             alert(`Error updating review: ${error.error || 'Internal Server Error'}`);
-//         });
-//     };
-// }
 
 function editReview(button) {
     const review = button.closest('.review');
@@ -395,7 +329,7 @@ function editReview(button) {
         })
         .catch(error => {
             console.error('Error updating review:', error);
-            alert(`Error updating review: ${error.message || 'Internal Server Error'}`);
+            alert(`${error.error || 'Internal Server Error'}`);
         });
     };
 }

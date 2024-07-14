@@ -59,23 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // async function saveComment() {
     //     const commentText = document.getElementById('comment-text').value;
     //     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
-    //     console.log('Discussion ID:', discussionId); // Debug log
-    
-    //     if (!commentText.trim()) {  // Check if commentText is empty or whitespace
-    //         alert('Comments cannot be empty.');
-    //         return;
-    //     }
-    
-    //     if (/^[\p{P}\p{S}]+$/u.test(commentText)) {  // Check if commentText consists solely of punctuation or symbols
-    //         alert('Comments cannot consist solely of punctuations.');
-    //         return;
-    //     }
-    
-    //     const wordCount = commentText.trim().split(/\s+/).length;
-    //     if (wordCount > 150) {  // Check if commentText exceeds 150 words
-    //         alert('Comments cannot exceed 150 words.');
-    //         return;
-    //     }
     
     //     if (editMode && currentComment) {
     //         try {
@@ -85,14 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
     //                     'Content-Type': 'application/json',
     //                     'Authorization': `Bearer ${token}`
     //                 },
-    //                 body: JSON.stringify({ content: commentText })
+    //                 body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
     //             });
     //             if (response.ok) {
     //                 currentComment.querySelector('.comment-content').textContent = commentText;
     //                 closePopup();
     //                 alert('Comment updated successfully!');
     //             } else {
-    //                 console.error('Failed to update comment:', response.statusText);
+    //                 const errorData = await response.json();
+    //                 console.error('Failed to update comment:', errorData.error || response.statusText);
     //             }
     //         } catch (error) {
     //             console.error('Error:', error);
@@ -105,60 +89,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveComment() {
         const commentText = document.getElementById('comment-text').value;
-        const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
-        console.log('Discussion ID:', discussionId); // Debug log
+        const discussionId = new URLSearchParams(window.location.search).get('discussionId');
     
-        if (!commentText.trim()) {  // Check if commentText is empty or whitespace
-            alert('Comments cannot be empty.');
-            return;
-        }
-    
-        if (/^[\p{P}\p{S}]+$/u.test(commentText)) {  // Check if commentText consists solely of punctuation or symbols
-            alert('Comments cannot consist solely of punctuations.');
-            return;
-        }
-    
-        const wordCount = commentText.trim().split(/\s+/).length;
-        if (wordCount > 150) {  // Check if commentText exceeds 150 words
-            alert('Comments cannot exceed 150 words.');
-            return;
-        }
-    
-        console.log('Comment Text:', commentText); // Log comment text
-    
-        if (editMode && currentComment) {
-            try {
-                const response = await fetch(`/comments/${currentCommentId}`, {
+        try {
+            const response = editMode && currentComment
+                ? await fetch(`/comments/${currentCommentId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
+                })
+                : await fetch('/comments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 });
-                if (response.ok) {
+    
+            if (response.ok) {
+                if (editMode && currentComment) {
                     currentComment.querySelector('.comment-content').textContent = commentText;
-                    closePopup();
                     alert('Comment updated successfully!');
                 } else {
-                    const errorData = await response.json();
-                    console.error('Failed to update comment:', errorData.error || response.statusText);
+                    alert('Comment posted successfully!');
+                    fetchComments(discussionId); // Refresh comments for the specific discussion
                 }
-            } catch (error) {
-                console.error('Error:', error);
+                closePopup();
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || response.statusText); // Show alert for validation error
             }
-        } else {
-            await postComment(commentText, discussionId);
-            closePopup();
+        } catch (error) {
+            console.error('Error:', error);
         }
     }
     
             
     //This requires jwt
     async function postComment(text, discussionId) {
-        console.log('Posting Comment:', text); // Debug log
-        console.log('Discussion ID:', discussionId); // Debug log
-    
         try {
             const response = await fetch('/comments', {
                 method: 'POST',
@@ -173,17 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetchComments(discussionId); // Refresh comments for the specific discussion
             } else {
                 const errorData = await response.json();
-                if (errorData.error === 'Comments cannot consist solely of punctuations.') {
-                    alert(errorData.error);
-                } else {
-                    console.error('Failed to post comment:', errorData.error || response.statusText);
-                }
+                alert(errorData.error || response.statusText); // Show alert for validation error
             }
         } catch (error) {
             console.error('Error:', error);
         }
     }
-                
+                        
     // -- this requires jwt
     window.deleteComment = async function(button) {
         const comment = button.closest('.comment');
