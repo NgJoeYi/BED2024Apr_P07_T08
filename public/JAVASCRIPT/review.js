@@ -203,19 +203,16 @@ function closePopup() {
 async function deleteReview(button) {
     const review = button.closest('.review');
     const reviewId = review.getAttribute('data-id');
-    const token = sessionStorage.getItem('token');
+    // const token = sessionStorage.getItem('token');
 
-    console.log(`Attempting to delete review with ID: ${reviewId} by user with token: ${token}`);
+    // console.log(`Attempting to delete review with ID: ${reviewId} by user with token: ${token}`);
 
     try {
-        const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetchWithAuth(`http://localhost:3000/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
+            method: 'DELETE'
         });
 
+        if (!response) return; // ********************** jwt
         if (response.ok) {
             alert('Review deleted successfully!');
             review.remove();
@@ -235,21 +232,17 @@ function postReview() {
     const courseId = parseInt(urlParams.get('courseID'), 10); // Ensure courseId is an integer
     const reviewText = document.getElementById('review-text').value;
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
-    const token = sessionStorage.getItem('token');
+    // const token = sessionStorage.getItem('token');
 
-    console.log('Posting review with courseId:', courseId, 'reviewText:', reviewText, 'rating:', rating, 'token:', token); // Debug log
+    // console.log('Posting review with courseId:', courseId, 'reviewText:', reviewText, 'rating:', rating, 'token:', token); // Debug log
 
-    if (!token) {
-        alert('User is not authenticated. Please log in.');
-        return;
-    }
+    // if (!token) {
+    //     alert('User is not authenticated. Please log in.');
+    //     return;
+    // }
 
-    fetch('http://localhost:3000/reviews', {
+    fetchWithAuth('http://localhost:3000/reviews', { // ------------------------------------------------- headers in jwtutility.js
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ review_text: reviewText, rating: rating, courseId: courseId }) // Ensure courseId is passed as an integer
     })
     .then(response => {
@@ -274,7 +267,7 @@ function editReview(button) {
     const review = button.closest('.review');
     const reviewUserId = parseInt(review.dataset.userId, 10);
     const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
-    const token = sessionStorage.getItem('token'); // Get the token from session storage
+    // const token = sessionStorage.getItem('token'); // Get the token from session storage
 
     if (reviewUserId !== currentUserId) {
         alert('You can only edit your own reviews.');
@@ -306,15 +299,12 @@ function editReview(button) {
         const reviewId = review.getAttribute('data-id');
         const courseId = parseInt(new URLSearchParams(window.location.search).get('courseID'), 10);
 
-        fetch(`http://localhost:3000/reviews/${reviewId}`, {
+        fetchWithAuth(`http://localhost:3000/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId })
         })
         .then(response => {
+            if (!response) return; // ********************** jwt
             if (!response.ok) {
                 return response.json().then(err => { throw err; });
             }
