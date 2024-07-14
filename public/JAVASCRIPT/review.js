@@ -235,29 +235,14 @@ async function deleteReview(button) {
 function postReview() {
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = parseInt(urlParams.get('courseID'), 10); // Ensure courseId is an integer
-
     const reviewText = document.getElementById('review-text').value;
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
     const token = sessionStorage.getItem('token');
 
     console.log('Posting review with courseId:', courseId, 'reviewText:', reviewText, 'rating:', rating, 'token:', token); // Debug log
 
-    const wordCount = reviewText.trim().split(/\s+/).length;
-
-    if (!reviewText.trim()) {
-        alert('Reviews cannot be empty.');
-        return;
-    }
-    if (/^[\p{P}\s]+$/u.test(reviewText)) {
-        alert('Reviews cannot consist solely of punctuation.');
-        return;
-    }
-    if (rating < 1) {
-        alert('Reviews must have a minimum of 1 star.');
-        return;
-    }
-    if (wordCount > 250) {
-        alert('Reviews cannot exceed 250 words.');
+    if (!token) {
+        alert('User is not authenticated. Please log in.');
         return;
     }
 
@@ -283,18 +268,81 @@ function postReview() {
     })
     .catch(error => {
         console.error('Error posting review:', error);
-        alert(`Error posting review: ${error.message || 'Internal Server Error'}`);
+        alert(`Error posting review: ${error.error || 'Internal Server Error'}`);
     });
 }
 
+// function editReview(button) {
+//     const review = button.closest('.review');
+//     const reviewUserId = parseInt(review.dataset.userId, 10); // Get the user ID from the review
+//     const reviewId = review.getAttribute('data-id'); // Get review ID
+//     const token = sessionStorage.getItem('token');
+//     const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
+
+//     console.log('Editing review with ID:', reviewId, 'by user ID:', reviewUserId); // Debug log
+
+//     if (reviewUserId !== currentUserId) {
+//         alert('You can only edit your own reviews.');
+//         return;
+//     }
+
+//     const reviewText = review.querySelector('.review-details p').textContent;
+//     const reviewStars = review.querySelectorAll('.fa-star');
+//     const popupStars = document.querySelectorAll('.popup .fa-star');
+
+//     document.getElementById('review-text').value = reviewText;
+
+//     const rating = Array.from(reviewStars).filter(star => star.classList.contains('selected')).length;
+
+//     popupStars.forEach(star => {
+//         if (star.getAttribute('data-value') <= rating) {
+//             star.classList.add('selected');
+//         } else {
+//             star.classList.remove('selected');
+//         }
+//     });
+
+//     showPopup('edit');
+
+//     const postButton = document.querySelector('.popup-content button');
+//     postButton.onclick = () => {
+//         const updatedText = document.getElementById('review-text').value;
+//         const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
+
+//         console.log('Updating review with ID:', reviewId, 'updatedText:', updatedText, 'updatedRating:', updatedRating); // Debug log
+
+//         fetch(`http://localhost:3000/reviews/${reviewId}`, {
+//             method: 'PUT',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${token}`
+//             },
+//             body: JSON.stringify({ review_text: updatedText, rating: updatedRating })
+//         })
+//         .then(response => {
+//             if (!response.ok) {
+//                 return response.json().then(err => { throw err; });
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             console.log('Review updated successfully:', data); // Debug log
+//             alert(data.message);
+//             closePopup();
+//             fetchReviews(courseId);
+//         })
+//         .catch(error => {
+//             console.error('Error updating review:', error);
+//             alert(`Error updating review: ${error.error || 'Internal Server Error'}`);
+//         });
+//     };
+// }
 
 function editReview(button) {
     const review = button.closest('.review');
-    const reviewUserId = parseInt(review.dataset.userId, 10); // Get the user ID from the review
+    const reviewUserId = parseInt(review.dataset.userId, 10);
     const token = sessionStorage.getItem('token');
-    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-
-    console.log('Editing review with ID:', review.getAttribute('data-id'), 'by user ID:', reviewUserId); // Debug log
+    const currentUserId = getUserIdFromToken(token);
 
     if (reviewUserId !== currentUserId) {
         alert('You can only edit your own reviews.');
@@ -324,29 +372,7 @@ function editReview(button) {
         const updatedText = document.getElementById('review-text').value;
         const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
         const reviewId = review.getAttribute('data-id');
-
-        console.log('Updating review with ID:', reviewId, 'updatedText:', updatedText, 'updatedRating:', updatedRating); // Debug log
-
-        const wordCount = updatedText.trim().split(/\s+/).length;
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseId = parseInt(urlParams.get('courseID'), 10); // Ensure courseId is an integer
-
-        if (!updatedText.trim()) {
-            alert('Reviews cannot be empty.');
-            return;
-        }
-        if (/^[\p{P}\s]+$/u.test(updatedText)) {
-            alert('Reviews cannot consist solely of punctuation.');
-            return;
-        }
-        if (updatedRating < 1) {
-            alert('Reviews must have a minimum of 1 star.');
-            return;
-        }
-        if (wordCount > 250) {
-            alert('Reviews cannot exceed 250 words.');
-            return;
-        }
+        const courseId = parseInt(new URLSearchParams(window.location.search).get('courseID'), 10);
 
         fetch(`http://localhost:3000/reviews/${reviewId}`, {
             method: 'PUT',
@@ -354,7 +380,7 @@ function editReview(button) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId }) // Ensure correct JSON structure
+            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId })
         })
         .then(response => {
             if (!response.ok) {
@@ -363,12 +389,8 @@ function editReview(button) {
             return response.json();
         })
         .then(data => {
-            console.log('Review updated successfully:', data); // Debug log
             alert(data.message);
             closePopup();
-
-            // Fetch the courseId from the URL and ensure it is passed to fetchReviews
-            console.log('Fetching reviews after update with courseId:', courseId); // Debug log
             fetchReviews(courseId);
         })
         .catch(error => {
