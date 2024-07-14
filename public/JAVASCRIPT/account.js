@@ -510,6 +510,28 @@ async function deleteDiscussion(discussionId) {
   }
 }
 
+function showSection(sectionId) {
+  // Hide all tab contents
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabContents.forEach(content => content.classList.remove('active'));
+
+  // Remove active class from all tabs
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => tab.classList.remove('active'));
+
+  // Show the selected tab content
+  document.getElementById(sectionId).classList.add('active');
+
+  // Add active class to the clicked tab
+  event.target.classList.add('active');
+}
+
+// Set the default tab to be active
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelector('.tab').click();
+});
+
+
 function getToken() {
   // Implementation for fetching the token goes here
   // For example, it could be fetched from local storage

@@ -141,9 +141,9 @@
 
 .dashboard {
   max-width: 80%;
-  margin-left: 290px;
+  margin-left: 250px;
   margin-top: 70px; /* Adjust according to the height of the top navbar */
-  padding: 50px;
+  padding: 40px;
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 20px;
@@ -300,42 +300,25 @@
 
 /* -----------------------------------------Review---------------------------------------  */
 
-.title-container {
-  grid-column: span 2;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column; /* Added to stack items vertically */
-  align-items: flex-start; /* Align items to the start of the flex container */
-}
 
-.title {
-  font-size: 25px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10px; /* Adjust this value as needed */
-}
-.review-wrapper {
+/* .review-wrapper {
   display: flex;
   flex-direction: row;
   gap: 20px;
   float: left;
-}
+} */
 
 /* Review Card */
-.review-card {
+/* .review-card {
   background-color: rgba(228, 179, 164, 0.8);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 20px;
-  margin: 20px auto;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
+
+} */
 
 /* Review Header */
 .review-header {
@@ -485,17 +468,15 @@
 
 
 /*------------------------------------------User Discussions------------------------------- */
-
-
-.user-discussions {
+/* .user-discussions {
   display: flex;
   flex-direction: row;
   gap: 20px;
   margin: 20px;
   float: left;
-  }
+  } */
   
-  .post {
+  /* .post {
   background-color: rgba(228, 179, 164, 0.8);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
@@ -504,7 +485,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  }
+  } */
   
   .post-header {
   display: flex;
@@ -519,7 +500,7 @@
   }
   
   .username {
-  font-size: 1.5rem;
+  font-size: 10px;
   font-weight: bold;
   color: #333;
   }
@@ -816,10 +797,13 @@
 .title-container {
   text-align: center;
   margin-bottom: 20px;
+  border-radius: 10px;
+  padding: 10px;
   background-color: whitesmoke;
 }
 
 .title {
+  margin-top: 10px;
   font-size: 25px;
   font-weight: bold;
   color: #333;
@@ -917,10 +901,92 @@
   cursor: pointer;
 }
 
-
-
-
 input[readonly] {
   cursor: not-allowed;
   background-color: #f5f5f5;
+}
+
+
+whole-container {
+  width: 100%;
+}
+.tab-container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  height: 50px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.tab {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid #e5e7eb;
+  background: #f7f7f7;
+  cursor: pointer;
+  font-size: 20px;
+  text-align: center;
+}
+.tab.active {
+  background: #fff;
+  border-bottom: 2px solid #000;
+}
+.tab-content {
+  display: none;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+
+.total-container {
+  grid-column: span 1;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+}
+.total-title-container {
+  text-align: center;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: whitesmoke;
+}
+.total-container h2 {
+  margin-top: 10px;
+  font-size: 25px;
+  font-weight: bold;
+  color: #333;
+}
+
+.total-container .card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.total-container .card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.total-container .card-content h3 {
+  color: #1b2b40;
+  margin: 0;
+}
+
+.total-container .card-content p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #d9aa52;
 }
