@@ -17,7 +17,6 @@ window.onclick = function(event) {
 
 
 // --------------------------------------reviews-----------------------------
-
 document.addEventListener('DOMContentLoaded', function() {
   fetchAndDisplayReviews();
 });
@@ -42,7 +41,10 @@ async function fetchAndDisplayReviews() {
           return;
       }
 
-      userReviews.forEach(review => createReviewCard(review, reviewWrapper));
+      userReviews.forEach(review => {
+          console.log('Review Object:', review); // Debug log
+          createReviewCard(review, reviewWrapper);
+      });
   } catch (error) {
       console.error('Error fetching reviews:', error);
   }
@@ -57,7 +59,7 @@ function createReviewCard(review, reviewWrapper) {
   reviewHeader.className = 'review-header';
 
   const profilePic = document.createElement('img');
-  profilePic.src = review.profilePic; // Use review.profilePic
+  profilePic.src = review.profilePic;
   profilePic.alt = 'profile image';
   profilePic.className = 'profile-pic';
 
@@ -83,11 +85,14 @@ function createReviewCard(review, reviewWrapper) {
   const reviewActions = document.createElement('div');
   reviewActions.className = 'review-actions';
 
-  const deleteBtn = createButton('Delete', () => openDeleteModal(review.review_id));
-  const editBtn = createButton('Edit', () => editReview(review.review_id, review.review_text, review.rating));
+  // Handle optional courseId
+  const courseId = review.courseId !== undefined ? review.courseId : null;
 
-  reviewActions.appendChild(deleteBtn);
+  const editBtn = createButton('Edit', () => editReview(review.review_id, review.review_text, review.rating, courseId));
   reviewActions.appendChild(editBtn);
+
+  const deleteBtn = createButton('Delete', () => openDeleteReviewModal(review.review_id));
+  reviewActions.appendChild(deleteBtn);  
 
   reviewInfo.appendChild(userName);
   reviewInfo.appendChild(stars);
@@ -131,47 +136,111 @@ function createButton(text, onClick) {
   return button;
 }
 
-async function deleteReview(reviewId) {
-  try {
-      const token = getToken();
-      const response = await fetch(`/reviews/${reviewId}`, {
-          method: 'DELETE',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-          }
-      });
-      if (!response.ok) throw new Error('Failed to delete review');
-      
-      alert('Review deleted successfully');
-      closeDeleteModal();
-      fetchAndDisplayReviews();
-  } catch (error) {
-      console.error('Error deleting review:', error);
-      alert('Error deleting review: ' + error.message);
+function openDeleteReviewModal(reviewId) {
+  const deleteReviewModal = document.getElementById('deleteReviewModal');
+  deleteReviewModal.style.display = 'block';
+  deleteReviewModal.setAttribute('data-review-id', reviewId);
+}
+
+function closeDeleteReviewModal() {
+  const deleteReviewModal = document.getElementById('deleteReviewModal');
+  if (deleteReviewModal) {
+    deleteReviewModal.style.display = 'none';
+    deleteReviewModal.removeAttribute('data-review-id');
+  } else {
+    console.error('Delete review modal element not found.');
   }
 }
 
-function openDeleteModal(reviewId) {
-  document.getElementById('deleteReviewModal').style.display = 'block';
-  document.getElementById('confirmReviewDelete').onclick = function () {
-      deleteReview(reviewId);
-  };
+document.getElementById('confirmReviewDelete').addEventListener('click', function() {
+  const deleteReviewModal = document.getElementById('deleteReviewModal');
+  const reviewId = deleteReviewModal.getAttribute('data-review-id');
+  if (reviewId) {
+    deleteReview(reviewId);
+  } else {
+    console.error('Review ID not found.');
+  }
+});
+
+// async function deleteReview(reviewId) {
+//   console.log('Deleting review with ID:', reviewId); // Log review ID
+//   try {
+//     const token = getToken();
+//     const response = await fetch(`/reviews/${reviewId}`, {
+//       method: 'DELETE',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${token}`
+//       }
+//     });
+
+//     // Log response status and response
+//     console.log('Delete response status:', response.status); // Log response status
+//     const result = await response.json();
+//     console.log('Delete response result:', result); // Log response result
+
+//     if (!response.ok || result.error) {
+//       throw new Error(result.error || 'Failed to delete review');
+//     }
+    
+//     alert('Review deleted successfully');
+//     closeDeleteModal();
+//     fetchAndDisplayReviews();
+//   } catch (error) {
+//     console.error('Error deleting review:', error);
+//     alert('Error deleting review: ' + error.message);
+//   }
+// }
+
+async function deleteReview(reviewId) {
+  console.log('Deleting review with ID:', reviewId); // Log review ID
+  try {
+    const token = getToken();
+    const response = await fetch(`/reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Log response status and response
+    console.log('Delete response status:', response.status); // Log response status
+    const result = await response.json();
+    console.log('Delete response result:', result); // Log response result
+
+    if (!response.ok || result.error) {
+      throw new Error(result.error || 'Failed to delete review');
+    }
+    
+    alert('Review deleted successfully');
+    closeDeleteReviewModal();
+
+    // Remove the deleted review element from the DOM
+    const reviewElement = document.querySelector(`.review-card[data-review-id="${reviewId}"]`);
+    if (reviewElement) {
+      reviewElement.remove();
+    }
+
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    alert('Error deleting review: ' + error.message);
+  }
 }
 
-function closeDeleteModal() {
-  document.getElementById('deleteReviewModal').style.display = 'none';
+function editReview(reviewId, currentText, currentRating, courseId) {
+  openEditReviewModal(reviewId, currentText, currentRating, courseId);
 }
 
-function editReview(reviewId, currentText, currentRating) {
-  openEditReviewModal(reviewId, currentText, currentRating);
-}
-
-function openEditReviewModal(reviewId, currentText, currentRating) {
+function openEditReviewModal(reviewId, currentText, currentRating, courseId) {
   const modal = document.getElementById('editReviewModal');
   modal.style.display = 'block';
   document.getElementById('editReviewText').value = currentText;
   setRatingStars(currentRating);
+
+  // Ensure courseId is valid or set to null
+  const numericCourseId = courseId !== null && !isNaN(Number(courseId)) ? Number(courseId) : null;
+  modal.setAttribute('data-course-id', numericCourseId !== null ? numericCourseId : 'null');
 
   document.getElementById('submitEditedReview').onclick = function () {
       submitEditedReview(reviewId);
@@ -193,61 +262,51 @@ function setRatingStars(rating) {
 async function submitEditedReview(reviewId) {
   const newText = document.getElementById('editReviewText').value;
   const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
+  const modal = document.getElementById('editReviewModal');
+  const courseId = modal.getAttribute('data-course-id');
 
-  if (newText && newRating >= 1 && newRating <= 5) {
-      try {
-          const token = getToken();
-          const response = await fetch(`/reviews/${reviewId}`, {
-              method: 'PUT',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({ review_text: newText, rating: newRating })
-          });
-          if (!response.ok) throw new Error('Failed to update review');
-          
-          alert('Review updated successfully');
-          closeEditReviewModal();
-          fetchAndDisplayReviews();
-      } catch (error) {
-          console.error('Error updating review:', error);
+  // Check if newText is valid
+  if (!newText) {
+      alert('Review text is required.');
+      return;
+  }
+
+  // Check if newRating is valid
+  if (newRating < 1 || newRating > 5) {
+      alert('Rating must be between 1 and 5.');
+      return;
+  }
+
+  try {
+      const token = getToken();
+      const body = {
+          review_text: newText,
+          rating: newRating,
+          courseId: courseId !== 'null' ? Number(courseId) : 0 // Use 0 as a placeholder for no course
+      };
+
+      const response = await fetch(`/reviews/${reviewId}`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update review');
       }
-  } else {
-      alert('Invalid input');
+
+      alert('Review updated successfully');
+      closeEditReviewModal();
+      fetchAndDisplayReviews();
+  } catch (error) {
+      console.error('Error updating review:', error);
+      alert('Error updating review: ' + error.message);
   }
 }
-
-
-async function submitEditedReview(reviewId) {
-  const newText = document.getElementById('editReviewText').value;
-  const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
-
-  if (newText && newRating >= 1 && newRating <= 5) {
-      try {
-          const token = getToken();
-          const response = await fetch(`/reviews/${reviewId}`, {
-              method: 'PUT',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({ review_text: newText, rating: newRating })
-          });
-          if (!response.ok) throw new Error('Failed to update review');
-
-          alert('Review updated successfully');
-          closeEditReviewModal();
-          fetchAndDisplayReviews();
-      } catch (error) {
-          console.error('Error updating review:', error);
-          alert('Error updating review: ' + error.message);
-      }
-  } else {
-      alert('Invalid input');
-  }
-}
-
 
 document.querySelectorAll('#editReviewModal .stars .fa-star').forEach((star, index) => {
   star.addEventListener('click', () => updateStarSelection(index));
@@ -277,7 +336,7 @@ function resetStars() {
 }
 
 function getToken() {
-  return localStorage.getItem('token'); // Adjust this according to your storage method
+  return localStorage.getItem('token');
 }
 
 function getUserIdFromToken(token) {
@@ -291,7 +350,6 @@ function getUserIdFromToken(token) {
   
   return payload.id;
 }
-
 
 
 // accountSetting.js
@@ -383,7 +441,7 @@ function addUserDiscussionToFeed(discussion) {
   feed.appendChild(post);
 
   post.querySelector('.edit-btn').addEventListener('click', () => openEditModal(discussion.id, discussion.description, discussion.category));
-  post.querySelector('.delete-btn').addEventListener('click', () => openDeleteModal(discussion.id));
+  post.querySelector('.delete-btn').addEventListener('click', () => openDeleteDiscussionModal(discussion.id));
 }
 
 // Edit Modal functions
@@ -437,7 +495,7 @@ async function saveEdit(discussionId) {
 }
 
 // Delete Modal functions
-function openDeleteModal(discussionId) {
+function openDeleteDiscussionModal(discussionId) {
   console.log('Opening delete modal for discussion ID:', discussionId);
   const deleteModal = document.getElementById('deleteDiscussionModal');
   if (deleteModal) {
@@ -475,10 +533,10 @@ function openDeleteModal(discussionId) {
 function closeDeleteModalDis() {
   console.log('Closing delete modal');
   const deleteModal = document.getElementById('deleteDiscussionModal');
-  if (deleteModal) {
+  if (deleteModal) {  // Check if deleteModal is not null
     deleteModal.style.display = 'none';
   } else {
-    console.error('Delete modal not found');
+    console.error('Delete modal not found.');
   }
 }
 
@@ -509,6 +567,28 @@ async function deleteDiscussion(discussionId) {
     alert('Error deleting discussion: ' + error.message);
   }
 }
+
+function showSection(sectionId) {
+  // Hide all tab contents
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabContents.forEach(content => content.classList.remove('active'));
+
+  // Remove active class from all tabs
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => tab.classList.remove('active'));
+
+  // Show the selected tab content
+  document.getElementById(sectionId).classList.add('active');
+
+  // Add active class to the clicked tab
+  event.target.classList.add('active');
+}
+
+// Set the default tab to be active
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelector('.tab').click();
+});
+
 
 function getToken() {
   // Implementation for fetching the token goes here
