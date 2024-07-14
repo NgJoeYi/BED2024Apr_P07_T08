@@ -17,6 +17,8 @@ async function getAllReviews(courseId, filter = 'all', sort = 'mostRecent') {
         // Add WHERE clause if courseId is provided
         if (courseId && !isNaN(courseId)) {
             query += ` WHERE ur.course_id = @course_id `;
+        } else {
+            query += ` WHERE 1=1 `;
         }
         
         if (filter !== 'all') {

@@ -137,26 +137,25 @@ function createButton(text, onClick) {
 }
 
 function openDeleteReviewModal(reviewId) {
-  const deleteModal = document.getElementById('deleteReviewModal');
-  deleteModal.style.display = 'block';
-  deleteModal.setAttribute('data-review-id', reviewId);
+  const deleteReviewModal = document.getElementById('deleteReviewModal');
+  deleteReviewModal.style.display = 'block';
+  deleteReviewModal.setAttribute('data-review-id', reviewId);
 }
 
-function closeDeleteModal() {
-  const deleteModal = document.getElementById('deleteReviewModal');
-  if (deleteModal) { // Check if deleteModal is not null
-    deleteModal.style.display = 'none';
-    deleteModal.removeAttribute('data-review-id');
+function closeDeleteReviewModal() {
+  const deleteReviewModal = document.getElementById('deleteReviewModal');
+  if (deleteReviewModal) {
+    deleteReviewModal.style.display = 'none';
+    deleteReviewModal.removeAttribute('data-review-id');
   } else {
-    console.error('Delete modal element not found.');
+    console.error('Delete review modal element not found.');
   }
 }
 
 document.getElementById('confirmReviewDelete').addEventListener('click', function() {
-  const deleteModal = document.getElementById('deleteReviewModal');
-  const reviewId = deleteModal.getAttribute('data-review-id');
+  const deleteReviewModal = document.getElementById('deleteReviewModal');
+  const reviewId = deleteReviewModal.getAttribute('data-review-id');
   if (reviewId) {
-    console.log(`Deleting review with ID: ${reviewId}`);
     deleteReview(reviewId);
   } else {
     console.error('Review ID not found.');
@@ -215,7 +214,7 @@ async function deleteReview(reviewId) {
     }
     
     alert('Review deleted successfully');
-    closeDeleteModal();
+    closeDeleteReviewModal();
 
     // Remove the deleted review element from the DOM
     const reviewElement = document.querySelector(`.review-card[data-review-id="${reviewId}"]`);
@@ -228,7 +227,6 @@ async function deleteReview(reviewId) {
     alert('Error deleting review: ' + error.message);
   }
 }
-
 
 function editReview(reviewId, currentText, currentRating, courseId) {
   openEditReviewModal(reviewId, currentText, currentRating, courseId);

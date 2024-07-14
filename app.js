@@ -100,8 +100,8 @@ app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.delete
 
 // Add Routes for reviews
 app.get('/reviews', reviewController.getReviews); //Here alr have default filter to ALL and default sort to MOST RECENT
-app.get('/reviews/rating/:rating', reviewController.getReviewsByRating); // Filter by specific rating
-app.get('/reviews/sort/:sort', reviewController.getReviewsSortedByRating); // Sort by specific rating
+app.get('/reviews/rating/:rating', reviewController.getReviewsByRating); // Filter by specific rating eg 5 stars, then will only show 5 stars
+app.get('/reviews/sort/:sort', reviewController.getReviewsSortedByRating); // Sort by specific rating eg by most recent. highest to lowest rating eg http://localhost:3000/reviews/sort/highestRating
 app.get('/reviews/course/:courseId', reviewController.getReviewsByCourseId); // Filter by specific course ID
 app.get('/reviews/course/:courseId/rating/:rating', reviewController.getReviewsByCourseIdAndRating); // Filter by course ID and rating
 app.get('/reviews/course/:courseId/sort/:sort', reviewController.getReviewsByCourseIdAndSort); // Filter by course ID and sort
