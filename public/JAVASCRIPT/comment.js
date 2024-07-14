@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentComment = null;
     let currentCommentId = null;
     const token = getToken();
-    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-    //const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+    // const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10);  // Get the current user ID from session storage and not decode token bc decode token to get user Id pose security concerns since sensitive info can be found using token
+
 
     // console.log('Current User ID:', currentUserId); // Debug log
 
@@ -187,12 +188,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.editComment = function(button) {
         const comment = button.closest('.comment');
         const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
-        const token = getToken();
-        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
-        const currentUserId = decodedToken.id; // Extract user ID from JWT
+        const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
     
-        console.log('Comment User ID:', comment.dataset.userId); // Debug log
-        console.log('Comment User ID (parsed):', commentUserId); // Debug log
+        console.log('Comment User ID:', commentUserId); // Debug log
+        console.log('Current User ID:', currentUserId); // Debug log
     
         if (commentUserId === currentUserId) {
             currentComment = comment;
@@ -203,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('You can only edit your own comments.');
         }
     };
-
+    
     
     // window.editComment = function(button) {
     //     const comment = button.closest('.comment');
@@ -307,8 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentsSection = document.querySelector('.comments-section');
         commentsSection.innerHTML = ''; // Clear existing comments
         const token = getToken();
-        const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-    
+        const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
         // Sort comments so newest comment appears at top
         comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
@@ -361,8 +359,8 @@ function getToken() {
     return sessionStorage.getItem('token');
 }
 
-  function getUserIdFromToken(token) {
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.id;
-}
+// function getUserIdFromToken(token) {
+//     if (!token) return null;
+//     const payload = JSON.parse(atob(token.split('.')[1]));
+//     return payload.id;
+// }
