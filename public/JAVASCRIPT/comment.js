@@ -94,24 +94,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
         try {
             const response = editMode && currentComment
-                ? await fetch(`/comments/${currentCommentId}`, {
+                ? await fetchWithAuth(`/comments/${currentCommentId}`, { // ------------------------------------------------- headers in jwtutility.js
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 })
-                : await fetch('/comments', {
+                : await fetchWithAuth('/comments', { // ------------------------------------------------- headers in jwtutility.js
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 });
     
-            if (response.ok) {
+            if (response.ok) { // response && response.ok
                 if (editMode && currentComment) {
                     currentComment.querySelector('.comment-content').textContent = commentText;
                     alert('Comment updated successfully!');
@@ -133,15 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
     //This requires jwt
     async function postComment(text, discussionId) {
         try {
-            const response = await fetch('/comments', {
+            const response = await fetchWithAuth('/comments', { // ------------------------------------------------- headers in jwtutility.js
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify({ content: text, discussionId: parseInt(discussionId, 10) }) // Ensure discussionId is an integer
             });
-            if (response.ok) {
+            if (response.ok) { // response && response.ok
                 alert('Comment posted successfully!');
                 fetchComments(discussionId); // Refresh comments for the specific discussion
             } else {
@@ -159,19 +147,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentId = comment.dataset.id;
     
         try {
-            const response = await fetch(`/comments/${commentId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+            const response = await fetchWithAuth(`/comments/${commentId}`, { // ------------------------------------------------- headers in jwtutility.js
+                method: 'DELETE'
             });
     
             console.log('Response status:', response.status); // To debug
     
-            if (response.status === 403) {
+            if (response.status === 403) { // response && response.status === 403
                 alert('You can only delete your own comments.');
-            } else if (response.ok) {
+            } else if (response.ok) { // response && response.ok
                 if (confirm("Are you sure you want to delete this comment?")) {
                     comment.remove();
                     alert('Comment deleted successfully!');
@@ -222,13 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // };
 
     async function fetchDiscussionDetails(discussionId) {
-        const token = getToken();
         try {
-            const response = await fetch(`/discussions/${discussionId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await fetchWithAuth(`/discussions/${discussionId}`); // ------------------------------------------------- headers in jwtutility.js
             if (!response.ok) {
                 throw new Error(`Error fetching discussion: ${response.statusText}`);
             }

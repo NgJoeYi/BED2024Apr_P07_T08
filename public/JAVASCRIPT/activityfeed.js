@@ -14,12 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const title = document.getElementById('title').value;
         const category = document.getElementById('category').value;
         const description = document.getElementById('description').value;
-        const token = getToken(); // Function to get the current user's ID
-
-        if (!token) {
-            alert('User must be logged in to submit a discussion.');
-            return;
-        }
 
         const data = {
             title: title,
@@ -30,15 +24,12 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Submitting form with data:', data);
         displayLoading(true);
 
-        fetch('/discussions', {
+        fetchWithAuth('/discussions', { // ------------------------------------------------- headers in jwtutility.js
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify(data)
         })
         .then(response => {
+            if (!response) return; // ****************** jwt
             console.log('Server response status:', response.status);
             return response.json();
         })
@@ -61,15 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
-function getToken() {
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-        alert('User is not logged in or session has expired');
-        return null;
-    }
-    return token;
-}
 
 function fetchDiscussions() {
     const category = document.getElementById('filter-category').value;
@@ -173,19 +155,36 @@ function addDiscussionToFeed(discussion) {
     const dislikeButton = post.querySelector('.dislike-button');
     const commentButton = post.querySelector('.comment-button');
 
+    // likeButton.addEventListener('click', function () {
+    //     if (this.getAttribute('data-liked') === 'false') {
+    //         console.log('Like button clicked');
+    //         incrementLikes(discussion.id, this, dislikeButton);
+    //     }
+    // });
     likeButton.addEventListener('click', function () {
-        if (this.getAttribute('data-liked') === 'false') {
-            console.log('Like button clicked');
-            incrementLikes(discussion.id, this, dislikeButton);
+        if (this.getAttribute('data-liked') === 'true') {
+            alert('You have already liked this discussion.'); // TRYING TO FIX LIKE DISLIKE ISSUE
+            return;
         }
+        console.log('Like button clicked');
+        incrementLikes(discussion.id, this, dislikeButton);
     });
 
     dislikeButton.addEventListener('click', function () {
-        if (this.getAttribute('data-disliked') === 'false') {
-            console.log('Dislike button clicked');
-            incrementDislikes(discussion.id, likeButton, this);
+        if (this.getAttribute('data-disliked') === 'true') {
+            alert('You have already disliked this discussion.'); // TRYING TO FIX LIKE DISLIKE ISSUE
+            return;
         }
+        console.log('Dislike button clicked');
+        incrementDislikes(discussion.id, likeButton, this);
     });
+
+    // dislikeButton.addEventListener('click', function () {
+    //     if (this.getAttribute('data-disliked') === 'false') {
+    //         console.log('Dislike button clicked');
+    //         incrementDislikes(discussion.id, likeButton, this);
+    //     }
+    // });
 
     commentButton.addEventListener('click', function () {
         const discussionId = this.getAttribute('data-id');
@@ -212,24 +211,18 @@ function fetchCommentCountForDiscussion(discussionId) {
 }
 
 function incrementLikes(discussionId, likeButton, dislikeButton) {
-    const token = getToken();
-    if (!token) {
-        return;
-    }
-    
     if (likeButton.getAttribute('data-liked') === 'true') {
         alert('You have already liked this discussion.');
         return;
     }
 
-    fetch(`/discussions/${discussionId}/like`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
+    fetchWithAuth(`/discussions/${discussionId}/like`, { // ------------------------------------------------- headers in jwtutility.js
+        method: 'POST'
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response) return; // ****************** jwt
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             likeButton.textContent = `👍 ${data.likes} Likes`;
@@ -246,25 +239,18 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
 }
 
 function incrementDislikes(discussionId, likeButton, dislikeButton) {
-    const token = getToken();
-    if (!token) {
-        return;
-    }
-
     if (dislikeButton.getAttribute('data-disliked') === 'true') {
         alert('You have already disliked this discussion.');
         return;
     }
 
-    fetch(`/discussions/${discussionId}/dislike`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
+    fetchWithAuth(`/discussions/${discussionId}/dislike`, { // ------------------------------------------------- headers in jwtutility.js
+        method: 'POST'
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => {
+        if (!response) return; // ****************** jwt
+        return response.json();
+    })    .then(data => {
         if (data.success) {
             dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
             dislikeButton.setAttribute('data-disliked', 'true');

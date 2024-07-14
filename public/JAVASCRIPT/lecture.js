@@ -26,18 +26,15 @@ function clearVideo() {
 async function deleteLecture(button) {
     const lectureID = button.dataset.lectureId;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
-    const token = sessionStorage.getItem('token');
+    // const token = sessionStorage.getItem('token');
 
     if (!confirm('Are you sure you want to delete this lecture?')) {
         return;
     }
 
     try {
-        const response = await fetch(`/lectures/${lectureID}`, { 
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetchWithAuth(`/lectures/${lectureID}`, { // ------------------------------------------------- headers in jwtutility.js
+            method: 'DELETE'
         });
 
         if (response.ok) {
@@ -56,11 +53,8 @@ async function deleteLecture(button) {
 
             if (lectures.length === 0) {
                 // No more lectures, delete the course
-                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { 
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const deleteCourseResponse = await fetchWithAuth(`/courses/${courseID}`, { // ------------------------------------------------- headers in jwtutility.js
+                    method: 'DELETE'
                 });
                 if (deleteCourseResponse.ok) {
                     alert('Course deleted successfully!');
@@ -89,18 +83,15 @@ async function deleteChapter(button) {
     if (!confirm(`Are you sure you want to delete the entire chapter: ${chapterName}?`)) {
         return;
     }
-    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
-    if (!token) {
-        alert('User not authenticated. Please log in.');
-        return;
-    }
+    // const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
+    // if (!token) {
+    //     alert('User not authenticated. Please log in.');
+    //     return;
+    // }
 
     try {
-        const response = await fetch(`/lectures/course/${courseID}/chapter/${chapterName}`, { 
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
-            }
+        const response = await fetchWithAuth(`/lectures/course/${courseID}/chapter/${chapterName}`, { // ------------------------------------------------- headers in jwtutility.js
+            method: 'DELETE'
         });
 
         if (response.ok) {
@@ -114,9 +105,8 @@ async function deleteChapter(button) {
             if (lectures.length === 0) {
                 // No more lectures, delete the course
                 console.log('NO MORE LECTURES');
-                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { 
-                    method: 'DELETE',
-                    'Authorization': `Bearer ${token}`
+                const deleteCourseResponse = await fetchWithAuth(`/courses/${courseID}`, { // ------------------------------------------------- headers in jwtutility.js
+                    method: 'DELETE'
                 });
                 if (deleteCourseResponse.ok) {
                     alert('Course deleted successfully!');
@@ -142,7 +132,7 @@ async function deleteChapter(button) {
 
 function displayLectures(lectures) {
     const userRole = sessionStorage.getItem('role');
-    const token = sessionStorage.getItem('token');
+    // const token = sessionStorage.getItem('token');
 
     const sidebar = document.querySelector('.sidebar .nav');
     if (!sidebar) {
@@ -171,18 +161,18 @@ function displayLectures(lectures) {
         navItem.className = 'nav-item';
 
         const deleteChapterButton = 
-            token && userRole === 'lecturer'
+            /*token && */userRole === 'lecturer'
             ? `<button class="delete-chapter" style="display:block;" data-chapter-name="${chapterName}" onclick="deleteChapter(this)">Delete Chapter</button>` 
             : '';
 
         const subNavItems = groupedLectures[chapterName]
             .map(lecture => {
                 const deleteButton = 
-                     token && userRole === 'lecturer'
+                     /*token && */userRole === 'lecturer'
                     ? `<button class="delete-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>` 
                     : '';
                 const editButton = 
-                     token && userRole === 'lecturer'
+                     /*token && */userRole === 'lecturer'
                     ? `<button class="edit-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="editLecture(this)">Edit</button>`
                     : '';
     
