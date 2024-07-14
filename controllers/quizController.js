@@ -387,17 +387,18 @@ const submitQuiz = async (req, res) => {
             // Check each answer and calculate the total score
             const correctOption = await Quiz.isCorrectAnswer(question_id); // getting the correct option
             if (correctOption.toLowerCase() === selected_option.toLowerCase()) {
+                // console.log('each time i get correct');
                 totalScore++;
             } else {
                 await Quiz.saveIncorrectAnswer(attemptId, question_id, selected_option, correctOption);
             }
         }
-
-        // Calculate score percentage
+        // Calculate score percentage -- need to revisit this when i am awake
         const scorePercentage = (totalScore / totalQuestions) * 100;
-
-        const passingScore = totalMarks * 0.5; // need to get at least half of the total marks to pass
-        const passed = totalScore >= passingScore; // if total score is more than half of the total marks = pass
+        console.log('Score percentage:', scorePercentage);
+        const passed = scorePercentage >= 50; // more than 50% mean pass
+        console.log('Passed:', passed);
+        // Calculate score percentage -- need to revisit this when i am awake
 
         // Update the quiz attempt record with the calculated score and passing status
         await Quiz.updateQuizAttempt(attemptId, scorePercentage, passed);
