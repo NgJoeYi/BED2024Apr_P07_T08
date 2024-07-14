@@ -258,14 +258,9 @@ async function handleImageUploadForCreate(data) {
 }
 
 async function createQuizRequest(data) {
-    const token = sessionStorage.getItem('token');
     try {
-        const response = await fetch('/quizzes', {
+        const response = await fetchWithAuth('/quizzes', { // ------------------------------------------------- headers in jwtutility.js
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify(data)
         });
         const body = await response.json();
@@ -378,14 +373,9 @@ async function handleImageUploadForQuestion(data) {
 }
 
 async function createQuestionRequest(data) {
-    const token = sessionStorage.getItem('token');
     try {
-        const response = await fetch(`/quizzes/${data.quiz_id}/questions`, {
+        const response = await fetchWithAuth(`/quizzes/${data.quiz_id}/questions`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify(data)
         });
         const body = await response.json();
@@ -473,14 +463,9 @@ async function updateQuiz(event) {
 }
 
 async function updateQuizRequest(data) {
-    const token = sessionStorage.getItem('token');
     try {
-        const response = await fetch(`/quizzes/${data.quiz_id}`, {
+        const response = await fetchWithAuth(`/quizzes/${data.quiz_id}`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify(data)
         });
         const body = await response.json();
@@ -508,13 +493,9 @@ function handleUpdateQuizResponse(response, body) {
 async function deleteQuiz(event) {
     event.preventDefault();
     const quizId = document.getElementById('update_quiz_id').value;
-    const token = sessionStorage.getItem('token');
     try {
-        const response = await fetch(`/quizzes/${quizId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetchWithAuth(`/quizzes/${quizId}`, { // ------------------------------------------------- headers in jwtutility.js
+            method: 'DELETE'
         });
         const body = await response.json();
         if (!response.ok) throw new Error(body.message);
