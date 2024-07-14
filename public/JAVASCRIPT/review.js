@@ -13,9 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }    
 
     const token = sessionStorage.getItem('token'); // Get the token from session storage
-    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-    // const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
-    // console.log('Current User ID:', currentUserId); // Debug log
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
 
     // Hide "Add Review" button if the user is not logged in
     if (!token) {
@@ -275,8 +273,8 @@ function postReview() {
 function editReview(button) {
     const review = button.closest('.review');
     const reviewUserId = parseInt(review.dataset.userId, 10);
-    const token = sessionStorage.getItem('token');
-    const currentUserId = getUserIdFromToken(token);
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
+    const token = sessionStorage.getItem('token'); // Get the token from session storage
 
     if (reviewUserId !== currentUserId) {
         alert('You can only edit your own reviews.');
@@ -344,7 +342,7 @@ function fetchReviews(courseId) {
     const filter = document.getElementById('filter').value;
     const sort = document.getElementById('sort').value;
     const token = sessionStorage.getItem('token'); // Get the token from session storage
-    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
 
     let url = `http://localhost:3000/reviews/course/${courseId}`;
     if (filter !== 'all') {
@@ -413,12 +411,12 @@ function fetchReviews(courseId) {
         .catch(error => console.error('Error fetching reviews:', error));
 }
 
-function getUserIdFromToken(token) {
-    if (!token) {
-        console.log('No token found'); // Debug log
-        return null;
-    }
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    console.log('Payload from token:', payload); // Debug log
-    return payload.id;
-}
+// function getUserIdFromToken(token) {
+//     if (!token) {
+//         console.log('No token found'); // Debug log
+//         return null;
+//     }
+//     const payload = JSON.parse(atob(token.split('.')[1]));
+//     console.log('Payload from token:', payload); // Debug log
+//     return payload.id;
+// }
