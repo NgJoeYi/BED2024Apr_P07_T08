@@ -191,6 +191,7 @@ const getCourseImage = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
 const searchCourses = async (req, res) => {
   try {
     const searchTerm = req.query.term;

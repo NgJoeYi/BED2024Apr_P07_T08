@@ -17,7 +17,6 @@
     <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
 </head>
 <body>
-<!--Top Navigation Bar--> 
     <header>
         <nav class="navbar">
         <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
@@ -52,8 +51,8 @@
 
         <div class="question-section">
             <div class="search-container">
-                <i class="fa fa-search search-icon"></i>
-                <input type="text" placeholder="Search.." class="question-input" style="padding-left:30px;">
+                <i class="fa fa-search search-icon" id = "search-icon" onclick="searchCourses(event)" input type = "submit"></i>
+                <input type="text" placeholder="Search.." id="search-course-input" style="padding-left:30px;">
             </div>
             <a href="UploadCourses.html" class="add-button" style="display: none;">+</a>
         </div>
@@ -80,7 +79,7 @@
         <div class="courses-grid-unique">
             <div class="course-cd-unique" data-category="coding" data-date="2024-01-01" data-course-id="1">
                 <a href="lecture.html">
-                    <img src="python.png" alt="Course Image">
+                    <img src="../public/images/python.png" alt="Course Image">
                     <div class="course-details-unique">
                         <p class="category">Coding</p>
                         <h6>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h6>

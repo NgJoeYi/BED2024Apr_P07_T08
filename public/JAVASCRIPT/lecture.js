@@ -1,23 +1,27 @@
-document.addEventListener('DOMContentLoaded', () => {
-    getLecturesByCourse();
+async function getLecturesByCourse() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseID = urlParams.get('courseID');
 
-    const navTitles = document.querySelectorAll('.nav-title');
-    navTitles.forEach(title => {
-        title.addEventListener('click', () => {
-            const subNav = title.nextElementSibling;
-            subNav.style.display = subNav.style.display === "none" || subNav.style.display === "" ? "block" : "none";
-        });
-    });
+    if (!courseID) {
+        console.error('No course ID found in URL.');
+        return;
+    }
 
-    const hamburger = document.querySelector('.hamburger');
-    const sidebar = document.querySelector('.sidebar');
-    hamburger.addEventListener('click', () => {
-        sidebar.style.width = sidebar.style.width === "250px" || sidebar.style.width === "" ? "60px" : "250px";
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.style.display = sidebar.style.width === "250px" ? 'block' : 'none';
-        });
-    });
-});
+    try {
+        const response = await fetch(`/lectures/course/${courseID}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const lectures = await response.json();
+        displayLectures(lectures);
+    } catch (error) {
+        console.error('Error fetching lectures:', error);
+    }
+}
+
+function clearVideo() {
+    const videoIframe = document.querySelector('.main-content iframe');
+    videoIframe.src = ''; // Clear the video source
+    videoIframe.dataset.lectureId = ''; // Clear the data attribute
+}
 
 async function deleteLecture(button) {
     const lectureID = button.dataset.lectureId;
@@ -133,31 +137,6 @@ async function deleteChapter(button) {
     } catch (error) {
         console.error('Error deleting chapter:', error);
         alert('Error deleting chapter. 324324432');
-    }
-}
-
-function clearVideo() {
-    const videoIframe = document.querySelector('.main-content iframe');
-    videoIframe.src = ''; // Clear the video source
-    videoIframe.dataset.lectureId = ''; // Clear the data attribute
-}
-
-async function getLecturesByCourse() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const courseID = urlParams.get('courseID');
-
-    if (!courseID) {
-        console.error('No course ID found in URL.');
-        return;
-    }
-
-    try {
-        const response = await fetch(`/lectures/course/${courseID}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const lectures = await response.json();
-        displayLectures(lectures);
-    } catch (error) {
-        console.error('Error fetching lectures:', error);
     }
 }
 
@@ -278,4 +257,26 @@ async function editLecture(button) {
     // Redirect to edit lecture page with lectureID and courseID as query parameters
     window.location.href = `editLecture.html?courseID=${courseID}&lectureID=${lectureID}`;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    getLecturesByCourse();
+
+    const navTitles = document.querySelectorAll('.nav-title');
+    navTitles.forEach(title => {
+        title.addEventListener('click', () => {
+            const subNav = title.nextElementSibling;
+            subNav.style.display = subNav.style.display === "none" || subNav.style.display === "" ? "block" : "none";
+        });
+    });
+
+    const hamburger = document.querySelector('.hamburger');
+    const sidebar = document.querySelector('.sidebar');
+    hamburger.addEventListener('click', () => {
+        sidebar.style.width = sidebar.style.width === "250px" || sidebar.style.width === "" ? "60px" : "250px";
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.style.display = sidebar.style.width === "250px" ? 'block' : 'none';
+        });
+    });
+});
+
 

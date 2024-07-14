@@ -111,6 +111,7 @@ app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewControl
 app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt
 
 // Add Routes for courses
+app.get('/courses/search', courseController.searchCourses);
 app.get('/courses', courseController.getAllCourses);
 app.get('/courses/categories',courseController.getAllCategories); // for filtering by category4
 app.get('/courses/filter', courseController.filterByCategory);
@@ -118,7 +119,6 @@ app.get('/courses/mostRecent',courseController.getMostRecentCourses); // for fil
 app.get('/courses/earliest',courseController.getEarliestCourses); // for filtering by earliest made courses
 app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:id', courseController.getCourseImage);
-app.get('/courses/search', courseController.searchCourses);
 app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.updateCourse);
 app.post('/courses', jwtAuthorization.verifyJWT, upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/noLectures', jwtAuthorization.verifyJWT, courseController.deleteCourseWithNoLectures);

@@ -247,7 +247,7 @@
     margin-bottom: 20px;
   }
   
-  input[type=email], input[type=password], input[type=text], input[type=date] {
+  input[type=email], input[type=password], input[type=text], input[type=date] , input[type=search]{
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
