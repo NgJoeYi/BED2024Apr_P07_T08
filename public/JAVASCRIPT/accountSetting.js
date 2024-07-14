@@ -1,15 +1,9 @@
 // ---------------------------------------------- EDIT ACCOUNT ----------------------------------------------
 // Populate data to make it a prefilled form and ready to be edited
 document.addEventListener('DOMContentLoaded', async function () {
-    const token = getToken();
-    if (token) {
         try {
-          const response = await fetch('/account', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-        });            
-            if (response.ok) {
+          const response = await fetchWithAuth('/account');  // ------------------------------------------------- headers in jwtutility.js
+            if (response.ok) { // response && response.ok
                 const user = await response.json();
                 // Populate profile info
                 document.querySelector('.user-name').textContent = user.name;
@@ -32,8 +26,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     element.textContent = user.name;
                 });
 
-                // Fetch and update total quizzes taken // CHANGES WERE MADE HERE
-                await fetchTotalQuizzesTaken(token); // CHANGES WERE MADE HERE
+                // Fetch and update total quizzes taken
+                await fetchTotalQuizzesTaken();
 
             } else {
                 console.error('Failed to fetch user data');
@@ -41,17 +35,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         } catch (error) {
             console.error('Error:', error);
         }
-    } else {
-      console.error('No user is logged in');
-    }
     
     // Toggle visibility for edit account details
     document.getElementById('edit-icon').addEventListener('click', function () {
-      if (!token) {
-        alert('Please log in first to edit your account details.');
-        window.location.href = 'Login.html';
-        return;
-      }
       const editAccountDetails = document.getElementById('edit-account-details');
       if (editAccountDetails.style.display === 'block') {
         editAccountDetails.style.display = 'none';
@@ -106,16 +92,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
         
         try {
-            const response = await fetch(`/account`, {
+            const response = await fetchWithAuth(`/account`, { // ------------------------------------------------- headers in jwtutility.js
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                  },
                 body: JSON.stringify(updatedUserData)
             });
 
-            if (response.ok) {
+            if (response.ok) { // response && response.ok
                 const updatedUser = await response.json();
                 alert('User details updated successfully');
   
@@ -159,20 +141,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     
   // ---------------------------------------------- UPLOAD PROFILE PICTURE ----------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    const token = getToken();
-    if (token) {
-      fetchUserProfile(token);
-    }
+      fetchUserProfile();
   });
   
-  async function fetchUserProfile(token) {
+  async function fetchUserProfile() {
     try {
-      const response = await fetch(`/account/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
+      const response = await fetchWithAuth(`/account/profile`); // ------------------------------------------------- headers in jwtutility.js
+      if (response.ok) { // response && response.ok
         const data = await response.json();
         if (data.profilePic) {
           document.getElementById('profile-pic').src = data.profilePic;
@@ -186,12 +161,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   
   function triggerFileInput() {
-    const token = getToken();
-    if (!token) {
-      alert('Please log in first to upload your profile picture.');
-      window.location.href = 'Login.html';
-      return;
-    }
+    // const token = getToken();
+    // if (!token) {
+    //   alert('Please log in first to upload your profile picture.');
+    //   window.location.href = 'Login.html';
+    //   return;
+    // }
     document.getElementById('file-input').click();
   }
   
@@ -209,25 +184,14 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   
   async function uploadImageToServer(base64Image) {
-    const token = getToken();
-    
-    if (!token) {
-      alert('No token found. Please log in first.');
-      return;
-    }
-  
     try {
       console.log('Uploading image...');
-      const response = await fetch(`/account/uploadProfilePic`, {
+      const response = await fetchWithAuth(`/account/uploadProfilePic`, { // ------------------------------------------------- headers in jwtutility.js
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ profilePic: base64Image })
       });
   
-      if (response.ok) {
+      if (response.ok) { // response && response.ok
         alert('Profile picture updated successfully');
       } else {
         const errorData = await response.json();
@@ -244,12 +208,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   // ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
   // Function to confirm account deletion
   function confirmDeleteAccount() {
-    const token = getToken();
+    // const token = getToken();
     
-    if (!token) {
-      alert('No user is logged in');
-      return;
-    }
+    // if (!token) {
+    //   alert('No user is logged in');
+    //   return;
+    // }
   
     document.getElementById('deleteModal').style.display = 'block';
   }
@@ -261,32 +225,24 @@ document.addEventListener('DOMContentLoaded', async function () {
   
   // Function to delete account with password authorization
   async function deleteAccount() {
-    const token = getToken();
-    const password = document.getElementById('delete-password').value;
-
-    if (!token) {
-        alert('No user is logged in');
-        return;
-    }
-
-    if (!password) {
-        alert('Please enter your password');
-        return;
-    }
+    // const token = getToken();
+    // const password = document.getElementById('delete-password').value;
+    // if (!password) {
+    //     alert('Please enter your password');
+    //     return;
+    // }
 
     try {
-        const response = await fetch('/account', {
+        const response = await fetchWithAuth('/account', { // ------------------------------------------------- headers in jwtutility.js
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({ password: password })
         });
 
-        if (response.ok) {
+        if (response.ok) { // response && response.ok
             alert('Account deleted successfully');
             sessionStorage.removeItem('token');
+            sessionStorage.removeItem('userId');
+            sessionStorage.removeItem('role');
             window.location.href = 'Index.html';
         } else {
             const errorData = await response.json();
@@ -302,50 +258,40 @@ document.addEventListener('DOMContentLoaded', async function () {
   
   // ---------------------------------------------- LOG OUT --------------------------------------------------------------
   function confirmLogout() {
-    const token = getToken();
-    if (!token) {
-      alert('No user is logged in.');
-      return;
-    }
+    // const token = getToken();
+    // if (!token) {
+    //   alert('No user is logged in.');
+    //   return;
+    // }
     
     const userConfirmed = confirm('Are you sure you want to log out?');
     if (userConfirmed) {
       // User clicked "OK"
       alert('Logging you out...');
       sessionStorage.removeItem('token'); // Clear the token from session storage
+      sessionStorage.removeItem('userId');
+      sessionStorage.removeItem('role');
       window.location.href = '/login.html'; // Redirect to the login page
     } else {
       // User clicked "Cancel"
       alert('Logout cancelled.');
     }
   }
-  
-  function getToken() {
-    return sessionStorage.getItem('token');
-  }
-
 
 // ---------------------------------------------- QUIZ RESULTS ----------------------------------------------
 async function fetchUserQuizResults() {
-  const token = getToken();
   try {
-      const response = await fetch('/account/quizResult', {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      });
-      if (!response.ok) throw new Error('Failed to fetch quiz results');
+      const response = await fetchWithAuth('/account/quizResult'); // ------------------------------------------------- headers in jwtutility.js
+      if (!response) return; // *************** changes for jwt
+      // if (!response.ok) throw new Error('Failed to fetch quiz results');
 
       const quizResults = await response.json();
       console.log('Fetched quiz results:', quizResults); // Debugging log
 
       // Fetching the attempt count
-      const attemptCountResponse = await fetch('/account/quizAttemptCount', {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }      
-      });
-      if (!attemptCountResponse.ok) throw new Error('Failed to fetch attempt count');
+      const attemptCountResponse = await fetchWithAuth('/account/quizAttemptCount'); // ------------------------------------------------- headers in jwtutility.js
+      if (!attemptCountResponse) return; // *************** changes for jwt
+      // if (!attemptCountResponse.ok) throw new Error('Failed to fetch attempt count');
 
       const attemptCountData = await attemptCountResponse.json(); // returned an obj
       const attemptCount = attemptCountData.AttemptCount; // accessing within the obj
@@ -411,14 +357,11 @@ function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
 
 // ---------------------- fetch total quizzes taken ----------------------
 
-async function fetchTotalQuizzesTaken(token) {
+async function fetchTotalQuizzesTaken() {
   try {
-      const response = await fetch('/account/quizAttemptCount', {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      });
-      if (!response.ok) throw new Error('Failed to fetch total quizzes taken');
+      const response = await fetchWithAuth('/account/quizAttemptCount'); // ------------------------------------------------- headers in jwtutility.js
+      if (!response) return; // *************** changes for jwt
+      // if (!response.ok) throw new Error('Failed to fetch total quizzes taken');
 
       const data = await response.json();
       const totalQuizzes = data.AttemptCount;
@@ -430,15 +373,3 @@ async function fetchTotalQuizzesTaken(token) {
   }
 }
 document.addEventListener('DOMContentLoaded', fetchUserQuizResults);
-
-
-
-
-
-
-// ---------------------- Utility ----------------------
-
-function getToken() {
-  return sessionStorage.getItem('token');
-}
-
