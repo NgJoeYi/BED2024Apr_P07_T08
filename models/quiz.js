@@ -747,7 +747,7 @@ class Quiz {
         }
     }
 
-    // ------- pass fail stats
+    // ------------------------- START OF: pass fail stats for statistics html (social impact) -------------------------
     static async getQuizPassFailStatistics() {
         let connection;
         try {
@@ -771,6 +771,65 @@ class Quiz {
             }
         }
     }
+    // ------------------------- END OF: pass fail stats for statistics html (social impact) -------------------------
+
+
+
+
+    // ------------------------- START OF: for updating of questions & score after lecturers delete questions from quiz -------------------------
+    // Retrieve all quiz attempts for a specific quiz
+    static async getAllQuizResultsByQuizId(quizId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT * FROM UserQuizAttempts WHERE quiz_id=@quizId
+            `;
+            const request = connection.request();
+            request.input('quizId', quizId);
+            const result = await request.query(sqlQuery);
+            return result.recordset;
+        } catch (error) {
+            console.error('Error fetching all quiz results for quiz:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    // Retrieve user responses by attempt ID
+    static async getUserResponsesByAttemptId(attemptId) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT * FROM UserResponses WHERE attempt_id=@attemptId
+            `;
+            const request = connection.request();
+            request.input('attemptId', attemptId);
+            const result = await request.query(sqlQuery);
+            return result.recordset;
+        } catch (error) {
+            console.error('Error fetching user responses by attempt ID:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    // ------------------------- END OF: for updating of questions & score after lecturers delete questions from quiz -------------------------
+
+
+
+
+
+
+
+    
 }
 
 module.exports= Quiz;
