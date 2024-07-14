@@ -14,8 +14,12 @@ async function fetchWithAuth(url, options = {}) {
     options.headers = {
         ...options.headers,
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
     };
+
+    // If FormData is being used, do not set Content-Type to application/json
+    if (!(options.body instanceof FormData)) {
+        options.headers['Content-Type'] = 'application/json';
+    }
 
     try {
         const response = await fetch(url, options);
