@@ -18,26 +18,40 @@ document.addEventListener('DOMContentLoaded', function() {
   fetchAndDisplayReviews();
 });
 
-async function fetchAndDisplayReviews() {
-  const token = getToken();
-  console.log('Token retrieved from sessionStorage:', token); // Debug log
-  if (!token) {
-    console.error('No token found in sessionStorage');
-    return;
-  }
-  
+async function isValidCourseId(courseId) {
+  console.log('Validating Course ID:', courseId); // Log the course ID being validated
+
   try {
-    const response = await fetch('/reviews', {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const response = await fetchWithAuth(`/courses/${courseId}`, { // ------------------------------------------------- headers in jwtutility.js
+      method: 'GET'
     });
-    if (!response.ok) throw new Error('Failed to fetch reviews');
+
+    const responseData = await response.json();
+    console.log('Validation Response Data:', responseData); // Log the validation response data
+
+    return response.ok;
+  } catch (error) {
+    console.error('Error validating course ID:', error);
+    return false;
+  }
+}
+
+async function fetchAndDisplayReviews() {
+  try {
+    const response = await fetchWithAuth('/reviews'); // ------------------------------------------------- headers in jwtutility.js
+    // if (!response.ok) throw new Error('Failed to fetch reviews');
+    if (!response) return; // *************** changes for jwt
 
     const reviews = await response.json();
-    const userId = getUserIdFromToken(token); // Use the new function
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
+    console.log('Current User ID:', currentUserId); // Debug log
+    console.log('Fetched Reviews:', reviews); // Debug log
+
     const reviewWrapper = document.querySelector('.review-wrapper');
     reviewWrapper.innerHTML = '';
 
-    const userReviews = reviews.filter(review => review.user_id === userId);
+    const userReviews = reviews.filter(review => review.user_id === currentUserId);
+    console.log('Filtered User Reviews:', userReviews); // Debug log
 
     if (userReviews.length === 0) {
       reviewWrapper.innerHTML = '<p>No reviews found for this user.</p>';
@@ -168,13 +182,8 @@ document.getElementById('confirmReviewDelete').addEventListener('click', functio
 async function deleteReview(reviewId) {
   console.log('Deleting review with ID:', reviewId); // Log review ID
   try {
-    const token = getToken();
-    const response = await fetch(`/reviews/${reviewId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+    const response = await fetchWithAuth(`/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
+      method: 'DELETE'
     });
 
     // Log response status and response
@@ -211,9 +220,15 @@ function openEditReviewModal(reviewId, currentText, currentRating, courseId) {
   document.getElementById('editReviewText').value = currentText;
   setRatingStars(currentRating);
 
-  // Ensure courseId is valid or set to null
-  const numericCourseId = courseId !== null && !isNaN(Number(courseId)) ? Number(courseId) : null;
+  // Ensure courseId is valid or set to 1 (default valid course ID)
+  const numericCourseId = courseId !== null && !isNaN(Number(courseId)) ? Number(courseId) : 1;
   modal.setAttribute('data-course-id', numericCourseId !== null ? numericCourseId : 'null');
+
+  console.log('Opening Edit Modal:');
+  console.log('Review ID:', reviewId);
+  console.log('Current Text:', currentText);
+  console.log('Current Rating:', currentRating);
+  console.log('Course ID:', numericCourseId);
 
   document.getElementById('submitEditedReview').onclick = function () {
     submitEditedReview(reviewId);
@@ -236,48 +251,43 @@ async function submitEditedReview(reviewId) {
   const newText = document.getElementById('editReviewText').value;
   const newRating = document.querySelectorAll('#editReviewModal .stars .fa-star.selected').length;
   const modal = document.getElementById('editReviewModal');
-  const courseId = modal.getAttribute('data-course-id');
+  const courseIdAttr = modal.getAttribute('data-course-id');
+  const courseId = courseIdAttr !== 'null' ? Number(courseIdAttr) : 1; // Default to a valid course ID (1)
 
-  // Check if newText is valid
-  if (!newText) {
-    alert('Review text is required.');
-    return;
-  }
-
-  // Check if newRating is valid
-  if (newRating < 1 || newRating > 5) {
-    alert('Rating must be between 1 and 5.');
-    return;
-  }
+  console.log('Submitting edited review:');
+  console.log('Review ID:', reviewId);
+  console.log('New Text:', newText);
+  console.log('New Rating:', newRating);
+  console.log('Course ID:', courseId);
 
   try {
-    const token = getToken();
     const body = {
       review_text: newText,
       rating: newRating,
-      courseId: courseId !== 'null' ? Number(courseId) : 0 // Use 0 as a placeholder for no course
+      courseId: courseId // Always include courseId
     };
 
-    const response = await fetch(`/reviews/${reviewId}`, {
+    console.log('Request Body:', body); // Log the request body
+
+    const response = await fetchWithAuth(`/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
       body: JSON.stringify(body)
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to update review');
-    }
+    const responseData = await response.json();
+    console.log('Response Data:', responseData); // Log the response data
 
-    alert('Review updated successfully');
-    closeEditReviewModal();
-    fetchAndDisplayReviews();
+    if (!response.ok) {
+      console.error('Error response from server:', responseData);
+      alert(responseData.error); // Show JOI validation error as alert
+    } else {
+      alert('Review updated successfully');
+      closeEditReviewModal();
+      fetchAndDisplayReviews();
+    }
   } catch (error) {
     console.error('Error updating review:', error);
-    alert('Error updating review: ' + error.message);
+    alert('Error updating review: ' + error.message); // Show generic error message
   }
 }
 
@@ -287,12 +297,41 @@ document.querySelectorAll('#editReviewModal .stars .fa-star').forEach((star, ind
   star.addEventListener('mouseout', () => resetStars());
 });
 
+// function updateStarSelection(index) {
+//   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
+//   if (index === 0) {
+//     // If the first star is clicked, set rating to 0 and remove all selected stars
+//     stars.forEach(star => star.classList.remove('selected'));
+//   } else {
+//     stars.forEach((star, i) => {
+//       if (i <= index) star.classList.add('selected');
+//       else star.classList.remove('selected');
+//     });
+//   }
+// }
+
 function updateStarSelection(index) {
   const stars = document.querySelectorAll('#editReviewModal .stars .fa-star');
-  stars.forEach((star, i) => {
-    if (i <= index) star.classList.add('selected');
-    else star.classList.remove('selected');
-  });
+  const firstStarSelected = stars[0].classList.contains('selected');
+
+  if (index === 0) {
+    // If the first star is clicked and it is already selected, deselect it
+    if (firstStarSelected) {
+      stars.forEach(star => star.classList.remove('selected'));
+    } else {
+      // Select only the first star
+      stars.forEach((star, i) => {
+        if (i === 0) star.classList.add('selected');
+        else star.classList.remove('selected');
+      });
+    }
+  } else {
+    // For other stars, update the selection as usual
+    stars.forEach((star, i) => {
+      if (i <= index) star.classList.add('selected');
+      else star.classList.remove('selected');
+    });
+  }
 }
 
 function highlightStars(index) {
@@ -308,39 +347,18 @@ function resetStars() {
   stars.forEach(star => star.classList.remove('hover'));
 }
 
-// Change made: Use sessionStorage instead of localStorage to get the token
-function getToken() {
-  return sessionStorage.getItem('token');
-}
-
-function getUserIdFromToken(token) {
-  // Return the token directly as per user request
-  return token;
-}
-
-// Fetch user discussions on DOM load
 // Fetch user discussions on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   fetchUserDiscussions();
 });
 
 async function fetchUserDiscussions() {
-  const token = getToken();
-  if (!token) {
-    console.error('No user token found');
-    return;
-  }
-
   try {
-    const response = await fetch(`/discussions/user`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch user discussions');
-    }
+    const response = await fetchWithAuth(`/discussions/user`); // ------------------------------------------------- headers in jwtutility.js
+    if (!response) return; // *************** changes for jwt
+    // if (!response.ok) {
+    //   throw new Error('Failed to fetch user discussions');
+    // }
 
     const data = await response.json();
     console.log('Fetched discussions data:', data);
@@ -435,13 +453,8 @@ async function saveEdit(discussionId) {
   console.log('Category:', category);
 
   try {
-    const token = getToken();
-    const response = await fetch(`/discussions/${discussionId}`, {
+    const response = await fetchWithAuth(`/discussions/${discussionId}`, { // ------------------------------------------------- headers in jwtutility.js
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
       body: JSON.stringify({ description, category })
     });
 
@@ -509,15 +522,8 @@ function closeDeleteModalDis() {
 
 async function deleteDiscussion(discussionId) {
   try {
-    const token = getToken();
-    console.log('Deleting discussion with ID:', discussionId, 'for user ID:', token);
-
-    const response = await fetch(`/discussions/${discussionId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+    const response = await fetchWithAuth(`/discussions/${discussionId}`, { // ------------------------------------------------- headers in jwtutility.js
+      method: 'DELETE'
     });
 
     if (!response.ok) {
@@ -571,8 +577,3 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log(`Clicked first tab: ${firstTab.textContent}`); // Debug log
   }
 });
-
-// Change made: Use sessionStorage instead of localStorage to get the token
-function getToken() {
-  return sessionStorage.getItem('token');
-}

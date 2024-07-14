@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Fetch and render statistics
     try {
-        const response = await fetch('/quizzes/statistics'); // Ensure the correct endpoint
+        const response = await fetch('/quizzes/statistics');
         const statistics = await response.json();
         renderPassFailStatistics(statistics);
     } catch (error) {

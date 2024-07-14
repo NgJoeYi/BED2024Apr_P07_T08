@@ -5,16 +5,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (lectureID && courseID) {
         try {
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                alert('User not authenticated. Please log in.');
-                return;
-            }
-            const response = await fetch(`/lectures/${lectureID}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await fetchWithAuth(`/lectures/${lectureID}`); // ------------------------------------------------- headers in jwtutility.js
             if (!response.ok) throw new Error('Network response was not ok');
             const lecture = await response.json();
             populateLectureDetails(lecture);
@@ -44,19 +35,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
     
             try {
-                const token = sessionStorage.getItem('token');
-                if (!token) {
-                    alert('User not authenticated. Please log in.');
-                    return;
-                }
-    
                 console.log('Final FormData:', Array.from(formData.entries())); // Log final FormData before sending
     
-                const response = await fetch(`/lectures/${lectureID}`, {
+                const response = await fetchWithAuth(`/lectures/${lectureID}`, { // ------------------------------------------------- headers in jwtutility.js
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: formData
                 });
     

@@ -1,11 +1,3 @@
-// document.addEventListener('DOMContentLoaded', function() {
-//     // Check if the user is already logged in when the page loads
-//     if (sessionStorage.getItem('token')) {
-//         alert('You are already logged in! Redirecting to the home page...');
-//         window.location.href = 'index.html';
-//     }
-// });
-
 // Initialize the selected role as 'student' and set the button active
 let selectedRole = 'student';
 document.getElementById('student-btn').classList.add('active');

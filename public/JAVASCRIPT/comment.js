@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentComment = null;
     let currentCommentId = null;
     const token = getToken();
-    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-    //const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+    // const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10);  // Get the current user ID from session storage and not decode token bc decode token to get user Id pose security concerns since sensitive info can be found using token
+
 
     // console.log('Current User ID:', currentUserId); // Debug log
 
@@ -59,23 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // async function saveComment() {
     //     const commentText = document.getElementById('comment-text').value;
     //     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
-    //     console.log('Discussion ID:', discussionId); // Debug log
-    
-    //     if (!commentText.trim()) {  // Check if commentText is empty or whitespace
-    //         alert('Comments cannot be empty.');
-    //         return;
-    //     }
-    
-    //     if (/^[\p{P}\p{S}]+$/u.test(commentText)) {  // Check if commentText consists solely of punctuation or symbols
-    //         alert('Comments cannot consist solely of punctuations.');
-    //         return;
-    //     }
-    
-    //     const wordCount = commentText.trim().split(/\s+/).length;
-    //     if (wordCount > 150) {  // Check if commentText exceeds 150 words
-    //         alert('Comments cannot exceed 150 words.');
-    //         return;
-    //     }
     
     //     if (editMode && currentComment) {
     //         try {
@@ -85,14 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
     //                     'Content-Type': 'application/json',
     //                     'Authorization': `Bearer ${token}`
     //                 },
-    //                 body: JSON.stringify({ content: commentText })
+    //                 body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
     //             });
     //             if (response.ok) {
     //                 currentComment.querySelector('.comment-content').textContent = commentText;
     //                 closePopup();
     //                 alert('Comment updated successfully!');
     //             } else {
-    //                 console.error('Failed to update comment:', response.statusText);
+    //                 const errorData = await response.json();
+    //                 console.error('Failed to update comment:', errorData.error || response.statusText);
     //             }
     //         } catch (error) {
     //             console.error('Error:', error);
@@ -105,104 +90,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function saveComment() {
         const commentText = document.getElementById('comment-text').value;
-        const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
-        console.log('Discussion ID:', discussionId); // Debug log
+        const discussionId = new URLSearchParams(window.location.search).get('discussionId');
     
-        if (!commentText.trim()) {  // Check if commentText is empty or whitespace
-            alert('Comments cannot be empty.');
-            return;
-        }
-    
-        if (/^[\p{P}\p{S}]+$/u.test(commentText)) {  // Check if commentText consists solely of punctuation or symbols
-            alert('Comments cannot consist solely of punctuations.');
-            return;
-        }
-    
-        const wordCount = commentText.trim().split(/\s+/).length;
-        if (wordCount > 150) {  // Check if commentText exceeds 150 words
-            alert('Comments cannot exceed 150 words.');
-            return;
-        }
-    
-        console.log('Comment Text:', commentText); // Log comment text
-    
-        if (editMode && currentComment) {
-            try {
-                const response = await fetch(`/comments/${currentCommentId}`, {
+        try {
+            const response = editMode && currentComment
+                ? await fetchWithAuth(`/comments/${currentCommentId}`, { // ------------------------------------------------- headers in jwtutility.js
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
+                })
+                : await fetchWithAuth('/comments', { // ------------------------------------------------- headers in jwtutility.js
+                    method: 'POST',
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 });
-                if (response.ok) {
+    
+            if (response.ok) { // response && response.ok
+                if (editMode && currentComment) {
                     currentComment.querySelector('.comment-content').textContent = commentText;
-                    closePopup();
                     alert('Comment updated successfully!');
                 } else {
-                    const errorData = await response.json();
-                    console.error('Failed to update comment:', errorData.error || response.statusText);
+                    alert('Comment posted successfully!');
+                    fetchComments(discussionId); // Refresh comments for the specific discussion
                 }
-            } catch (error) {
-                console.error('Error:', error);
+                closePopup();
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || response.statusText); // Show alert for validation error
             }
-        } else {
-            await postComment(commentText, discussionId);
-            closePopup();
+        } catch (error) {
+            console.error('Error:', error);
         }
     }
     
             
     //This requires jwt
     async function postComment(text, discussionId) {
-        console.log('Posting Comment:', text); // Debug log
-        console.log('Discussion ID:', discussionId); // Debug log
-    
         try {
-            const response = await fetch('/comments', {
+            const response = await fetchWithAuth('/comments', { // ------------------------------------------------- headers in jwtutility.js
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify({ content: text, discussionId: parseInt(discussionId, 10) }) // Ensure discussionId is an integer
             });
-            if (response.ok) {
+            if (response.ok) { // response && response.ok
                 alert('Comment posted successfully!');
                 fetchComments(discussionId); // Refresh comments for the specific discussion
             } else {
                 const errorData = await response.json();
-                if (errorData.error === 'Comments cannot consist solely of punctuations.') {
-                    alert(errorData.error);
-                } else {
-                    console.error('Failed to post comment:', errorData.error || response.statusText);
-                }
+                alert(errorData.error || response.statusText); // Show alert for validation error
             }
         } catch (error) {
             console.error('Error:', error);
         }
     }
-                
+                        
     // -- this requires jwt
     window.deleteComment = async function(button) {
         const comment = button.closest('.comment');
         const commentId = comment.dataset.id;
     
         try {
-            const response = await fetch(`/comments/${commentId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+            const response = await fetchWithAuth(`/comments/${commentId}`, { // ------------------------------------------------- headers in jwtutility.js
+                method: 'DELETE'
             });
     
             console.log('Response status:', response.status); // To debug
     
-            if (response.status === 403) {
+            if (response.status === 403) { // response && response.status === 403
                 alert('You can only delete your own comments.');
-            } else if (response.ok) {
+            } else if (response.ok) { // response && response.ok
                 if (confirm("Are you sure you want to delete this comment?")) {
                     comment.remove();
                     alert('Comment deleted successfully!');
@@ -219,12 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.editComment = function(button) {
         const comment = button.closest('.comment');
         const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
-        const token = getToken();
-        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
-        const currentUserId = decodedToken.id; // Extract user ID from JWT
+        const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
     
-        console.log('Comment User ID:', comment.dataset.userId); // Debug log
-        console.log('Comment User ID (parsed):', commentUserId); // Debug log
+        console.log('Comment User ID:', commentUserId); // Debug log
+        console.log('Current User ID:', currentUserId); // Debug log
     
         if (commentUserId === currentUserId) {
             currentComment = comment;
@@ -235,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('You can only edit your own comments.');
         }
     };
-
+    
     
     // window.editComment = function(button) {
     //     const comment = button.closest('.comment');
@@ -255,13 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // };
 
     async function fetchDiscussionDetails(discussionId) {
-        const token = getToken();
         try {
-            const response = await fetch(`/discussions/${discussionId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await fetchWithAuth(`/discussions/${discussionId}`); // ------------------------------------------------- headers in jwtutility.js
             if (!response.ok) {
                 throw new Error(`Error fetching discussion: ${response.statusText}`);
             }
@@ -339,8 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentsSection = document.querySelector('.comments-section');
         commentsSection.innerHTML = ''; // Clear existing comments
         const token = getToken();
-        const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-    
+        const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
         // Sort comments so newest comment appears at top
         comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
@@ -393,8 +338,8 @@ function getToken() {
     return sessionStorage.getItem('token');
 }
 
-  function getUserIdFromToken(token) {
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.id;
-}
+// function getUserIdFromToken(token) {
+//     if (!token) return null;
+//     const payload = JSON.parse(atob(token.split('.')[1]));
+//     return payload.id;
+// }

@@ -1,15 +1,28 @@
 const Joi = require('joi');
 
 const commentSchema = Joi.object({
-    content: Joi.string().trim().pattern(/^[^\s]+(\s+[^\s]+)*$/).max(150).required(),
-    discussionId: Joi.number().integer().required()
+    content: Joi.string()
+        .trim()
+        .pattern(/^(?![\p{P}\s]+$).+/u)
+        .max(150)
+        .required()
+        .messages({
+            'string.empty': 'Comments cannot be empty.',
+            'string.max': 'Comments cannot exceed 150 words.',
+            'string.pattern.base': 'Comments cannot consist solely of punctuations.'
+        }),
+    discussionId: Joi.number()
+        .integer()
+        .required()
+        .messages({
+            'number.base': 'Discussion ID must be a valid number.',
+            'number.empty': 'Discussion ID is required.'
+        })
 });
 
 function validateComment(req, res, next) {
-    console.log('Request body:', req.body); // Log the request body
     const { error } = commentSchema.validate(req.body);
     if (error) {
-        console.error('Validation error:', error.details[0].message); // Log the validation error
         return res.status(400).json({ error: error.details[0].message });
     }
     next();
