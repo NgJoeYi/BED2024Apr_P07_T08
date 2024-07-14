@@ -35,17 +35,16 @@ async function fetchCourses(category = 'all', sortBy = 'most-recent') {
 
 
 // DISPLAYING COURSES   
-function displayCourses() {
+function displayCourses(filteredCourses = null) {
   const coursesGrid = document.querySelector('.courses-grid-unique');
   coursesGrid.innerHTML = ''; // Clear any existing content
   const userRole = sessionStorage.getItem('role');
   const token = sessionStorage.getItem('token');
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, coursesData.length);
-  const currentCourses = coursesData.slice(startIndex, endIndex);
+  // Determine which courses to display
+  const coursesToDisplay = filteredCourses || coursesData;
 
-  currentCourses.forEach(course => {
+  coursesToDisplay.forEach(course => {
     const courseElement = document.createElement('div');
     courseElement.className = 'course-cd-unique';
     courseElement.dataset.category = course.Category;
@@ -73,8 +72,7 @@ function displayCourses() {
                   <button class="delete-course" data-course-id="${course.CourseID}" onclick="deleteCourse(event, this)">Delete</button>
                   <button class="edit-course" data-course-id="${course.CourseID}" onclick="editCourse(event, this)">Edit</button>           
               </div>
-              ` 
-              : ''}
+              ` : ''}
               <div class="reviews-count-container">
                   <span id="review-count-${course.CourseID}" class="review-count">💬 0 Reviews</span>
               </div>
@@ -274,6 +272,34 @@ function handleAddButtonVisibility() {
     document.querySelector('.edit-course').style.display = 'none';
   }
 }
+
+// SEARCH COURSES
+async function searchCourses(event) {
+  event.preventDefault(); // Prevent form submission
+  const searchContainer = document.getElementById('search-course-input');
+  const searchTitle = searchContainer.value.trim();
+  console.log('SEARCH TITLE:', searchTitle);
+  
+  try {
+    const response = await fetch(`/courses/search?term=${encodeURIComponent(searchTitle)}`);
+    if (!response.ok) {
+      throw new Error('Network response not ok');
+    }
+    const courses = await response.json();
+    displayCourses(courses);
+  } catch (error) {
+    console.error('Error searching for courses: ', error);
+    alert('Error searching for courses.');
+  }
+}
+
+// Handle Enter key press in the search input field
+document.getElementById('search-course-input').addEventListener('keypress', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault(); // Prevent default action of Enter key (form submission)
+    searchCourses(event); // Call your search function
+  }
+});
 
 // REVIEW
 function fetchReviewCountForCourse(courseId) {
