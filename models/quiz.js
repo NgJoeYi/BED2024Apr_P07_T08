@@ -317,7 +317,7 @@ class Quiz {
             if (result.rowsAffected[0] === 0) {  
                 return null;
             }
-            return result.recordset > 0;
+            return result.rowsAffected > 0;
         } catch (error) {
             console.error('Error updating question:', error);
             throw new Error("Error updating question");
@@ -565,7 +565,7 @@ class Quiz {
         }
     }
     
-    static async isCorrectAnswer(questionId, selectedOption) { // when user submits the quiz, checks if the response === to the correct ans
+    static async isCorrectAnswer(questionId) { // when user submits the quiz, checks if the response === to the correct ans
         let connection;
         try {
             connection = await sql.connect(dbConfig);
@@ -580,7 +580,7 @@ class Quiz {
             if (result.recordset.length === 0) {
                 return null;
             }
-            return result.recordset[0].correct_option === selectedOption;
+            return result.recordset[0].correct_option;
         } catch (error) {
             console.error('Error checking correct answer:', error);
             throw error;
@@ -709,6 +709,61 @@ class Quiz {
             return result.rowsAffected[0] > 0; // returns true
         } catch (error) {
             console.error('Error deleting incorrect answers:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+
+    // ---------------- save incorrect answer ----------------
+    static async saveIncorrectAnswer(attemptId, questionId, selectedOption, correctOption) {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            INSERT INTO IncorrectAnswers (attempt_id, question_id, selected_option, correct_option)
+            VALUES (@inputAttemptId, @inputQuestionId, @inputSelectedOption, @inputCorrectOption)
+            `;
+            const request = connection.request();
+            request.input('inputAttemptId', attemptId);
+            request.input('inputQuestionId', questionId);
+            request.input('inputSelectedOption', selectedOption);
+            request.input('inputCorrectOption', correctOption);
+            // const result = await request.query(sqlQuery);
+            // if (result.rowsAffected[0] === 0) {
+            //     return null
+            // } NO BECAUSE SOME TIMES PEOPLE GET FULL MARKS 
+            await request.query(sqlQuery);
+        } catch (error) {
+            console.error('Error saving incorrect answer:', error);
+            throw new Error("Error saving incorrect answer");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    // ------- pass fail stats
+    static async getQuizPassFailStatistics() {
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT Quizzes.quiz_id, Quizzes.title,
+            (SELECT COUNT(*) FROM UserQuizAttempts WHERE quiz_id = Quizzes.quiz_id) AS TotalAttempts,
+            (SELECT COUNT(*) FROM UserQuizAttempts WHERE quiz_id = Quizzes.quiz_id AND passed = 1) AS PassCount,
+            (SELECT COUNT(*) FROM UserQuizAttempts WHERE quiz_id = Quizzes.quiz_id AND passed = 0) AS FailCount
+            FROM Quizzes;
+            `;
+            const request = connection.request();
+            const result = await request.query(sqlQuery);
+            return result.recordset;
+        } catch (error) {
+            console.error('Error fetching pass/fail statistics:', error);
             throw error;
         } finally {
             if (connection) {

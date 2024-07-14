@@ -335,6 +335,22 @@ async function fetchUserQuizResults() {
       const quizResults = await response.json();
       console.log('Fetched quiz results:', quizResults); // Debugging log
 
+      // Fetching the attempt count
+      const attemptCountResponse = await fetch('/account/quizAttemptCount', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }      
+      });
+      if (!attemptCountResponse.ok) throw new Error('Failed to fetch attempt count');
+
+      const attemptCountData = await attemptCountResponse.json(); // returned an obj
+      const attemptCount = attemptCountData.AttemptCount; // accessing within the obj
+      console.log('Attempt count data:', attemptCountData); // Debugging log
+      console.log('Fetched attempt count:', attemptCount); // Debugging log
+
+      // Sort quiz results by AttemptDate in descending order //CHANGED
+      quizResults.sort((a, b) => new Date(b.AttemptDate) - new Date(a.AttemptDate));
+
       const quizResultsContainer = document.querySelector('.quiz-results');
       const noQuizResultsMessage = document.querySelector('.no-quiz-results-message');
 
@@ -344,21 +360,32 @@ async function fetchUserQuizResults() {
           noQuizResultsMessage.style.display = 'block';
       } else {
           noQuizResultsMessage.style.display = 'none';
-          quizResults.forEach(result => createQuizResultCard(result, quizResultsContainer));
+          quizResults.forEach((result, index) => createQuizResultCard(result, quizResultsContainer, attemptCount - index));
+          // quizResults.forEach(result => createQuizResultCard(result, quizResultsContainer));
       }
   } catch (error) {
       console.error('Error fetching quiz results:', error);
   }
 }
 
-function createQuizResultCard(result, quizResultsContainer) {
+function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
   console.log('Creating quiz result card for:', result); // Debugging log
+  console.log('Attempt Number:', attemptNumber); // Debugging log
+
+
   const quizResultCard = document.createElement('div');
   quizResultCard.className = 'quiz-result-card';
   quizResultCard.setAttribute('data-quiz-id', result.AttemptID);
 
-  const attemptDate = new Date(result.AttemptDate);
-  const formattedDate = `${attemptDate.getDate().toString().padStart(2, '0')}/${(attemptDate.getMonth() + 1).toString().padStart(2, '0')}/${attemptDate.getFullYear()} ${attemptDate.getHours().toString().padStart(2, '0')}:${attemptDate.getMinutes().toString().padStart(2, '0')}`;
+  const attemptDateStr = result.AttemptDate;
+
+  // Split the date string into date and time parts
+  const [datePart, timePart] = attemptDateStr.split('T');
+  const [year, month, day] = datePart.split('-');
+  const [hour, minute, second] = timePart.split(':');
+
+  // Reformat the date and time parts
+  const formattedDate = `${day}/${month}/${year} ${hour}:${minute}:${second.slice(0, 2)}`;
 
   quizResultCard.innerHTML = `
       <div class="quiz-result-header">
@@ -366,10 +393,11 @@ function createQuizResultCard(result, quizResultsContainer) {
           <span class="quiz-date">${formattedDate}</span>
       </div>
       <div class="quiz-result-details">
-          <p><strong>Score:</strong> ${result.Score}%</p> <!-- CHANGED: Added percentage -->
+            <p><strong>Attempt no:</strong> ${attemptNumber}</p>
+          <p><strong>Score:</strong> ${result.Score}%</p>
           <p><strong>Total Questions:</strong> ${result.TotalQuestions}</p>
           <p><strong>Total Marks:</strong> ${result.TotalMarks}</p>
-          <p><strong>Time Taken:</strong> ${result.TimeTaken ? result.TimeTaken + ' seconds' : 'N/A'}</p> <!-- CHANGED: Display time taken -->
+          <p><strong>Time Taken:</strong> ${result.TimeTaken ? result.TimeTaken + ' seconds' : 'N/A'}</p>
           <p><strong>Passed:</strong> ${result.Passed ? 'Yes' : 'No'}</p>
       </div>
   `;

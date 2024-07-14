@@ -64,10 +64,12 @@ app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController
 app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
 app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
+app.get('/account/quizAttemptCount', jwtAuthorization.verifyJWT, quizController.getAttemptCount);  // quiz related
 app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser); // question related
 
 // Add Routes for quizzes
-app.get('/quizzes', quizController.getAllQuizWithCreatorName);
+app.get('/quizzes/statistics', quizController.getQuizPassFailStatistics); // users not logged in can see
+app.get('/quizzes', quizController.getAllQuizWithCreatorName); // users not logged in can see
 app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);
 app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuiz);
 app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuiz, quizController.updateQuiz); // edit quiz

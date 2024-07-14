@@ -160,7 +160,7 @@ async function run() {
             FOREIGN KEY (question_id) REFERENCES Questions(question_id)
         );
 
-        CREATE TABLE IncorrectAnswers (
+        CREATE TABLE IncorrectAnswers ( 
             incorrect_id INT PRIMARY KEY IDENTITY(1,1),
             attempt_id INT NOT NULL,
             question_id INT NOT NULL,

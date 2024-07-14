@@ -317,6 +317,7 @@ async function saveChanges() {
     const updatedQuestions = [];
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('quizId');
+    let hasErrors = false; 
 
     for (const question of editQuestions) {
         const questionId = question.question_id; // Use correct ID field
@@ -371,15 +372,20 @@ async function saveChanges() {
                 body: JSON.stringify(updatedQuestion)
             });
             const data = await response.json();
-            if (!data.success) {
+            if (!response.ok) { // CHANGED MADE HERE
                 console.error(`Error updating question ${updatedQuestion.question_id}:`, data.message);
+                alert(`Error updating question ${updatedQuestion.question_id}: ${data.message}`); // CHANGED MADE HERE
+                hasErrors = true; // CHANGED MADE HERE
             } else {
                 console.log(`Question ${updatedQuestion.question_id} updated successfully`);
             }
         }
-        alert('Questions updated successfully');
-        window.location.href = `/quiz.html?quizId=${quizId}`;
+        if (!hasErrors) { // CHANGED MADE HERE
+            alert('Questions updated successfully'); // CHANGED MADE HERE
+            window.location.href = `/quiz.html?quizId=${quizId}`; // CHANGED MADE HERE
+        }
     } catch (error) {
         console.error('Error saving changes:', error);
+        alert(`Error saving changes: ${error.message}`);
     }
 }
