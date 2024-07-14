@@ -5,12 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchQuizResult(attemptId) {
-    fetch(`/quizResult/${attemptId}`, {
-        headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-        }
+    fetchWithAuth(`/quizResult/${attemptId}`) // ------------------------------------------------- headers in jwtutility.js
+    .then(response => {
+        if (!response) return; // ********************** jwt
+        return response.json();
     })
-    .then(response => response.json())
     .then(result => {
         console.log('Quiz result:', result); // Log the result to debug
         if (result) {
