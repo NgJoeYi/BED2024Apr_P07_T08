@@ -1,8 +1,13 @@
+let alertShown = false; // Flag to ensure alert is shown only once
+
 async function fetchWithAuth(url, options = {}) {
     const token = sessionStorage.getItem('token');
     if (!token) {
-        alert('No token found. Please log in.');
-        window.location.href = 'login.html';
+        if (!alertShown) {
+            alert('No token found. Please log in.');
+            alertShown = true;
+            window.location.href = 'login.html';
+        }
         return;
     }
 
@@ -20,17 +25,27 @@ async function fetchWithAuth(url, options = {}) {
                 sessionStorage.removeItem('token');
                 sessionStorage.removeItem('role');
                 sessionStorage.removeItem('userId');
-                alert('Session expired. Please log in again.');
-                window.location.href = 'login.html';
+                if (!alertShown) {
+                    alert('Session expired. Please log in again.');
+                    alertShown = true;
+                    window.location.href = 'login.html';
+                }
             } else {
-                alert(errorData.message || 'Unauthorized access');
+                if (!alertShown) {
+                    alert(errorData.message || 'Unauthorized access');
+                    alertShown = true;
+                    window.location.href = 'login.html';
+                }
             }
             return null;
         }
         return response;
     } catch (error) {
         console.error('Fetch error:', error);
-        alert('An error occurred. Please try again.');
+        if (!alertShown) {
+            alert('An error occurred. Please try again.');
+            alertShown = true;
+        }
         return null;
     }
 }
