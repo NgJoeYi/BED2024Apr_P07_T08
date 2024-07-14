@@ -31,6 +31,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                 document.querySelectorAll('.review-info .user-name, .comment-user-info .user-name').forEach(element => {
                     element.textContent = user.name;
                 });
+
+                // Fetch and update total quizzes taken // CHANGES WERE MADE HERE
+                await fetchTotalQuizzesTaken(token); // CHANGES WERE MADE HERE
+
             } else {
                 console.error('Failed to fetch user data');
             }
@@ -405,8 +409,36 @@ function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
   quizResultsContainer.appendChild(quizResultCard);
 }
 
+// ---------------------- fetch total quizzes taken ----------------------
+
+async function fetchTotalQuizzesTaken(token) {
+  try {
+      const response = await fetch('/account/quizAttemptCount', {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+      if (!response.ok) throw new Error('Failed to fetch total quizzes taken');
+
+      const data = await response.json();
+      const totalQuizzes = data.AttemptCount;
+      console.log('Total quizzes taken:', totalQuizzes);
+
+      document.getElementById('total-quizzes').textContent = totalQuizzes;
+  } catch (error) {
+      console.error('Error fetching total quizzes taken:', error);
+  }
+}
+document.addEventListener('DOMContentLoaded', fetchUserQuizResults);
+
+
+
+
+
+
+// ---------------------- Utility ----------------------
+
 function getToken() {
   return sessionStorage.getItem('token');
 }
 
-document.addEventListener('DOMContentLoaded', fetchUserQuizResults);
