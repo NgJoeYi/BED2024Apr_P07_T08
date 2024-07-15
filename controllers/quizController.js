@@ -13,6 +13,13 @@ const createQuiz = async (req, res) => {
     const userId = req.user.id;
     try {
 
+        const getAllTitles = await Quiz.getAllQuizWithCreatorName();
+        for (const quiz of getAllTitles) {
+            if (newQuizData.title === quiz.title) {
+                return res.status(400).json({ message: 'Title already exists' });
+            }
+        }
+
         // ----------------------------- DONE USING JOI INSTEAD -----------------------------
         /* VALIDATED TO MAKE SURE:
         1. all required fields are filled 
@@ -144,12 +151,20 @@ const updateQuiz = async (req, res) => {
     const newQuizData = req.body;
     const userId = req.user.id;
     try {
+
+        const getAllTitles = await Quiz.getAllQuizWithCreatorName();
+        for (const quiz of getAllTitles) {
+            if (newQuizData.title === quiz.title && quiz.id !== quizId) {
+                return res.status(400).json({ message: 'Title already exists' });
+            }
+        }
+
         const checkQuiz = await Quiz.getQuizById(quizId);
         if (!checkQuiz) {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
 
-        // only users that created the quiz can delete the quiz
+        // only users that created the quiz can delete the quiz ---------------------------------------------------------------
         if (checkQuiz.created_by !== userId){
             return res.status(403).json({ message: 'You are not authorized to update this quiz' });
         }
