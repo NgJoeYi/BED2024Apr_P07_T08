@@ -377,7 +377,7 @@ async function handleImageUploadForQuestion(data) {
 }
 
 async function createQuestionRequest(data) {
-    try {
+    try { 
         const response = await fetchWithAuth(`/quizzes/${data.quiz_id}/questions`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'POST',
             body: JSON.stringify(data)
