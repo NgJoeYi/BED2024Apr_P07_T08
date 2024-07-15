@@ -93,7 +93,6 @@ const getEarliestCourses = async(req,res)=>{
 const createCourse = async (req, res) => {
   const newCourse = req.body;
   const userID = req.user.id;
-  
   if (req.file) {
     newCourse.courseImage = req.file.buffer; // Directly use the buffer from multer
   } else {
@@ -186,6 +185,7 @@ const deleteCourseWithNoLectures = async (req, res) => {
     res.status(500).json({ message: "Error deleting course with no lectures:(" });
   }
 };
+
   
 // retreive specific image 
 const getCourseImage = async (req, res) => {

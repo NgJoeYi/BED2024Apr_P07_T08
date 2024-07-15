@@ -23,15 +23,39 @@ async function fetchCourses(category = 'all', sortBy = 'most-recent') {
     coursesData = courses;
     console.log('Fetched courses:', courses);
     totalPages = Math.ceil(coursesData.length / itemsPerPage);
+    deleteCourseWithNoLectures();
     displayCourses();
-
-    if (userRole && token === 'lecturer') {
-      deleteCourseWithNoLectures();
-    }
+    
   } catch (error) {
     console.error('Error fetching courses:', error);
   }
 }
+
+// DELETING COURSES WITH NO LECTURES 
+async function deleteCourseWithNoLectures() {
+  try {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch('/courses/noLectures', {
+          method: 'DELETE',
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+      if (response.status === 404) {
+          return;
+      } else if (!response.ok) {
+          const errorMessage = await response.text();
+          console.error('Network response was not ok:', errorMessage);
+          throw new Error(`Network response was not ok: ${errorMessage}`);
+      }
+
+      console.log('Deleted courses with no lectures'); // Log success
+      fetchCourses(); // Refresh the courses list
+  } catch (error) {
+      console.error('Error deleting courses with no lectures:', error);
+  }
+}
+
 
 
 // DISPLAYING COURSES   
@@ -103,8 +127,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // adding event listener for pagination
-  document.getElementById('prev-page').addEventListener('click', prevPage);
-  document.getElementById('next-page').addEventListener('click', nextPage);
+  const prevPage =  document.getElementById('prev-page');
+  const nextPage =  document.getElementById('next-page');
+  if (prevPage && nextPage){
+    document.getElementById('prev-page').addEventListener('click', prevPage);
+    document.getElementById('next-page').addEventListener('click', nextPage);
+  }
+
 
   // add event listener for filtering category
   document.getElementById('filter-category').addEventListener('change', function () {
@@ -213,56 +242,25 @@ async function deleteCourse(event, button) {
   }
 }
 
-
-//  EDIT COURSE
-async function editCourse(event, button) {
-  event.stopPropagation();
-  event.preventDefault();
-
-  const courseID = button.dataset.courseId;
-  const token = sessionStorage.getItem('token'); // Get the JWT token from sessionStorage
-  if (!courseID) {
-    alert('Course ID not found.');
-    return;
-  }
-  try {
-    const response = await fetch(`/courses/${courseID}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const { course, userID: courseCreatorUserID } = await response.json();
-
-    const userId = parseInt(sessionStorage.getItem('userId')); // current user's ID from session storage
-
-    if (courseCreatorUserID !== userId) {
-      alert('You do not have permission to edit this course.');
-      return;
-    }
-    // Redirect to edit course page with courseID as query parameter
-    window.location.href = `updateCourse.html?courseID=${courseID}`;
-  } catch (error) {
-    console.error('Error fetching course details:', error);
-  }
-}
-
 function handleAddButtonVisibility() {
   const userRole = sessionStorage.getItem('role');
   const token = sessionStorage.getItem('token');
 
+  const addButton = document.querySelector('.add-button');
+  const deleteButton = document.querySelector('.delete-course');
+  const editButton = document.querySelector('.edit-course');
+
   if (token && userRole === 'lecturer') {
-    document.querySelector('.add-button').style.display = 'block';
-    document.querySelector('.delete-course').style.display = 'block';
-    document.querySelector('.edit-course').style.display = 'block';
+    if (addButton) addButton.style.display = 'block';
+    if (deleteButton) deleteButton.style.display = 'block';
+    if (editButton) editButton.style.display = 'block';
   } else {
-    document.querySelector('.add-button').style.display = 'none';
-    document.querySelector('.delete-course').style.display = 'none';
-    document.querySelector('.edit-course').style.display = 'none';
+    if (addButton) addButton.style.display = 'none';
+    if (deleteButton) deleteButton.style.display = 'none';
+    if (editButton) editButton.style.display = 'none';
   }
 }
+
 
 // SEARCH COURSES
 async function searchCourses(event) {
@@ -285,12 +283,51 @@ async function searchCourses(event) {
 }
 
 // Handle Enter key press in the search input field
-document.getElementById('search-course-input').addEventListener('keypress', function(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault(); // Prevent default action of Enter key (form submission)
-    searchCourses(event); // Call your search function
+const searchCourseInput = document.getElementById('search-course-input');
+if (searchCourseInput){
+  document.getElementById('search-course-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default action of Enter key (form submission)
+      searchCourses(event); // Call your search function
+    }
+  });
+}
+
+async function editCourse(event, button) {
+  event.stopPropagation();
+  event.preventDefault();
+
+  const courseID = button.dataset.courseId;
+  const token = sessionStorage.getItem('token'); // Get the JWT token from sessionStorage
+  if (!courseID) {
+      alert('Course ID not found.');
+      return;
   }
-});
+  try {
+      const response = await fetch(`/courses/${courseID}`, {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+      const { course, userID: courseCreatorUserID } = await response.json();
+      
+      // Decode the JWT to get the user ID of the logged-in user
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const loggedInUserID = decodedToken.id;
+      console.log(courseCreatorUserID);
+      if (courseCreatorUserID !== loggedInUserID) {
+          alert('You do not have permission to edit this course.');
+          return;
+      }
+      // Redirect to edit course page with courseID as query parameter
+      window.location.href = `updateCourse.html?courseID=${courseID}`;
+  } catch (error) {
+      console.error('Error fetching course details:', error);
+  }
+}
 
 // REVIEW
 function fetchReviewCountForCourse(courseId) {

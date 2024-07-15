@@ -184,8 +184,6 @@ class Courses {
         }
     }
     
-    
-    
     static async deleteCourse(id) {
         let pool;
         try {
