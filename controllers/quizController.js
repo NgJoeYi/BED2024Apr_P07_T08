@@ -13,6 +13,16 @@ const createQuiz = async (req, res) => {
     const userId = req.user.id;
     try {
 
+        const getAllTitles = await Quiz.getAllQuizWithCreatorName();
+        // Check for duplicate titles
+        const newTitle = newQuizData.title.trim().toLowerCase(); // Trim and convert new title to lower case
+        for (const quiz of getAllTitles) {
+            const existingTitle = quiz.title.trim().toLowerCase(); // Trim and convert existing title to lower case
+            if (newTitle === existingTitle) { // Compare titles
+                return res.status(400).json({ message: 'Title already exists' });
+            }
+        }
+
         // ----------------------------- DONE USING JOI INSTEAD -----------------------------
         /* VALIDATED TO MAKE SURE:
         1. all required fields are filled 
@@ -144,12 +154,23 @@ const updateQuiz = async (req, res) => {
     const newQuizData = req.body;
     const userId = req.user.id;
     try {
+
+        const getAllTitles = await Quiz.getAllQuizWithCreatorName();
+        // Check for duplicate titles, excluding the current quiz being updated
+        const newTitle = newQuizData.title.trim().toLowerCase(); // Trim and convert new title to lower case
+        for (const quiz of getAllTitles) {
+            const existingTitle = quiz.title.trim().toLowerCase(); // Trim and convert existing title to lower case
+            if (newTitle === existingTitle && quiz.id !== quizId) { // Exclude the current quiz from duplicate check
+                return res.status(400).json({ message: 'Title already exists' });
+            }
+        }
+
         const checkQuiz = await Quiz.getQuizById(quizId);
         if (!checkQuiz) {
             return res.status(404).json({ message: 'Quiz does not exist' });
         }
 
-        // only users that created the quiz can delete the quiz
+        // only users that created the quiz can delete the quiz ---------------------------------------------------------------
         if (checkQuiz.created_by !== userId){
             return res.status(403).json({ message: 'You are not authorized to update this quiz' });
         }
@@ -466,13 +487,24 @@ const submitQuiz = async (req, res) => {
 };
 
 
-const getAttemptCount = async (req, res) => { // so i can display number of attempts to user
+const getAttemptCountByQuizId = async (req, res) => { // so i can display number of attempts to user
     const userId = req.user.id;
     try {
-        const count = await Quiz.getAttemptCount(userId);
+        const count = await Quiz.getAttemptCountByQuizId(userId);
         res.status(200).json(count);
     } catch (error) {
-        console.error('Get Attempt Count - Server Error:', error); // Log error details
+        console.error('Get Attempt Count By Quiz Id - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const getAllAttemptCount = async (req, res) => { // so i can display number of attempts to user
+    const userId = req.user.id;
+    try {
+        const count = await Quiz.getAllAttemptCount(userId);
+        res.status(200).json(count);
+    } catch (error) {
+        console.error('Get All Attempt Count - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
@@ -528,7 +560,8 @@ module.exports = {
     createQuestionOnUpdate,
     getAllQuizResultsForUser,
     getUserQuizResult,
-    getAttemptCount,
+    getAttemptCountByQuizId,
+    getAllAttemptCount,
     submitQuiz,
     updateQuestion,
     deleteQuestion,
