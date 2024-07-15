@@ -208,7 +208,7 @@ async function deleteReview(button) {
     // console.log(`Attempting to delete review with ID: ${reviewId} by user with token: ${token}`);
 
     try {
-        const response = await fetchWithAuth(`http://localhost:3000/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
+        const response = await fetchWithAuth(`reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'DELETE'
         });
 
@@ -241,7 +241,7 @@ function postReview() {
     //     return;
     // }
 
-    fetchWithAuth('http://localhost:3000/reviews', { // ------------------------------------------------- headers in jwtutility.js
+    fetchWithAuth('/reviews', { // ------------------------------------------------- headers in jwtutility.js
         method: 'POST',
         body: JSON.stringify({ review_text: reviewText, rating: rating, courseId: courseId }) // Ensure courseId is passed as an integer
     })
@@ -299,7 +299,7 @@ function editReview(button) {
         const reviewId = review.getAttribute('data-id');
         const courseId = parseInt(new URLSearchParams(window.location.search).get('courseID'), 10);
 
-        fetchWithAuth(`http://localhost:3000/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
+        fetchWithAuth(`/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'PUT',
             body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId })
         })
@@ -334,7 +334,7 @@ function fetchReviews(courseId) {
     const token = sessionStorage.getItem('token'); // Get the token from session storage
     const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
 
-    let url = `http://localhost:3000/reviews/course/${courseId}`;
+    let url = `/reviews/course/${courseId}`;
     if (filter !== 'all') {
         url += `/rating/${filter}`;
     }
