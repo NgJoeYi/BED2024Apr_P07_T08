@@ -35,8 +35,33 @@ const createQuiz = async (req, res) => {
     }
 };
 
+const createQuestionAfterQuizCreation = async (req, res) => { // utilise this in quiz.js 
+    const newQuestionData = req.body;
+    const quizId = parseInt(req.params.id);
+    try {
+        const checkQuiz = await Quiz.getQuizById(quizId);
+        if (!checkQuiz) {
+            return res.status(404).json({ message: 'Quiz does not exist' });
+        }
+
+        // if there is image then buffer it
+        if (newQuestionData.qnsImg) {
+            newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
+        }
+
+        const question = await Quiz.createQuestion(newQuestionData);
+        if (!question) {
+            return res.status(400).json({ message: "Failed to create question" });
+        }
+        res.status(201).json({ message: 'Question created successfully', question });
+    } catch (error) {
+        console.error('Error creating question:', error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
 // users can add new questions in the edit mode too so i must make sure the total question is correct
-const createQuestion = async (req, res) => {
+const createQuestionOnUpdate = async (req, res) => { // utilise this in editQuestion.js 
     const newQuestionData = req.body;
     try {
         const checkQuiz = await Quiz.getQuizById(newQuestionData.quiz_id);
@@ -192,7 +217,7 @@ const deleteQuiz = async (req, res) => {
 
         const quiz = await Quiz.deleteQuiz(quizId);
         if (quiz) {
-            res.status(200).json({ message: 'Quiz successfully deleted' });
+            res.status(204).json({ message: 'Quiz successfully deleted' });
         } else {
             res.status(400).json({ message: 'Failed to delete quiz' });
         }
@@ -218,8 +243,8 @@ const getQuizWithQuestions = async (req, res) => {
 
 // need to check if the correct option updated is the same with one of the options given
 const updateQuestion = async (req, res) => { // get back to here
-    const qnsId = req.params.questionId;
-    const quizId = req.params.quizId;
+    const qnsId = parseInt(req.params.questionId);
+    const quizId = parseInt(req.params.quizId);
     const newQuestionData = req.body;
     try {
 
@@ -252,10 +277,9 @@ const updateQuestion = async (req, res) => { // get back to here
             newQuestionData.question_text = newQuestionData.question_text.charAt(0).toUpperCase() + newQuestionData.question_text.slice(1);
         }
 
-        if (newQuestionData.qnsImg) {
+        if (newQuestionData.qnsImg) { // if image is provided
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
-        } else {
-            // if no new image is provided, use the existing image from the database
+        } else { // if image is not provided get the initial image
             newQuestionData.qnsImg = checkQns.qnsImg;
         }
 
@@ -368,7 +392,7 @@ const deleteQuestion = async (req, res) => {
         }
 
 
-        res.status(200).json({ message: 'Question deleted successfully' });
+        res.status(204).json({ message: 'Question deleted successfully' });
     } catch (error) {
         console.error('Delete Questions - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
@@ -500,7 +524,8 @@ module.exports = {
     updateQuiz,
     deleteQuiz,
     getQuizWithQuestions,
-    createQuestion,
+    createQuestionAfterQuizCreation,
+    createQuestionOnUpdate,
     getAllQuizResultsForUser,
     getUserQuizResult,
     getAttemptCount,

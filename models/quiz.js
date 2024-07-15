@@ -304,7 +304,7 @@ class Quiz {
             `;
             const request = connection.request();
             request.input('question_text', newQuestionData.question_text);
-            request.input('qnsImg', newQuestionData.qnsImg);
+            request.input('qnsImg', sql.VarBinary, newQuestionData.qnsImg);
             request.input('option_1', newQuestionData.option_1);
             request.input('option_2', newQuestionData.option_2);
             request.input('option_3', newQuestionData.option_3);
