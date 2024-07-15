@@ -117,7 +117,7 @@ async function run() {
 
         CREATE TABLE Quizzes (
             quiz_id INT PRIMARY KEY IDENTITY(1,1),
-            title NVARCHAR(255) NOT NULL,
+            title NVARCHAR(255) NOT NULL UNIQUE,
             description NVARCHAR(MAX),
             total_questions INT NOT NULL,
             total_marks INT NOT NULL,
