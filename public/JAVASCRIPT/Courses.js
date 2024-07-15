@@ -188,40 +188,31 @@ async function deleteCourse(event, button) {
     alert('Course ID not found.');
     return;
   }
-  console.log('DELETE COURSE ID:', courseID);
-
-  if (!confirm('Are you sure you want to delete this course?')) {
-    return;
-  }
-
   try {
     const token = sessionStorage.getItem('token');
     const response = await fetch(`/courses/${courseID}`, {
       method: 'DELETE',
-      headers: {  // -- jwt implementation
-        'Authorization': `Bearer ${token}` // -- jwt implementation
-      }  // -- jwt implementation
-    });
-    console.log('PASSED HERE ');
-    if (response.ok) {
-      if (response.status === 204) {
-        alert('Course deleted successfully!');
-        button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
-      } else {
-        const result = await response.json();
-        alert(result.message);
-        button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
+    });
+
+    if (response.status === 204) {
+      if (!confirm('Are you sure you want to delete this course?')) {
+        return;
+      }    
+      alert('Course deleted successfully!');
+      button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
     } else {
-      const errorData = await response.json();
-      console.error('Failed to delete course. Status:', response.status, 'Message:', errorData.message);
-      alert('Failed to delete the course. ' + errorData.message);
+      const result = await response.json();
+      alert(result.message);
     }
   } catch (error) {
     console.error('Error deleting course:', error);
     alert('Error deleting course.');
   }
 }
+
 
 //  EDIT COURSE
 async function editCourse(event, button) {

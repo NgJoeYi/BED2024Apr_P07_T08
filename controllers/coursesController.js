@@ -147,18 +147,29 @@ const updateCourse = async (req, res) => {
 
 const deleteCourse = async (req, res) => {
   const courseID = parseInt(req.params.id);
-
+  const userID = req.user.id; 
   try {
+    const course = await Courses.getCourseById(courseID);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Check if the user is the creator of the course
+    if (course.userID !== userID) {
+      return res.status(403).json({ message: "You do not have permission to delete this course" });
+    }
+
     const success = await Courses.deleteCourse(courseID);
     if (!success) {
-      return res.status(404).json({ message: "Course not foundd" });
+      return res.status(404).json({ message: "Course not found" });
     }
-    res.status(204).json({ message: "Course deleted successfully!" });
+    res.status(204).json({ message: 'Course deleted successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error deleting course :(" });
+    res.status(500).json({ message: "Error deleting course" });
   }
 };
+
 
 const deleteCourseWithNoLectures = async (req, res) => {
   try {
