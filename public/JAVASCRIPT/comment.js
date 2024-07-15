@@ -316,6 +316,31 @@ document.addEventListener('DOMContentLoaded', () => {
             commentsSection.appendChild(commentElement);
         });
     }
+
+    async function fetchCommentCountByDiscussionId(discussionId) {
+        try {
+            const response = await fetchWithAuth(`/comments/discussion/${discussionId}/count`, {
+                method: 'GET'
+            });
+
+            console.log('Response status:', response.status);
+            const responseText = await response.text();
+            console.log('Response text:', responseText);
+
+            if (!response.ok) {
+                console.error('Error response:', responseText);
+                throw new Error('Failed to fetch comment count by discussion ID');
+            }
+
+            const data = JSON.parse(responseText);
+            console.log('Parsed data:', data);
+
+            const totalCommentsElement = document.getElementById('total-comments');
+            totalCommentsElement.textContent = data.count;
+        } catch (error) {
+            console.error('Error fetching comment count by discussion ID:', error);
+        }
+    }
         
     function formatUsername(username) {
         return username.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -329,6 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
     fetchDiscussionDetails(discussionId); // Fetch discussion details
     fetchComments(discussionId); // Fetch comments for the specific discussion
+    fetchCommentCountByDiscussionId(discussionId);
 
     window.saveComment = saveComment;
     window.closePopup = closePopup;

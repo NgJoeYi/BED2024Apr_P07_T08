@@ -129,6 +129,29 @@ async function getCommentCount(discussionId) {
     }
 }
 
+async function getCommentCountByDiscussionId(discussionId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        const query = `
+            SELECT COUNT(*) AS count
+            FROM user_comments
+            WHERE discussion_id = @discussionId
+        `;
+        const request = new sql.Request(connection);
+        request.input('discussionId', sql.Int, discussionId);
+        const result = await request.query(query);
+        return result.recordset[0].count;
+    } catch (err) {
+        console.error(err);
+        throw new Error('Error fetching comment count by discussion ID');
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
 
 module.exports = {
     getAllComments,
@@ -137,6 +160,7 @@ module.exports = {
     createComment,
     updateComment,
     deleteComment,
-    getCommentCount
+    getCommentCount,
+    getCommentCountByDiscussionId
     
 };
