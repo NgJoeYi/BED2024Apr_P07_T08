@@ -278,28 +278,42 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   }
 
-// ---------------------------------------------- QUIZ RESULTS ----------------------------------------------
-async function fetchUserQuizResults() {
-  try {
+  // ---------------------------------------------- QUIZ RESULTS ----------------------------------------------
+
+
+  async function fetchUserQuizResults() {
+    try {
       const response = await fetchWithAuth('/account/quizResult'); // ------------------------------------------------- headers in jwtutility.js
       if (!response) return; // *************** changes for jwt
       // if (!response.ok) throw new Error('Failed to fetch quiz results');
 
       const quizResults = await response.json();
-      console.log('Fetched quiz results:', quizResults); // Debugging log
+      // console.log('Fetched quiz results:', quizResults); // Debugging log
+
+      // group by title since title is unique too
+      quizResults.forEach(result => {
+          result.QuizID = result.QuizTitle; // Assuming QuizTitle as QuizID for grouping
+      });
 
       // Fetching the attempt count
-      const attemptCountResponse = await fetchWithAuth('/account/quizAttemptCount'); // ------------------------------------------------- headers in jwtutility.js
+      const attemptCountResponse = await fetchWithAuth('/account/getAttemptCountByQuizId'); // ------------------------------------------------- headers in jwtutility.js
       if (!attemptCountResponse) return; // *************** changes for jwt
-      // if (!attemptCountResponse.ok) throw new Error('Failed to fetch attempt count');
-
-      const attemptCountData = await attemptCountResponse.json(); // returned an obj
-      const attemptCount = attemptCountData.AttemptCount; // accessing within the obj
-      console.log('Attempt count data:', attemptCountData); // Debugging log
-      console.log('Fetched attempt count:', attemptCount); // Debugging log
-
-      // Sort quiz results by AttemptDate in descending order //CHANGED
+ 
+      // sorting quiz results by AttemptDate in descending order
       quizResults.sort((a, b) => new Date(b.AttemptDate) - new Date(a.AttemptDate));
+
+      // Group quiz results by QuizID
+      const groupedQuizResults = quizResults.reduce((acc, result) => {
+          // console.log('Processing result:', result); // Debugging log
+          const quizId = result.QuizID || result.quiz_id;
+          if (!acc[quizId]) {
+              acc[quizId] = [];
+          }
+          acc[quizId].push(result);
+          return acc;
+      }, {});
+
+      // console.log('Grouped quiz results:', groupedQuizResults); // Debugging log
 
       const quizResultsContainer = document.querySelector('.quiz-results');
       const noQuizResultsMessage = document.querySelector('.no-quiz-results-message');
@@ -310,18 +324,22 @@ async function fetchUserQuizResults() {
           noQuizResultsMessage.style.display = 'block';
       } else {
           noQuizResultsMessage.style.display = 'none';
-          quizResults.forEach((result, index) => createQuizResultCard(result, quizResultsContainer, attemptCount - index));
-          // quizResults.forEach(result => createQuizResultCard(result, quizResultsContainer));
-      }
-  } catch (error) {
+          Object.keys(groupedQuizResults).forEach(quizId => {
+              const results = groupedQuizResults[quizId];
+              results.forEach((result, index) => {
+                  const attemptNumber = index + 1; // Correct attempt number for each quiz ID
+                  createQuizResultCard(result, quizResultsContainer, attemptNumber);
+              });
+            });
+          }
+        } catch (error) {
       console.error('Error fetching quiz results:', error);
+    }
   }
-}
-
-function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
-  console.log('Creating quiz result card for:', result); // Debugging log
-  console.log('Attempt Number:', attemptNumber); // Debugging log
-
+  
+  function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
+  // console.log('Creating quiz result card for:', result); // Debugging log
+  // console.log('Attempt Number:', attemptNumber); // Debugging log
 
   const quizResultCard = document.createElement('div');
   quizResultCard.className = 'quiz-result-card';
@@ -343,7 +361,7 @@ function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
           <span class="quiz-date">${formattedDate}</span>
       </div>
       <div class="quiz-result-details">
-            <p><strong>Attempt no:</strong> ${attemptNumber}</p>
+          <p><strong>Attempt number:</strong> ${attemptNumber}</p>
           <p><strong>Score:</strong> ${result.Score}%</p>
           <p><strong>Total Questions:</strong> ${result.TotalQuestions}</p>
           <p><strong>Total Marks:</strong> ${result.TotalMarks}</p>
@@ -351,7 +369,7 @@ function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
           <p><strong>Passed:</strong> ${result.Passed ? 'Yes' : 'No'}</p>
       </div>
   `;
-
+  
   quizResultsContainer.appendChild(quizResultCard);
 }
 
@@ -359,17 +377,24 @@ function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
 
 async function fetchTotalQuizzesTaken() {
   try {
-      const response = await fetchWithAuth('/account/quizAttemptCount'); // ------------------------------------------------- headers in jwtutility.js
+      const response = await fetchWithAuth('/account/getAllAttemptCount'); // ------------------------------------------------- headers in jwtutility.js
       if (!response) return; // *************** changes for jwt
       // if (!response.ok) throw new Error('Failed to fetch total quizzes taken');
 
-      const data = await response.json();
-      const totalQuizzes = data.AttemptCount;
-      console.log('Total quizzes taken:', totalQuizzes);
+      const dataWrapper = await response.json();
+      console.log('Fetched total quizzes data wrapper:', dataWrapper); // Debugging log
+
+      const totalQuizzes = dataWrapper?.AttemptCount; // extract the AttemptCount directly
+      // console.log('Total quizzes data:', totalQuizzes); // Debugging log
+
+      if (typeof totalQuizzes !== 'number') {
+          throw new Error('Total quizzes data is not a number');
+      }
 
       document.getElementById('total-quizzes').textContent = totalQuizzes;
   } catch (error) {
       console.error('Error fetching total quizzes taken:', error);
   }
 }
+
 document.addEventListener('DOMContentLoaded', fetchUserQuizResults);

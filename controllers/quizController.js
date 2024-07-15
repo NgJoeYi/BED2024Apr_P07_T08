@@ -466,13 +466,24 @@ const submitQuiz = async (req, res) => {
 };
 
 
-const getAttemptCount = async (req, res) => { // so i can display number of attempts to user
+const getAttemptCountByQuizId = async (req, res) => { // so i can display number of attempts to user
     const userId = req.user.id;
     try {
-        const count = await Quiz.getAttemptCount(userId);
+        const count = await Quiz.getAttemptCountByQuizId(userId);
         res.status(200).json(count);
     } catch (error) {
-        console.error('Get Attempt Count - Server Error:', error); // Log error details
+        console.error('Get Attempt Count By Quiz Id - Server Error:', error); // Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+const getAllAttemptCount = async (req, res) => { // so i can display number of attempts to user
+    const userId = req.user.id;
+    try {
+        const count = await Quiz.getAllAttemptCount(userId);
+        res.status(200).json(count);
+    } catch (error) {
+        console.error('Get All Attempt Count - Server Error:', error); // Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
@@ -528,7 +539,8 @@ module.exports = {
     createQuestionOnUpdate,
     getAllQuizResultsForUser,
     getUserQuizResult,
-    getAttemptCount,
+    getAttemptCountByQuizId,
+    getAllAttemptCount,
     submitQuiz,
     updateQuestion,
     deleteQuestion,

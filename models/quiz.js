@@ -512,7 +512,34 @@ class Quiz {
         }
     }    
    
-    static async getAttemptCount(userId) { // show number of attempt to user
+    static async getAttemptCountByQuizId(userId) { // show number of attempt to user // grouped by quiz id
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT COUNT(*) AS AttemptCount
+            FROM UserQuizAttempts
+            WHERE user_id = @userId
+            GROUP BY quiz_id
+            `;
+            const request = connection.request();
+            request.input('userId', userId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0];
+        } catch (error) {
+            console.error(error);
+            throw new Error("Error fetching quiz with questions");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    static async getAllAttemptCount(userId) { // show number of attempt to user
         let connection;
         try {
             connection = await sql.connect(dbConfig);
