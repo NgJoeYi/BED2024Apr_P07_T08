@@ -461,7 +461,7 @@ class Quiz {
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
+            SELECT U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
                    U.time_taken AS TimeTaken, U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription, 
                    Q.total_marks AS TotalMarks, Q.total_questions AS TotalQuestions,
                    QR.question_id AS QuestionID, QR.selected_option AS SelectedOption, QNS.correct_option AS CorrectOption, 
@@ -472,7 +472,8 @@ class Quiz {
             INNER JOIN Questions QNS ON QR.question_id = QNS.question_id
             INNER JOIN Users ON U.user_id = Users.id
             WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
-        `;        
+            `;
+
             const request = connection.request();
             request.input('inputUserId', userId);
             request.input('inputAttemptId', attemptId);
@@ -490,7 +491,6 @@ class Quiz {
             }));
                 
             return {
-                AttemptID: attemptData.AttemptID,
                 UserName: attemptData.UserName,
                 AttemptDate: attemptData.AttemptDate,
                 Score: attemptData.Score,
