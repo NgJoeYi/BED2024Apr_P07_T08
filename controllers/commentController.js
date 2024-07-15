@@ -54,10 +54,13 @@ async function updateComment(req, res) {
         connection = await sql.connect(dbConfig);
         const comment = await commentModel.getCommentById(connection, id);
         console.log('Comment User ID:', comment.user_id); // Debug log
-        if (parseInt(comment.user_id, 10) !== parseInt(userId, 10)) {
-            console.log('User ID mismatch:', parseInt(comment.user_id, 10), parseInt(userId, 10)); // Debug log
-            return res.status(403).send('You can only edit your own comments.');
-        }
+
+        // ******** DONT NEED DO THIS BC TO CHECK USERID IS ALREADY DONE USING verifyJWT MIDDLEWARE ******
+        // if (parseInt(comment.user_id, 10) !== parseInt(userId, 10)) {
+        //     console.log('User ID mismatch:', parseInt(comment.user_id, 10), parseInt(userId, 10)); // Debug log
+        //     return res.status(403).send('You can only edit your own comments.');
+        // }
+
         const updatedComment = await commentModel.updateComment(connection, id, content);
         res.json(updatedComment);
     } catch (err) {
@@ -77,9 +80,12 @@ async function deleteComment(req, res) {
     try {
         connection = await sql.connect(dbConfig);
         const comment = await commentModel.getCommentById(connection, id);
-        if (parseInt(comment.user_id, 10) !== parseInt(userId, 10)) {
-            return res.status(403).send('You can only delete your own comments.');
-        }
+
+        // ******** DONT NEED DO THIS BC TO CHECK USERID IS ALREADY DONE USING verifyJWT MIDDLEWARE ******
+        // if (parseInt(comment.user_id, 10) !== parseInt(userId, 10)) {
+        //     return res.status(403).send('You can only delete your own comments.');
+        // }
+
         const deletedComment = await commentModel.deleteComment(connection, id);
         res.json(deletedComment);
     } catch (err) {

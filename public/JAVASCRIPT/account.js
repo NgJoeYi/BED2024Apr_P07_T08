@@ -67,6 +67,41 @@ async function fetchAndDisplayReviews() {
   }
 }
 
+async function fetchReviewCount() {
+  try {
+    // Adjust the endpoint as necessary
+    const response = await fetch('/reviews/count', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Include authorization if needed
+      }
+    });
+
+    console.log('Response status:', response.status); // Add this line
+    const responseText = await response.text(); // Log the response text
+    console.log('Response text:', responseText); // Add this line to log the response text
+
+    if (!response.ok) {
+      console.error('Error response:', responseText); // Log the error response text
+      throw new Error('Failed to fetch review count');
+    }
+
+    const data = JSON.parse(responseText); // Parse the response text as JSON
+    console.log('Parsed data:', data); // Log the parsed data
+
+    const totalReviewsElement = document.getElementById('total-reviews');
+    totalReviewsElement.textContent = data.count;
+  } catch (error) {
+    console.error('Error fetching review count:', error);
+  }
+}
+
+// Call the function when the DOM content is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  fetchReviewCount();
+});
+
 function createReviewCard(review, reviewWrapper) {
   const reviewCard = document.createElement('div');
   reviewCard.className = 'review-card';
