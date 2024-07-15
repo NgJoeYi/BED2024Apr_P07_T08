@@ -128,6 +128,28 @@ async function getReviewCount(req, res) {
     }
 }
 
+async function getReviewCountByCourseId(req, res) {
+    const { courseId } = req.params;
+    try {
+        const count = await reviewModel.getReviewCountByCourseId(courseId);
+        res.json({ count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching review count by course ID");
+    }
+}
+
+async function getReviewCountByUserId(req, res) {
+    const { userId } = req.params;
+    try {
+        const count = await reviewModel.getReviewCountByUserId(userId);
+        res.json({ count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching review count by user ID");
+    }
+}
+
 
 async function getReviewsByRating(req, res) {
     const { rating } = req.params;
@@ -191,6 +213,8 @@ module.exports = {
     createReview,
     deleteReview,
     getReviewCount,
+    getReviewCountByCourseId,
+    getReviewCountByUserId,
     getReviewsByRating,
     getReviewsSortedByRating,
     getReviewsByCourseId,

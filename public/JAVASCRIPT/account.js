@@ -67,40 +67,35 @@ async function fetchAndDisplayReviews() {
   }
 }
 
-async function fetchReviewCount() {
+document.addEventListener('DOMContentLoaded', function() {
+  fetchReviewCountByUserId();
+});
+
+async function fetchReviewCountByUserId() {
+  const userId = sessionStorage.getItem('userId'); // Assuming userId is stored in session storage
   try {
-    // Adjust the endpoint as necessary
-    const response = await fetch('/reviews/count', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionStorage.getItem('token')}` // Include authorization if needed
+      const response = await fetchWithAuth(`/reviews/user/${userId}/count`, { 
+          method: 'GET'
+      });
+
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
+      if (!response.ok) {
+          console.error('Error response:', responseText);
+          throw new Error('Failed to fetch review count by user ID');
       }
-    });
 
-    console.log('Response status:', response.status); // Add this line
-    const responseText = await response.text(); // Log the response text
-    console.log('Response text:', responseText); // Add this line to log the response text
+      const data = JSON.parse(responseText);
+      console.log('Parsed data:', data);
 
-    if (!response.ok) {
-      console.error('Error response:', responseText); // Log the error response text
-      throw new Error('Failed to fetch review count');
-    }
-
-    const data = JSON.parse(responseText); // Parse the response text as JSON
-    console.log('Parsed data:', data); // Log the parsed data
-
-    const totalReviewsElement = document.getElementById('total-reviews');
-    totalReviewsElement.textContent = data.count;
+      const totalReviewsElement = document.getElementById('total-reviews');
+      totalReviewsElement.textContent = data.count;
   } catch (error) {
-    console.error('Error fetching review count:', error);
+      console.error('Error fetching review count by user ID:', error);
   }
 }
-
-// Call the function when the DOM content is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  fetchReviewCount();
-});
 
 function createReviewCard(review, reviewWrapper) {
   const reviewCard = document.createElement('div');

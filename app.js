@@ -93,7 +93,8 @@ app.post('/discussions/:discussionId/dislike', jwtAuthorization.verifyJWT, discu
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
-app.get('/comments/count', commentController.getCommentCount);  //Will get total comments in total, but to specify each discussion how much comments is in Js bc then would get comments by discussionId to display number of comments etc
+app.get('/comments/count', commentController.getCommentCount); 
+app.get('/comments/discussion/:discussionId/count', commentController.getCommentCountByDiscussionId);
 app.put('/comments/:id', jwtAuthorization.verifyJWT, commentValidation, commentController.updateComment);
 app.post('/comments', jwtAuthorization.verifyJWT, commentValidation, commentController.createComment);
 app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
@@ -106,6 +107,8 @@ app.get('/reviews/course/:courseId', reviewController.getReviewsByCourseId); // 
 app.get('/reviews/course/:courseId/rating/:rating', reviewController.getReviewsByCourseIdAndRating); // Filter by course ID and rating
 app.get('/reviews/course/:courseId/sort/:sort', reviewController.getReviewsByCourseIdAndSort); // Filter by course ID and sort
 app.get('/reviews/count', reviewController.getReviewCount); 
+app.get('/reviews/course/:courseId/count', reviewController.getReviewCountByCourseId);
+app.get('/reviews/user/:userId/count', reviewController.getReviewCountByUserId);
 app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview);
 app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview);
 app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt

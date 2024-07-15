@@ -109,6 +109,17 @@ async function getCommentCount(req, res) {
     }
 }
 
+async function getCommentCountByDiscussionId(req, res) {
+    const { discussionId } = req.params;
+    try {
+        const count = await commentModel.getCommentCountByDiscussionId(discussionId);
+        res.json({ count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching comment count by discussion ID");
+    }
+}
+
 
 module.exports = {
     getComments,
@@ -116,4 +127,5 @@ module.exports = {
     updateComment,
     deleteComment,
     getCommentCount,
+    getCommentCountByDiscussionId,
 };
