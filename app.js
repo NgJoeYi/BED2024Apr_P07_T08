@@ -77,7 +77,8 @@ app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz
 app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
-app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestion);
+app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionAfterQuizCreation); // question form AFTER quiz creation // quiz.js
+app.post('/quizzes/:id/questions/update', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionOnUpdate); // question form DURING edit question // editQuestion.js
 app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 
