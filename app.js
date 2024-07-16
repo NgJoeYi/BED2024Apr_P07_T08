@@ -60,27 +60,27 @@ app.post('/login', userController.loginUser);
 
 // Add Routes for account management
 app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById);
-app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController.updateProfilePic);
 app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
-app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
-app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 app.get('/account/getAllAttemptCount', jwtAuthorization.verifyJWT, quizController.getAllAttemptCount);  // quiz related
 app.get('/account/getAttemptCountByQuizId', jwtAuthorization.verifyJWT, quizController.getAttemptCountByQuizId);  // quiz related
 app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser); // question related
+app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController.updateProfilePic);
+app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
+app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 
 // Add Routes for quizzes
 app.get('/quizzes/statistics', quizController.getQuizPassFailStatistics); // users not logged in can see
 app.get('/quizzes', quizController.getAllQuizWithCreatorName); // users not logged in can see
 app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);
-app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuiz);
-app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuiz, quizController.updateQuiz); // edit quiz
-app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
 app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
-app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
+app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuiz);
+app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionAfterQuizCreation); // question form AFTER quiz creation // quiz.js
 app.post('/quizzes/:id/questions/update', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionOnUpdate); // question form DURING edit question // editQuestion.js
+app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuiz, quizController.updateQuiz); // edit quiz
 app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
+app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 
 // Add Routes for discussions
