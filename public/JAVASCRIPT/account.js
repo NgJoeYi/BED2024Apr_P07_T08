@@ -67,6 +67,36 @@ async function fetchAndDisplayReviews() {
   }
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+  fetchReviewCountByUserId();
+});
+
+async function fetchReviewCountByUserId() {
+  const userId = sessionStorage.getItem('userId'); // Assuming userId is stored in session storage
+  try {
+      const response = await fetchWithAuth(`/reviews/user/${userId}/count`, { 
+          method: 'GET'
+      });
+
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
+      if (!response.ok) {
+          console.error('Error response:', responseText);
+          throw new Error('Failed to fetch review count by user ID');
+      }
+
+      const data = JSON.parse(responseText);
+      console.log('Parsed data:', data);
+
+      const totalReviewsElement = document.getElementById('total-reviews');
+      totalReviewsElement.textContent = data.count;
+  } catch (error) {
+      console.error('Error fetching review count by user ID:', error);
+  }
+}
+
 function createReviewCard(review, reviewWrapper) {
   const reviewCard = document.createElement('div');
   reviewCard.className = 'review-card';

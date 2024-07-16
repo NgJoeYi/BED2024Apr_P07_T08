@@ -304,7 +304,7 @@ class Quiz {
             `;
             const request = connection.request();
             request.input('question_text', newQuestionData.question_text);
-            request.input('qnsImg', newQuestionData.qnsImg);
+            request.input('qnsImg', sql.VarBinary, newQuestionData.qnsImg);
             request.input('option_1', newQuestionData.option_1);
             request.input('option_2', newQuestionData.option_2);
             request.input('option_3', newQuestionData.option_3);
@@ -461,7 +461,7 @@ class Quiz {
         try {
             connection = await sql.connect(dbConfig);
             const sqlQuery = `
-            SELECT U.attempt_id AS AttemptID, U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
+            SELECT U.user_id AS UserID, U.attempt_date AS AttemptDate, U.score AS Score, 
                    U.time_taken AS TimeTaken, U.passed AS Passed, Q.title AS QuizTitle, Q.description AS QuizDescription, 
                    Q.total_marks AS TotalMarks, Q.total_questions AS TotalQuestions,
                    QR.question_id AS QuestionID, QR.selected_option AS SelectedOption, QNS.correct_option AS CorrectOption, 
@@ -472,7 +472,8 @@ class Quiz {
             INNER JOIN Questions QNS ON QR.question_id = QNS.question_id
             INNER JOIN Users ON U.user_id = Users.id
             WHERE U.user_id = @inputUserId AND U.attempt_id = @inputAttemptId;
-        `;        
+            `;
+
             const request = connection.request();
             request.input('inputUserId', userId);
             request.input('inputAttemptId', attemptId);
@@ -490,7 +491,6 @@ class Quiz {
             }));
                 
             return {
-                AttemptID: attemptData.AttemptID,
                 UserName: attemptData.UserName,
                 AttemptDate: attemptData.AttemptDate,
                 Score: attemptData.Score,
@@ -512,7 +512,34 @@ class Quiz {
         }
     }    
    
-    static async getAttemptCount(userId) { // show number of attempt to user
+    static async getAttemptCountByQuizId(userId) { // show number of attempt to user // grouped by quiz id
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const sqlQuery = `
+            SELECT COUNT(*) AS AttemptCount
+            FROM UserQuizAttempts
+            WHERE user_id = @userId
+            GROUP BY quiz_id
+            `;
+            const request = connection.request();
+            request.input('userId', userId);
+            const result = await request.query(sqlQuery);
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0];
+        } catch (error) {
+            console.error(error);
+            throw new Error("Error fetching quiz with questions");
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
+    static async getAllAttemptCount(userId) { // show number of attempt to user
         let connection;
         try {
             connection = await sql.connect(dbConfig);

@@ -5,9 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Log the courseId for debugging purposes
     console.log('Retrieved courseId:', courseId);
-     
+
     if (courseId && !isNaN(courseId)) {
         fetchReviews(courseId);
+        fetchReviewCountByCourseId(courseId); // Fetch review count by courseId
     } else {
         console.error('courseId is not defined or is invalid');
     }    
@@ -208,7 +209,7 @@ async function deleteReview(button) {
     // console.log(`Attempting to delete review with ID: ${reviewId} by user with token: ${token}`);
 
     try {
-        const response = await fetchWithAuth(`http://localhost:3000/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
+        const response = await fetchWithAuth(`reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'DELETE'
         });
 
@@ -241,7 +242,7 @@ function postReview() {
     //     return;
     // }
 
-    fetchWithAuth('http://localhost:3000/reviews', { // ------------------------------------------------- headers in jwtutility.js
+    fetchWithAuth('/reviews', { // ------------------------------------------------- headers in jwtutility.js
         method: 'POST',
         body: JSON.stringify({ review_text: reviewText, rating: rating, courseId: courseId }) // Ensure courseId is passed as an integer
     })
@@ -299,7 +300,7 @@ function editReview(button) {
         const reviewId = review.getAttribute('data-id');
         const courseId = parseInt(new URLSearchParams(window.location.search).get('courseID'), 10);
 
-        fetchWithAuth(`http://localhost:3000/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
+        fetchWithAuth(`/reviews/${reviewId}`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'PUT',
             body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId })
         })
@@ -334,7 +335,7 @@ function fetchReviews(courseId) {
     const token = sessionStorage.getItem('token'); // Get the token from session storage
     const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
 
-    let url = `http://localhost:3000/reviews/course/${courseId}`;
+    let url = `/reviews/course/${courseId}`;
     if (filter !== 'all') {
         url += `/rating/${filter}`;
     }
@@ -401,12 +402,27 @@ function fetchReviews(courseId) {
         .catch(error => console.error('Error fetching reviews:', error));
 }
 
-// function getUserIdFromToken(token) {
-//     if (!token) {
-//         console.log('No token found'); // Debug log
-//         return null;
-//     }
-//     const payload = JSON.parse(atob(token.split('.')[1]));
-//     console.log('Payload from token:', payload); // Debug log
-//     return payload.id;
-// }
+async function fetchReviewCountByCourseId(courseId) {
+    try {
+        const response = await fetchWithAuth(`/reviews/course/${courseId}/count`, { 
+            method: 'GET'
+        });
+
+        console.log('Response status:', response.status);
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+
+        if (!response.ok) {
+            console.error('Error response:', responseText);
+            throw new Error('Failed to fetch review count by course ID');
+        }
+
+        const data = JSON.parse(responseText);
+        console.log('Parsed data:', data);
+
+        const totalReviewsElement = document.getElementById('total-reviews');
+        totalReviewsElement.textContent = data.count;
+    } catch (error) {
+        console.error('Error fetching review count by course ID:', error);
+    }
+}

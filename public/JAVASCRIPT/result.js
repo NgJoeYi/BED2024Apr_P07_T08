@@ -43,7 +43,6 @@ function displayResult(result) {
             <div class="result-title">${result.QuizTitle}</div>
             <div class="result-description">${result.QuizDescription}</div>
             <div class="result-details">
-                <p><strong>Attempt ID:</strong> ${result.AttemptID}</p>
                 <p><strong>User Name:</strong> ${result.UserName}</p>
                 <p><strong>Attempt Date:</strong> ${formattedDate}</p>
                 <p><strong>Score:</strong> ${result.Score}%</p>

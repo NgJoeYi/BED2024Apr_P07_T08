@@ -163,6 +163,52 @@ async function getReviewCount(courseId) {
     }
 }
 
+async function getReviewCountByCourseId(courseId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        const query = `
+            SELECT COUNT(*) AS count
+            FROM user_reviews
+            WHERE course_id = @courseId
+        `;
+        const request = new sql.Request(connection);
+        request.input('courseId', sql.Int, courseId);
+        const result = await request.query(query);
+        return result.recordset[0].count;
+    } catch (err) {
+        console.error(err);
+        throw new Error('Error fetching review count by course ID');
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
+async function getReviewCountByUserId(userId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        const query = `
+            SELECT COUNT(*) AS count
+            FROM user_reviews
+            WHERE user_id = @userId
+        `;
+        const request = new sql.Request(connection);
+        request.input('userId', sql.Int, userId);
+        const result = await request.query(query);
+        return result.recordset[0].count;
+    } catch (err) {
+        console.error(err);
+        throw new Error('Error fetching review count by user ID');
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
 
 module.exports = {
     getAllReviews,
@@ -170,5 +216,7 @@ module.exports = {
     createReview,
     updateReview,
     deleteReview,
-    getReviewCount
+    getReviewCount,
+    getReviewCountByCourseId,
+    getReviewCountByUserId
 };

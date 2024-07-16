@@ -64,7 +64,8 @@ app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController
 app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
 app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
-app.get('/account/quizAttemptCount', jwtAuthorization.verifyJWT, quizController.getAttemptCount);  // quiz related
+app.get('/account/getAllAttemptCount', jwtAuthorization.verifyJWT, quizController.getAllAttemptCount);  // quiz related
+app.get('/account/getAttemptCountByQuizId', jwtAuthorization.verifyJWT, quizController.getAttemptCountByQuizId);  // quiz related
 app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser); // question related
 
 // Add Routes for quizzes
@@ -77,7 +78,8 @@ app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz
 app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
-app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestion);
+app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionAfterQuizCreation); // question form AFTER quiz creation // quiz.js
+app.post('/quizzes/:id/questions/update', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionOnUpdate); // question form DURING edit question // editQuestion.js
 app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 
@@ -93,7 +95,8 @@ app.post('/discussions/:discussionId/dislike', jwtAuthorization.verifyJWT, discu
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
-app.get('/comments/count', commentController.getCommentCount);  //Will get total comments in total, but to specify each discussion how much comments is in Js bc then would get comments by discussionId to display number of comments etc
+app.get('/comments/count', commentController.getCommentCount); 
+app.get('/comments/discussion/:discussionId/count', commentController.getCommentCountByDiscussionId);
 app.put('/comments/:id', jwtAuthorization.verifyJWT, commentValidation, commentController.updateComment);
 app.post('/comments', jwtAuthorization.verifyJWT, commentValidation, commentController.createComment);
 app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
@@ -106,6 +109,8 @@ app.get('/reviews/course/:courseId', reviewController.getReviewsByCourseId); // 
 app.get('/reviews/course/:courseId/rating/:rating', reviewController.getReviewsByCourseIdAndRating); // Filter by course ID and rating
 app.get('/reviews/course/:courseId/sort/:sort', reviewController.getReviewsByCourseIdAndSort); // Filter by course ID and sort
 app.get('/reviews/count', reviewController.getReviewCount); 
+app.get('/reviews/course/:courseId/count', reviewController.getReviewCountByCourseId);
+app.get('/reviews/user/:userId/count', reviewController.getReviewCountByUserId);
 app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview);
 app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview);
 app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt

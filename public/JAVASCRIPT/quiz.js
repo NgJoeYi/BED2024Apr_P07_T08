@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const questionModal = document.getElementById('question-modal');
     const closeQuizModalBtn = document.querySelector('.close-quiz-modal-btn');
     const closeUpdateModalBtn = document.querySelector('.close-update-modal-btn');
-    const closeQuestionModalBtn = document.querySelector('.close-question-modal-btn');
+    // const closeQuestionModalBtn = document.querySelector('.close-question-modal-btn');
 
     createQuizBtn.addEventListener('click', () => {
         quizModal.style.display = 'block';
@@ -48,19 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateModal.style.display = 'none';  
     });  
 
-    closeQuestionModalBtn.addEventListener('click', () => {
-        questionModal.style.display = 'none';
-    });
+    // closeQuestionModalBtn.addEventListener('click', () => {
+    //     questionModal.style.display = 'none';
+    // });
 
-    window.addEventListener('click', (event) => {
-        if (event.target == quizModal) {
-            quizModal.style.display = 'none';
-        } else if (event.target == updateModal) {  
-            updateModal.style.display = 'none';  
-        } else if (event.target == questionModal) {
-            questionModal.style.display = 'none';
-        }
-    });
+    // window.addEventListener('click', (event) => {
+    //     if (event.target == quizModal) {
+    //         quizModal.style.display = 'none';
+    //     } else if (event.target == updateModal) {  
+    //         updateModal.style.display = 'none';  
+    //     } else if (event.target == questionModal) {
+    //         questionModal.style.display = 'none';
+    //     }
+    // });
 
     const quizForm = document.getElementById('quiz-form');
     if (quizForm) {
@@ -77,10 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
         questionForm.addEventListener('submit', createQuestion);
     }
 
-    const prevButton = document.getElementById('prev-question');
-    if (prevButton) {
-        prevButton.addEventListener('click', showPreviousQuestion);
-    }
+    // const prevButton = document.getElementById('prev-question');
+    // if (prevButton) {
+    //     prevButton.addEventListener('click', showPreviousQuestion);
+    // }
 
     const nextButton = document.getElementById('next-question');
     if (nextButton) {
@@ -324,7 +324,11 @@ function createQuestionForm() {
             <input type="file" id="qnsImg" name="qnsImg" accept="image/*">
         </div>
     `;
-    document.getElementById('prev-question').disabled = currentQuestionIndex === 0;
+
+    // Display the current question number
+    const questionNumberElement = document.getElementById('question-number');
+    questionNumberElement.innerText = `Question ${currentQuestionIndex + 1}/${totalQuestions}`;
+    // document.getElementById('prev-question').disabled = currentQuestionIndex === 0;
     document.getElementById('next-question').style.display = currentQuestionIndex < totalQuestions - 1 ? 'inline-block' : 'none';
     document.getElementById('submit-questions').style.display = currentQuestionIndex === totalQuestions - 1 ? 'inline-block' : 'none';
 }
@@ -373,7 +377,7 @@ async function handleImageUploadForQuestion(data) {
 }
 
 async function createQuestionRequest(data) {
-    try {
+    try { 
         const response = await fetchWithAuth(`/quizzes/${data.quiz_id}/questions`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'POST',
             body: JSON.stringify(data)
@@ -403,12 +407,12 @@ function handleQuestionCreationResponse(response, body) {
     }
 }
 
-function showPreviousQuestion() {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        createQuestionForm();
-    }
-}
+// function showPreviousQuestion() {
+//     if (currentQuestionIndex > 0) {
+//         currentQuestionIndex--;
+//         createQuestionForm();
+//     }
+// }
 
 function showNextQuestion() {
     const questionForm = document.getElementById('question-form');
