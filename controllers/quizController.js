@@ -102,6 +102,44 @@ const createQuestionOnUpdate = async (req, res) => { // utilise this in editQues
             return res.status(400).json({ message: 'Could not update total questions in the quiz' });
         }
 
+        // ------------------------ retrieiving the users response to recalc the score to be displayed to the user ------------------------
+
+        /* example: user got 100% when the quiz initially had 5 questions.
+           But if lecturer decides to update the question to make the quiz have 6 question, the score should update, and would be adjusted to 83%.
+           MY REASONING: i want to make it so that the quiz questions are synced. Imagine Lecturers keep adding question to the quiz,
+           and each time the lecturer adds a new question, the user take the quiz again, then the quiz history for that particular quiz 
+           would have total questions of 5,6,7,8,9.... which is very messy because all students would have different number of questions in their quiz history
+           which user would probably find it messy, and confusing.
+           hence, i will update the user score, passing rate and total question each time the lecturer adds a new question to the quiz.
+           There are no limits to the number of attempts for the quiz, so if users want to have quiz with 100% they are free to retake the quiz
+           because questions may be added/deleted hence score and passing rate will adjust accordingly. time taken would not change.
+
+           same applies for the deletion of question
+        */
+
+        // Retrieve all quiz attempts for the quiz
+        const userAttempts = await Quiz.getAllQuizResultsByQuizId(newQuestionData.quiz_id);
+        if (userAttempts) {
+            for (const attempt of userAttempts) {
+                // Retrieve the user's responses for the current attempt
+                const userResponses = await Quiz.getUserResponsesByAttemptId(attempt.attempt_id);
+
+                // Recalculate the score
+                let newScore = 0;
+                for (const response of userResponses) {
+                    const correctOption = await Quiz.isCorrectAnswer(response.question_id);
+                    if (response.selected_option === correctOption) {
+                        newScore += 1;
+                    }
+                }
+                const totalQuestions = checkQuiz.total_questions + 1; // Including the newly added question
+                const newPercentage = (newScore / totalQuestions) * 100;
+
+                // Update the user's quiz attempt with the new score
+                await Quiz.updateQuizAttempt(attempt.attempt_id, newPercentage, newPercentage >= 50);
+            }
+        }
+
         return res.status(201).json({ message: "Question created successfully", question });
     } catch (error) {
         console.error('Error creating question:', error);
