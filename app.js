@@ -112,6 +112,8 @@ app.get('/comments/count', commentController.getCommentCount);
 app.get('/comments/discussion/:discussionId/count', commentController.getCommentCountByDiscussionId);
 app.put('/comments/:id', jwtAuthorization.verifyJWT, commentValidation, commentController.updateComment);
 app.post('/comments', jwtAuthorization.verifyJWT, commentValidation, commentController.createComment);
+app.post('/comments/:commentId/like', commentController.incrementLikes); // Dont need jwtAuthorzation middleware bc when not logged in, user unable to go to comments page.
+app.post('/comments/:commentId/dislike', commentController.incrementDislikes);
 app.delete('/comments/:id', jwtAuthorization.verifyJWT, commentController.deleteComment);
 
 // Add Routes for reviews

@@ -56,34 +56,44 @@ function fetchDiscussions() {
 
     displayLoading(true);
 
-    fetch(`/discussions?category=${category}&sort=${sort}&search=${searchQuery}`)
-        .then(response => response.json())
-        .then(data => {
-            const feed = document.querySelector('.activity-feed');
-            feed.innerHTML = ''; // Clear the feed
+    fetchWithAuth(`/discussions?category=${category}&sort=${sort}&search=${searchQuery}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const feed = document.querySelector('.activity-feed');
+        feed.innerHTML = ''; // Clear the feed
 
-            if (data.success) {
-                if (data.discussions.length === 0) {
-                    const noDiscussionMessage = document.createElement('div');
-                    noDiscussionMessage.classList.add('no-discussion-message');
-                    noDiscussionMessage.textContent = "No discussion found";
-                    feed.appendChild(noDiscussionMessage);
-                } else {
-                    data.discussions.forEach(discussion => {
-                        addDiscussionToFeed(discussion);
-                    });
-                }
+        if (data.success) {
+            if (data.discussions.length === 0) {
+                const noDiscussionMessage = document.createElement('div');
+                noDiscussionMessage.classList.add('no-discussion-message');
+                noDiscussionMessage.textContent = "No discussions found";
+                feed.appendChild(noDiscussionMessage);
             } else {
-                console.error('Error fetching discussions:', data.error);
-                alert('Error fetching discussions.');
+                data.discussions.forEach(discussion => {
+                    addDiscussionToFeed(discussion);
+                });
             }
-            displayLoading(false);
-        })
-        .catch(error => {
-            console.error('Network or server error:', error);
+        } else {
+            console.error('Error fetching discussions:', data.error);
             alert('Error fetching discussions.');
-            displayLoading(false);
-        });
+        }
+        displayLoading(false);
+    })
+    .catch(error => {
+        console.error('Network or server error:', error);
+        alert('Error fetching discussions.');
+        displayLoading(false);
+    });
 }
 
 function clearSearch() {
@@ -220,15 +230,54 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error adding like.');
+        alert('Error adding like.');function incrementLikes(discussionId, likeButton, dislikeButton) {
+            if (likeButton.getAttribute('data-liked') === 'true') {
+                alert('You have already liked this discussion.');
+                return;
+            }
+        
+            fetchWithAuth(`/discussions/${discussionId}/like`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    likeButton.textContent = `👍 ${data.likes} Likes`;
+                    likeButton.setAttribute('data-liked', 'true');
+                    dislikeButton.setAttribute('data-disliked', 'false');
+                } else {
+                    alert('Error adding like.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding like.');
+            });
+        }
+        
     });
 }
 
 function incrementDislikes(discussionId, likeButton, dislikeButton) {
+    if (dislikeButton.getAttribute('data-disliked') === 'true') {
+        alert('You have already disliked this discussion.');
+        return;
+    }
+
     fetchWithAuth(`/discussions/${discussionId}/dislike`, {
         method: 'POST'
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
@@ -244,8 +293,9 @@ function incrementDislikes(discussionId, likeButton, dislikeButton) {
     });
 }
 
+
 function fetchCommentCountForDiscussion(discussionId) {
-    fetch(`/comments/count?discussionId=${discussionId}`)
+    fetch(`/comments/discussion/${discussionId}/count`)
         .then(response => response.json())
         .then(data => {
             if (data.count !== undefined) {

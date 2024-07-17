@@ -120,6 +120,29 @@ async function getCommentCountByDiscussionId(req, res) {
     }
 }
 
+async function incrementLikes(req, res) {
+    try {
+        const commentId = req.params.commentId;
+        const likes = await commentModel.incrementLikes(commentId);
+        res.json({ success: true, likes });
+    } catch (err) {
+        console.error('Error incrementing likes:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+}
+
+async function incrementDislikes(req, res) {
+    try {
+        const commentId = req.params.commentId;
+        const dislikes = await commentModel.incrementDislikes(commentId);
+        res.json({ success: true, dislikes });
+    } catch (err) {
+        console.error('Error incrementing dislikes:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+}
+
+
 
 module.exports = {
     getComments,
@@ -128,4 +151,6 @@ module.exports = {
     deleteComment,
     getCommentCount,
     getCommentCountByDiscussionId,
+    incrementLikes,
+    incrementDislikes,
 };
