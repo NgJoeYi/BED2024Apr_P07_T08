@@ -93,6 +93,9 @@ app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.
 app.post('/discussions/:discussionId/like', jwtAuthorization.verifyJWT, discussionController.incrementLikes);
 app.post('/discussions/:discussionId/dislike', jwtAuthorization.verifyJWT, discussionController.incrementDislikes);
 
+// what i added extra - discussion
+app.post('/discussions/:discussionId/view', jwtAuthorization.verifyJWT, discussionController.incrementViews);
+
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
 app.get('/comments/count', commentController.getCommentCount); 
