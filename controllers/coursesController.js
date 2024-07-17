@@ -211,7 +211,7 @@ const searchCourses = async (req, res) => {
     }
     const courses = await Courses.searchCourses(searchTerm);
     if (!courses.length) {
-      return res.status(404).json({ message: 'No courses found' });
+      return res.status(404).json({ message: 'No courses found please enter properly' });
     }
     res.json(courses);
 } catch (error) {

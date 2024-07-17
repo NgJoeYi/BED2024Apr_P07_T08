@@ -268,7 +268,10 @@ async function searchCourses(event) {
   const searchContainer = document.getElementById('search-course-input');
   const searchTitle = searchContainer.value.trim();
   console.log('SEARCH TITLE:', searchTitle);
-  
+  if(searchTitle === ""){
+    window.location.href="Courses.html";
+    return;
+  }
   try {
     const response = await fetch(`/courses/search?term=${encodeURIComponent(searchTitle)}`);
     if (!response.ok) {
@@ -278,7 +281,7 @@ async function searchCourses(event) {
     displayCourses(courses);
   } catch (error) {
     console.error('Error searching for courses: ', error);
-    alert('Error searching for courses.');
+    alert('Error searching for courses. Please re-enter.');
   }
 }
 
