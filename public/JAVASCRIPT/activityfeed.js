@@ -245,7 +245,7 @@ function incrementDislikes(discussionId, likeButton, dislikeButton) {
 }
 
 function fetchCommentCountForDiscussion(discussionId) {
-    fetch(`/comments/count?discussionId=${discussionId}`)
+    fetch(`/comments/discussion/${discussionId}/count`)
         .then(response => response.json())
         .then(data => {
             if (data.count !== undefined) {
