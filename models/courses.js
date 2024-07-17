@@ -95,7 +95,7 @@ class Courses {
     static async getMostRecentCourses(){
         const connection = await sql.connect(dbConfig);
         try{
-            const sqlQuery  = `select * from Courses ORDER BY CreatedAt DESC`
+            const sqlQuery  = `select * from Courses ORDER BY CreatedAt ASC`
             const result = await connection.request().query(sqlQuery);
             return result.recordset;
 
@@ -112,7 +112,7 @@ class Courses {
        static async getEarliestCourses(){
         const connection = await sql.connect(dbConfig);
         try{
-            const sqlQuery  = `select * from Courses ORDER BY CreatedAt ASC`
+            const sqlQuery  = `select * from Courses ORDER BY CreatedAt DESC`
             const result = await connection.request().query(sqlQuery);
             return result.recordset;
 
