@@ -96,18 +96,10 @@ function displayNewLecture(newLecture, videoFiles) {
     newChapterDiv.className = 'chapter';
     newChapterDiv.contentEditable = 'false';
 
-    const chapterNameElement = document.createElement('div');
-    chapterNameElement.className = 'chapter-name';
-    chapterNameElement.innerHTML = `
-        <p contenteditable="true" class="editable-placeholder">Chapter Name: ${newLecture.ChapterName}</p>
-        <span class="delete-chapter-icon" onclick="removeChapter(this)">
-            <i class="fa-solid fa-x" style="color: #ff3838;"></i>
-        </span>
-    `;
-
     const lectureDetails = document.createElement('div');
     lectureDetails.className = 'lecture-details';
     lectureDetails.innerHTML = `
+        <p>Chapter Name : ${newLecture.ChapterName}</p>
         <p>Lecture Name: ${newLecture.Title}</p>
         <p>Duration: ${newLecture.Duration} minutes</p>
         <p>Description: ${newLecture.Description}</p>
@@ -118,7 +110,6 @@ function displayNewLecture(newLecture, videoFiles) {
     videoElement.textContent = `Lecture Video: ${videoFileNames}`;
     lectureDetails.appendChild(videoElement);
 
-    newChapterDiv.appendChild(chapterNameElement);
     newChapterDiv.appendChild(lectureDetails);
 
     courseArrangement.insertBefore(newChapterDiv, courseArrangement.querySelector('.new-btn-container'));

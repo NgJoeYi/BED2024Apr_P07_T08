@@ -1,3 +1,8 @@
+const itemsPerPage = 6;
+let currentPage = 1;
+let totalPages = 1;
+let coursesData = [];
+
 // GETTING ALL COURSES
 async function fetchCourses(category = 'all', sortBy = 'most-recent') {
   try {
@@ -23,16 +28,38 @@ async function fetchCourses(category = 'all', sortBy = 'most-recent') {
     coursesData = courses;
     console.log('Fetched courses:', courses);
     totalPages = Math.ceil(coursesData.length / itemsPerPage);
+    deleteCourseWithNoLectures();
     displayCourses();
-
-    if (userRole && token === 'lecturer') {
-      deleteCourseWithNoLectures();
-    }
+    
   } catch (error) {
     console.error('Error fetching courses:', error);
   }
 }
 
+// DELETING COURSES WITH NO LECTURES 
+async function deleteCourseWithNoLectures() {
+  try {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch('/courses/noLectures', {
+          method: 'DELETE',
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+      if (response.status === 404) {
+          return;
+      } else if (!response.ok) {
+          const errorMessage = await response.text();
+          console.error('Network response was not ok:', errorMessage);
+          throw new Error(`Network response was not ok: ${errorMessage}`);
+      }
+
+      console.log('Deleted courses with no lectures'); // Log success
+      fetchCourses(); // Refresh the courses list
+  } catch (error) {
+      console.error('Error deleting courses with no lectures:', error);
+  }
+}
 
 // DISPLAYING COURSES   
 function displayCourses(filteredCourses = null) {
@@ -44,7 +71,12 @@ function displayCourses(filteredCourses = null) {
   // Determine which courses to display
   const coursesToDisplay = filteredCourses || coursesData;
 
-  coursesToDisplay.forEach(course => {
+  // Calculate pagination range
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const coursesToShow = coursesToDisplay.slice(startIndex, endIndex);
+
+  coursesToShow.forEach(course => {
     const courseElement = document.createElement('div');
     courseElement.className = 'course-cd-unique';
     courseElement.dataset.category = course.Category;
@@ -56,27 +88,27 @@ function displayCourses(filteredCourses = null) {
 
     courseElement.innerHTML = `
       <a href="lecture.html?courseID=${course.CourseID}">
-          <img src="${imageUrl}" alt="Course Image">
-          <div class="course-details-unique">
-              <p class="category">${course.Category}</p>
-              <h6>${course.Title}</h6>
-              <div class="course-meta">
-                  <span>${course.Duration} hr</span>
-              </div>
-              <div>
-                  <p class="posted-date">Posted on: ${new Date(course.CreatedAt).toLocaleDateString()}</p>
-                  <p>${course.Level}</p>
-              </div>
-              ${token && userRole === 'lecturer' ? `
-              <div class="delete-button-container">
-                  <button class="delete-course" data-course-id="${course.CourseID}" onclick="deleteCourse(event, this)">Delete</button>
-                  <button class="edit-course" data-course-id="${course.CourseID}" onclick="editCourse(event, this)">Edit</button>           
-              </div>
-              ` : ''}
-              <div class="reviews-count-container">
-                  <span id="review-count-${course.CourseID}" class="review-count">💬 0 Reviews</span>
-              </div>
+        <img src="${imageUrl}" alt="Course Image">
+        <div class="course-details-unique">
+          <p class="category">${course.Category}</p>
+          <h6>${course.Title}</h6>
+          <div class="course-meta">
+            <span>${course.Duration} hr</span>
           </div>
+          <div>
+            <p class="posted-date">Posted on: ${new Date(course.CreatedAt).toLocaleDateString()}</p>
+            <p>${course.Level}</p>
+          </div>
+          ${token && userRole === 'lecturer' ? `
+          <div class="delete-button-container">
+            <button class="delete-course" data-course-id="${course.CourseID}" onclick="deleteCourse(event, this)">Delete</button>
+            <button class="edit-course" data-course-id="${course.CourseID}" onclick="editCourse(event, this)">Edit</button>           
+          </div>
+          ` : ''}
+          <div class="reviews-count-container">
+            <span id="review-count-${course.CourseID}" class="review-count">💬 0 Reviews</span>
+          </div>
+        </div>
       </a>
     `;
     coursesGrid.appendChild(courseElement);
@@ -85,6 +117,18 @@ function displayCourses(filteredCourses = null) {
     fetchReviewCountForCourse(course.CourseID);
   });
   updatePaginationControls();
+}
+
+
+// PAGINATION
+function updatePaginationControls() {
+  const prevPageBtn = document.getElementById('prev-page');
+  const nextPageBtn = document.getElementById('next-page');
+  const currentPageDisplay = document.getElementById('current-page');
+
+  currentPageDisplay.textContent = currentPage;
+  currentPage === 1 ? prevPageBtn.classList.add('disabled') : prevPageBtn.classList.remove('disabled');
+  currentPage === totalPages ? nextPageBtn.classList.add('disabled') : nextPageBtn.classList.remove('disabled');
 }
 
 // Initialize on DOM load
@@ -102,9 +146,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // adding event listener for pagination
-  document.getElementById('prev-page').addEventListener('click', prevPage);
-  document.getElementById('next-page').addEventListener('click', nextPage);
+  // Add event listener for pagination
+  const prevPageBtn = document.getElementById('prev-page');
+  const nextPageBtn = document.getElementById('next-page');
+  if (prevPageBtn && nextPageBtn) {
+    prevPageBtn.addEventListener('click', prevPage);
+    nextPageBtn.addEventListener('click', nextPage);
+  }
+
 
   // add event listener for filtering category
   document.getElementById('filter-category').addEventListener('change', function () {
@@ -120,11 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchCourses(document.getElementById('filter-category').value, sortBy);
   });
 });
-
-const itemsPerPage = 6;
-let currentPage = 1;
-let totalPages = 1;
-let coursesData = [];
 
 // ADDING CONTENT TO FILTER-CATEGORY 
 async function filter() {
@@ -153,17 +197,6 @@ async function filter() {
   }
 }
 
-// PAGINATION
-function updatePaginationControls() {
-  const prevPageBtn = document.getElementById('prev-page');
-  const nextPageBtn = document.getElementById('next-page');
-  const currentPageDisplay = document.getElementById('current-page');
-
-  currentPageDisplay.textContent = currentPage;
-  currentPage === 1 ? prevPageBtn.classList.add('disabled') : prevPageBtn.classList.remove('disabled');
-  currentPage === totalPages ? nextPageBtn.classList.add('disabled') : nextPageBtn.classList.remove('disabled');
-}
-
 function prevPage() {
   if (currentPage > 1) {
     currentPage--;
@@ -188,30 +221,21 @@ async function deleteCourse(event, button) {
     alert('Course ID not found.');
     return;
   }
-  console.log('DELETE COURSE ID:', courseID);
-
-  if (!confirm('Are you sure you want to delete this course?')) {
-    return;
-  }
-
   try {
     const response = await fetchWithAuth(`/courses/${courseID}`, { // ------------------------------------------------- headers in jwtutility.js
       method: 'DELETE'
     });
-    console.log('PASSED HERE ');
-    if (response.ok) { // response && response.ok
-      if (response.status === 204) {
-        alert('Course deleted successfully!');
-        button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
-      } else {
-        const result = await response.json();
-        alert(result.message);
-        button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
-      }
+
+    if (response.status === 204) {
+      if (!confirm('Are you sure you want to delete this course?')) {
+        window.location.href = "Courses.html";
+        return;
+      }    
+      alert('Course deleted successfully!');
+      button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
     } else {
-      const errorData = await response.json();
-      console.error('Failed to delete course. Status:', response.status, 'Message:', errorData.message);
-      alert('Failed to delete the course. ' + errorData.message);
+      const result = await response.json();
+      alert(result.message);
     }
   } catch (error) {
     console.error('Error deleting course:', error);
@@ -219,15 +243,68 @@ async function deleteCourse(event, button) {
   }
 }
 
-//  EDIT COURSE
+function handleAddButtonVisibility() {
+  const userRole = sessionStorage.getItem('role');
+  const token = sessionStorage.getItem('token');
+
+  const addButton = document.querySelector('.add-button');
+  const deleteButton = document.querySelector('.delete-course');
+  const editButton = document.querySelector('.edit-course');
+
+  if (token && userRole === 'lecturer') {
+    if (addButton) addButton.style.display = 'block';
+    if (deleteButton) deleteButton.style.display = 'block';
+    if (editButton) editButton.style.display = 'block';
+  } else {
+    if (addButton) addButton.style.display = 'none';
+    if (deleteButton) deleteButton.style.display = 'none';
+    if (editButton) editButton.style.display = 'none';
+  }
+}
+
+
+// SEARCH COURSES
+async function searchCourses(event) {
+  event.preventDefault(); // Prevent form submission
+  const searchContainer = document.getElementById('search-course-input');
+  const searchTitle = searchContainer.value.trim();
+  console.log('SEARCH TITLE:', searchTitle);
+  if(searchTitle === ""){
+    window.location.href="Courses.html";
+    return;
+  }
+  try {
+    const response = await fetch(`/courses/search?term=${encodeURIComponent(searchTitle)}`);
+    if (!response.ok) {
+      throw new Error('Network response not ok');
+    }
+    const courses = await response.json();
+    displayCourses(courses);
+  } catch (error) {
+    console.error('Error searching for courses: ', error);
+    alert('Error searching for courses. Please re-enter.');
+  }
+}
+
+// Handle Enter key press in the search input field
+const searchCourseInput = document.getElementById('search-course-input');
+if (searchCourseInput){
+  document.getElementById('search-course-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default action of Enter key (form submission)
+      searchCourses(event); // Call your search function
+    }
+  });
+}
+
 async function editCourse(event, button) {
   event.stopPropagation();
   event.preventDefault();
 
   const courseID = button.dataset.courseId;
   if (!courseID) {
-    alert('Course ID not found.');
-    return;
+      alert('Course ID not found.');
+      return;
   }
   try {
     const response = await fetchWithAuth(`/courses/${courseID}`); // ------------------------------------------------- headers in jwtutility.js
@@ -245,52 +322,9 @@ async function editCourse(event, button) {
     // Redirect to edit course page with courseID as query parameter
     window.location.href = `updateCourse.html?courseID=${courseID}`;
   } catch (error) {
-    console.error('Error fetching course details:', error);
+      console.error('Error fetching course details:', error);
   }
 }
-
-function handleAddButtonVisibility() {
-  const userRole = sessionStorage.getItem('role');
-  const token = sessionStorage.getItem('token');
-
-  if (token && userRole === 'lecturer') {
-    document.querySelector('.add-button').style.display = 'block';
-    document.querySelector('.delete-course').style.display = 'block';
-    document.querySelector('.edit-course').style.display = 'block';
-  } else {
-    document.querySelector('.add-button').style.display = 'none';
-    document.querySelector('.delete-course').style.display = 'none';
-    document.querySelector('.edit-course').style.display = 'none';
-  }
-}
-
-// SEARCH COURSES
-async function searchCourses(event) {
-  event.preventDefault(); // Prevent form submission
-  const searchContainer = document.getElementById('search-course-input');
-  const searchTitle = searchContainer.value.trim();
-  console.log('SEARCH TITLE:', searchTitle);
-  
-  try {
-    const response = await fetch(`/courses/search?term=${encodeURIComponent(searchTitle)}`);
-    if (!response.ok) {
-      throw new Error('Network response not ok');
-    }
-    const courses = await response.json();
-    displayCourses(courses);
-  } catch (error) {
-    console.error('Error searching for courses: ', error);
-    alert('Error searching for courses.');
-  }
-}
-
-// Handle Enter key press in the search input field
-document.getElementById('search-course-input').addEventListener('keypress', function(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault(); // Prevent default action of Enter key (form submission)
-    searchCourses(event); // Call your search function
-  }
-});
 
 // REVIEW
 function fetchReviewCountForCourse(courseId) {

@@ -93,7 +93,6 @@ const getEarliestCourses = async(req,res)=>{
 const createCourse = async (req, res) => {
   const newCourse = req.body;
   const userID = req.user.id;
-  
   if (req.file) {
     newCourse.courseImage = req.file.buffer; // Directly use the buffer from multer
   } else {
@@ -147,18 +146,29 @@ const updateCourse = async (req, res) => {
 
 const deleteCourse = async (req, res) => {
   const courseID = parseInt(req.params.id);
-
+  const userID = req.user.id; 
   try {
+    const course = await Courses.getCourseById(courseID);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Check if the user is the creator of the course
+    if (course.userID !== userID) {
+      return res.status(403).json({ message: "You do not have permission to delete this course" });
+    }
+
     const success = await Courses.deleteCourse(courseID);
     if (!success) {
-      return res.status(404).json({ message: "Course not foundd" });
+      return res.status(404).json({ message: "Course not found" });
     }
-    res.status(204).json({ message: "Course deleted successfully!" });
+    res.status(204).json({ message: 'Course deleted successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error deleting course :(" });
+    res.status(500).json({ message: "Error deleting course" });
   }
 };
+
 
 const deleteCourseWithNoLectures = async (req, res) => {
   try {
@@ -175,6 +185,7 @@ const deleteCourseWithNoLectures = async (req, res) => {
     res.status(500).json({ message: "Error deleting course with no lectures:(" });
   }
 };
+
   
 // retreive specific image 
 const getCourseImage = async (req, res) => {
@@ -200,7 +211,7 @@ const searchCourses = async (req, res) => {
     }
     const courses = await Courses.searchCourses(searchTerm);
     if (!courses.length) {
-      return res.status(404).json({ message: 'No courses found' });
+      return res.status(404).json({ message: 'No courses found please enter properly' });
     }
     res.json(courses);
 } catch (error) {
