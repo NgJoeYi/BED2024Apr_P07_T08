@@ -54,7 +54,7 @@ async function run() {
             FOREIGN KEY (user_id) REFERENCES Users(id)
         );
 
-        CREATE TABLE Discussions (
+       CREATE TABLE Discussions (
             id INT PRIMARY KEY IDENTITY(1,1),
             title NVARCHAR(255) NOT NULL,
             description TEXT NOT NULL,
@@ -63,8 +63,10 @@ async function run() {
             user_id INT NOT NULL,
             likes INT DEFAULT 0,
             dislikes INT DEFAULT 0,
+            views INT DEFAULT 0,
             FOREIGN KEY (user_id) REFERENCES Users(id)
         );
+
 
         CREATE TABLE user_comments (
             id INT IDENTITY(1,1) PRIMARY KEY,

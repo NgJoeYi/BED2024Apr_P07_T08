@@ -154,6 +154,19 @@ const deleteDiscussion = async (req, res) => {
     }
 };
 
+const incrementViews = async (req, res) => {
+    try {
+        const discussionId = req.params.discussionId;
+        const views = await discussionModel.incrementViews(discussionId);
+        res.json({ success: true, views });
+    } catch (err) {
+        console.error('Error incrementing views:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+
+
 module.exports = {
     getDiscussions,
     getDiscussionById,
@@ -164,5 +177,6 @@ module.exports = {
     updateDiscussion,
     deleteDiscussion,
     validateDiscussion,
-    validateUpdateDiscussion
+    validateUpdateDiscussion,
+    incrementViews
 };

@@ -37,6 +37,7 @@ function verifyJWT(req, res, next) {
             'POST /discussions': ['student', 'lecturer'],
             'POST /discussions/:discussionId/like': ['student', 'lecturer'],
             'POST /discussions/:discussionId/dislike': ['student', 'lecturer'],
+            'POST /discussions/:discussionId/view': ['student', 'lecturer'],  // Add this line for views
             'PUT /discussions/:id': ['student', 'lecturer'],
             'DELETE /discussions/:id': ['student', 'lecturer'],
             
