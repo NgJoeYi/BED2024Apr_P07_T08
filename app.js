@@ -126,6 +126,7 @@ app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCo
 
 
 // Add Routes for lectures
+app.get('/lectures/checking', jwtAuthorization.verifyJWT, lectureController.checkingUserID); // get current user ID 
 app.get('/lectures/last-chapter', jwtAuthorization.verifyJWT, lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
 app.get('/lectures', lectureController.getAllLectures); // Fetches all lectures
 app.get('/lectures/max-course-id', lectureController.getMaxCourseID); // Getting the new course ID

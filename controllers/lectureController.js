@@ -1,3 +1,4 @@
+const { user } = require("../dbConfig");
 const Lectures = require("../models/Lectures");
 const multer = require("multer");
 
@@ -88,10 +89,10 @@ const updateLecture = async (req, res) => {
     const id = req.params.id;
     const { title, description, chapterName, duration } = req.body;
     let video = req.file ? req.file.buffer : null;
+    const existingLecture = await Lectures.getLectureByID(id);
 
     if (!video) {
         try {
-            const existingLecture = await Lectures.getLectureByID(id);
             if (existingLecture && existingLecture.video) {
                 video = existingLecture.video;
             }
@@ -109,11 +110,14 @@ const updateLecture = async (req, res) => {
         Video: video
     };
     try {
+        if(userID != existingLecture.userID){
+            return res.status(403).send('You do not have permission to edit the lecture');
+        }
         const updateResult = await Lectures.updateLecture(id, newLectureData);
         if (!updateResult) {
             return res.status(404).send('Lecture not found!');
         }
-        res.json({ message: 'Lecture updated successfully', data: updateResult });
+        res.json({ message: 'Lecture updated successfully', data: updateResult, userID : userID });
     } catch (error) {
         console.error('Error updating lecture:', error);
         res.status(500).send('Error updating lecture');
@@ -224,6 +228,12 @@ const getLecturesByCourseID = async (req, res) => {
     }
 };
 
+const checkingUserID = async (req, res) => {
+    const userID = req.user.id;
+    console.log('Current logged-in user ID:', userID);
+    res.json({ userID });
+};
+
 
 module.exports = {
     getAllLectures,
@@ -235,5 +245,6 @@ module.exports = {
     getLectureVideoByID,
     getLecturesByCourseID,
     getMaxCourseID,
-    getLectureByID
+    getLectureByID,
+    checkingUserID
 };

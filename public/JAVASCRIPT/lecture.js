@@ -243,7 +243,6 @@ function displayLectures(lectures) {
     subNavItems.forEach(item => {
         item.addEventListener('click', function() {
             const lectureID = this.getAttribute('data-lecture-id');
-            console.log(`Fetching video for lecture ID: ${lectureID}`);
             setVideo(lectureID);
             subNavItems.forEach(item => item.style.fontWeight = 'normal');
             this.style.fontWeight = 'bold';
@@ -272,12 +271,42 @@ async function setVideo(lectureID) {
 }
 
 async function editLecture(button) {
+    // Getting user ID of lecture 
     const lectureID = button.dataset.lectureId;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
+    const token = sessionStorage.getItem('token');
+    try {
+        // Getting user ID of logged on now 
+        const checkingUserIDResponse = await fetch(`/lectures/checking`,{
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!checkingUserIDResponse.ok) {
+            throw new Error('Network response not ok');
+        }
+        const { userID: userIDLoggedon } = await checkingUserIDResponse.json();
+        console.log('Logged-on user ID:', userIDLoggedon);
 
-    // Redirect to edit lecture page with lectureID and courseID as query parameters
-    window.location.href = `editLecture.html?courseID=${courseID}&lectureID=${lectureID}`;
+        const response = await fetch(`/lectures/${lectureID}`);
+        if (!response.ok) {
+            throw new Error('Network response not ok');
+        }
+        const lecture = await response.json();
+        const userIDInLecture = lecture.userID;
+        console.log('Lecture user ID:', userIDInLecture);
+
+        if (userIDLoggedon === userIDInLecture) {
+            // Redirect to edit lecture page with lectureID and courseID as query parameters
+            window.location.href = `editLecture.html?courseID=${courseID}&lectureID=${lectureID}`;
+        } else {
+            alert('You do not have permission to edit this lecture.');
+        }
+    } catch (error) {
+        console.error('Error getting lecture or user ID:', error);
+    }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     getLecturesByCourse();
