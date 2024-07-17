@@ -232,6 +232,7 @@ async function deleteCourse(event, button) {
 
     if (response.status === 204) {
       if (!confirm('Are you sure you want to delete this course?')) {
+        window.location.href = "Courses.html";
         return;
       }    
       alert('Course deleted successfully!');

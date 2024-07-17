@@ -31,7 +31,18 @@ const getLectureByID = async (req, res) => {
 
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
+    const userID = req.user.id;
     try {
+        const lecture = await Lectures.getLectureByID(lectureID);
+        if (!lecture) {
+          return res.status(404).json({ message: "Lecture not found" });
+        }
+        // Check if the user is the creator of the lecture
+        if (lecture.userID !== userID) {
+            console.log('COMES HERE');
+            return res.status(403).send({ message: "You do not have permission to delete this lecture teehee" });
+        }
+
         const success = await Lectures.deleteLecture(lectureID);
         if (!success) {
             return res.status(404).send("Lecture not found");
@@ -43,6 +54,24 @@ const deleteLecture = async (req, res) => {
     }
 };
 
+const deletingChapterName = async (req, res) => {
+    const { courseID, chapterName } = req.params;
+    const userID = req.user.id;
+    try {
+        const success = await Lectures.deletingChapterName(courseID, chapterName);
+        if (!success) {
+            return res.status(404).send("Chapter not found");
+        }
+         // Check if the user is the creator of the course
+        if (course.userID !== userID) {
+            return res.status(403).json({ message: "You do not have permission to delete this course" });
+        }
+        res.status(204).send("Lectures successfully deleted");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error deleting lectures");
+    }
+}
 const updateLecture = async (req, res) => {
     const userID = req.user.id; // user id that logged on now 
     // lecture id 
@@ -80,22 +109,6 @@ const updateLecture = async (req, res) => {
         res.status(500).send('Error updating lecture');
     }
 };
-
-
-
-const deletingChapterName = async (req, res) => {
-    const { courseID, chapterName } = req.params;
-    try {
-        const success = await Lectures.deletingChapterName(courseID, chapterName);
-        if (!success) {
-            return res.status(404).send("Chapter not found");
-        }
-        res.status(204).send("Lectures successfully deleted");
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error deleting lectures");
-    }
-}
 
 const getLastChapterName = async (req, res) => {
     const userID = req.user.id;

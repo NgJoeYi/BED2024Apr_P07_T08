@@ -28,10 +28,6 @@ async function deleteLecture(button) {
     const courseID = new URLSearchParams(window.location.search).get('courseID');
     const token = sessionStorage.getItem('token');
 
-    if (!confirm('Are you sure you want to delete this lecture?')) {
-        return;
-    }
-
     try {
         const response = await fetch(`/lectures/${lectureID}`, { 
             method: 'DELETE',
@@ -40,7 +36,7 @@ async function deleteLecture(button) {
             }
         });
 
-        if (response.ok) {
+        if (response.status === 204) {
             alert('Lecture deleted successfully!');
             button.closest('.sub-nav-item').remove();
 
@@ -67,11 +63,14 @@ async function deleteLecture(button) {
                     window.location.href = 'courses.html';
                 } else {
                     console.error('Failed to delete course. Status:', deleteCourseResponse.status);
+                    alert('Failed to delete the course.');
                 }
             } else {
-                // If there are remaining lectures, reload them
-                getLecturesByCourse();
+                // There are remaining lectures, update UI or redirect as needed
+                window.location.href = `lecture.html?courseID=${courseID}`;
             }
+        } else if (response.status === 403) {
+            alert('You do not have permission to delete this lecture.');
         } else {
             console.error('Failed to delete lecture. Status:', response.status);
             alert('Failed to delete the lecture.');
@@ -81,6 +80,7 @@ async function deleteLecture(button) {
         alert('Error deleting lecture.');
     }
 }
+
 
 async function deleteChapter(button) {
     const chapterName = button.dataset.chapterName;
