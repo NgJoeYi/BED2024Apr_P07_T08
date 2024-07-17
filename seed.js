@@ -64,6 +64,7 @@ async function run() {
             likes INT DEFAULT 0,
             dislikes INT DEFAULT 0,
             views INT DEFAULT 0,
+            pinned BIT DEFAULT 0,  
             FOREIGN KEY (user_id) REFERENCES Users(id)
         );
 

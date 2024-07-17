@@ -111,6 +111,9 @@ function addDiscussionToFeed(discussion) {
     const capitalizedUsername = capitalizeFirstLetter(discussion.username);
     const profilePicUrl = discussion.profilePic || 'images/profilePic.jpeg';
 
+    const pinButtonText = discussion.pinned ? 'Unpin' : 'Pin';
+    const pinButtonClass = discussion.pinned ? 'unpin-button' : 'pin-button';
+
     post.innerHTML = `
         <div class="post-header">
             <div class="profile-pic">
@@ -118,6 +121,7 @@ function addDiscussionToFeed(discussion) {
             </div>
             <div class="username">${capitalizedUsername}</div>
             <div class="role">(${discussion.role})</div>
+            <button class="${pinButtonClass} pin-button-top-right" data-id="${discussion.id}">${pinButtonText}</button>
         </div>
         <div class="post-meta">
             <span class="category-discussion">Category: ${discussion.category}</span>
@@ -137,13 +141,19 @@ function addDiscussionToFeed(discussion) {
         </div>
     `;
 
-    feed.prepend(post);
+    // Prepend pinned discussions and append unpinned discussions
+    if (discussion.pinned) {
+        feed.prepend(post);
+    } else {
+        feed.appendChild(post);
+    }
 
     fetchCommentCountForDiscussion(discussion.id);
 
     const likeButton = post.querySelector('.like-button');
     const dislikeButton = post.querySelector('.dislike-button');
     const commentButton = post.querySelector('.comment-button');
+    const pinButton = post.querySelector(`.${pinButtonClass}`);
 
     likeButton.addEventListener('click', function () {
         if (this.getAttribute('data-liked') === 'true') {
@@ -168,7 +178,14 @@ function addDiscussionToFeed(discussion) {
         incrementViews(discussionId);
         window.location.href = `comment.html?discussionId=${discussionId}`;
     });
+
+    pinButton.addEventListener('click', function () {
+        const discussionId = this.getAttribute('data-id');
+        const action = discussion.pinned ? 'unpin' : 'pin';
+        togglePinDiscussion(discussionId, action, this);
+    });
 }
+
 
 function incrementViews(discussionId) {
     fetchWithAuth(`/discussions/${discussionId}/view`, {
@@ -264,4 +281,32 @@ window.onclick = function(event) {
     if (event.target == document.getElementById("popup")) {
         document.getElementById("popup").style.display = "none";
     }
+}
+
+function togglePinDiscussion(discussionId, action, button) {
+    fetchWithAuth(`/discussions/${discussionId}/${action}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(error => {
+                throw new Error(error.message);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            fetchDiscussions(); // Refresh the discussions list to reflect the change
+        } else {
+            alert('Error pinning/unpinning discussion.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`Network error: ${error.message}`);
+    });
 }

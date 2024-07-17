@@ -95,6 +95,8 @@ app.post('/discussions/:discussionId/dislike', jwtAuthorization.verifyJWT, discu
 
 // what i added extra - discussion
 app.post('/discussions/:discussionId/view', jwtAuthorization.verifyJWT, discussionController.incrementViews);
+app.post('/discussions/:id/pin', jwtAuthorization.verifyJWT, discussionController.pinDiscussion);
+app.post('/discussions/:id/unpin', jwtAuthorization.verifyJWT, discussionController.unpinDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
