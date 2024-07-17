@@ -56,7 +56,6 @@ const getDiscussions = async (req, res) => {
     }
 };
 
-
 const getDiscussionById = async (req, res) => {
     const discussionId = req.params.id;
     try {
@@ -165,7 +164,27 @@ const incrementViews = async (req, res) => {
     }
 };
 
+const pinDiscussion = async (req, res) => {
+    const discussionId = req.params.id;
+    try {
+        await discussionModel.updateDiscussionPin(discussionId, true);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error pinning discussion:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
 
+const unpinDiscussion = async (req, res) => {
+    const discussionId = req.params.id;
+    try {
+        await discussionModel.updateDiscussionPin(discussionId, false);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error unpinning discussion:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
 
 module.exports = {
     getDiscussions,
@@ -178,5 +197,7 @@ module.exports = {
     deleteDiscussion,
     validateDiscussion,
     validateUpdateDiscussion,
-    incrementViews
+    incrementViews,
+    pinDiscussion,
+    unpinDiscussion
 };

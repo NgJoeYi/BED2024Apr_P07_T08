@@ -2,7 +2,7 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
 class Discussion {
-    constructor(id, title, description, category, posted_date, likes, dislikes, views, username, profilePic, role) {
+    constructor(id, title, description, category, posted_date, likes, dislikes, views, username, profilePic, role, pinned) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -14,13 +14,14 @@ class Discussion {
         this.username = username;
         this.profilePic = profilePic;
         this.role = role; 
+        this.pinned = pinned; // Add pinned attribute
     }
 
     static async getDiscussions(category, sort, search) {
         try {
             let query = `
                 SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, d.views, u.name AS username, 
-                       ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
+                       ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role, d.pinned
                 FROM Discussions d
                 LEFT JOIN Users u ON d.user_id = u.id
                 LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -34,12 +35,8 @@ class Discussion {
             if (search) {
                 query += ` AND (d.title LIKE @search OR d.description LIKE @search)`;
             }
-    
-            if (sort === 'most-recent') {
-                query += ` ORDER BY d.posted_date DESC`;
-            } else if (sort === 'oldest') {
-                query += ` ORDER BY d.posted_date ASC`;
-            }
+
+            query += ` ORDER BY d.pinned ASC, d.posted_date ASC`; // Sort pinned discussions to the top
     
             const pool = await sql.connect(dbConfig);
             const request = pool.request();
@@ -54,7 +51,7 @@ class Discussion {
     
             const result = await request.query(query);
             return result.recordset.map(row => new Discussion(
-                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.views, row.username, row.profilePic, row.role
+                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.views, row.username, row.profilePic, row.role, row.pinned
             ));
         } catch (err) {
             throw new Error(`Error getting discussions: ${err.message}`);
@@ -75,7 +72,7 @@ class Discussion {
                 `);
             const row = result.recordset[0];
             return new Discussion(
-                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.views, row.username, row.profilePic, row.role
+                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.views, row.username, row.profilePic, row.role, row.pinned
             );
         } catch (err) {
             throw new Error(`Error fetching discussion details: ${err.message}`);
@@ -94,8 +91,8 @@ class Discussion {
                 .input('posted_date', sql.DateTime, posted_date)
                 .input('userId', sql.Int, userId)
                 .query(`
-                    INSERT INTO Discussions (title, description, category, posted_date, user_id, views)
-                    VALUES (@title, @description, @category, @posted_date, @userId, 0);
+                    INSERT INTO Discussions (title, description, category, posted_date, user_id, views, pinned)
+                    VALUES (@title, @description, @category, @posted_date, @userId, 0, 0);
                     SELECT SCOPE_IDENTITY() AS id;
                 `);
 
@@ -112,7 +109,7 @@ class Discussion {
             const user = userResult.recordset[0];
 
             return new Discussion(
-                discussionId, title, description, category, posted_date, 0, 0, 0, user.name, user.profilePic, user.role
+                discussionId, title, description, category, posted_date, 0, 0, 0, user.name, user.profilePic, user.role, false
             );
         } catch (err) {
             throw new Error(`Error creating discussion: ${err.message}`);
@@ -176,7 +173,7 @@ class Discussion {
             const result = await pool.request()
                 .input('userId', sql.Int, userId)
                 .query(`
-                    SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, d.views, u.name AS username, p.img AS profilePic
+                    SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, d.views, u.name AS username, p.img AS profilePic, d.pinned
                     FROM Discussions d
                     LEFT JOIN Users u ON d.user_id = u.id
                     LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -184,7 +181,7 @@ class Discussion {
                     ORDER BY d.posted_date DESC
                 `);
             return result.recordset.map(row => new Discussion(
-                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.views, row.username, row.profilePic, row.role
+                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.views, row.username, row.profilePic, row.role, row.pinned
             ));
         } catch (err) {
             throw new Error(`Error getting user discussions: ${err.message}`);
@@ -220,6 +217,19 @@ class Discussion {
             return true;
         } catch (err) {
             throw new Error(`Error deleting discussion: ${err.message}`);
+        }
+    }
+
+    static async updateDiscussionPin(discussionId, pinned) {
+        try {
+            const pool = await sql.connect(dbConfig);
+            await pool.request()
+                .input('discussionId', sql.Int, discussionId)
+                .input('pinned', sql.Bit, pinned)
+                .query('UPDATE Discussions SET pinned = @pinned WHERE id = @discussionId');
+            return true;
+        } catch (err) {
+            throw new Error(`Error updating discussion pin: ${err.message}`);
         }
     }
 }

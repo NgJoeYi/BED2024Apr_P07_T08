@@ -40,6 +40,8 @@ function verifyJWT(req, res, next) {
             'POST /discussions/:discussionId/view': ['student', 'lecturer'],  // Add this line for views
             'PUT /discussions/:id': ['student', 'lecturer'],
             'DELETE /discussions/:id': ['student', 'lecturer'],
+            'POST /discussions/:id/pin': ['student', 'lecturer'],  // Add this line for pin
+            'POST /discussions/:id/unpin': ['student', 'lecturer'],  // Add this line for unpin
             
             'GET /comments': ['student', 'lecturer'],
             'PUT /comments/:id': ['student', 'lecturer'],
