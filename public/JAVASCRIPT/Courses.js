@@ -1,3 +1,8 @@
+const itemsPerPage = 6;
+let currentPage = 1;
+let totalPages = 1;
+let coursesData = [];
+
 // GETTING ALL COURSES
 async function fetchCourses(category = 'all', sortBy = 'most-recent') {
   try {
@@ -56,8 +61,6 @@ async function deleteCourseWithNoLectures() {
   }
 }
 
-
-
 // DISPLAYING COURSES   
 function displayCourses(filteredCourses = null) {
   const coursesGrid = document.querySelector('.courses-grid-unique');
@@ -68,7 +71,12 @@ function displayCourses(filteredCourses = null) {
   // Determine which courses to display
   const coursesToDisplay = filteredCourses || coursesData;
 
-  coursesToDisplay.forEach(course => {
+  // Calculate pagination range
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const coursesToShow = coursesToDisplay.slice(startIndex, endIndex);
+
+  coursesToShow.forEach(course => {
     const courseElement = document.createElement('div');
     courseElement.className = 'course-cd-unique';
     courseElement.dataset.category = course.Category;
@@ -80,27 +88,27 @@ function displayCourses(filteredCourses = null) {
 
     courseElement.innerHTML = `
       <a href="lecture.html?courseID=${course.CourseID}">
-          <img src="${imageUrl}" alt="Course Image">
-          <div class="course-details-unique">
-              <p class="category">${course.Category}</p>
-              <h6>${course.Title}</h6>
-              <div class="course-meta">
-                  <span>${course.Duration} hr</span>
-              </div>
-              <div>
-                  <p class="posted-date">Posted on: ${new Date(course.CreatedAt).toLocaleDateString()}</p>
-                  <p>${course.Level}</p>
-              </div>
-              ${token && userRole === 'lecturer' ? `
-              <div class="delete-button-container">
-                  <button class="delete-course" data-course-id="${course.CourseID}" onclick="deleteCourse(event, this)">Delete</button>
-                  <button class="edit-course" data-course-id="${course.CourseID}" onclick="editCourse(event, this)">Edit</button>           
-              </div>
-              ` : ''}
-              <div class="reviews-count-container">
-                  <span id="review-count-${course.CourseID}" class="review-count">💬 0 Reviews</span>
-              </div>
+        <img src="${imageUrl}" alt="Course Image">
+        <div class="course-details-unique">
+          <p class="category">${course.Category}</p>
+          <h6>${course.Title}</h6>
+          <div class="course-meta">
+            <span>${course.Duration} hr</span>
           </div>
+          <div>
+            <p class="posted-date">Posted on: ${new Date(course.CreatedAt).toLocaleDateString()}</p>
+            <p>${course.Level}</p>
+          </div>
+          ${token && userRole === 'lecturer' ? `
+          <div class="delete-button-container">
+            <button class="delete-course" data-course-id="${course.CourseID}" onclick="deleteCourse(event, this)">Delete</button>
+            <button class="edit-course" data-course-id="${course.CourseID}" onclick="editCourse(event, this)">Edit</button>           
+          </div>
+          ` : ''}
+          <div class="reviews-count-container">
+            <span id="review-count-${course.CourseID}" class="review-count">💬 0 Reviews</span>
+          </div>
+        </div>
       </a>
     `;
     coursesGrid.appendChild(courseElement);
@@ -109,6 +117,18 @@ function displayCourses(filteredCourses = null) {
     fetchReviewCountForCourse(course.CourseID);
   });
   updatePaginationControls();
+}
+
+
+// PAGINATION
+function updatePaginationControls() {
+  const prevPageBtn = document.getElementById('prev-page');
+  const nextPageBtn = document.getElementById('next-page');
+  const currentPageDisplay = document.getElementById('current-page');
+
+  currentPageDisplay.textContent = currentPage;
+  currentPage === 1 ? prevPageBtn.classList.add('disabled') : prevPageBtn.classList.remove('disabled');
+  currentPage === totalPages ? nextPageBtn.classList.add('disabled') : nextPageBtn.classList.remove('disabled');
 }
 
 // Initialize on DOM load
@@ -126,12 +146,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // adding event listener for pagination
-  const prevPage =  document.getElementById('prev-page');
-  const nextPage =  document.getElementById('next-page');
-  if (prevPage && nextPage){
-    document.getElementById('prev-page').addEventListener('click', prevPage);
-    document.getElementById('next-page').addEventListener('click', nextPage);
+  // Add event listener for pagination
+  const prevPageBtn = document.getElementById('prev-page');
+  const nextPageBtn = document.getElementById('next-page');
+  if (prevPageBtn && nextPageBtn) {
+    prevPageBtn.addEventListener('click', prevPage);
+    nextPageBtn.addEventListener('click', nextPage);
   }
 
 
@@ -149,11 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchCourses(document.getElementById('filter-category').value, sortBy);
   });
 });
-
-const itemsPerPage = 6;
-let currentPage = 1;
-let totalPages = 1;
-let coursesData = [];
 
 // ADDING CONTENT TO FILTER-CATEGORY 
 async function filter() {
@@ -180,17 +195,6 @@ async function filter() {
   } catch (error) {
     console.error('Error fetching categories:', error);
   }
-}
-
-// PAGINATION
-function updatePaginationControls() {
-  const prevPageBtn = document.getElementById('prev-page');
-  const nextPageBtn = document.getElementById('next-page');
-  const currentPageDisplay = document.getElementById('current-page');
-
-  currentPageDisplay.textContent = currentPage;
-  currentPage === 1 ? prevPageBtn.classList.add('disabled') : prevPageBtn.classList.remove('disabled');
-  currentPage === totalPages ? nextPageBtn.classList.add('disabled') : nextPageBtn.classList.remove('disabled');
 }
 
 function prevPage() {
