@@ -219,6 +219,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function incrementLikes(commentId, likeButton, dislikeButton) {
+        try {
+            const response = await fetchWithAuth(`/comments/${commentId}/like`, {
+                method: 'POST'
+            });
+            const data = await response.json();
+            if (data.success) {
+                likeButton.textContent = `👍 ${data.likes} Likes`;
+                likeButton.setAttribute('data-liked', 'true');
+                dislikeButton.setAttribute('data-disliked', 'false');
+            } else {
+                alert('Error adding like.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error adding like.');
+        }
+    }
+
+    async function incrementDislikes(commentId, likeButton, dislikeButton) {
+        try {
+            const response = await fetchWithAuth(`/comments/${commentId}/dislike`, {
+                method: 'POST'
+            });
+            const data = await response.json();
+            if (data.success) {
+                dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
+                dislikeButton.setAttribute('data-disliked', 'true');
+                likeButton.setAttribute('data-liked', 'false');
+            } else {
+                alert('Error adding dislike.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error adding dislike.');
+        }
+    }
+
     function displayComments(comments) {
         const commentsSection = document.querySelector('.comments-section');
         commentsSection.innerHTML = ''; // Clear existing comments
@@ -236,6 +274,12 @@ document.addEventListener('DOMContentLoaded', () => {
             commentElement.classList.add('comment');
             commentElement.dataset.id = comment.id;
             commentElement.dataset.userId = comment.user_id;
+
+            const likedByUser = comment.userLiked ? 'true' : 'false';
+            const dislikedByUser = comment.userDisliked ? 'true' : 'false';
+
+            const likesText = `👍 ${comment.likes || 0} Likes`;
+            const dislikesText = `👎 ${comment.dislikes || 0} Dislikes`;
     
             commentElement.innerHTML = `
                 <div class="user-info">
@@ -248,10 +292,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="comment-content">${comment.content}</div>
                 <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
                 <div class="comment-actions">
-                ${token && comment.user_id === currentUserId ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
-                                                                <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
+                    <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
+                    <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
+                    ${token && comment.user_id === currentUserId ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
+                                                                    <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
                 </div>
             `;
+
+            const likeButton = commentElement.querySelector('.like-button');
+            const dislikeButton = commentElement.querySelector('.dislike-button');
+
+            likeButton.addEventListener('click', function () {
+                if (this.getAttribute('data-liked') === 'true') {
+                    alert('You have already liked this comment.');
+                    return;
+                }
+                incrementLikes(comment.id, this, dislikeButton);
+            });
+
+            dislikeButton.addEventListener('click', function () {
+                if (this.getAttribute('data-disliked') === 'true') {
+                    alert('You have already disliked this comment.');
+                    return;
+                }
+                incrementDislikes(comment.id, likeButton, this);
+            });
+            
             commentsSection.appendChild(commentElement);
         });
     }

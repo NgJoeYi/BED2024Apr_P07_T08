@@ -72,6 +72,8 @@ async function run() {
         CREATE TABLE user_comments (
             id INT IDENTITY(1,1) PRIMARY KEY,
             user_id INT NOT NULL,
+            likes INT DEFAULT 0,
+            dislikes INT DEFAULT 0,
             content TEXT NOT NULL,
             created_at DATETIME DEFAULT GETDATE(),
             discussion_id INT NOT NULL,

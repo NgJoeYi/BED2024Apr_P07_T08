@@ -152,6 +152,50 @@ async function getCommentCountByDiscussionId(discussionId) {
     }
 }
 
+async function incrementLikes(commentId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        await connection.request()
+            .input('commentId', sql.Int, commentId)
+            .query('UPDATE user_comments SET likes = likes + 1 WHERE id = @commentId');
+
+        const result = await connection.request()
+            .input('commentId', sql.Int, commentId)
+            .query('SELECT likes FROM user_comments WHERE id = @commentId');
+
+        return result.recordset[0].likes;
+    } catch (err) {
+        throw new Error(`Error incrementing likes: ${err.message}`);
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
+async function incrementDislikes(commentId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        await connection.request()
+            .input('commentId', sql.Int, commentId)
+            .query('UPDATE user_comments SET dislikes = dislikes + 1 WHERE id = @commentId');
+
+        const result = await connection.request()
+            .input('commentId', sql.Int, commentId)
+            .query('SELECT dislikes FROM user_comments WHERE id = @commentId');
+
+        return result.recordset[0].dislikes;
+    } catch (err) {
+        throw new Error(`Error incrementing dislikes: ${err.message}`);
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
 
 module.exports = {
     getAllComments,
@@ -161,6 +205,7 @@ module.exports = {
     updateComment,
     deleteComment,
     getCommentCount,
-    getCommentCountByDiscussionId
-    
+    getCommentCountByDiscussionId,
+    incrementLikes,
+    incrementDislikes  
 };
