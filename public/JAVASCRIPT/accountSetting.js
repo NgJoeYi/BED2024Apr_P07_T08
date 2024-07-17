@@ -1,15 +1,9 @@
 // ---------------------------------------------- EDIT ACCOUNT ----------------------------------------------
 // Populate data to make it a prefilled form and ready to be edited
 document.addEventListener('DOMContentLoaded', async function () {
-    const token = getToken();
-    if (token) {
         try {
-          const response = await fetch('/account', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-        });            
-            if (response.ok) {
+          const response = await fetchWithAuth('/account');  // ------------------------------------------------- headers in jwtutility.js
+            if (response.ok) { // response && response.ok
                 const user = await response.json();
                 // Populate profile info
                 document.querySelector('.user-name').textContent = user.name;
@@ -32,8 +26,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                     element.textContent = user.name;
                 });
 
-                // Fetch and update total quizzes taken // CHANGES WERE MADE HERE
-                await fetchTotalQuizzesTaken(token); // CHANGES WERE MADE HERE
+                // Fetch and update total quizzes taken
+                await fetchTotalQuizzesTaken();
 
             } else {
                 console.error('Failed to fetch user data');
@@ -41,17 +35,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         } catch (error) {
             console.error('Error:', error);
         }
-    } else {
-      console.error('No user is logged in');
-    }
     
     // Toggle visibility for edit account details
     document.getElementById('edit-icon').addEventListener('click', function () {
-      if (!token) {
-        alert('Please log in first to edit your account details.');
-        window.location.href = 'Login.html';
-        return;
-      }
       const editAccountDetails = document.getElementById('edit-account-details');
       if (editAccountDetails.style.display === 'block') {
         editAccountDetails.style.display = 'none';
@@ -106,16 +92,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
         
         try {
-            const response = await fetch(`/account`, {
+            const response = await fetchWithAuth(`/account`, { // ------------------------------------------------- headers in jwtutility.js
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                  },
                 body: JSON.stringify(updatedUserData)
             });
 
-            if (response.ok) {
+            if (response.ok) { // response && response.ok
                 const updatedUser = await response.json();
                 alert('User details updated successfully');
   
@@ -159,20 +141,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     
   // ---------------------------------------------- UPLOAD PROFILE PICTURE ----------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    const token = getToken();
-    if (token) {
-      fetchUserProfile(token);
-    }
+      fetchUserProfile();
   });
   
-  async function fetchUserProfile(token) {
+  async function fetchUserProfile() {
     try {
-      const response = await fetch(`/account/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
+      const response = await fetchWithAuth(`/account/profile`); // ------------------------------------------------- headers in jwtutility.js
+      if (response.ok) { // response && response.ok
         const data = await response.json();
         if (data.profilePic) {
           document.getElementById('profile-pic').src = data.profilePic;
@@ -186,12 +161,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   
   function triggerFileInput() {
-    const token = getToken();
-    if (!token) {
-      alert('Please log in first to upload your profile picture.');
-      window.location.href = 'Login.html';
-      return;
-    }
+    // const token = getToken();
+    // if (!token) {
+    //   alert('Please log in first to upload your profile picture.');
+    //   window.location.href = 'Login.html';
+    //   return;
+    // }
     document.getElementById('file-input').click();
   }
   
@@ -209,25 +184,14 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   
   async function uploadImageToServer(base64Image) {
-    const token = getToken();
-    
-    if (!token) {
-      alert('No token found. Please log in first.');
-      return;
-    }
-  
     try {
       console.log('Uploading image...');
-      const response = await fetch(`/account/uploadProfilePic`, {
+      const response = await fetchWithAuth(`/account/uploadProfilePic`, { // ------------------------------------------------- headers in jwtutility.js
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ profilePic: base64Image })
       });
   
-      if (response.ok) {
+      if (response.ok) { // response && response.ok
         alert('Profile picture updated successfully');
       } else {
         const errorData = await response.json();
@@ -244,12 +208,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   // ---------------------------------------------- DELETE ACCOUNT ----------------------------------------------
   // Function to confirm account deletion
   function confirmDeleteAccount() {
-    const token = getToken();
+    // const token = getToken();
     
-    if (!token) {
-      alert('No user is logged in');
-      return;
-    }
+    // if (!token) {
+    //   alert('No user is logged in');
+    //   return;
+    // }
   
     document.getElementById('deleteModal').style.display = 'block';
   }
@@ -261,32 +225,24 @@ document.addEventListener('DOMContentLoaded', async function () {
   
   // Function to delete account with password authorization
   async function deleteAccount() {
-    const token = getToken();
-    const password = document.getElementById('delete-password').value;
-
-    if (!token) {
-        alert('No user is logged in');
-        return;
-    }
-
-    if (!password) {
-        alert('Please enter your password');
-        return;
-    }
+    // const token = getToken();
+    // const password = document.getElementById('delete-password').value;
+    // if (!password) {
+    //     alert('Please enter your password');
+    //     return;
+    // }
 
     try {
-        const response = await fetch('/account', {
+        const response = await fetchWithAuth('/account', { // ------------------------------------------------- headers in jwtutility.js
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({ password: password })
         });
 
-        if (response.ok) {
+        if (response.ok) { // response && response.ok
             alert('Account deleted successfully');
             sessionStorage.removeItem('token');
+            sessionStorage.removeItem('userId');
+            sessionStorage.removeItem('role');
             window.location.href = 'Index.html';
         } else {
             const errorData = await response.json();
@@ -302,58 +258,62 @@ document.addEventListener('DOMContentLoaded', async function () {
   
   // ---------------------------------------------- LOG OUT --------------------------------------------------------------
   function confirmLogout() {
-    const token = getToken();
-    if (!token) {
-      alert('No user is logged in.');
-      return;
-    }
+    // const token = getToken();
+    // if (!token) {
+    //   alert('No user is logged in.');
+    //   return;
+    // }
     
     const userConfirmed = confirm('Are you sure you want to log out?');
     if (userConfirmed) {
       // User clicked "OK"
       alert('Logging you out...');
       sessionStorage.removeItem('token'); // Clear the token from session storage
+      sessionStorage.removeItem('userId');
+      sessionStorage.removeItem('role');
       window.location.href = '/login.html'; // Redirect to the login page
     } else {
       // User clicked "Cancel"
       alert('Logout cancelled.');
     }
   }
-  
-  function getToken() {
-    return sessionStorage.getItem('token');
-  }
+
+  // ---------------------------------------------- QUIZ RESULTS ----------------------------------------------
 
 
-// ---------------------------------------------- QUIZ RESULTS ----------------------------------------------
-async function fetchUserQuizResults() {
-  const token = getToken();
-  try {
-      const response = await fetch('/account/quizResult', {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      });
-      if (!response.ok) throw new Error('Failed to fetch quiz results');
+  async function fetchUserQuizResults() {
+    try {
+      const response = await fetchWithAuth('/account/quizResult'); // ------------------------------------------------- headers in jwtutility.js
+      if (!response) return; // *************** changes for jwt
+      // if (!response.ok) throw new Error('Failed to fetch quiz results');
 
       const quizResults = await response.json();
-      console.log('Fetched quiz results:', quizResults); // Debugging log
+      // console.log('Fetched quiz results:', quizResults); // Debugging log
+
+      // group by title since title is unique too
+      quizResults.forEach(result => {
+          result.QuizID = result.QuizTitle; // Assuming QuizTitle as QuizID for grouping
+      });
 
       // Fetching the attempt count
-      const attemptCountResponse = await fetch('/account/quizAttemptCount', {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }      
-      });
-      if (!attemptCountResponse.ok) throw new Error('Failed to fetch attempt count');
-
-      const attemptCountData = await attemptCountResponse.json(); // returned an obj
-      const attemptCount = attemptCountData.AttemptCount; // accessing within the obj
-      console.log('Attempt count data:', attemptCountData); // Debugging log
-      console.log('Fetched attempt count:', attemptCount); // Debugging log
-
-      // Sort quiz results by AttemptDate in descending order //CHANGED
+      const attemptCountResponse = await fetchWithAuth('/account/getAttemptCountByQuizId'); // ------------------------------------------------- headers in jwtutility.js
+      if (!attemptCountResponse) return; // *************** changes for jwt
+ 
+      // sorting quiz results by AttemptDate in descending order
       quizResults.sort((a, b) => new Date(b.AttemptDate) - new Date(a.AttemptDate));
+
+      // Group quiz results by QuizID
+      const groupedQuizResults = quizResults.reduce((acc, result) => {
+          // console.log('Processing result:', result); // Debugging log
+          const quizId = result.QuizID || result.quiz_id;
+          if (!acc[quizId]) {
+              acc[quizId] = [];
+          }
+          acc[quizId].push(result);
+          return acc;
+      }, {});
+
+      // console.log('Grouped quiz results:', groupedQuizResults); // Debugging log
 
       const quizResultsContainer = document.querySelector('.quiz-results');
       const noQuizResultsMessage = document.querySelector('.no-quiz-results-message');
@@ -364,18 +324,22 @@ async function fetchUserQuizResults() {
           noQuizResultsMessage.style.display = 'block';
       } else {
           noQuizResultsMessage.style.display = 'none';
-          quizResults.forEach((result, index) => createQuizResultCard(result, quizResultsContainer, attemptCount - index));
-          // quizResults.forEach(result => createQuizResultCard(result, quizResultsContainer));
-      }
-  } catch (error) {
+          Object.keys(groupedQuizResults).forEach(quizId => {
+              const results = groupedQuizResults[quizId];
+              results.forEach((result, index) => {
+                  const attemptNumber = index + 1; // Correct attempt number for each quiz ID
+                  createQuizResultCard(result, quizResultsContainer, attemptNumber);
+              });
+            });
+          }
+        } catch (error) {
       console.error('Error fetching quiz results:', error);
+    }
   }
-}
-
-function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
-  console.log('Creating quiz result card for:', result); // Debugging log
-  console.log('Attempt Number:', attemptNumber); // Debugging log
-
+  
+  function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
+  // console.log('Creating quiz result card for:', result); // Debugging log
+  // console.log('Attempt Number:', attemptNumber); // Debugging log
 
   const quizResultCard = document.createElement('div');
   quizResultCard.className = 'quiz-result-card';
@@ -397,7 +361,7 @@ function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
           <span class="quiz-date">${formattedDate}</span>
       </div>
       <div class="quiz-result-details">
-            <p><strong>Attempt no:</strong> ${attemptNumber}</p>
+          <p><strong>Attempt number:</strong> ${attemptNumber}</p>
           <p><strong>Score:</strong> ${result.Score}%</p>
           <p><strong>Total Questions:</strong> ${result.TotalQuestions}</p>
           <p><strong>Total Marks:</strong> ${result.TotalMarks}</p>
@@ -405,40 +369,32 @@ function createQuizResultCard(result, quizResultsContainer, attemptNumber) {
           <p><strong>Passed:</strong> ${result.Passed ? 'Yes' : 'No'}</p>
       </div>
   `;
-
+  
   quizResultsContainer.appendChild(quizResultCard);
 }
 
 // ---------------------- fetch total quizzes taken ----------------------
 
-async function fetchTotalQuizzesTaken(token) {
+async function fetchTotalQuizzesTaken() {
   try {
-      const response = await fetch('/account/quizAttemptCount', {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      });
-      if (!response.ok) throw new Error('Failed to fetch total quizzes taken');
+      const response = await fetchWithAuth('/account/getAllAttemptCount'); // ------------------------------------------------- headers in jwtutility.js
+      if (!response) return; // *************** changes for jwt
+      // if (!response.ok) throw new Error('Failed to fetch total quizzes taken');
 
-      const data = await response.json();
-      const totalQuizzes = data.AttemptCount;
-      console.log('Total quizzes taken:', totalQuizzes);
+      const dataWrapper = await response.json();
+      console.log('Fetched total quizzes data wrapper:', dataWrapper); // Debugging log
+
+      const totalQuizzes = dataWrapper?.AttemptCount; // extract the AttemptCount directly
+      // console.log('Total quizzes data:', totalQuizzes); // Debugging log
+
+      if (typeof totalQuizzes !== 'number') {
+          throw new Error('Total quizzes data is not a number');
+      }
 
       document.getElementById('total-quizzes').textContent = totalQuizzes;
   } catch (error) {
       console.error('Error fetching total quizzes taken:', error);
   }
 }
+
 document.addEventListener('DOMContentLoaded', fetchUserQuizResults);
-
-
-
-
-
-
-// ---------------------- Utility ----------------------
-
-function getToken() {
-  return sessionStorage.getItem('token');
-}
-

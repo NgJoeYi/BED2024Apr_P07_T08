@@ -222,12 +222,8 @@ async function deleteCourse(event, button) {
     return;
   }
   try {
-    const token = sessionStorage.getItem('token');
-    const response = await fetch(`/courses/${courseID}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
+    const response = await fetchWithAuth(`/courses/${courseID}`, { // ------------------------------------------------- headers in jwtutility.js
+      method: 'DELETE'
     });
 
     if (response.status === 204) {
@@ -306,32 +302,25 @@ async function editCourse(event, button) {
   event.preventDefault();
 
   const courseID = button.dataset.courseId;
-  const token = sessionStorage.getItem('token'); // Get the JWT token from sessionStorage
   if (!courseID) {
       alert('Course ID not found.');
       return;
   }
   try {
-      const response = await fetch(`/courses/${courseID}`, {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      });
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
-      const { course, userID: courseCreatorUserID } = await response.json();
-      
-      // Decode the JWT to get the user ID of the logged-in user
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      const loggedInUserID = decodedToken.id;
-      console.log(courseCreatorUserID);
-      if (courseCreatorUserID !== loggedInUserID) {
-          alert('You do not have permission to edit this course.');
-          return;
-      }
-      // Redirect to edit course page with courseID as query parameter
-      window.location.href = `updateCourse.html?courseID=${courseID}`;
+    const response = await fetchWithAuth(`/courses/${courseID}`); // ------------------------------------------------- headers in jwtutility.js
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const { course, userID: courseCreatorUserID } = await response.json();
+
+    const userId = parseInt(sessionStorage.getItem('userId')); // current user's ID from session storage
+
+    if (courseCreatorUserID !== userId) {
+      alert('You do not have permission to edit this course.');
+      return;
+    }
+    // Redirect to edit course page with courseID as query parameter
+    window.location.href = `updateCourse.html?courseID=${courseID}`;
   } catch (error) {
       console.error('Error fetching course details:', error);
   }

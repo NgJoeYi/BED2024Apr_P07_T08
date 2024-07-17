@@ -64,9 +64,11 @@ async function updateReview(req, res) {
         if (!review) {
             return res.status(404).json({ error: 'Review not found' });
         }
-        if (review.user_id !== userId) {
-            return res.status(403).json({ error: 'You can only edit your own reviews.' });
-        }
+
+        // ******** DONT NEED DO THIS BC TO CHECK USERID IS ALREADY DONE USING verifyJWT MIDDLEWARE ******
+        // if (review.user_id !== userId) {
+        //     return res.status(403).json({ error: 'You can only edit your own reviews.' });
+        // } 
 
         await reviewModel.updateReview(id, review_text, rating, courseId);
         res.status(200).json({ message: 'Review updated successfully' });
@@ -92,10 +94,11 @@ async function deleteReview(req, res) {
             return res.status(404).json({ error: 'Review not found' });
         }
         
-        if (parseInt(review.user_id, 10) !== parseInt(userId, 10)) {
-            console.error('User not authorized to delete this review');
-            return res.status(403).send('You can only delete your own reviews.');
-        }
+        // ******** DONT NEED DO THIS BC TO CHECK USERID IS ALREADY DONE USING verifyJWT MIDDLEWARE ******
+        // if (parseInt(review.user_id, 10) !== parseInt(userId, 10)) {
+        //     console.error('User not authorized to delete this review');
+        //     return res.status(403).send('You can only delete your own reviews.');
+        // }
 
         console.log('Review found:', review);
         
@@ -122,6 +125,28 @@ async function getReviewCount(req, res) {
     } catch (err) {
         console.error(err);
         res.status(500).send("Error fetching review count");
+    }
+}
+
+async function getReviewCountByCourseId(req, res) {
+    const { courseId } = req.params;
+    try {
+        const count = await reviewModel.getReviewCountByCourseId(courseId);
+        res.json({ count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching review count by course ID");
+    }
+}
+
+async function getReviewCountByUserId(req, res) {
+    const { userId } = req.params;
+    try {
+        const count = await reviewModel.getReviewCountByUserId(userId);
+        res.json({ count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error fetching review count by user ID");
     }
 }
 
@@ -188,6 +213,8 @@ module.exports = {
     createReview,
     deleteReview,
     getReviewCount,
+    getReviewCountByCourseId,
+    getReviewCountByUserId,
     getReviewsByRating,
     getReviewsSortedByRating,
     getReviewsByCourseId,

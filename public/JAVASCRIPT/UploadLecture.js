@@ -7,17 +7,9 @@ function closeModal() {
 }
 
 async function fetchLastChapterName() {
-    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
-    if (!token) {
-        alert('User not authenticated. Please log in.');
-        return;
-    }
     try {
-        const response = await fetch(`/lectures/last-chapter`,{
-            headers: {
-                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
-            }
-        });
+        const response = await fetchWithAuth(`/lectures/last-chapter`); // ------------------------------------------------- headers in jwtutility.js
+        if (!response) return; // ********************** jwt
         if (response.ok) {
             const data = await response.json();
             return data.chapterName;
@@ -33,12 +25,6 @@ async function fetchLastChapterName() {
 
 // UPLOAD LECTURES
 async function addFiles() {
-    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
-    if (!token) {
-        alert('User not authenticated. Please log in.');
-        return;
-    }
-
     const previousChapterName = await fetchLastChapterName();
     const chapterNameInput = document.getElementById('chapterName').value.trim();
     const title = document.getElementById('lectureName').value.trim();
@@ -81,13 +67,12 @@ async function addFiles() {
         formData.append('Description', description);
         Array.from(videoFileInput.files).forEach(file => formData.append('Video', file));
 
-        const response = await fetch('/lectures', {
+        const response = await fetchWithAuth('/lectures', { // ------------------------------------------------- headers in jwtutility.js
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
-            },
             body: formData
         });
+
+        if (!response) return; // ********************** jwt
 
         if (response.ok) {
             const newLecture = await response.json();
@@ -142,12 +127,6 @@ function resetForm() {
 }
 
 async function addCourses() {
-    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
-    if (!token) {
-        alert('User not authenticated. Please log in.');
-        return;
-    }
-
     const title = document.getElementById('course-name-text').textContent.trim();
     const description = document.getElementById('course-details').textContent.trim();
     const category = document.getElementById('category').value.trim();
@@ -169,13 +148,12 @@ async function addCourses() {
     formData.append('imageFile', courseImageInput.files[0]);
 
     try {
-        const response = await fetch('/courses', {
+        const response = await fetchWithAuth('/courses', { // ------------------------------------------------- headers in jwtutility.js
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`  // Include the JWT token in the Authorization header
-            },
             body: formData
         });
+
+        if (!response) return; // ********************** jwt
 
         if (response.ok) {
             const newCourse = await response.json();

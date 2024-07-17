@@ -85,13 +85,12 @@
     <!-- Question Creation Modal -->
     <div id="question-modal" class="modal">
         <div class="modal-content">
-            <span class="close-question-modal-btn">&times;</span>
             <h2>Create Questions</h2>
             <form id="question-form">
                 <input type="hidden" id="quiz_id" name="quiz_id">
+                <div id="question-number"></div>
                 <div id="questions-container"></div>
                 <div class="navigation-buttons">
-                    <button type="button" id="prev-question" disabled>Previous</button>
                     <button type="button" id="next-question">Next</button>
                 </div>
                 <button type="submit" id="submit-questions" style="display:none;">Submit Questions</button>
@@ -172,6 +171,7 @@
     </div>
 </footer>
 
+    <script src="JAVASCRIPT/JwtUtility.js"></script>
     <script src="JAVASCRIPT/quiz.js"></script>
     <script src="JAVASCRIPT/script.js"></script> 
     <!-- for hiding login/signin when use logged in  -->

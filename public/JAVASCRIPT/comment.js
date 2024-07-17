@@ -1,26 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Fetch elements
     const popup = document.getElementById('popup');
     const closePopupBtn = document.querySelector('.popup .close');
-    const addCommentBtn = document.getElementById('addCommentBtn'); // Add Comment button
+    const addCommentBtn = document.getElementById('addCommentBtn'); 
+
     let editMode = false;
     let currentComment = null;
     let currentCommentId = null;
+
     const token = getToken();
-    const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-    //const currentUserId = sessionStorage.getItem('userId'); // Get the current user ID from session storage
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10);  // Get the current user ID from session storage and not decode token bc decode token to get user Id pose security concerns since sensitive info can be found using token
 
-    // console.log('Current User ID:', currentUserId); // Debug log
-
+    // Event listener to close pop up
     closePopupBtn.addEventListener('click', closePopup);
 
-    // addCommentBtn.addEventListener('click', () => {
-    //     if (token) {
-    //         showPopup('add');
-    //     } else {
-    //         alert('Please log in or sign up to add comments.');
-    //     }
-    // });
-
+    // Only if have token, will show Add Comment button
     if (token) {
         addCommentBtn.addEventListener('click', () => {
             showPopup('add');
@@ -29,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addCommentBtn.style.display = 'none';
     }
 
+    // Pop up is for Add Comment and for Edit Comment, so need 'type' to differentiate them
     function showPopup(type) {
         const popupTitle = popup.querySelector('h2');
         const commentText = document.getElementById('comment-text');
@@ -40,12 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
             editMode = false;
             currentComment = null;
             currentCommentId = null;
-            saveButton.onclick = saveComment; // Set onclick to saveComment for adding new comments
+            saveButton.onclick = saveComment;
         } else {
             popupTitle.textContent = 'Edit Comment';
             commentText.value = currentComment.querySelector('.comment-content').textContent.trim();
             editMode = true;
-            saveButton.onclick = saveComment; // Set onclick to saveComment for editing comments
+            saveButton.onclick = saveComment; 
         }
 
         popup.style.display = 'flex';
@@ -55,186 +51,110 @@ document.addEventListener('DOMContentLoaded', () => {
         popup.style.display = 'none';
     }
 
-    // -- this requires jwt
-    // async function saveComment() {
-    //     const commentText = document.getElementById('comment-text').value;
-    //     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
-    
-    //     if (editMode && currentComment) {
-    //         try {
-    //             const response = await fetch(`/comments/${currentCommentId}`, {
-    //                 method: 'PUT',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                     'Authorization': `Bearer ${token}`
-    //                 },
-    //                 body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
-    //             });
-    //             if (response.ok) {
-    //                 currentComment.querySelector('.comment-content').textContent = commentText;
-    //                 closePopup();
-    //                 alert('Comment updated successfully!');
-    //             } else {
-    //                 const errorData = await response.json();
-    //                 console.error('Failed to update comment:', errorData.error || response.statusText);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error:', error);
-    //         }
-    //     } else {
-    //         await postComment(commentText, discussionId);
-    //         closePopup();
-    //     }
-    // }
-
     async function saveComment() {
         const commentText = document.getElementById('comment-text').value;
         const discussionId = new URLSearchParams(window.location.search).get('discussionId');
     
         try {
+            
+            // 'editMode && currentComment' is a condition and used with '? :' ---> if true (editMode = true, currentComment not null), will go to ? branch (PUT). if false (editMode = false), will go : branch (POST)
             const response = editMode && currentComment
-                ? await fetch(`/comments/${currentCommentId}`, {
+
+                // 'fetchWithAuth' is in JwtUtility.js, which is used to verify token in frontend. 'verifyJWT' middleware in your routes is to verify token in backend
+                ? await fetchWithAuth(`/comments/${currentCommentId}`, { 
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 })
-                : await fetch('/comments', {
+                : await fetchWithAuth('/comments', { // ------------------------------------------------- headers in jwtutility.js
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 });
     
-            if (response.ok) {
+            if (response.ok) { // See if the PUT and POST is done successfully
                 if (editMode && currentComment) {
                     currentComment.querySelector('.comment-content').textContent = commentText;
                     alert('Comment updated successfully!');
                 } else {
                     alert('Comment posted successfully!');
-                    fetchComments(discussionId); // Refresh comments for the specific discussion
+                    fetchComments(discussionId); // Refresh the comments to display new comment
                 }
                 closePopup();
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || response.statusText); // Show alert for validation error
+                alert(errorData.error || response.statusText); // Show alert for error
             }
         } catch (error) {
             console.error('Error:', error);
         }
     }
     
-            
-    //This requires jwt
     async function postComment(text, discussionId) {
         try {
-            const response = await fetch('/comments', {
+            const response = await fetchWithAuth('/comments', { 
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify({ content: text, discussionId: parseInt(discussionId, 10) }) // Ensure discussionId is an integer
             });
-            if (response.ok) {
+            if (response.ok) { 
                 alert('Comment posted successfully!');
-                fetchComments(discussionId); // Refresh comments for the specific discussion
+                fetchComments(discussionId); // Refresh the comments to display new comment 
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || response.statusText); // Show alert for validation error
+                alert(errorData.error || response.statusText); // Show alert for error
             }
         } catch (error) {
             console.error('Error:', error);
         }
     }
                         
-    // -- this requires jwt
-    window.deleteComment = async function(button) {
+    async function deleteComment(button) {
         const comment = button.closest('.comment');
         const commentId = comment.dataset.id;
     
         try {
-            const response = await fetch(`/comments/${commentId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+            const response = await fetchWithAuth(`/comments/${commentId}`, {
+                method: 'DELETE'
             });
     
-            console.log('Response status:', response.status); // To debug
-    
-            if (response.status === 403) {
-                alert('You can only delete your own comments.');
-            } else if (response.ok) {
+            console.log('Response status:', response.status);
+
+            if (response.ok){
                 if (confirm("Are you sure you want to delete this comment?")) {
                     comment.remove();
                     alert('Comment deleted successfully!');
                 }
-            } else {
+            }
+            else{
                 console.error('Failed to delete comment:', response.statusText);
             }
+    
         } catch (error) {
             console.error('Error:', error);
         }
-    };    
+    }
+    
+    async function editComment(button) {
 
-    // -- this requires jwt
-    window.editComment = function(button) {
+        // 'button.closest' is to ensure I edit the right comment that I want to edit ---> I can have 2 diff comments, but the edit button for both comments are named the same. So need use button.closest to ensure I am editing my desired comment and not my other comment. (button.closest = will take the nearest comment where you clicked the button)
         const comment = button.closest('.comment');
-        const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
-        const token = getToken();
-        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode JWT
-        const currentUserId = decodedToken.id; // Extract user ID from JWT
-    
-        console.log('Comment User ID:', comment.dataset.userId); // Debug log
-        console.log('Comment User ID (parsed):', commentUserId); // Debug log
-    
+        const commentUserId = parseInt(comment.dataset.userId, 10);
+        const currentUserId = parseInt(sessionStorage.getItem('userId'), 10);
+        
         if (commentUserId === currentUserId) {
-            currentComment = comment;
+            currentComment = comment; // currentComment = the comment I want edit
             currentCommentId = comment.dataset.id;
-            console.log('Current Comment ID:', currentCommentId); // Debug log
-            showPopup('edit');
+            showPopup('edit'); // Pop up for type 'Edit' is shown
         } else {
             alert('You can only edit your own comments.');
         }
-    };
-
-    
-    // window.editComment = function(button) {
-    //     const comment = button.closest('.comment');
-    //     const commentUserId = parseInt(comment.dataset.userId, 10); // Get the user ID from the comment
-
-    //     console.log('Comment User ID:', comment.dataset.userId); // Debug log
-    //     console.log('Comment User ID (parsed):', commentUserId); // Debug log
-
-    //     if (commentUserId === parseInt(currentUserId, 10)) {
-    //         currentComment = comment;
-    //         currentCommentId = comment.dataset.id;
-    //         console.log('Current Comment ID:', currentCommentId); // Debug log
-    //         showPopup('edit');
-    //     } else {
-    //         alert('You can only edit your own comments.');
-    //     }
-    // };
-
+    }
+        
     async function fetchDiscussionDetails(discussionId) {
-        const token = getToken();
         try {
-            const response = await fetch(`/discussions/${discussionId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await fetchWithAuth(`/discussions/${discussionId}`);
             if (!response.ok) {
                 throw new Error(`Error fetching discussion: ${response.statusText}`);
             }
             const discussion = await response.json();
-            console.log('Discussion details:', discussion); // Debug log
             if (!discussion) {
                 throw new Error('Discussion not found');
             }
@@ -243,9 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching discussion details:', error);
         }
     }
-    
-    
-    
 
     function displayDiscussionDetails(discussion) {
         if (!discussion) {
@@ -266,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const likesText = `👍 ${discussion.likes} Likes`;
         const dislikesText = `👎 ${discussion.dislikes} Dislikes`;
     
-        // hi i change this 
         mainPost.innerHTML = `
             <div class="post-header">
                 <div class="profile-pic">
@@ -307,8 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentsSection = document.querySelector('.comments-section');
         commentsSection.innerHTML = ''; // Clear existing comments
         const token = getToken();
-        const currentUserId = getUserIdFromToken(token); // Extract user ID from the token
-    
+        const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert to integer
+
         // Sort comments so newest comment appears at top
         comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
@@ -332,12 +248,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="comment-content">${comment.content}</div>
                 <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
                 <div class="comment-actions">
-                    ${token && comment.user_id === currentUserId ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
-                                                                    <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
+                ${token && comment.user_id === currentUserId ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
+                                                                <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
                 </div>
             `;
             commentsSection.appendChild(commentElement);
         });
+    }
+
+    async function fetchCommentCountByDiscussionId(discussionId) {
+        try {
+            const response = await fetchWithAuth(`/comments/discussion/${discussionId}/count`, {
+                method: 'GET'
+            });
+
+            console.log('Response status:', response.status);
+            const responseText = await response.text();
+            console.log('Response text:', responseText);
+
+            if (!response.ok) {
+                console.error('Error response:', responseText);
+                throw new Error('Failed to fetch comment count by discussion ID');
+            }
+
+            const data = JSON.parse(responseText);
+            console.log('Parsed data:', data);
+
+            const totalCommentsElement = document.getElementById('total-comments');
+            // totalCommentsElement.textContent = data.count;
+            if (totalCommentsElement) {
+                totalCommentsElement.textContent = data.count;
+            }
+            
+        } catch (error) {
+            console.error('Error fetching comment count by discussion ID:', error);
+        }
     }
         
     function formatUsername(username) {
@@ -350,19 +295,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get discussion ID from URL
-    fetchDiscussionDetails(discussionId); // Fetch discussion details
+    fetchDiscussionDetails(discussionId); // Fetch discussion details aka the main post for each discussion
     fetchComments(discussionId); // Fetch comments for the specific discussion
+    fetchCommentCountByDiscussionId(discussionId);
 
+    window.editComment = editComment;
+    window.deleteComment = deleteComment;
     window.saveComment = saveComment;
     window.closePopup = closePopup;
 });
 
 function getToken() {
     return sessionStorage.getItem('token');
-}
-
-  function getUserIdFromToken(token) {
-    if (!token) return null;
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.id;
 }

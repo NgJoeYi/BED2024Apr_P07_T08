@@ -14,12 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const title = document.getElementById('title').value;
         const category = document.getElementById('category').value;
         const description = document.getElementById('description').value;
-        const token = getToken(); // Function to get the current user's ID
-
-        if (!token) {
-            alert('User must be logged in to submit a discussion.');
-            return;
-        }
 
         const data = {
             title: title,
@@ -30,18 +24,11 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Submitting form with data:', data);
         displayLoading(true);
 
-        fetch('/discussions', {
+        fetchWithAuth('/discussions', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify(data)
         })
-        .then(response => {
-            console.log('Server response status:', response.status);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             console.log('Server response data:', data);
             if (data.success) {
@@ -62,15 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function getToken() {
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-        alert('User is not logged in or session has expired');
-        return null;
-    }
-    return token;
-}
-
 function fetchDiscussions() {
     const category = document.getElementById('filter-category').value;
     const sort = document.getElementById('sort-date').value;
@@ -86,7 +64,6 @@ function fetchDiscussions() {
 
             if (data.success) {
                 if (data.discussions.length === 0) {
-                    // Display "No discussion found" message
                     const noDiscussionMessage = document.createElement('div');
                     noDiscussionMessage.classList.add('no-discussion-message');
                     noDiscussionMessage.textContent = "No discussion found";
@@ -119,8 +96,6 @@ function capitalizeFirstLetter(string) {
 }
 
 function addDiscussionToFeed(discussion) {
-    console.log(discussion); // Add this line to debug
-
     const feed = document.querySelector('.activity-feed');
     const post = document.createElement('div');
     post.classList.add('post');
@@ -131,12 +106,13 @@ function addDiscussionToFeed(discussion) {
 
     const likesText = `👍 ${discussion.likes} Likes`;
     const dislikesText = `👎 ${discussion.dislikes} Dislikes`;
+    const viewsText = `👁️ ${discussion.views} Views`;
 
-    // Capitalize the first letter of the username
     const capitalizedUsername = capitalizeFirstLetter(discussion.username);
-
-    // Check if profilePic is available, otherwise use default profile picture
     const profilePicUrl = discussion.profilePic || 'images/profilePic.jpeg';
+
+    const pinButtonText = discussion.pinned ? 'Unpin' : 'Pin';
+    const pinButtonClass = discussion.pinned ? 'unpin-button' : 'pin-button';
 
     post.innerHTML = `
         <div class="post-header">
@@ -144,7 +120,8 @@ function addDiscussionToFeed(discussion) {
                 <img src="${profilePicUrl}" alt="Profile Picture">
             </div>
             <div class="username">${capitalizedUsername}</div>
-            <div class="role">(${discussion.role})</div> <!-- Display the role -->
+            <div class="role">(${discussion.role})</div>
+            <button class="${pinButtonClass} pin-button-top-right" data-id="${discussion.id}">${pinButtonText}</button>
         </div>
         <div class="post-meta">
             <span class="category-discussion">Category: ${discussion.category}</span>
@@ -157,39 +134,113 @@ function addDiscussionToFeed(discussion) {
             <div class="likes-dislikes">
                 <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
                 <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
-                <span id="comment-count-${discussion.id}" class="comment-count" style="margin-left: -2px;">💬 0 Comments</span>
+                <span id="comment-count-${discussion.id}" class="comment-count">💬 0 Comments</span>
+                <span class="views-count">${viewsText}</span>
             </div>
             <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
         </div>
     `;
 
-    feed.prepend(post);
+    // Prepend pinned discussions and append unpinned discussions
+    if (discussion.pinned) {
+        feed.prepend(post);
+    } else {
+        feed.appendChild(post);
+    }
 
-    // Fetch and display the comment count for each discussion
     fetchCommentCountForDiscussion(discussion.id);
 
-    // Attach event listeners after appending to the feed to ensure they are correctly set up
     const likeButton = post.querySelector('.like-button');
     const dislikeButton = post.querySelector('.dislike-button');
     const commentButton = post.querySelector('.comment-button');
+    const pinButton = post.querySelector(`.${pinButtonClass}`);
 
     likeButton.addEventListener('click', function () {
-        if (this.getAttribute('data-liked') === 'false') {
-            console.log('Like button clicked');
-            incrementLikes(discussion.id, this, dislikeButton);
+        if (this.getAttribute('data-liked') === 'true') {
+            alert('You have already liked this discussion.');
+            return;
         }
+        incrementLikes(discussion.id, this, dislikeButton);
+        incrementViews(discussion.id);
     });
 
     dislikeButton.addEventListener('click', function () {
-        if (this.getAttribute('data-disliked') === 'false') {
-            console.log('Dislike button clicked');
-            incrementDislikes(discussion.id, likeButton, this);
+        if (this.getAttribute('data-disliked') === 'true') {
+            alert('You have already disliked this discussion.');
+            return;
         }
+        incrementDislikes(discussion.id, likeButton, this);
+        incrementViews(discussion.id);
     });
 
     commentButton.addEventListener('click', function () {
         const discussionId = this.getAttribute('data-id');
+        incrementViews(discussionId);
         window.location.href = `comment.html?discussionId=${discussionId}`;
+    });
+
+    pinButton.addEventListener('click', function () {
+        const discussionId = this.getAttribute('data-id');
+        const action = discussion.pinned ? 'unpin' : 'pin';
+        togglePinDiscussion(discussionId, action, this);
+    });
+}
+
+
+function incrementViews(discussionId) {
+    fetchWithAuth(`/discussions/${discussionId}/view`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(`Views incremented for discussion ${discussionId}. Current views: ${data.views}`);
+        } else {
+            console.error('Error incrementing views:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error incrementing views:', error);
+    });
+}
+
+function incrementLikes(discussionId, likeButton, dislikeButton) {
+    fetchWithAuth(`/discussions/${discussionId}/like`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            likeButton.textContent = `👍 ${data.likes} Likes`;
+            likeButton.setAttribute('data-liked', 'true');
+            dislikeButton.setAttribute('data-disliked', 'false');
+        } else {
+            alert('Error adding like.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding like.');
+    });
+}
+
+function incrementDislikes(discussionId, likeButton, dislikeButton) {
+    fetchWithAuth(`/discussions/${discussionId}/dislike`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
+            dislikeButton.setAttribute('data-disliked', 'true');
+            likeButton.setAttribute('data-liked', 'false');
+        } else {
+            alert('Error adding dislike.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding dislike.');
     });
 }
 
@@ -209,77 +260,15 @@ function fetchCommentCountForDiscussion(discussionId) {
             console.error('Network or server error:', error);
             alert('Error fetching comment count.');
         });
+    }
+
+function displayLoading(show) {
+    const loadingElement = document.getElementById('loading');
+    if (loadingElement) {
+        loadingElement.style.display = show ? 'block' : 'none';
+    }
 }
 
-function incrementLikes(discussionId, likeButton, dislikeButton) {
-    const token = getToken();
-    if (!token) {
-        return;
-    }
-    
-    if (likeButton.getAttribute('data-liked') === 'true') {
-        alert('You have already liked this discussion.');
-        return;
-    }
-
-    fetch(`/discussions/${discussionId}/like`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            likeButton.textContent = `👍 ${data.likes} Likes`;
-            likeButton.setAttribute('data-liked', 'true');
-            dislikeButton.setAttribute('data-disliked', 'false');
-        } else {
-            alert('Error adding like.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error adding like.');
-    });
-}
-
-function incrementDislikes(discussionId, likeButton, dislikeButton) {
-    const token = getToken();
-    if (!token) {
-        return;
-    }
-
-    if (dislikeButton.getAttribute('data-disliked') === 'true') {
-        alert('You have already disliked this discussion.');
-        return;
-    }
-
-    fetch(`/discussions/${discussionId}/dislike`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
-            dislikeButton.setAttribute('data-disliked', 'true');
-            likeButton.setAttribute('data-liked', 'false');
-        } else {
-            alert('Error adding dislike.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error adding dislike.');
-    });
-}
-
-// Define the popup functions
 function openPopup() {
     document.getElementById("popup").style.display = "block";
 }
@@ -288,17 +277,36 @@ function closePopup() {
     document.getElementById("popup").style.display = "none";
 }
 
-// Close the popup when clicking outside the popup content
 window.onclick = function(event) {
     if (event.target == document.getElementById("popup")) {
         document.getElementById("popup").style.display = "none";
     }
 }
 
-// Helper function to show/hide loading indicator
-function displayLoading(show) {
-    const loadingElement = document.getElementById('loading');
-    if (loadingElement) {
-        loadingElement.style.display = show ? 'block' : 'none';
-    }
+function togglePinDiscussion(discussionId, action, button) {
+    fetchWithAuth(`/discussions/${discussionId}/${action}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(error => {
+                throw new Error(error.message);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            fetchDiscussions(); // Refresh the discussions list to reflect the change
+        } else {
+            alert('Error pinning/unpinning discussion.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`Network error: ${error.message}`);
+    });
 }

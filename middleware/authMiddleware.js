@@ -12,6 +12,9 @@ function verifyJWT(req, res, next) {
     jwt.verify(token, process.env.SECRET_TOKEN, (err, decoded) => {
         if (err) {
             console.log('Token verification failed:', err);
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({ message: 'Token expired' });
+            }
             return res.status(403).json({ message: 'Forbidden' });
         }
         console.log('Token:', token);
@@ -25,7 +28,8 @@ function verifyJWT(req, res, next) {
             'PUT /account': ['student', 'lecturer'], // -- will need to come back to this
             'DELETE /account': ['student', 'lecturer'], //hi i added this here - Raeann( delete it when u see HAHHAH)
             'GET /account/quizResult': ['student', 'lecturer'], 
-            'GET /account/quizAttemptCount': ['student', 'lecturer'], 
+            'GET /account/getAttemptCountByQuizId': ['student', 'lecturer'], 
+            'GET /account/getAllAttemptCount': ['student', 'lecturer'], 
             
             'GET /discussions/user': ['student', 'lecturer'],
             'GET /discussions': ['student', 'lecturer'],
@@ -33,8 +37,11 @@ function verifyJWT(req, res, next) {
             'POST /discussions': ['student', 'lecturer'],
             'POST /discussions/:discussionId/like': ['student', 'lecturer'],
             'POST /discussions/:discussionId/dislike': ['student', 'lecturer'],
+            'POST /discussions/:discussionId/view': ['student', 'lecturer'],  // Add this line for views
             'PUT /discussions/:id': ['student', 'lecturer'],
             'DELETE /discussions/:id': ['student', 'lecturer'],
+            'POST /discussions/:id/pin': ['student', 'lecturer'],  // Add this line for pin
+            'POST /discussions/:id/unpin': ['student', 'lecturer'],  // Add this line for unpin
             
             'GET /comments': ['student', 'lecturer'],
             'PUT /comments/:id': ['student', 'lecturer'],
@@ -50,9 +57,10 @@ function verifyJWT(req, res, next) {
             'POST /submitQuiz': ['student', 'lecturer'],
             'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
             'POST /quizzes/:id/questions': ['lecturer'], // Only lecturers can add questions to a quiz
+            'POST /quizzes/:id/questions/update': ['lecturer'], // Only lecturers can add questions to a quiz
             'PUT /quizzes/:quizId/questions/:questionId': ['lecturer'],
             'DELETE /quizzes/:quizId/questions/:questionId': ['lecturer'],
-
+            
             // 'GET /courses': ['student', 'lecturer'],
             // 'GET /courses/:id': ['student', 'lecturer'],
             // 'GET /courses/images/:id': ['student', 'lecturer'],
@@ -109,4 +117,4 @@ module.exports = { verifyJWT };
 // - users that are not logged in can view comments 
 // - users that are not logged in can view courses 
 // - users that are not logged in can view discussions
-// -- users that are not logged in can attempt the quizzes // maybe...
+// -- users that are not logged in can view quizzes

@@ -40,18 +40,12 @@ function stopTimer() {
     console.log(`Total time taken: ${totalSeconds} seconds`); // Log the total time taken
 }
 
-function getToken() {
-    return sessionStorage.getItem('token');
-  }
+// function getToken() {
+//     return sessionStorage.getItem('token');
+//   }
 
 function fetchQuizWithQuestions(quizId) {
-    const token = getToken()
-    fetch(`/quizzes/${quizId}/questions`, {
-        headers: 
-        {
-            'Authorization': `Bearer ${token}`
-        }
-    })
+    fetchWithAuth(`/quizzes/${quizId}/questions`) // ------------------------------------------------- headers in jwtutility.js
         .then(response => response.json())
         .then(quiz => {
             if (quiz) {
@@ -146,12 +140,8 @@ function submitQuiz() {
         selected_option: userResponses[question.question_id]
     }));
 
-    fetch(`/submitQuiz`, {
+    fetchWithAuth(`/submitQuiz`, { // ------------------------------------------------- headers in jwtutility.js
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
-        },
         body: JSON.stringify({
             quizId,
             responses: userResponsesArray,

@@ -23,17 +23,8 @@ function initializeEditQuestion() {
 
 let editQuestions = []; // Renamed variable to avoid conflicts
 
-function getToken() {
-    return sessionStorage.getItem('token');
-}
-
 function fetchQuizWithQuestionsForEdit(quizId, isEditMode) {
-    const token = getToken();
-    fetch(`/quizzes/${quizId}/questions`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    })
+    fetchWithAuth(`/quizzes/${quizId}/questions`) // ------------------------------------------------- headers in jwtutility.js
     .then(response => response.json())
     .then(quiz => {
         if (quiz && quiz.questions) {
@@ -103,23 +94,23 @@ function displayQuestionsForEdit(isEditMode) {
     });
 
     // Add button container
-    const buttonContainer = document.createElement('div'); // *********************
-    buttonContainer.style.display = 'flex'; // *********************
-    buttonContainer.style.gap = '10px'; // *********************
-    questionsContainer.appendChild(buttonContainer); // *********************
+    const buttonContainer = document.createElement('div');   
+    buttonContainer.style.display = 'flex';   
+    buttonContainer.style.gap = '10px';   
+    questionsContainer.appendChild(buttonContainer);   
 
     // Add Create Question button
-    const createQuestionButton = document.createElement('button'); // *********************
-    createQuestionButton.id = 'create-question'; // *********************
-    createQuestionButton.innerText = 'Create Question'; // *********************
-    createQuestionButton.onclick = createNewQuestionForm; // *********************
-    buttonContainer.appendChild(createQuestionButton); // *********************
+    const createQuestionButton = document.createElement('button');   
+    createQuestionButton.id = 'create-question';   
+    createQuestionButton.innerText = 'Create Question';   
+    createQuestionButton.onclick = createNewQuestionForm;   
+    buttonContainer.appendChild(createQuestionButton);   
 
     const saveButton = document.createElement('button');
     saveButton.id = 'save-changes'; // Make sure the button has this ID
     saveButton.innerText = 'Save Changes';
     saveButton.onclick = saveChanges;
-    buttonContainer.appendChild(saveButton); // *********************
+    buttonContainer.appendChild(saveButton);   
 
     // Hide or remove the submit quiz button in edit mode
     const submitQuizButton = document.getElementById('submit-quiz');
@@ -226,24 +217,20 @@ async function saveNewQuestion(questionCard, questionInput, imageInput, optionIn
         });
     }
 
-    const token = getToken();
     try {
-        const response = await fetch(`/quizzes/${quizId}/questions`, {
+        const response = await fetchWithAuth(`/quizzes/${quizId}/questions/update`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify(newQuestionData)
         });
 
         const data = await response.json();
         if (response.ok) {
             alert('Question created successfully');
-            questionCard.remove(); // Optionally remove the form after submission
-            newQuestionData.question_id = data.question_id; // Assuming the server returns the new question_id
-            editQuestions.push(newQuestionData); // Add the new question to the list
+            questionCard.remove();
+            newQuestionData.question_id = data.question_id; 
+            editQuestions.push(newQuestionData); 
             displayQuestionsForEdit(true); // Refresh the questions list in edit mode
+            window.location.reload(); // Refresh the page to reload the data
         } else {
             console.error('Failed to create question:', data.message);
             alert(`Failed to create question: ${data.message}`);
@@ -259,17 +246,13 @@ async function saveNewQuestion(questionCard, questionInput, imageInput, optionIn
 // --------------------------------------------------------- DELETE QUESTION ---------------------------------------------------------
 
 function deleteQuestion(questionId) {
-    const token = getToken();
     const urlParams = new URLSearchParams(window.location.search);
     const quizId = urlParams.get('quizId');
 
     console.log(`Deleting question with id: ${questionId} from quiz: ${quizId}`);
 
-    fetch(`/quizzes/${quizId}/questions/${questionId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+    fetchWithAuth(`/quizzes/${quizId}/questions/${questionId}`, { // ------------------------------------------------- headers in jwtutility.js
+        method: 'DELETE'
     })
     .then(response => {
         return response.json();
@@ -294,12 +277,8 @@ function deleteQuestion(questionId) {
 }
 
 function deleteQuizById(quizId) {
-    const token = getToken();
-    fetch(`/quizzes/${quizId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+    fetchWithAuth(`/quizzes/${quizId}`, { // ------------------------------------------------- headers in jwtutility.js
+        method: 'DELETE'
     })
     .then(response => response.json())
     .then(data => {
@@ -363,26 +342,22 @@ async function saveChanges() {
 
     try {
         for (const updatedQuestion of updatedQuestions) {
-            const response = await fetch(`/quizzes/${quizId}/questions/${updatedQuestion.question_id}`, {
+            const response = await fetchWithAuth(`/quizzes/${quizId}/questions/${updatedQuestion.question_id}`, { // ------------------------------------------------- headers in jwtutility.js
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getToken()}`
-                },
                 body: JSON.stringify(updatedQuestion)
             });
             const data = await response.json();
-            if (!response.ok) { // CHANGED MADE HERE
+            if (!response.ok) {   
                 console.error(`Error updating question ${updatedQuestion.question_id}:`, data.message);
-                alert(`Error updating question ${updatedQuestion.question_id}: ${data.message}`); // CHANGED MADE HERE
-                hasErrors = true; // CHANGED MADE HERE
+                alert(`Error updating question ${updatedQuestion.question_id}: ${data.message}`);   
+                hasErrors = true;   
             } else {
                 console.log(`Question ${updatedQuestion.question_id} updated successfully`);
             }
         }
-        if (!hasErrors) { // CHANGED MADE HERE
-            alert('Questions updated successfully'); // CHANGED MADE HERE
-            window.location.href = `/quiz.html?quizId=${quizId}`; // CHANGED MADE HERE
+        if (!hasErrors) {   
+            alert('Questions updated successfully');   
+            window.location.href = `/quiz.html?quizId=${quizId}`;   
         }
     } catch (error) {
         console.error('Error saving changes:', error);
