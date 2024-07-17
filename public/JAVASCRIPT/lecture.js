@@ -210,8 +210,10 @@ function displayLectures(lectures) {
                 return `
                     <div class="sub-nav-item" data-lecture-id="${lecture.LectureID}">
                         ${lecture.Title}
-                        ${deleteButton}
-                        ${editButton}
+                        <div class = "button-container">
+                            ${deleteButton}
+                            ${editButton}
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -219,15 +221,14 @@ function displayLectures(lectures) {
 
         navItem.innerHTML = `
             <div class="nav-title">
-                ${chapterName}
-                <span>&#9660;</span>
+                <h2>${chapterName}</h2>
                 ${deleteChapterButton}
+                <span><i class="fa-solid fa-caret-right" style ="font-size:30px;"></i></span>
             </div>
             <div class="sub-nav" style="display: none;">
                 ${subNavItems}
             </div>
         `;
-
         sidebar.appendChild(navItem);
     }
 
@@ -248,7 +249,6 @@ function displayLectures(lectures) {
             this.style.fontWeight = 'bold';
         });
     });
-
     if (lectures.length > 0) {
         const firstLectureID = lectures[0].LectureID;
         setVideo(firstLectureID);
@@ -318,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
             subNav.style.display = subNav.style.display === "none" || subNav.style.display === "" ? "block" : "none";
         });
     });
-
     const hamburger = document.querySelector('.hamburger');
     const sidebar = document.querySelector('.sidebar');
     hamburger.addEventListener('click', () => {

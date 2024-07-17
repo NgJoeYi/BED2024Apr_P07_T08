@@ -29,6 +29,11 @@
         </nav>
     </header>
 
+    <!-- inspired from gignite:
+        1. sidebar
+        2. video container
+        3. lecture information -->
+        
     <div class="container">
         <div class="sidebar">
             <div class="hamburger">
@@ -36,12 +41,36 @@
             </div>
             <div class="nav">
                 <!-- Lecture navigation will be dynamically inserted here -->
+                <div class="nav-item">
+                    <div class="nav-title">
+                        <h2>Introduction</h2>
+                        <button class="delete-chapter" style="display:block;" data-chapter-name="Introduction" onclick="deleteChapter(this)">Delete Chapter</button>
+
+                        <span><i class="fa-solid fa-caret-right" style ="font-size:30px;"></i></span>
+                    </div>
+                    <div class="sub-nav" style = "display: block;">
+                            <div class="sub-nav-item" data-lecture-id="5">
+                                <h3>SEO Basics</h3>
+                                <div class = "button-container">
+                                    <button class="delete-lecture" style="display:block;" data-lecture-id="5" onclick="deleteLecture(this)">Delete</button>
+                                    <button class="edit-lecture" style="display:block;" data-lecture-id="5" onclick="editLecture(this)">Edit</button>    
+                                </div>
+                            </div>
+                        
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="main-content">
             <div class="video-container">
-                <iframe width="100%" height="100%" src="../public/lectureVideos/video1.mp4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class = "lecture-details-card">
+                <p>Title: </p>
+                <p>Description: </p>
+                <p>Duration: </p>
+                <p>Created At: </p>
             </div>
         </div>
         
