@@ -105,26 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // document.getElementById('filter').addEventListener('change', () => {
-    //     const urlParams = new URLSearchParams(window.location.search);
-    //     const courseId = urlParams.get('courseID');
-    //     if (courseId && !isNaN(courseId)) {
-    //         fetchReviews(courseId);
-    //     } else {
-    //         console.error('Invalid course ID');
-    //     }
-    // });
-    
-    // document.getElementById('sort').addEventListener('change', () => {
-    //     const urlParams = new URLSearchParams(window.location.search);
-    //     const courseId = urlParams.get('courseID');
-    //     if (courseId && !isNaN(courseId)) {
-    //         fetchReviews(courseId);
-    //     } else {
-    //         console.error('Invalid course ID');
-    //     }
-    // });
-
     document.getElementById('filter').addEventListener('change', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('courseID');
@@ -323,6 +303,44 @@ function editReview(button) {
     };
 }
 
+async function incrementReviewLikes(reviewId, likeButton, dislikeButton) {
+    try {
+        const response = await fetch(`/reviews/${reviewId}/like`, {
+            method: 'POST'
+        });
+        const data = await response.json();
+        if (data.success) {
+            likeButton.textContent = `👍 ${data.likes} Likes`;
+            likeButton.setAttribute('data-liked', 'true');
+            dislikeButton.setAttribute('data-disliked', 'false');
+        } else {
+            alert('Error adding like.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error adding like.');
+    }
+}
+
+async function incrementReviewDislikes(reviewId, likeButton, dislikeButton) {
+    try {
+        const response = await fetch(`/reviews/${reviewId}/dislike`, {
+            method: 'POST'
+        });
+        const data = await response.json();
+        if (data.success) {
+            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
+            dislikeButton.setAttribute('data-disliked', 'true');
+            likeButton.setAttribute('data-liked', 'false');
+        } else {
+            alert('Error adding dislike.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error adding dislike.');
+    }
+}
+
 function fetchReviews(courseId) {
     console.log('Course Id in fetchReviews(courseId):', courseId);
     if (isNaN(courseId)) {
@@ -369,6 +387,12 @@ function fetchReviews(courseId) {
                 reviewElement.setAttribute('data-user-id', review.user_id);
                 reviewElement.setAttribute('data-date', review.review_date);
 
+                const likedByUser = review.userLiked ? 'true' : 'false';
+                const dislikedByUser = review.userDisliked ? 'true' : 'false';
+
+                const likesText = `👍 ${review.likes || 0} Likes`;
+                const dislikesText = `👎 ${review.dislikes || 0} Dislikes`;
+
                 // Add buttons conditionally based on user login and ownership
                 const reviewActions = token && review.user_id === currentUserId ? `
                     <button onclick="editReview(this)">Edit</button>
@@ -393,9 +417,31 @@ function fetchReviews(courseId) {
                         </div>
                     </div>
                     <div class="review-actions">
+                        <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
+                        <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
                         ${reviewActions}
                     </div>
                 `;
+
+                const likeButton = reviewElement.querySelector('.like-button');
+                const dislikeButton = reviewElement.querySelector('.dislike-button');
+
+                likeButton.addEventListener('click', function () {
+                    if (this.getAttribute('data-liked') === 'true') {
+                        alert('You have already liked this review.');
+                        return;
+                    }
+                    incrementReviewLikes(review.review_id, this, dislikeButton);
+                });
+
+                dislikeButton.addEventListener('click', function () {
+                    if (this.getAttribute('data-disliked') === 'true') {
+                        alert('You have already disliked this review.');
+                        return;
+                    }
+                    incrementReviewDislikes(review.review_id, likeButton, this);
+                });
+                
                 reviewsContainer.appendChild(reviewElement);
             });
         })
