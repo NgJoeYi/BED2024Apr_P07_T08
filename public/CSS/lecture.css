@@ -23,6 +23,13 @@ body {
   flex: 1;
 }
 
+/* 
+inspired from gignite:
+1. sidebar
+2. video container
+3. lecture information
+*/
+
 /* CHAPTER SIDE BAR*/
 .sidebar {
   width: 400px;
