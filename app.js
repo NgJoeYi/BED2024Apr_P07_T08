@@ -128,6 +128,8 @@ app.get('/reviews/course/:courseId/count', reviewController.getReviewCountByCour
 app.get('/reviews/user/:userId/count', reviewController.getReviewCountByUserId);
 app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview);
 app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview);
+app.post('/reviews/:reviewId/like', reviewController.incrementLikes); // Dont need jwtAuthorzation middleware bc when not logged in, user unable to go to courses page aka where the reviews are.
+app.post('/reviews/:reviewId/dislike', reviewController.incrementDislikes);
 app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt
 
 // Add Routes for courses

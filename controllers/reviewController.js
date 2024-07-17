@@ -28,30 +28,6 @@ async function createReview(req, res) {
     }
 }
 
-// async function updateReview(req, res) {
-//     const { id } = req.params;
-//     const { review_text, rating, courseId } = req.body;
-//     const userId = req.user.id;
-
-//     console.log(`Updating review: id=${id}, userId=${userId}, review_text=${review_text}, rating=${rating}, courseId=${courseId}`);
-
-//     try {
-//         const review = await reviewModel.getReviewById(id);
-//         if (!review) {
-//             return res.status(404).json({ error: 'Review not found' });
-//         }
-//         if (review.user_id !== userId) {
-//             return res.status(403).json({ error: 'You can only edit your own reviews.' });
-//         }
-
-//         await reviewModel.updateReview(id, review_text, rating, courseId);
-//         res.status(200).json({ message: 'Review updated successfully' });
-//     } catch (err) {
-//         console.error('Error updating review:', err.message);
-//         res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
-//     }
-// }
-
 async function updateReview(req, res) {
     const { id } = req.params;
     const { review_text, rating, courseId } = req.body;
@@ -206,6 +182,28 @@ async function getReviewsByCourseIdAndSort(req, res) {
     }
 }
 
+async function incrementLikes(req, res) {
+    try {
+        const reviewId = req.params.reviewId;
+        const likes = await reviewModel.incrementLikes(reviewId);
+        res.json({ success: true, likes });
+    } catch (err) {
+        console.error('Error incrementing likes:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+}
+
+async function incrementDislikes(req, res) {
+    try {
+        const reviewId = req.params.reviewId;
+        const dislikes = await reviewModel.incrementDislikes(reviewId);
+        res.json({ success: true, dislikes });
+    } catch (err) {
+        console.error('Error incrementing dislikes:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+}
+
 
 module.exports = {
     getReviews,
@@ -219,5 +217,7 @@ module.exports = {
     getReviewsSortedByRating,
     getReviewsByCourseId,
     getReviewsByCourseIdAndRating,
-    getReviewsByCourseIdAndSort
+    getReviewsByCourseIdAndSort,
+    incrementLikes,
+    incrementDislikes,
 };

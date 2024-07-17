@@ -38,7 +38,7 @@ async function getCommentById(connection, id) {
 
 async function getCommentsByDiscussionId(connection, discussionId) {
     const query = `
-        SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, u.id AS user_id, u.name AS username,
+        SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, uc.likes, uc.dislikes, u.id AS user_id, u.name AS username,
                ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role 
         FROM user_comments uc
         JOIN Users u ON uc.user_id = u.id
@@ -195,7 +195,6 @@ async function incrementDislikes(commentId) {
         }
     }
 }
-
 
 module.exports = {
     getAllComments,

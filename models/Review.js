@@ -8,7 +8,7 @@ async function getAllReviews(courseId, filter = 'all', sort = 'mostRecent') {
         connection = await sql.connect(dbConfig);
         
         let query = `
-            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
+            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.likes, ur.dislikes, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
             FROM user_reviews ur
             JOIN Users u ON ur.user_id = u.id
             LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -61,7 +61,7 @@ async function getReviewById(id) {
         const result = await connection.request()
             .input('review_id', sql.Int, id)
             .query(`
-                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
+                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.likes, ur.dislikes, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
                 FROM user_reviews ur
                 JOIN Users u ON ur.user_id = u.id
                 LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -209,6 +209,49 @@ async function getReviewCountByUserId(userId) {
     }
 }
 
+async function incrementLikes(reviewId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        await connection.request()
+            .input('reviewId', sql.Int, reviewId)
+            .query('UPDATE user_reviews SET likes = likes + 1 WHERE review_id = @reviewId');
+
+        const result = await connection.request()
+            .input('reviewId', sql.Int, reviewId)
+            .query('SELECT likes FROM user_reviews WHERE review_id = @reviewId');
+
+        return result.recordset[0].likes;
+    } catch (err) {
+        throw new Error(`Error incrementing likes: ${err.message}`);
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
+
+async function incrementDislikes(reviewId) {
+    let connection;
+    try {
+        connection = await sql.connect(dbConfig);
+        await connection.request()
+            .input('reviewId', sql.Int, reviewId)
+            .query('UPDATE user_reviews SET dislikes = dislikes + 1 WHERE review_id = @reviewId');
+
+        const result = await connection.request()
+            .input('reviewId', sql.Int, reviewId)
+            .query('SELECT dislikes FROM user_reviews WHERE review_id = @reviewId');
+
+        return result.recordset[0].dislikes;
+    } catch (err) {
+        throw new Error(`Error incrementing dislikes: ${err.message}`);
+    } finally {
+        if (connection) {
+            await connection.close();
+        }
+    }
+}
 
 module.exports = {
     getAllReviews,
@@ -218,5 +261,7 @@ module.exports = {
     deleteReview,
     getReviewCount,
     getReviewCountByCourseId,
-    getReviewCountByUserId
+    getReviewCountByUserId,
+    incrementLikes,
+    incrementDislikes
 };

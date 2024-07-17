@@ -112,6 +112,8 @@ async function run() {
         CREATE TABLE user_reviews (
             review_id INT PRIMARY KEY IDENTITY,
             user_id INT NOT NULL,
+            likes INT DEFAULT 0,
+            dislikes INT DEFAULT 0,
             review_text TEXT NOT NULL,
             rating INT CHECK (rating >= 1 AND rating <= 5),
             review_date DATETIME DEFAULT GETDATE(),
