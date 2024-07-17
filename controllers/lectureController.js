@@ -39,7 +39,6 @@ const deleteLecture = async (req, res) => {
         }
         // Check if the user is the creator of the lecture
         if (lecture.userID !== userID) {
-            console.log('COMES HERE');
             return res.status(403).send({ message: "You do not have permission to delete this lecture teehee" });
         }
 
@@ -56,22 +55,33 @@ const deleteLecture = async (req, res) => {
 
 const deletingChapterName = async (req, res) => {
     const { courseID, chapterName } = req.params;
+    const { lectureIDs } = req.body;
     const userID = req.user.id;
+    console.log(lectureIDs.length);
     try {
-        const success = await Lectures.deletingChapterName(courseID, chapterName);
+        // Ensure all lectures belong to the same user
+        for(let i=0; i< lectureIDs.length; i++){
+            const lectureID = lectureIDs[i];
+            const lecture = await Lectures.getLectureByID(lectureID);
+            if (!lecture) {
+                return res.status(404).json({ message: `Lecture with ID ${lectureID} not found` });
+            }
+            if (lecture.userID !== userID) {
+                return res.status(403).send({ message: "You do not have permission to delete this chapter." });
+            }
+        }
+
+        const success = await Lectures.deletingChapterName(courseID, chapterName, lectureIDs);
         if (!success) {
             return res.status(404).send("Chapter not found");
         }
-         // Check if the user is the creator of the course
-        if (course.userID !== userID) {
-            return res.status(403).json({ message: "You do not have permission to delete this course" });
-        }
-        res.status(204).send("Lectures successfully deleted");
+        res.status(204).send("Chapter successfully deleted");
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error deleting lectures");
+        res.status(500).send("Error deleting chapter");
     }
 }
+
 const updateLecture = async (req, res) => {
     const userID = req.user.id; // user id that logged on now 
     // lecture id 
