@@ -27,8 +27,12 @@ class Comment {
         try {
             connection = await sql.connect(dbConfig);
             const result = await connection.query(query);
-            return result.recordset;
-        } catch (err) {
+            
+            return result.recordset.map(row => new Comment( // do mapping so more organized, easier to work with also
+                row.id, row.content, row.created_at, row.discussion_id, row.user_id, row.username, row.profilePic, row.role, row.likes, row.dislikes
+            ));
+
+            } catch (err) {
             throw new Error('Error fetching comments: ' + err.message);
         } finally {
             if (connection) {
@@ -52,7 +56,12 @@ class Comment {
             const request = new sql.Request(connection);
             request.input('id', sql.Int, id);
             const result = await request.query(query);
-            return result.recordset[0];
+
+            const record = result.recordset[0];
+            return new Comment( // Can just return new Comment, don't need map because 'getCommentById' will only have 1 row of data given as response by db. But 'getAllComments' & 'getCommentsByDiscussionId' have > 1 row of arrays given as data response by db
+                record.id, record.content, record.created_at, record.discussion_id, record.user_id, record.username, record.profilePic, record.role, record.likes, record.dislikes
+            );
+
         } catch (err) {
             throw new Error('Error fetching comment: ' + err.message);
         } finally {
@@ -77,7 +86,11 @@ class Comment {
             const request = new sql.Request(connection);
             request.input('discussionId', sql.Int, discussionId);
             const result = await request.query(query);
-            return result.recordset;
+
+            return result.recordset.map(row => new Comment(
+                row.id, row.content, row.created_at, row.discussion_id, row.user_id, row.username, row.profilePic, row.role, row.likes, row.dislikes
+            ));
+
         } catch (err) {
             throw new Error('Error fetching comments: ' + err.message);
         } finally {
