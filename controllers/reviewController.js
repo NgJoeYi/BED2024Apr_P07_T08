@@ -5,8 +5,13 @@ const reviewModel = require('../models/Review');
 const getReviews = async (req, res) => {
     const { courseId, filter = 'all', sort = 'mostRecent' } = req.query;
     try {
-        const reviews = await reviewModel.getAllReviews(courseId, filter, sort);
-        res.status(200).json(reviews);
+        let reviews;
+        if (courseId) {
+            reviews = await reviewModel.getAllReviews(courseId, filter, sort); // Basically Getting reviews by course Id
+        } else {
+            reviews = await reviewModel.getAllReviews();
+        }
+        res.json(reviews);
     } catch (err) {
         console.error('Server error:', err.message);
         res.status(500).json({ error: err.message });
@@ -17,11 +22,9 @@ const createReview = async (req, res) => {
     const { review_text, rating, courseId } = req.body;
     const userId = req.user.id;
 
-    console.log(`Creating review: userId=${userId}, review_text=${review_text}, rating=${rating}, courseId=${courseId}`);
-
     try {
-        await reviewModel.createReview(userId, review_text, rating, courseId);
-        res.status(201).json({ message: 'Review created successfully' });
+        const result = await reviewModel.createReview(userId, review_text, rating, courseId);
+        res.status(201).json({ message: 'Review created successfully', data: result });
     } catch (err) {
         console.error('Error creating review:', err.message);
         res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
@@ -29,11 +32,9 @@ const createReview = async (req, res) => {
 }
 
 const updateReview = async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params; // Review Id
     const { review_text, rating, courseId } = req.body;
-    const userId = req.user.id;
-
-    console.log(`Updating review: id=${id}, userId=${userId}, review_text=${review_text}, rating=${rating}, courseId=${courseId}`);
+    const userId = req.user.id; // User Id
 
     try {
         const review = await reviewModel.getReviewById(id);
@@ -45,9 +46,9 @@ const updateReview = async (req, res) => {
         // if (review.user_id !== userId) {
         //     return res.status(403).json({ error: 'You can only edit your own reviews.' });
         // } 
+        const result = await reviewModel.updateReview(id, review_text, rating, courseId);
+        res.status(200).json({ message: 'Review updated successfully', data: result });
 
-        await reviewModel.updateReview(id, review_text, rating, courseId);
-        res.status(200).json({ message: 'Review updated successfully' });
     } catch (err) {
         console.error('Error updating review:', err.message);
         res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
@@ -57,8 +58,6 @@ const updateReview = async (req, res) => {
 const deleteReview = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
-
-    console.log(`Received request to delete review with ID: ${id}`);
 
     try {
         const review = await reviewModel.getReviewById(id);
@@ -73,13 +72,10 @@ const deleteReview = async (req, res) => {
         //     console.error('User not authorized to delete this review');
         //     return res.status(403).send('You can only delete your own reviews.');
         // }
-
-        console.log('Review found:', review);
         
-        await reviewModel.deleteReview(id);
-
-        console.log('Review deleted successfully');
-        res.status(200).json({ message: 'Review deleted successfully' });
+        const result = await reviewModel.deleteReview(id);
+        res.status(200).json({ message: 'Review deleted successfully', data: result });
+        
     } catch (err) {
         console.error('Error deleting review:', err.message);
         res.status(500).json({ error: err.message });
@@ -87,9 +83,8 @@ const deleteReview = async (req, res) => {
 }
 
 const getReviewCount = async (req, res) => {
-    const { courseId } = req.query;
     try {
-        const count = await reviewModel.getReviewCount(courseId);
+        const count = await reviewModel.getReviewCount();
         res.json({ count });
     } catch (err) {
         console.error(err);

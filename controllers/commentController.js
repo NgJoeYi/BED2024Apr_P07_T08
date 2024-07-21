@@ -37,6 +37,10 @@ const updateComment = async (req, res) => {
     try {
         const comment = await commentModel.getCommentById(id);
 
+        if (!comment) {
+            return res.status(404).json({ error: 'Comment not found' });
+        }
+
         // ******** DONT NEED DO THIS BC TO CHECK USERID IS ALREADY DONE USING verifyJWT MIDDLEWARE ******
         // if (parseInt(comment.user_id, 10) !== parseInt(userId, 10)) {
         //     console.log('User ID mismatch:', parseInt(comment.user_id, 10), parseInt(userId, 10)); // Debug log
@@ -56,6 +60,11 @@ const deleteComment = async (req, res) => {
     const userId = req.user.id;
     try {
         const comment = await commentModel.getCommentById(id);
+
+        if (!comment) {
+            console.error('Comment not found');
+            return res.status(404).json({ error: 'Comment not found' });
+        }
 
         // ******** DONT NEED DO THIS BC TO CHECK USERID IS ALREADY DONE USING verifyJWT MIDDLEWARE ******
         // if (parseInt(comment.user_id, 10) !== parseInt(userId, 10)) {
