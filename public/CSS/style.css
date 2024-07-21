@@ -871,7 +871,8 @@
   margin-bottom: 14px;
   margin: 35px;
   padding: 20px;
-  border: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
 }
 
 .filter-sort-tabs {
