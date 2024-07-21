@@ -105,6 +105,7 @@ class Comment {
         const query = `
             INSERT INTO user_comments (content, user_id, discussion_id, created_at)
             VALUES (@content, @userId, @discussion_id, GETDATE())
+            SELECT SCOPE_IDENTITY() AS id;
         `;
         let connection;
         try {
@@ -114,7 +115,9 @@ class Comment {
             request.input('userId', sql.Int, userId);
             request.input('discussion_id', sql.Int, discussion_id);
             const result = await request.query(query);
-            return result.rowsAffected;
+            const commentId = result.recordset[0].id;
+
+            return await this.getCommentById(commentId); // Aka will return instance of Comment class since getting details of new review created
         } catch (err) {
             throw new Error('Error creating comment: ' + err.message);
         } finally {
@@ -136,8 +139,9 @@ class Comment {
             const request = new sql.Request(connection);
             request.input('id', sql.Int, id);
             request.input('content', sql.NVarChar, content);
-            const result = await request.query(query);
-            return result.rowsAffected;
+            await request.query(query);
+
+            return await this.getCommentById(id);
         } catch (err) {
             throw new Error('Error updating comment: ' + err.message);
         } finally {
@@ -158,7 +162,8 @@ class Comment {
             const request = new sql.Request(connection);
             request.input('id', sql.Int, id);
             const result = await request.query(query);
-            return result.rowsAffected;
+
+            return result.rowsAffected > 0;
         } catch (err) {
             throw new Error('Error deleting comment: ' + err.message);
         } finally {
