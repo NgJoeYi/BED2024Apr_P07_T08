@@ -1,48 +1,5 @@
-const Joi = require('joi');
+const validateDiscussion = require('../middleware/discussionValidation');
 const discussionModel = require('../models/Discussion');
-
-// Joi validation schemas
-const discussionSchema = Joi.object({
-    title: Joi.string().min(5).required().messages({
-        'string.min': 'Title must be at least 5 characters long',
-        'any.required': 'Title is required'
-    }),
-    category: Joi.string().required().messages({
-        'any.required': 'Category is required'
-    }),
-    description: Joi.string().min(10).required().messages({
-        'string.min': 'Description must be at least 10 characters long',
-        'any.required': 'Description is required'
-    })
-});
-
-const updateDiscussionSchema = Joi.object({
-    category: Joi.string().required().messages({
-        'any.required': 'Category is required'
-    }),
-    description: Joi.string().min(10).required().messages({
-        'string.min': 'Description must be at least 10 characters long',
-        'any.required': 'Description is required'
-    })
-});
-
-// Middleware to validate create discussion request
-const validateDiscussion = (req, res, next) => {
-    const { error } = discussionSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-        return res.status(400).json({ success: false, errors: error.details.map(err => err.message) });
-    }
-    next();
-};
-
-// Middleware to validate update discussion request
-const validateUpdateDiscussion = (req, res, next) => {
-    const { error } = updateDiscussionSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-        return res.status(400).json({ success: false, errors: error.details.map(err => err.message) });
-    }
-    next();
-};
 
 // Controller functions
 const getDiscussions = async (req, res) => {
@@ -195,8 +152,7 @@ module.exports = {
     getDiscussionsByUser,
     updateDiscussion,
     deleteDiscussion,
-    validateDiscussion,
-    validateUpdateDiscussion,
+    validateDiscussion, // Importing the validateDiscussion function here
     incrementViews,
     pinDiscussion,
     unpinDiscussion

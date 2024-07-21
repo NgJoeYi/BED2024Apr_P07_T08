@@ -36,7 +36,7 @@ class Discussion {
                 query += ` AND (d.title LIKE @search OR d.description LIKE @search)`;
             }
 
-            query += ` ORDER BY d.pinned ASC, d.posted_date ASC`; // Sort pinned discussions to the top
+            query += ` ORDER BY d.pinned DESC, d.posted_date DESC`; // Sort pinned discussions to the top
     
             const pool = await sql.connect(dbConfig);
             const request = pool.request();
