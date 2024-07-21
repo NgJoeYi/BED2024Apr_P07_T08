@@ -658,7 +658,7 @@
 .search-container {
   display: flex;
   align-items: center;
-  flex: 1;
+  width: 50%;
   position: relative;
 }
 
@@ -678,10 +678,10 @@
   padding-left: 40px; /* Increase padding to move placeholder text more to the right */
 }
 
-.add-button-activity, .refresh-button {
+.refresh-button {
   width: 80px; /* Set a fixed width */
   height: 38px; /* Set a fixed height */
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   border: none;
   background-color: #d9aa52;
   color: white;
@@ -690,32 +690,41 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1rem; /* Ensure text fits well */
-  margin-left: 0.5rem;
-  padding: 0; /* Ensure padding is consistent */
-}
-
-.refresh-button {
-  margin-top: 10px;
+  font-size: 1rem;
+  margin-left: 20px;
+  margin-right: 50%; /* Space between buttons */
 }
 
 .add-button-activity {
-  margin-top: 10px;
-  font-size: 1.5rem; /* Increase font size for the + symbol */
+  width: 250px; /* Set a fixed width */
+  height: 38px; /* Set a fixed height */
+  margin-bottom: 10px;
+  border: none;
+  background-color: #d9aa52;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
 }
+
+
+
+
 
 /* Container for the post */
+/* Post styling */
 .post {
-  border: 1px solid #E5E5E5;
+  background-color: #fff;
+  border: 1px solid #ccc;
   border-radius: 10px;
-  padding: 20px;
-  margin: 10px 0;
-  background-color: #FFFFFF;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative; /* Ensure relative positioning to contain the absolute pin button */
+  padding: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
 }
 
-/* Header for the post */
 .post-header {
   display: flex;
   align-items: center;
@@ -723,27 +732,9 @@
   position: relative; /* Ensure relative positioning to contain the absolute pin button */
 }
 
-/* for the pin  */
-.pin-button-top-right {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 15px;
-  background-color: #d9aa52;
-  color: white;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.pin-button-top-right:hover {
-  color: #000;
-}
-
 .profile-pic {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   overflow: hidden;
   margin-right: 10px;
@@ -755,46 +746,69 @@
   object-fit: cover;
 }
 
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
 .username {
-  font-size: 23px;
   font-weight: bold;
+  margin-right: 8px;
 }
 
 .role {
-  margin-left: 20px;
+  color: gray;
 }
 
+.pin-button-top-right {
+  background-color: transparent;
+  border: solid 1px black;
+  padding: 10px;
+  color: #0366d6;
+  cursor: pointer;
+  position: absolute;
+  top: 16px;
+  right: 16px; /* Add this line */
+}
+
+
+
 .post-meta {
-  display: flex;
-  flex-direction: column;
-  color: #666666;
-  font-size: 15px;
-  margin-bottom: 10px;
+  margin-top: 8px;
+  color: gray;
+  font-size: 12px;
 }
 
 .category-discussion {
-  color: #888888;
+  display: inline-block;
+  margin-right: 8px;
 }
 
 .posted-date-activity-dis {
-  color: #888888;
-  margin-top: 5px;
-  float: left;
+  margin-top: 8px;
+  color: gray;
 }
 
-/* Content of the post */
-.post-content-dis p{
-    margin-top: 10px;
-    color: #546e7a;
-    font-size: 20px;
+.follow-button {
+  margin-left: 30px;
 }
 
-/* Footer for the post */
+
+/* Post content styling */
+.post-content-dis {
+  margin-top: 16px;
+}
+
+.post-content-dis h3 {
+  margin: 0 0 10px 0;
+}
+
+/* Post footer styling */
 .post-footer {
+  margin-top: 16px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
+  justify-content: space-between;
 }
 
 .likes-dislikes {
@@ -802,28 +816,31 @@
   align-items: center;
 }
 
-.like-button, .dislike-button {
+.like-button, .dislike-button, .follow-button, .pin-btn {
   background: none;
   border: none;
   font-size: 1em;
   margin-right: 15px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-.like-button:focus, .dislike-button:focus {
+.like-button:focus, .dislike-button:focus, .follow-button:focus, .pin-btn:focus {
   outline: none;
+}
+
+.follow-button {
+  color: #0366d6;
 }
 
 .comment-button {
-  background: none;
+  background-color: #d9aa52;
+  color: white;
   border: none;
-  font-size: 1em;
+  padding: 8px 16px;
   cursor: pointer;
-  color: #FFA500;
-}
-
-.comment-button:focus {
-  outline: none;
+  border-radius: 4px;
 }
 
 .no-discussion-message {
@@ -834,6 +851,7 @@
 }
 
 .clear-search-button {
+
   background: none;
   border: none;
   cursor: pointer;
@@ -841,11 +859,71 @@
   color: #888;
   position: absolute;
   right: 10px;
-  top: 10px;
+  top: 40%;
+  transform: translateY(-50%);
 }
+
 .clear-search-button:hover {
   color: #333;
 }
+
+.tabs-container {
+  margin-bottom: 14px;
+  margin: 35px;
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+
+.filter-sort-tabs {
+ 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+}
+
+.filter-sort {
+  display: flex;
+  align-items: center;
+}
+
+.filter-unique, .sort-unique {
+  display: flex;
+  align-items: center;
+  margin-left: 20px; /* Space between filter and sort */
+}
+
+.filter-unique select, .sort-unique select {
+  margin-left: 5px;
+}
+
+.tab-btn {
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-right: 5px;
+  border-radius: 5px 5px 0 0;
+}
+
+.tab-btn.active {
+  background-color: #d9aa52;
+  color: white;
+}
+
+.tab-content {
+
+  padding: 20px;
+  border-radius: 5px;
+  margin-top: 16px;
+}
+
+
 
 
 
@@ -853,15 +931,10 @@
 
 .activity-feed {
   padding: 30px;
+  border-radius: 35px;
 }
 
-.post {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
+
 
 .post-content p {
   font-size: 15px;
@@ -1072,7 +1145,7 @@
 .filter-sort-unique {
   display: flex;
   margin: 20px;
-  justify-content: space-between;
+  right: 16px;
   padding: 1rem;
   border-bottom: 1px solid #ccc;
   border-top: 1px solid #ccc;
