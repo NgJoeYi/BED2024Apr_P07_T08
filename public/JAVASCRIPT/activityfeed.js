@@ -125,30 +125,40 @@ function addDiscussionToFeed(discussion) {
     const pinButtonClass = discussion.pinned ? 'unpin-button' : 'pin-button';
 
     post.innerHTML = `
-        <div class="post-header">
-            <div class="profile-pic">
+
+            <div class="post-header">
+                <div class="profile-pic">
                 <img src="${profilePicUrl}" alt="Profile Picture">
             </div>
-            <div class="username">${capitalizedUsername}</div>
-            <div class="role">(${discussion.role})</div>
-            <button class="${pinButtonClass} pin-button-top-right" data-id="${discussion.id}">${pinButtonText}</button>
-        </div>
-        <div class="post-meta">
-            <span class="category-discussion">Category: ${discussion.category}</span>
-            <span class="posted-date-activity-dis">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
-        </div>
-        <div class="post-content-dis">
-            <p>${discussion.description}</p>
-        </div>
-        <div class="post-footer">
-            <div class="likes-dislikes">
-                <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
-                <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
-                <span id="comment-count-${discussion.id}" class="comment-count">💬 0 Comments</span>
-                <span class="views-count">${viewsText}</span>
+            <div class="user-info">
+                <div class="username">${capitalizedUsername}</div>
+                <div class="role">(${discussion.role})</div>
+                <button class="follow-button">Follow</button>
             </div>
-            <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
-        </div>
+                <button class="${pinButtonClass} pin-button-top-right" data-id="${discussion.id}">${pinButtonText}</button>
+            </div>
+
+            <div class="post-meta">
+                 <span class="posted-date-activity-dis"> ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+                 </div>
+            <div class="post-content-dis">
+                <h3>${discussion.title}</h3>
+                <p>${discussion.description}</p>
+            </div>
+            <div class="post-footer">
+                <div class="likes-dislikes">
+                    <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
+                    <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
+                    <span id="comment-count-${discussion.id}" class="comment-count">💬 0 Comments</span>
+                    <span class="views-count">${viewsText}</span>
+                </div>
+                <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
+
+                 
+            </div>
+            
+        
+
     `;
 
     // Prepend pinned discussions and append unpinned discussions
