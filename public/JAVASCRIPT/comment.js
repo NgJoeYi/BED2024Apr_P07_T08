@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'PUT',
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 })
-                : await fetchWithAuth('/comments', { // ------------------------------------------------- headers in jwtutility.js
+                : await fetchWithAuth('/comments', { 
                     method: 'POST',
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 });
@@ -206,9 +206,24 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    // async function fetchComments(discussionId) {
+    //     try {
+    //         const response = await fetch(`/comments?discussionId=${discussionId}`);
+    //         if (!response.ok) {
+    //             throw new Error(`Error fetching comments: ${response.statusText}`);
+    //         }
+    //         const comments = await response.json();
+    //         displayComments(comments);
+    //     } catch (error) {
+    //         console.error('Error fetching comments:', error);
+    //     }
+    // }
+
     async function fetchComments(discussionId) {
         try {
-            const response = await fetch(`/comments?discussionId=${discussionId}`);
+            const response = await fetchWithAuth(`/comments?discussionId=${discussionId}`, {
+                method: 'GET'
+            });
             if (!response.ok) {
                 throw new Error(`Error fetching comments: ${response.statusText}`);
             }
@@ -217,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching comments:', error);
         }
-    }
+    }    
 
     async function incrementLikes(commentId, likeButton, dislikeButton) {
         try {

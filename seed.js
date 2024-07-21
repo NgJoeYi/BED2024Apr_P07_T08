@@ -326,8 +326,8 @@ async function run() {
         INSERT INTO Quizzes (title, description, total_questions, total_marks, created_by, quizImg) VALUES
         ('Color Blindness Assessment', 'A quiz to assess your ability to distinguish colors and detect color blindness.', 5, 100, 2, @colorBlindPlaceHolder),
         ('Dyslexia Test', 'A quiz to assess your visual acuity and sharpness of vision.', 5, 100, 4, @dyslexiaPlaceHolder),
-        ('Astigmatism Test', 'A quiz to detect the presence of astigmatism in your vision.', 5, 100, 3, @depressionPlaceHolder),
-        ('Macular Degeneration Assessment', 'A quiz to assess the risk of macular degeneration.', 5, 100, 1, @dysgraphiaPlaceHolder);
+        ('Astigmatism Test', 'A quiz to detect the presence of astigmatism in your vision.', 5, 100, 2, @depressionPlaceHolder),
+        ('Macular Degeneration Assessment', 'A quiz to assess the risk of macular degeneration.', 5, 100, 4, @dysgraphiaPlaceHolder);
         `;
         await connection.request()
         .input('colorBlindPlaceHolder', sql.VarBinary, imageBuffers.colorBlindPlaceHolder)
