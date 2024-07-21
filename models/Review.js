@@ -15,7 +15,7 @@ class Review {
         this.role = role;
     }
 
-    static async getAllReviews(courseId, filter = 'all', sort = 'mostRecent') {
+    static async getAllReviews(courseId, filter = 'all', sort = 'mostRecent') { // By default will show all reviews arranged by most recent
 
         const query = `
         SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.likes, ur.dislikes, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
@@ -26,6 +26,9 @@ class Review {
         ${filter !== 'all' ? 'AND ur.rating = @filter' : ''}
         ${sort === 'highestRating' ? 'ORDER BY ur.rating DESC' : sort === 'lowestRating' ? 'ORDER BY ur.rating ASC' : 'ORDER BY ur.review_date DESC'}
         `;
+
+        // ** '${courseId && !isNaN(courseId) ? 'WHERE ur.course_id = @course_id' : 'WHERE 1=1'}' ---> if courseId exists, will have WHERE condition of 'ur.course_id = @course_id'. if courseId dont exist, then will 'WHERE 1=1'
+        // ** 'WHERE 1=1' is just placeholder so that even when courseId dont exist, the filtering and sorting code below will still be carried out n applied
 
         let connection;
         try {
@@ -105,10 +108,10 @@ class Review {
         }
     }
     
-    static async updateReview(id, review_text, rating, courseId) {
+    static async updateReview(id, review_text, rating) {
         const query = `
         UPDATE user_reviews
-        SET review_text = @review_text, rating = @rating, course_id = @course_id
+        SET review_text = @review_text, rating = @rating
         WHERE review_id = @review_id
         `;
         let connection;
@@ -118,7 +121,6 @@ class Review {
             request.input('review_id', sql.Int, id);
             request.input('review_text', sql.NVarChar, review_text);
             request.input('rating', sql.Int, rating);
-            request.input('course_id', sql.Int, courseId);
             const result = await request.query(query);    
             if (result.rowsAffected[0] === 0) {
                 throw new Error('Review not found or no changes made');
@@ -142,6 +144,7 @@ class Review {
         VALUES (@user_id, @review_text, @rating, GETDATE(), @course_id);
         SELECT SCOPE_IDENTITY() AS review_id;
          `;
+
         let connection;
         try {
             
@@ -189,19 +192,17 @@ class Review {
     }
     
     
-    static async getReviewCount(courseId) {
+    static async getReviewCount() {
         
         const query = `
         SELECT COUNT(*) AS count
         FROM user_reviews
-        ${courseId ? 'WHERE course_id = @courseId' : ''}
         `;
 
         let connection;
         try {
             connection = await sql.connect(dbConfig);
             const request = new sql.Request(connection);
-            request.input('courseId', sql.Int, courseId);
             const result = await request.query(query);
             return result.recordset[0].count;
         } catch (err) {
@@ -264,7 +265,7 @@ class Review {
         }
     }
     
-    static async incrementLikes(reviewId) {
+    static async incrementLikes(reviewId) { // UPDATE to increase like count, SELECT to retrieve the new like count
         
         const query = `
         UPDATE user_reviews 

@@ -327,8 +327,8 @@ async function editCourse(event, button) {
 }
 
 // REVIEW
-function fetchReviewCountForCourse(courseId) {
-  fetch(`/reviews/count?courseId=${courseId}`)
+async function fetchReviewCountForCourse(courseId) {
+  fetch(`/reviews/course/${courseId}/count`)
     .then(response => response.json())
     .then(data => {
       if (data.count !== undefined) {
@@ -344,4 +344,5 @@ function fetchReviewCountForCourse(courseId) {
       alert('Error fetching review count.');
     });
 }
+
 
