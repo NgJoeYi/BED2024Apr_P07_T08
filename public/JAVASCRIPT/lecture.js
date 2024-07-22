@@ -79,14 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
             subNav.style.display = subNav.style.display === "none" ? "block" : "none";
         });
     });
-    const hamburger = document.querySelector('.hamburger');
-    const sidebar = document.querySelector('.sidebar');
-    hamburger.addEventListener('click', () => {
-        sidebar.style.width = sidebar.style.width === "250px" || sidebar.style.width === "" ? "60px" : "250px";
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.style.display = sidebar.style.width === "250px" ? 'block' : 'none';
-        });
-    });
+    
 });
 
 
@@ -171,7 +164,21 @@ async function deleteChapter(button) {
         alert('Error deleting chapter.');
     }
 }
-
+async function displayLectureDetails(lectureID) {
+    try {
+        const response = await fetch(`/lectures/lecture-details/${lectureID}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        
+        // Update the HTML elements with the fetched data
+        document.getElementById('title').innerHTML = `<strong>Title:</strong> ${data.Title}`;
+        document.getElementById('description').innerHTML = `<strong>Description:</strong> ${data.Description}`;
+        document.getElementById('duration').innerHTML = `<strong>Duration:</strong> ${data.Duration}`;
+        document.getElementById('createdAt').innerHTML = `<strong>Created At:</strong> ${data.CreatedAt}`;
+    } catch (error) {
+        console.error('Error fetching lecture details:', error);
+    }
+}
 
 
 function displayLectures(lectures) {
@@ -260,6 +267,7 @@ function displayLectures(lectures) {
     subNavItems.forEach(item => {
         item.addEventListener('click', function() {
             const lectureID = this.getAttribute('data-lecture-id');
+            displayLectureDetails(lectureID);
             setVideo(lectureID);
             subNavItems.forEach(item => item.style.fontWeight = 'normal');
             this.style.fontWeight = 'bold';
@@ -267,6 +275,7 @@ function displayLectures(lectures) {
     });
     if (lectures.length > 0) {
         const firstLectureID = lectures[0].LectureID;
+        displayLectureDetails(firstLectureID);
         setVideo(firstLectureID);
     }
 }

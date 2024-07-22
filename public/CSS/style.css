@@ -1137,7 +1137,9 @@
   position: relative;
   margin-bottom: 20px;
 }
-
+.search-container{
+  width: 100%;
+}
 .search-icon {
   position: absolute;
   left: 10px;

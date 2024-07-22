@@ -16,6 +16,18 @@ const getAllLectures = async (req, res) => {
         res.status(500).send('Error retrieving lectures');
     }
 };
+const getLectureDetails = async (req,res)=>{
+    const id  = parseInt(req.params.id);
+    try{
+        const getLectureDetails = await Lectures.getLectureDetails(id);
+        res.json(getLectureDetails);
+
+    }catch (error) {
+        console.error(error);
+        res.status(500).send('Error retrieving lectures');
+    }
+}
+
 const getLectureByID = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -241,6 +253,7 @@ const checkingUserID = async (req, res) => {
 
 module.exports = {
     getAllLectures,
+    getLectureDetails,
     updateLecture,
     createLecture,
     deleteLecture,

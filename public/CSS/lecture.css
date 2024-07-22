@@ -181,7 +181,11 @@ inspired from gignite:
   background-color: white;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 20px;
+  padding: 2%;
+}
+.lecture-details-card p {
+  font-size: 20px;
+  line-height: 30px;
 }
 
 .review-section {
