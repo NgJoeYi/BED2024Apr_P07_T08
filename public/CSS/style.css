@@ -370,7 +370,14 @@
 }
 
 
-
+.reg-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Full height */
+  width: 100%;
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
 
   /* register */
   .reg-container {
@@ -385,8 +392,14 @@
   .reg-card {
     display: flex;
     justify-content: center;
-    flex-direction: row;
+    flex-direction: column;
     width: 100%;
+    max-width: 400px; /* Set a max width for the reg card */
+    border: 1px solid #e5e7eb; /* Add border for outline */
+    border-radius: 0.5rem; /* Rounded corners */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+    padding: 2rem; /* Add padding */
+    background-color: #fff; /* Background color for contrast */
   }
   
   .illustration img {
@@ -397,8 +410,6 @@
   
   .reg-content {
     text-align: center;
-    margin-top: 30px;
-    padding-right: 110px;
   }
   
   .reg-content h1 {
