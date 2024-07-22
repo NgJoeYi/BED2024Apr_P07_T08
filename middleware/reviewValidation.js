@@ -11,7 +11,7 @@ const reviewSchema = Joi.object({
             'string.max': 'Reviews cannot exceed 250 words.',
             'string.pattern.base': 'Reviews cannot consist solely of punctuations.'
         }),
-    rating: Joi.number()
+    rating: Joi.number() // Rating must be number (integer) ranging from 1 to 5
         .integer()
         .min(1)
         .max(5)
