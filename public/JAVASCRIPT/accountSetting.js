@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   // Function to delete account with password authorization
   async function deleteAccount() {
     // const token = getToken();
-    // const password = document.getElementById('delete-password').value;
+    const password = document.getElementById('delete-password').value;
     // if (!password) {
     //     alert('Please enter your password');
     //     return;
