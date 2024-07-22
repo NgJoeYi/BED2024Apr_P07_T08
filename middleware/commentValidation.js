@@ -1,9 +1,10 @@
 const Joi = require('joi');
 
+// Defining schema (set of rules 2 validate comment)
 const commentSchema = Joi.object({
-    content: Joi.string()
+    content: Joi.string() // Content must be string
         .trim()
-        .pattern(/^(?![\p{P}\s]+$).+/u)
+        .pattern(/^(?![\p{P}\s]+$).+/u) // Ensure not only punctuation or whitespace
         .max(150)
         .required()
         .messages({
@@ -11,7 +12,7 @@ const commentSchema = Joi.object({
             'string.max': 'Comments cannot exceed 150 words.',
             'string.pattern.base': 'Comments cannot consist solely of punctuations.'
         }),
-    discussionId: Joi.number()
+    discussionId: Joi.number() // Discussion Id must be number (integer)
         .integer()
         .required()
         .messages({
@@ -20,12 +21,13 @@ const commentSchema = Joi.object({
         })
 });
 
+// Middleware
 function validateComment(req, res, next) {
-    const { error } = commentSchema.validate(req.body);
+    const { error } = commentSchema.validate(req.body); // Validating request data against the commentSchema + 'const { error }' is to extract error out from process of 'commentSchema.validate(req.body)'. --> aka destructure (to make code cleaner etc)
     if (error) {
-        return res.status(400).json({ error: error.details[0].message });
+        return res.status(400).json({ error: error.details[0].message }); // Terminate middleware execution on validation error
     }
-    next();
+    next(); // If comment successfully validated, then can move on
 }
 
 module.exports = validateComment;
