@@ -204,6 +204,12 @@
 
 
 /* login */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
   .login-container {
     background: transparent;
     border-radius: 10px;
@@ -216,8 +222,14 @@
   .login-card {
     display: flex;
     justify-content: center;
-    flex-direction: row;
+    flex-direction: column;
     width: 100%;
+    max-width: 400px; /* Set a max width for the login card */
+    border: 1px solid #e5e7eb; /* Add border for outline */
+    border-radius: 0.5rem; /* Rounded corners */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+    padding: 2rem; /* Add padding */
+    background-color: #fff; /* Background color for contrast */
   }
   
   .illustration img {
@@ -228,8 +240,6 @@
   
   .login-content {
     text-align: center;
-    margin-top: 30px;
-    padding-right: 110px;
   }
   
   .login-content h1 {
