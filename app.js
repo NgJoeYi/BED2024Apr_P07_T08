@@ -96,7 +96,7 @@ app.get('/discussions', discussionController.getDiscussions);
 app.get('/discussions/user', jwtAuthorization.verifyJWT, discussionController.getDiscussionsByUser);
 app.get('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.getDiscussionById);
 app.post('/discussions', jwtAuthorization.verifyJWT, discussionController.validateDiscussion, discussionController.createDiscussion);  //add validation for create 
-app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.validateUpdateDiscussion, discussionController.updateDiscussion);   //add validation for update 
+app.put('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.validateDiscussion, discussionController.updateDiscussion);   //add validation for update 
 app.delete('/discussions/:id', jwtAuthorization.verifyJWT, discussionController.deleteDiscussion);
 app.post('/discussions/:discussionId/like', jwtAuthorization.verifyJWT, discussionController.incrementLikes);
 app.post('/discussions/:discussionId/dislike', jwtAuthorization.verifyJWT, discussionController.incrementDislikes);
@@ -128,6 +128,8 @@ app.get('/reviews/course/:courseId/count', reviewController.getReviewCountByCour
 app.get('/reviews/user/:userId/count', reviewController.getReviewCountByUserId);
 app.put('/reviews/:id', jwtAuthorization.verifyJWT, reviewValidation, reviewController.updateReview);
 app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewController.createReview);
+app.post('/reviews/:reviewId/like', reviewController.incrementLikes); // Dont need jwtAuthorzation middleware bc when not logged in, user unable to go to courses page aka where the reviews are.
+app.post('/reviews/:reviewId/dislike', reviewController.incrementDislikes);
 app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt
 
 // Add Routes for courses

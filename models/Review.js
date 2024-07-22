@@ -1,222 +1,319 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 
+class Review {
+    constructor(review_id, review_text, rating, review_date, likes, dislikes, user_id, user_name, profilePic, role) {
+        this.review_id = review_id;
+        this.review_text = review_text;
+        this.rating = rating;
+        this.review_date = review_date;
+        this.likes = likes;
+        this.dislikes = dislikes;
+        this.user_id = user_id;
+        this.user_name = user_name;
+        this.profilePic = profilePic;
+        this.role = role;
+    }
 
-async function getAllReviews(courseId, filter = 'all', sort = 'mostRecent') {
-    let connection;
-    try {
-        connection = await sql.connect(dbConfig);
-        
-        let query = `
-            SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
-            FROM user_reviews ur
-            JOIN Users u ON ur.user_id = u.id
-            LEFT JOIN ProfilePic p ON u.id = p.user_id
+    static async getAllReviews(courseId, filter = 'all', sort = 'mostRecent') { // By default will show all reviews arranged by most recent
+
+        const query = `
+        SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.likes, ur.dislikes, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
+        FROM user_reviews ur
+        JOIN Users u ON ur.user_id = u.id
+        LEFT JOIN ProfilePic p ON u.id = p.user_id
+        ${courseId && !isNaN(courseId) ? 'WHERE ur.course_id = @course_id' : 'WHERE 1=1'}
+        ${filter !== 'all' ? 'AND ur.rating = @filter' : ''}
+        ${sort === 'highestRating' ? 'ORDER BY ur.rating DESC' : sort === 'lowestRating' ? 'ORDER BY ur.rating ASC' : 'ORDER BY ur.review_date DESC'}
         `;
-        
-        // Add WHERE clause if courseId is provided
-        if (courseId && !isNaN(courseId)) {
-            query += ` WHERE ur.course_id = @course_id `;
-        } else {
-            query += ` WHERE 1=1 `;
-        }
-        
-        if (filter !== 'all') {
-            query += ` AND ur.rating = @filter `;
-        }
-        
-        if (sort === 'highestRating') {
-            query += ` ORDER BY ur.rating DESC `;
-        } else if (sort === 'lowestRating') {
-            query += ` ORDER BY ur.rating ASC `;
-        } else {
-            query += ` ORDER BY ur.review_date DESC `;
-        }
-        
-        const request = connection.request();
-        
-        if (courseId && !isNaN(courseId)) {
-            request.input('course_id', sql.Int, parseInt(courseId, 10));
-        }
-        
-        if (filter !== 'all') {
-            request.input('filter', sql.Int, filter);
-        }
-        
-        const result = await request.query(query);
-        return result.recordset;
-    } catch (err) {
-        console.error('Error fetching reviews:', err.message);
-        throw new Error('Error fetching reviews');
-    } finally {
-        if (connection) {
-            await connection.close();
+
+        // ** '${courseId && !isNaN(courseId) ? 'WHERE ur.course_id = @course_id' : 'WHERE 1=1'}' ---> if courseId exists, will have WHERE condition of 'ur.course_id = @course_id'. if courseId dont exist, then will 'WHERE 1=1'
+        // ** 'WHERE 1=1' is just placeholder so that even when courseId dont exist, the filtering and sorting code below will still be carried out n applied
+
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = connection.request();
+
+            if (courseId && !isNaN(courseId)) {
+                request.input('course_id', sql.Int, parseInt(courseId, 10));
+            }
+
+            if (filter !== 'all') {
+                request.input('filter', sql.Int, filter);
+            }
+
+            const result = await request.query(query);
+            return result.recordset.map(record => new Review(
+                record.review_id,
+                record.review_text,
+                record.rating,
+                record.review_date,
+                record.likes,
+                record.dislikes,
+                record.user_id,
+                record.user_name,
+                record.profilePic,
+                record.role
+            ));
+
+        } catch (err) {
+            console.error('Error fetching reviews:', err.message);
+            throw new Error('Error fetching reviews');
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
         }
     }
-}
 
-async function getReviewById(id) {
-    try {
-        const connection = await sql.connect(dbConfig);
-        const result = await connection.request()
-            .input('review_id', sql.Int, id)
-            .query(`
-                SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
-                FROM user_reviews ur
-                JOIN Users u ON ur.user_id = u.id
-                LEFT JOIN ProfilePic p ON u.id = p.user_id
-                WHERE ur.review_id = @review_id
-            `);
-        return result.recordset[0];
-    } catch (err) {
-        console.error('Error fetching review:', err.message);
-        throw new Error('Error fetching review');
-    }
-}
+    
+    static async getReviewById(id) {
 
-async function updateReview(id, review_text, rating, courseId) {
-    try {
-        const pool = await sql.connect(dbConfig);
-        const result = await pool.request()
-            .input('review_id', sql.Int, id) // Correctly declare the variable here
-            .input('review_text', sql.NVarChar, review_text)
-            .input('rating', sql.Int, rating)
-            .input('course_id', sql.Int, courseId)
-            .query(`
-                UPDATE user_reviews
-                SET review_text = @review_text, rating = @rating, course_id = @course_id
-                WHERE review_id = @review_id
-            `);
+        const query = `
+        SELECT ur.review_id, ur.review_text, ur.rating, ur.review_date, ur.likes, ur.dislikes, ur.user_id, u.name AS user_name, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role
+        FROM user_reviews ur
+        JOIN Users u ON ur.user_id = u.id
+        LEFT JOIN ProfilePic p ON u.id = p.user_id
+        WHERE ur.review_id = @review_id
+        `;
 
-        if (result.rowsAffected[0] === 0) {
-            throw new Error('Review not found or no changes made');
-        }
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('review_id', sql.Int, id);
+            const result = await request.query(query);
+            const record = result.recordset[0];
+            return new Review(
+                record.review_id, 
+                record.review_text, 
+                record.rating, 
+                record.review_date, 
+                record.likes, 
+                record.dislikes, 
+                record.user_id, 
+                record.user_name, 
+                record.profilePic, 
+                record.role
+            );
 
-        return result;
-    } catch (err) {
-        console.error('SQL error:', err.message);
-        throw err;
-    }
-}
-
-async function createReview(userId, review_text, rating, courseId) {
-    let pool;
-    try {
-        pool = await sql.connect(dbConfig);
-        console.log(`Executing query to create review with userId: ${userId}, review_text: ${review_text}, rating: ${rating}, courseId: ${courseId}`);
-        await pool.request()
-            .input('user_id', sql.Int, userId)
-            .input('review_text', sql.NVarChar, review_text)
-            .input('rating', sql.Int, rating)
-            .input('course_id', sql.Int, courseId)
-            .query(`
-                INSERT INTO user_reviews (user_id, review_text, rating, review_date, course_id)
-                VALUES (@user_id, @review_text, @rating, GETDATE(), @course_id)
-            `);
-    } catch (err) {
-        console.error('SQL Error:', err); // Detailed SQL error logging
-        throw new Error('Error creating review: ' + err.message);
-    } finally {
-        if (pool) {
-            pool.close();
+        } catch (err) {
+            console.error('Error fetching review:', err.message);
+            throw new Error('Error fetching review');
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
         }
     }
-}
+    
+    static async updateReview(id, review_text, rating) {
+        const query = `
+        UPDATE user_reviews
+        SET review_text = @review_text, rating = @rating
+        WHERE review_id = @review_id
+        `;
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('review_id', sql.Int, id);
+            request.input('review_text', sql.NVarChar, review_text);
+            request.input('rating', sql.Int, rating);
+            const result = await request.query(query);    
+            if (result.rowsAffected[0] === 0) {
+                throw new Error('Review not found or no changes made');
+            }
 
-async function deleteReview(connection, id) {
-    try {
-        await connection.request()
-            .input('review_id', sql.Int, id)
-            .query(`
-                DELETE FROM user_reviews
-                WHERE review_id = @review_id
-            `);
-        console.log('Review deleted successfully for ID:', id);
-    } catch (err) {
-        console.error('Error executing delete query:', err.message);
-        throw new Error('Error deleting review: ' + err.message);
-    }
-}
-
-
-async function getReviewCount(courseId) {
-    let connection;
-    try {
-        connection = await sql.connect(dbConfig);
-        let countQuery = `SELECT COUNT(*) AS count FROM user_reviews`;
-        if (courseId) {
-            countQuery += ` WHERE course_id = @courseId`;
+            return await this.getReviewById(id);
+        
+        } catch (err) {
+            console.error('SQL error:', err.message);
+            throw err;
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
         }
-        const request = new sql.Request(connection);
-        if (courseId) {
+    }
+        
+    static async createReview(userId, review_text, rating, courseId) {
+        const query = `
+        INSERT INTO user_reviews (user_id, review_text, rating, review_date, course_id)
+        VALUES (@user_id, @review_text, @rating, GETDATE(), @course_id);
+        SELECT SCOPE_IDENTITY() AS review_id;
+         `;
+
+        let connection;
+        try {
+            
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('user_id', sql.Int, userId);
+            request.input('review_text', sql.NVarChar, review_text);
+            request.input('rating', sql.Int, rating);
+            request.input('course_id', sql.Int, courseId);
+            const result = await request.query(query);
+            const reviewId = result.recordset[0].review_id;
+            return await this.getReviewById(reviewId)
+
+        } catch (err) {
+            console.error('SQL Error during review creation:', err); // Detailed SQL error logging
+            throw new Error('Error creating review: ' + err.message);
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+        
+    static async deleteReview(id) {
+        const query = `
+        DELETE FROM user_reviews
+        WHERE review_id = @review_id
+        `;
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('review_id', sql.Int, id);
+            const result = await request.query(query);
+
+            return result.rowsAffected > 0;
+        } catch (err) {
+            console.error('Error executing delete query:', err.message);
+            throw new Error('Error deleting review: ' + err.message);
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
+    
+    static async getReviewCount() {
+        
+        const query = `
+        SELECT COUNT(*) AS count
+        FROM user_reviews
+        `;
+
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            const result = await request.query(query);
+            return result.recordset[0].count;
+        } catch (err) {
+            console.error(err);
+            throw new Error('Error fetching review count');
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+    
+    static async getReviewCountByCourseId(courseId) {
+
+        const query = `
+        SELECT COUNT(*) AS count
+        FROM user_reviews
+        WHERE course_id = @courseId
+        `;
+
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
             request.input('courseId', sql.Int, courseId);
-        }
-        const result = await request.query(countQuery);
-        return result.recordset[0].count;
-    } catch (err) {
-        console.error(err);
-        throw new Error('Error fetching review count');
-    } finally {
-        if (connection) {
-            await connection.close();
+            const result = await request.query(query);
+            return result.recordset[0].count;
+        } catch (err) {
+            console.error(err);
+            throw new Error('Error fetching review count by course ID');
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
         }
     }
-}
+    
+    static async getReviewCountByUserId(userId) {
 
-async function getReviewCountByCourseId(courseId) {
-    let connection;
-    try {
-        connection = await sql.connect(dbConfig);
         const query = `
-            SELECT COUNT(*) AS count
-            FROM user_reviews
-            WHERE course_id = @courseId
+        SELECT COUNT(*) AS count
+        FROM user_reviews
+        WHERE user_id = @userId
         `;
-        const request = new sql.Request(connection);
-        request.input('courseId', sql.Int, courseId);
-        const result = await request.query(query);
-        return result.recordset[0].count;
-    } catch (err) {
-        console.error(err);
-        throw new Error('Error fetching review count by course ID');
-    } finally {
-        if (connection) {
-            await connection.close();
+
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(query);
+            return result.recordset[0].count;
+        } catch (err) {
+            console.error(err);
+            throw new Error('Error fetching review count by user ID');
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
         }
     }
-}
-
-async function getReviewCountByUserId(userId) {
-    let connection;
-    try {
-        connection = await sql.connect(dbConfig);
+    
+    static async incrementLikes(reviewId) { // UPDATE to increase like count, SELECT to retrieve the new like count
+        
         const query = `
-            SELECT COUNT(*) AS count
-            FROM user_reviews
-            WHERE user_id = @userId
+        UPDATE user_reviews 
+        SET likes = likes + 1
+        WHERE review_id = @reviewId;
+        SELECT likes FROM user_reviews WHERE review_id = @reviewId;
         `;
-        const request = new sql.Request(connection);
-        request.input('userId', sql.Int, userId);
-        const result = await request.query(query);
-        return result.recordset[0].count;
-    } catch (err) {
-        console.error(err);
-        throw new Error('Error fetching review count by user ID');
-    } finally {
-        if (connection) {
-            await connection.close();
+
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('reviewId', sql.Int, reviewId);
+            const result = await request.query(query);
+            return result.recordset[0].likes;
+        } catch (err) {
+            throw new Error(`Error incrementing likes: ${err.message}`);
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
         }
     }
+    
+    static async incrementDislikes(reviewId) {
+
+        const query = `
+        UPDATE user_reviews
+        SET dislikes = dislikes + 1
+        WHERE review_id = @reviewId;
+        SELECT dislikes FROM user_reviews WHERE review_id = @reviewId;
+        `;
+
+        let connection;
+        try {
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('reviewId', sql.Int, reviewId);
+            const result = await request.query(query);
+            return result.recordset[0].dislikes;
+        } catch (err) {
+            throw new Error(`Error incrementing dislikes: ${err.message}`);
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }            
 }
 
-
-module.exports = {
-    getAllReviews,
-    getReviewById,
-    createReview,
-    updateReview,
-    deleteReview,
-    getReviewCount,
-    getReviewCountByCourseId,
-    getReviewCountByUserId
-};
+module.exports = Review;

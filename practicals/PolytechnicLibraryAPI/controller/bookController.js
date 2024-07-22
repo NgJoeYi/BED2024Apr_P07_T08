@@ -1,18 +1,18 @@
 const Book = require('../model/book');
 
-const getAllBooks = async(req, res) => {
+const getAllBooks = async (req, res) => {
     try {
-        const books = await User.getAllBooks();
-        if (!books) {
+        const books = await Book.getAllBooks();
+        if (!books || books.length === 0) {
             return res.status(404).send('No books to retrieve');
         }
-        res.status(200).json({ title, author, availability });
+        res.status(200).json(books);
     } catch (error) {
-        throw new Error("Error in bookController: could not get all books");
+        res.status(500).json({ error: "Error in bookController: Could not get all books" });
     }
 }
 
-const updateBookAvailability = async(req, res) => {
+const updateBookAvailability = async (req, res) => {
     const bookId = parseInt(req.params.id);
     const { availability } = req.body;
     try {
@@ -20,13 +20,14 @@ const updateBookAvailability = async(req, res) => {
         if (!checkBook) {
             return res.status(404).send('Book not found');
         }
-        const books = await Book.updateBookAvailability(bookId, availability);
-        res.status(books).json({ title, author, availability });        
+        const updatedBook = await Book.updateBookAvailability(bookId, availability);
+        res.status(200).json(updatedBook);        
     } catch (error) {
-        throw new Error("Error in bookController: could not get all books");
+        res.status(500).json({ error: "Error in bookController: Could not update book availability" });
     }
 }
 
 module.exports = {
-    getAllBooks, updateBookAvailability
+    getAllBooks,
+    updateBookAvailability
 }

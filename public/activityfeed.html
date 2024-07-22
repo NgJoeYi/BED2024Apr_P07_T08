@@ -50,30 +50,52 @@
             <button id="clear-search" class="clear-search-button" onclick="clearSearch()">✖</button>
         </div>
         <button class="refresh-button" onclick="fetchDiscussions()">Search</button>
-        <button class="add-button-activity" onclick="openPopup()">+</button>
-        
+        <button class="add-button-activity" onclick="openPopup()">+ Add Discussion</button>
+    </div>
+    
+
+    
+
+
+    <div class="tabs-container" style="margin-bottom: 24px;">
+        <div class="filter-sort-tabs">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('following')">Following</button>
+                <button class="tab-btn" onclick="showTab('mainFeed')">Main Feed</button>
+            </div>
+            <div class="filter-sort">
+                <div class="filter-unique">
+                    Filter by: 
+                    <select id="filter-category">
+                        <option value="all">All</option>
+                        <option value="math">Math</option>
+                        <option value="coding">Coding</option>
+                        <option value="english">English</option>
+                        <option value="microsoft">Microsoft</option>
+                        <!-- Add more categories as needed -->
+                    </select>
+                </div>
+                <div class="sort-unique">
+                    Sort by: 
+                    <select id="sort-date">
+                        <option value="most-recent">Most Recent</option>
+                        <option value="oldest">Oldest</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="filter-sort-unique">
-        <div class="filter-unique">
-            Filter by: 
-            <select id="filter-category">
-                <option value="all">All</option>
-                <option value="math">Math</option>
-                <option value="coding">Coding</option>
-                <option value="english">English</option>
-                <option value="microsoft">Microsoft</option>
-                <!-- Add more categories as needed -->
-            </select>
-        </div>
-        <div class="sort-unique">
-            Sort by: 
-            <select id="sort-date">
-                <option value="most-recent">Most Recent</option>
-                <option value="oldest">Oldest</option>
-            </select>
-        </div>
+
+    <div id="following" class="tab-content" style="display: none;">
+        <!-- Content for 'Following' tab -->
     </div>
+    <div id="mainFeed" class="tab-content" style="display: block;">
+        <!-- Content for 'Main Feed' tab -->
+    </div>
+    
+    
+
 
     <div class="activity-feed">
         <!-- Discussions will be dynamically added here by JavaScript -->
