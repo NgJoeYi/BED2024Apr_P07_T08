@@ -17,43 +17,34 @@ async function getLecturesByCourse() {
     }
 }
 
-function clearVideo() {
-    const videoIframe = document.querySelector('.main-content iframe');
-    videoIframe.src = ''; // Clear the video source
-    videoIframe.dataset.lectureId = ''; // Clear the data attribute
-}
-
 async function deleteLecture(button) {
     const lectureID = button.dataset.lectureId;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
     const token = sessionStorage.getItem('token');
 
-    // Confirmation dialog
     const userConfirmed = confirm('Are you sure you want to delete this lecture?');
     if (!userConfirmed) {
-        return; 
+        return;
     }
+
     try {
-        const response = await fetchWithAuth(`/lectures/${lectureID}`, { // ------------------------------------------------- headers in jwtutility.js
+        const response = await fetchWithAuth(`/lectures/${lectureID}`, {
             method: 'DELETE'
         });
         if (response.status === 204) {
             alert('Lecture deleted successfully!');
             button.closest('.sub-nav-item').remove();
 
-            // Clear video if the deleted lecture is currently playing
             const currentVideoLectureID = document.querySelector('.main-content iframe').dataset.lectureId;
             if (currentVideoLectureID === lectureID) {
                 clearVideo();
             }
 
-            // Check if there are any remaining lectures for the course
             const lecturesResponse = await fetch(`/lectures/course/${courseID}`);
             const lectures = await lecturesResponse.json();
 
             if (lectures.length === 0) {
-                // No more lectures, delete the course
-                const deleteCourseResponse = await fetchWithAuth(`/courses/${courseID}`, { // ------------------------------------------------- headers in jwtutility.js
+                const deleteCourseResponse = await fetchWithAuth(`/courses/${courseID}`, {
                     method: 'DELETE'
                 });
                 if (deleteCourseResponse.ok) {
@@ -64,7 +55,6 @@ async function deleteLecture(button) {
                     alert('Failed to delete the course.');
                 }
             } else {
-                // There are remaining lectures, update UI or redirect as needed
                 window.location.href = `lecture.html?courseID=${courseID}`;
             }
         } else if (response.status === 403) {
@@ -79,6 +69,32 @@ async function deleteLecture(button) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    getLecturesByCourse();
+
+    const navTitles = document.querySelectorAll('.nav-title');
+    navTitles.forEach(title => {
+        title.addEventListener('click', () => {
+            const subNav = title.nextElementSibling;
+            subNav.style.display = subNav.style.display === "none" ? "block" : "none";
+        });
+    });
+    const hamburger = document.querySelector('.hamburger');
+    const sidebar = document.querySelector('.sidebar');
+    hamburger.addEventListener('click', () => {
+        sidebar.style.width = sidebar.style.width === "250px" || sidebar.style.width === "" ? "60px" : "250px";
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.style.display = sidebar.style.width === "250px" ? 'block' : 'none';
+        });
+    });
+});
+
+
+function clearVideo() {
+    const videoIframe = document.querySelector('.main-content iframe');
+    videoIframe.src = ''; // Clear the video source
+    videoIframe.dataset.lectureId = ''; // Clear the data attribute
+}
 
 async function deleteChapter(button) {
     const chapterName = button.dataset.chapterName;
@@ -277,11 +293,7 @@ async function editLecture(button) {
     const token = sessionStorage.getItem('token');
     try {
         // Getting user ID of logged on now 
-        const checkingUserIDResponse = await fetch(`/lectures/checking`,{
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const checkingUserIDResponse = await  fetchWithAuth(`/lectures/checking`);
         if (!checkingUserIDResponse.ok) {
             throw new Error('Network response not ok');
         }
@@ -308,24 +320,5 @@ async function editLecture(button) {
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    getLecturesByCourse();
-
-    const navTitles = document.querySelectorAll('.nav-title');
-    navTitles.forEach(title => {
-        title.addEventListener('click', () => {
-            const subNav = title.nextElementSibling;
-            subNav.style.display = subNav.style.display === "none" || subNav.style.display === "" ? "block" : "none";
-        });
-    });
-    const hamburger = document.querySelector('.hamburger');
-    const sidebar = document.querySelector('.sidebar');
-    hamburger.addEventListener('click', () => {
-        sidebar.style.width = sidebar.style.width === "250px" || sidebar.style.width === "" ? "60px" : "250px";
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.style.display = sidebar.style.width === "250px" ? 'block' : 'none';
-        });
-    });
-});
 
 
