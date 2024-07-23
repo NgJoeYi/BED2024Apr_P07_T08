@@ -8,6 +8,34 @@ function base64ToBuffer(base64String) {
     return Buffer.from(base64String, 'base64');
 }
 
+/**
+ * @swagger
+ * /quizzes:
+ *   post:
+ *     summary: Create a new quiz
+ *     tags: [Quizzes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               quizImg:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Quiz created successfully
+ *       400:
+ *         description: Title already exists or failed to create a new quiz
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const createQuiz = async (req, res) => {
     const newQuizData = req.body;
     const userId = req.user.id;
@@ -45,6 +73,51 @@ const createQuiz = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /quizzes/{id}/questions:
+ *   post:
+ *     summary: Create a question after quiz creation
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The quiz ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               question_text:
+ *                 type: string
+ *               option_1:
+ *                 type: string
+ *               option_2:
+ *                 type: string
+ *               option_3:
+ *                 type: string
+ *               option_4:
+ *                 type: string
+ *               correct_option:
+ *                 type: string
+ *               qnsImg:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Question created successfully
+ *       404:
+ *         description: Quiz does not exist
+ *       400:
+ *         description: Failed to create question
+ *       500:
+ *         description: Internal Server Error
+ */
 const createQuestionAfterQuizCreation = async (req, res) => { // utilise this in quiz.js 
     const newQuestionData = req.body;
     const quizId = parseInt(req.params.id);
@@ -70,7 +143,46 @@ const createQuestionAfterQuizCreation = async (req, res) => { // utilise this in
     }
 };
 
-// users can add new questions in the edit mode too so i must make sure the total question is correct
+/**
+ * @swagger
+ * /quizzes/{id}/questions/update:
+ *   post:
+ *     summary: Create a question during quiz update
+ *     tags: [Quizzes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               quiz_id:
+ *                 type: integer
+ *               question_text:
+ *                 type: string
+ *               option_1:
+ *                 type: string
+ *               option_2:
+ *                 type: string
+ *               option_3:
+ *                 type: string
+ *               option_4:
+ *                 type: string
+ *               correct_option:
+ *                 type: string
+ *               qnsImg:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Question created successfully
+ *       404:
+ *         description: Quiz does not exist
+ *       400:
+ *         description: Failed to create question or could not update total questions in the quiz
+ *       500:
+ *         description: Internal Server Error
+ */
 const createQuestionOnUpdate = async (req, res) => { // utilise this in editQuestion.js 
     const newQuestionData = req.body;
     try {
@@ -147,6 +259,27 @@ const createQuestionOnUpdate = async (req, res) => { // utilise this in editQues
     }
 };
 
+/**
+ * @swagger
+ * /quizzes/{id}:
+ *   get:
+ *     summary: Get quiz by ID
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The quiz ID
+ *     responses:
+ *       200:
+ *         description: Quiz retrieved successfully
+ *       404:
+ *         description: Quiz does not exist
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const getQuizById = async (req, res) => {
     const quizId = parseInt(req.params.id);
     try {
@@ -174,6 +307,20 @@ const getQuizById = async (req, res) => {
 //     }
 // };
 
+/**
+ * @swagger
+ * /quizzes:
+ *   get:
+ *     summary: Get all quizzes with creator name
+ *     tags: [Quizzes]
+ *     responses:
+ *       200:
+ *         description: Quizzes retrieved successfully
+ *       404:
+ *         description: Quiz does not exist
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const getAllQuizWithCreatorName = async (req, res) => {
     try {
         const quiz = await Quiz.getAllQuizWithCreatorName();
@@ -187,6 +334,45 @@ const getAllQuizWithCreatorName = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /quizzes/{id}:
+ *   put:
+ *     summary: Update a quiz
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The quiz ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               quizImg:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Quiz updated successfully
+ *       400:
+ *         description: Title already exists
+ *       403:
+ *         description: You are not authorized to update this quiz
+ *       404:
+ *         description: Quiz does not exist
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const updateQuiz = async (req, res) => {
     const quizId = parseInt(req.params.id);
     const newQuizData = req.body;
@@ -227,6 +413,29 @@ const updateQuiz = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /quizzes/{id}:
+ *   delete:
+ *     summary: Delete a quiz
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The quiz ID
+ *     responses:
+ *       204:
+ *         description: Quiz successfully deleted
+ *       403:
+ *         description: You are not authorized to delete this quiz
+ *       404:
+ *         description: Quiz does not exist
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const deleteQuiz = async (req, res) => {
     const quizId = parseInt(req.params.id);
     const userId = req.user.id;
@@ -286,6 +495,27 @@ const deleteQuiz = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /quizzes/{id}/questions:
+ *   get:
+ *     summary: Get quiz with questions by quiz ID
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The quiz ID
+ *     responses:
+ *       200:
+ *         description: Quiz retrieved successfully
+ *       404:
+ *         description: Quiz does not exist
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const getQuizWithQuestions = async (req, res) => {
     const quizId = parseInt(req.params.id);
     try {
@@ -301,6 +531,57 @@ const getQuizWithQuestions = async (req, res) => {
 };
 
 // need to check if the correct option updated is the same with one of the options given
+/**
+ * @swagger
+ * /quizzes/{quizId}/questions/{questionId}:
+ *   put:
+ *     summary: Update a question
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: quizId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The quiz ID
+ *       - in: path
+ *         name: questionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The question ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               question_text:
+ *                 type: string
+ *               option_1:
+ *                 type: string
+ *               option_2:
+ *                 type: string
+ *               option_3:
+ *                 type: string
+ *               option_4:
+ *                 type: string
+ *               correct_option:
+ *                 type: string
+ *               qnsImg:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Question updated successfully
+ *       400:
+ *         description: Correct option must be one of the given options or could not update question
+ *       404:
+ *         description: Quiz or Question does not exist
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const updateQuestion = async (req, res) => { // get back to here
     const qnsId = parseInt(req.params.questionId);
     const quizId = parseInt(req.params.quizId);
@@ -355,6 +636,35 @@ const updateQuestion = async (req, res) => { // get back to here
 
 // FOR DELETE QUESTION, WHEN I DELETE QUESTION I MUST ALSO UPDATE THE TOTAL QUESTION IN QUIZZES
 // if user wants to delete one last question, also prompt them if they want to delete the quiz -------------------------------------
+/**
+ * @swagger
+ * /quizzes/{quizId}/questions/{questionId}:
+ *   delete:
+ *     summary: Delete a question
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: quizId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The quiz ID
+ *       - in: path
+ *         name: questionId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The question ID
+ *     responses:
+ *       204:
+ *         description: Question deleted successfully
+ *       404:
+ *         description: Quiz or Question does not exist
+ *       400:
+ *         description: Could not delete question or could not update total questions in the quiz
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const deleteQuestion = async (req, res) => {
     const qnsId = req.params.questionId;
     const quizId = req.params.quizId;
@@ -458,19 +768,51 @@ const deleteQuestion = async (req, res) => {
     }
 };
 
-
-
-
 // flow of content for below so i dont get confused
 // 1. user submit quiz
 // 2. when user submit quiz count how many attempt the user has 
 // 3. display the result to the user
 // 4. also display it in the user's profile page
 
-
 // maybe for incorrect answers table, can use it to create pie chart to represent statistics of ppl's score
 
 // check if all qns r attempted
+/**
+ * @swagger
+ * /submitQuiz:
+ *   post:
+ *     summary: Submit a quiz
+ *     tags: [Quizzes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               quizId:
+ *                 type: integer
+ *               responses:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     question_id:
+ *                       type: integer
+ *                     selected_option:
+ *                       type: string
+ *               timeTaken:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Quiz submitted successfully
+ *       400:
+ *         description: All questions must be answered
+ *       404:
+ *         description: Quiz not found
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const submitQuiz = async (req, res) => {
     const { quizId, responses, timeTaken } = req.body;
     const userId = req.user.id;
@@ -524,7 +866,18 @@ const submitQuiz = async (req, res) => {
     }
 };
 
-
+/**
+ * @swagger
+ * /account/getAttemptCountByQuizId:
+ *   get:
+ *     summary: Get attempt count by quiz ID for the logged-in user
+ *     tags: [Quizzes]
+ *     responses:
+ *       200:
+ *         description: Attempt count retrieved successfully
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const getAttemptCountByQuizId = async (req, res) => { // so i can display number of attempts to user
     const userId = req.user.id;
     try {
@@ -536,6 +889,18 @@ const getAttemptCountByQuizId = async (req, res) => { // so i can display number
     }
 };
 
+/**
+ * @swagger
+ * /account/getAllAttemptCount:
+ *   get:
+ *     summary: Get all attempt count for the logged-in user
+ *     tags: [Quizzes]
+ *     responses:
+ *       200:
+ *         description: All attempt count retrieved successfully
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const getAllAttemptCount = async (req, res) => { // so i can display number of attempts to user
     const userId = req.user.id;
     try {
@@ -547,6 +912,27 @@ const getAllAttemptCount = async (req, res) => { // so i can display number of a
     }
 };
 
+/**
+ * @swagger
+ * /quizResult/{attemptId}:
+ *   get:
+ *     summary: Get quiz result by attempt ID for the logged-in user
+ *     tags: [Quizzes]
+ *     parameters:
+ *       - in: path
+ *         name: attemptId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The attempt ID
+ *     responses:
+ *       200:
+ *         description: Quiz result retrieved successfully
+ *       400:
+ *         description: Failed to retrieve user's quiz result
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const getUserQuizResult = async (req, res) => {
     const userId = req.user.id;
     const attemptId = parseInt(req.params.attemptId);
@@ -562,6 +948,20 @@ const getUserQuizResult = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /account/quizResult:
+ *   get:
+ *     summary: Get all quiz results for the logged-in user
+ *     tags: [Quizzes]
+ *     responses:
+ *       200:
+ *         description: Quiz results retrieved successfully
+ *       400:
+ *         description: No quiz completed
+ *       500:
+ *         description: Server error. Please try again later.
+ */
 const getAllQuizResultsForUser = async (req, res) => { // for account page
     const userId = req.user.id;
     try {
@@ -576,6 +976,18 @@ const getAllQuizResultsForUser = async (req, res) => { // for account page
     }
 };
 
+/**
+ * @swagger
+ * /quizzes/statistics:
+ *   get:
+ *     summary: Get quiz pass/fail statistics
+ *     tags: [Quizzes]
+ *     responses:
+ *       200:
+ *         description: Pass/fail statistics retrieved successfully
+ *       500:
+ *         description: Internal server error
+ */
 const getQuizPassFailStatistics = async (req, res) => {
     try {
         const stats = await Quiz.getQuizPassFailStatistics();
@@ -585,7 +997,6 @@ const getQuizPassFailStatistics = async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 };
-
 
 module.exports = {
     createQuiz,
@@ -604,4 +1015,4 @@ module.exports = {
     updateQuestion,
     deleteQuestion,
     getQuizPassFailStatistics
-}
+};

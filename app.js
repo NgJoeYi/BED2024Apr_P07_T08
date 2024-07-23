@@ -10,6 +10,7 @@ const multer = require('multer');
 
 //implemented swagger 
 const swaggerUi = require("swagger-ui-express"); 
+const swaggerSpecs = require("./swagger-config"); // Import Swagger specs
 const swaggerDocument = require("./swagger-output.json"); // Import generated spec 
 
 
@@ -35,7 +36,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // to use swagger..
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // so in search bar type: localhost:3000/api-docs 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs)); // so in search bar type: localhost:3000/api-docs 
 
 // Set up the view engine
 app.set('view engine', 'ejs');

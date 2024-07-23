@@ -2,6 +2,24 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken'); 
 
+/**
+ * @swagger
+ * /users/current:
+ *   get:
+ *     summary: Retrieve the currently logged-in user by ID
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: User does not exist
+ *       500:
+ *         description: Server error
+ */
 const getUserById = async (req, res) => {
     //const userId = parseInt(req.params.id);
     const userId = req.user.id;
@@ -18,6 +36,7 @@ const getUserById = async (req, res) => {
 };
 
 /*
+// Commented out function
 const checkUserExist = async (req, res) => {
     const { email } = req.body;
     try {
@@ -33,6 +52,33 @@ const checkUserExist = async (req, res) => {
 };
 */
 
+/**
+ * @swagger
+ * /users:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: integer
+ *       400:
+ *         description: Email is already in use or could not create an account
+ *       500:
+ *         description: Server error
+ */
 const createUser = async (req, res) => {
     const newUserData = req.body;
     try {
@@ -58,6 +104,42 @@ const createUser = async (req, res) => {
 };
 
 // --------------------------------------- JWT ---------------------------------------
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Log in a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 userId:
+ *                   type: integer
+ *       404:
+ *         description: Invalid email or password
+ *       500:
+ *         description: Server error
+ */
 const loginUser = async (req, res) => {
     const { email, password } = req.body; // user filled in email and password field
     try {
@@ -88,6 +170,43 @@ const loginUser = async (req, res) => {
 };
 // --------------------------------------- JWT ---------------------------------------
 
+/**
+ * @swagger
+ * /users:
+ *   put:
+ *     summary: Update the current user's information
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               dob:
+ *                 type: string
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Current password is required, email is already in use, or other validation errors
+ *       404:
+ *         description: User does not exist
+ *       500:
+ *         description: Server error
+ */
 const updateUser = async (req, res) => {
     const userId = req.user.id;
     const newUserData = req.body;
@@ -137,6 +256,31 @@ const updateUser = async (req, res) => {
 };
 
 
+/**
+ * @swagger
+ * /users:
+ *   delete:
+ *     summary: Delete the current user account
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *     responses:
+ *       204:
+ *         description: Account deleted successfully
+ *       400:
+ *         description: Please enter your password or password is incorrect
+ *       404:
+ *         description: User does not exist
+ *       500:
+ *         description: Server error
+ */
 // after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
 const deleteUser = async (req, res) => {
     const userId = req.user.id;
@@ -172,28 +316,36 @@ const deleteUser = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @swagger
+ * /users/profile-pic:
+ *   put:
+ *     summary: Update the profile picture of the currently logged-in user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profilePic:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile picture updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 profilePic:
+ *                   type: string
+ *       400:
+ *         description: Failed to update profile picture
+ *       500:
+ *         description: Server error
+ */
 const updateProfilePic = async (req, res) => {
     const userId = req.user.id;
     const { profilePic } = req.body;
@@ -210,9 +362,27 @@ const updateProfilePic = async (req, res) => {
     }
 };
 
-
-
-
+/**
+ * @swagger
+ * /users/profile-pic:
+ *   get:
+ *     summary: Get the profile picture of the currently logged-in user
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Profile picture retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 profilePic:
+ *                   type: string
+ *       404:
+ *         description: User does not exist
+ *       500:
+ *         description: Server error
+ */
 const getProfilePicByUserId = async (req, res) => {
     const userId = req.user.id;
     try {
@@ -223,7 +393,7 @@ const getProfilePicByUserId = async (req, res) => {
 
         let profilePic = await User.getProfilePicByUserId(userId);
         if (!profilePic) {
-           profilePic = 'images/profilePic.jpeg'; // Default profile picture 
+            profilePic = 'images/profilePic.jpeg'; // Default profile picture
         }
         res.status(200).json({ profilePic });
     } catch (error) {
@@ -231,31 +401,6 @@ const getProfilePicByUserId = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = {
     getUserById,
@@ -266,7 +411,6 @@ module.exports = {
     updateProfilePic,
     getProfilePicByUserId
 };
-
 
 // ------------ KNOWLEDGE ATTAINED FROM BCRYPT ------------
 // 1. hashing the password so if even 2 users have the same password, the hash value is different
