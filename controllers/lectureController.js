@@ -16,6 +16,18 @@ const getAllLectures = async (req, res) => {
         res.status(500).send('Error retrieving lectures');
     }
 };
+const getLectureDetails = async (req,res)=>{
+    const id  = parseInt(req.params.id);
+    try{
+        const getLectureDetails = await Lectures.getLectureDetails(id);
+        res.json(getLectureDetails);
+
+    }catch (error) {
+        console.error(error);
+        res.status(500).send('Error retrieving lectures');
+    }
+}
+
 const getLectureByID = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -58,11 +70,14 @@ const deletingChapterName = async (req, res) => {
     const { courseID, chapterName } = req.params;
     const { lectureIDs } = req.body;
     const userID = req.user.id;
-    console.log(lectureIDs.length);
+
+    if (!Array.isArray(lectureIDs) || lectureIDs.length === 0) {
+        return res.status(400).json({ message: "Invalid lecture IDs provided" });
+    }
+
     try {
         // Ensure all lectures belong to the same user
-        for(let i=0; i< lectureIDs.length; i++){
-            const lectureID = lectureIDs[i];
+        for (const lectureID of lectureIDs) {
             const lecture = await Lectures.getLectureByID(lectureID);
             if (!lecture) {
                 return res.status(404).json({ message: `Lecture with ID ${lectureID} not found` });
@@ -81,7 +96,8 @@ const deletingChapterName = async (req, res) => {
         console.error(error);
         res.status(500).send("Error deleting chapter");
     }
-}
+};
+
 
 const updateLecture = async (req, res) => {
     const userID = req.user.id; // user id that logged on now 
@@ -237,6 +253,7 @@ const checkingUserID = async (req, res) => {
 
 module.exports = {
     getAllLectures,
+    getLectureDetails,
     updateLecture,
     createLecture,
     deleteLecture,

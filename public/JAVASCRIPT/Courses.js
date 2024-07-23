@@ -30,6 +30,7 @@ async function fetchCourses(category = 'all', sortBy = 'most-recent') {
     totalPages = Math.ceil(coursesData.length / itemsPerPage);
     deleteCourseWithNoLectures();
     displayCourses();
+    filter();
     
   } catch (error) {
     console.error('Error fetching courses:', error);
@@ -233,6 +234,7 @@ async function deleteCourse(event, button) {
       }    
       alert('Course deleted successfully!');
       button.closest('.course-cd-unique').remove(); // Remove the course element from the DOM
+      filter();
     } else {
       const result = await response.json();
       alert(result.message);
