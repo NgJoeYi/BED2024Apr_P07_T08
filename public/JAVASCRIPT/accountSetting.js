@@ -362,9 +362,8 @@ document.addEventListener('DOMContentLoaded', async function () {
       </div>
       <div class="quiz-result-details">
           <p><strong>Attempt number:</strong> ${attemptNumber}</p>
-          <p><strong>Score:</strong> ${result.Score}%</p>
+          <p><strong>Score:</strong> ${result.Score}/${result.TotalMarks}</p>
           <p><strong>Total Questions:</strong> ${result.TotalQuestions}</p>
-          <p><strong>Total Marks:</strong> ${result.TotalMarks}</p>
           <p><strong>Time Taken:</strong> ${result.TimeTaken ? result.TimeTaken + ' seconds' : 'N/A'}</p>
           <p><strong>Passed:</strong> ${result.Passed ? 'Yes' : 'No'}</p>
       </div>

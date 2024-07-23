@@ -45,10 +45,9 @@ function displayResult(result) {
             <div class="result-details">
                 <p><strong>User Name:</strong> ${result.UserName}</p>
                 <p><strong>Attempt Date:</strong> ${formattedDate}</p>
-                <p><strong>Score:</strong> ${result.Score}%</p>
+                <p><strong>Score:</strong> ${result.Score}/${result.TotalMarks}</p>
                 <p><strong>Time Taken:</strong> ${result.TimeTaken ? result.TimeTaken + ' seconds' : 'N/A'}</p>
                 <p><strong>Total Questions:</strong> ${result.TotalQuestions}</p>
-                <p><strong>Total Marks:</strong> ${result.TotalMarks}</p>
                 <p><strong>Passed:</strong> ${result.Passed ? 'Yes' : 'No'}</p>
             </div>
             <div class="incorrect-questions">

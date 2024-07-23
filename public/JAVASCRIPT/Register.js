@@ -21,40 +21,41 @@ document.getElementById('student-btn').addEventListener('click', function() {
     handleRoleButtonClick('student');
 });
 
+// Add event listener to the registration form
 document.getElementById('register-form').addEventListener('submit', async function (event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent the default form submission
 
-    const formData = new FormData(this);
-    formData.append('role', selectedRole);
+    const formData = new FormData(this); // Create a FormData object from the form
+    formData.append('role', selectedRole); // Append the selected role to the form data
 
-    const data = {};
+    const data = {}; // Initialize an empty object to store form data
     formData.forEach((value, key) => {
-        data[key] = value;
+        data[key] = value; // Populate the object with form data
     });
 
     try {
         const response = await fetch('/register', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json' // Set the content type to JSON
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data) // Convert the form data object to JSON
         });
 
-        const responseData = await response.json();
+        const responseData = await response.json(); // Parse the JSON response
 
         if (!response.ok) {
             if (responseData.errors && responseData.errors.length > 0) {
-                alert(`Validation errors:\n${responseData.errors.join('\n')}`);
+                alert(`Validation errors:\n${responseData.errors.join('\n')}`); // Show validation errors
             } else {
-                alert(`${responseData.message}`);
+                alert(`${responseData.message}`); // Show other error messages
             }
             return;
         }
 
-        alert('User registered successfully!');
+        alert('User registered successfully!');  // Show success message
         window.location.href = 'login.html'; // Redirect on successful login
     } catch (error) {
-        alert('Registration failed. Please try again later');
+        alert('Registration failed. Please try again later'); // Show error message on failure
     }
 });
