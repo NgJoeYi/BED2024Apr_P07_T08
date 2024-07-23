@@ -433,34 +433,36 @@ function addUserDiscussionToFeed(discussion) {
   const capitalizedUsername = capitalizeFirstLetter(discussion.username);
 
   post.innerHTML = `
-  <div class="post-header">
-    <div class="profile-pic">
-      <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
+    <div class="post-header">
+      <div class="profile-pic">
+        <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
+      </div>
+      <div class="username">${capitalizedUsername}</div>
     </div>
-    <div class="username">${capitalizedUsername}</div>
-  </div>
-  <div class="post-meta">
-    <span class="category">Category: ${discussion.category}</span>
-    <span class="posted-date-activity">${new Date(discussion.posted_date).toLocaleDateString()}</span>
-  </div>
-  <div class="post-content">
-    <p>${discussion.description}</p>
-  </div>
-  <div class="post-footer">
-    <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
-    <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
-  </div>
-`;
+    <div class="post-meta">
+      <span class="category">Category: ${discussion.category}</span>
+      <span class="posted-date-activity">${new Date(discussion.posted_date).toLocaleDateString()}</span>
+    </div>
+    <div class="post-content">
+      <h3>${discussion.title}</h3>
+      <p>${discussion.description}</p>
+    </div>
+    <div class="post-footer">
+      <button class="btn delete-btn" data-id="${discussion.id}">Delete</button>
+      <button class="btn edit-btn" data-id="${discussion.id}">Edit</button>
+    </div>
+  `;
 
   feed.appendChild(post);
 
-  post.querySelector('.edit-btn').addEventListener('click', () => openEditModal(discussion.id, discussion.description, discussion.category));
+  post.querySelector('.edit-btn').addEventListener('click', () => openEditModal(discussion.id, discussion.title, discussion.description, discussion.category));
   post.querySelector('.delete-btn').addEventListener('click', () => openDeleteDiscussionModal(discussion.id));
 }
 
 
 // Edit Modal functions
-function openEditModal(discussionId, description, category) {
+function openEditModal(discussionId, title, description, category) {
+  document.getElementById('editTitle').value = title;
   document.getElementById('editText').value = description;
   document.getElementById('editCategory').value = category;
   document.getElementById('editModal').style.display = 'block';
@@ -470,22 +472,28 @@ function openEditModal(discussionId, description, category) {
   };
 }
 
+
 function closeEditModal() {
   document.getElementById('editModal').style.display = 'none';
 }
 
 async function saveEdit(discussionId) {
+  const title = document.getElementById('editTitle').value;
   const description = document.getElementById('editText').value;
   const category = document.getElementById('editCategory').value;
 
   console.log('Saving edit for discussion ID:', discussionId);
+  console.log('Title:', title);
   console.log('Description:', description);
   console.log('Category:', category);
 
   try {
     const response = await fetchWithAuth(`/discussions/${discussionId}`, { // ------------------------------------------------- headers in jwtutility.js
       method: 'PUT',
-      body: JSON.stringify({ description, category })
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ title, description, category })
     });
 
     const responseData = await response.json();
@@ -503,6 +511,7 @@ async function saveEdit(discussionId) {
     alert('Error updating discussion: ' + error.message);
   }
 }
+
 
 // Delete Modal functions
 function openDeleteDiscussionModal(discussionId) {
