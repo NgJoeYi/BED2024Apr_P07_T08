@@ -1,3 +1,16 @@
+document.addEventListener('DOMContentLoaded', () => {
+    getLecturesByCourse();
+
+    // const navTitles = document.querySelectorAll('.nav-title');
+    // navTitles.forEach(title => {
+    //     title.addEventListener('click', () => {
+    //         const subNav = title.nextElementSibling;
+    //         subNav.style.display = subNav.style.display === "none" ? "block" : "none";
+    //     });
+    // });    
+});
+
+
 async function getLecturesByCourse() {
     const urlParams = new URLSearchParams(window.location.search);
     const courseID = urlParams.get('courseID');
@@ -68,20 +81,6 @@ async function deleteLecture(button) {
         alert('Error deleting lecture.');
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    getLecturesByCourse();
-
-    const navTitles = document.querySelectorAll('.nav-title');
-    navTitles.forEach(title => {
-        title.addEventListener('click', () => {
-            const subNav = title.nextElementSibling;
-            subNav.style.display = subNav.style.display === "none" ? "block" : "none";
-        });
-    });
-    
-});
-
 
 function clearVideo() {
     const videoIframe = document.querySelector('.main-content iframe');
@@ -164,6 +163,7 @@ async function deleteChapter(button) {
         alert('Error deleting chapter.');
     }
 }
+
 async function displayLectureDetails(lectureID) {
     try {
         const response = await fetch(`/lectures/lecture-details/${lectureID}`);
@@ -180,11 +180,26 @@ async function displayLectureDetails(lectureID) {
     }
 }
 
+function iconOrientation(){
+    const rotateIcon = document.getElementById('rotate-icon');
+    const subNav = rotateIcon.closest('.nav-item').querySelector('.sub-nav');
+
+    rotateIcon.addEventListener('click', () => {
+        rotateIcon.classList.toggle('rotate-down');
+        subNav.classList.toggle('show');
+    });
+}
+
+function toggleSubNav(event) {
+    const rotateIcon = event.target;
+    const subNav = rotateIcon.closest('.nav-item').querySelector('.sub-nav');
+    rotateIcon.classList.toggle('rotate-down');
+    subNav.classList.toggle('show');
+}
+
 
 function displayLectures(lectures) {
     const userRole = sessionStorage.getItem('role');
-    // const token = sessionStorage.getItem('token');
-
     const sidebar = document.querySelector('.sidebar .nav');
     if (!sidebar) {
         console.error('Sidebar element not found.');
@@ -211,29 +226,23 @@ function displayLectures(lectures) {
         const navItem = document.createElement('div');
         navItem.className = 'nav-item';
 
-        const deleteChapterButton = 
-            // token && 
-            userRole === 'lecturer'
-            ? `<button class="delete-chapter" style="display:block;" data-chapter-name="${chapterName}" onclick="deleteChapter(this)">Delete Chapter</button>` 
+        const deleteChapterButton = userRole === 'lecturer'
+            ? `<button class="delete-chapter" style="display:block;" data-chapter-name="${chapterName}" onclick="deleteChapter(this)">Delete Chapter</button>`
             : '';
 
         const subNavItems = groupedLectures[chapterName]
             .map(lecture => {
-                const deleteButton = 
-                    //  token && 
-                    userRole === 'lecturer'
-                    ? `<button class="delete-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>` 
+                const deleteButton = userRole === 'lecturer'
+                    ? `<button class="delete-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>`
                     : '';
-                const editButton = 
-                    //  token && 
-                    userRole === 'lecturer'
+                const editButton = userRole === 'lecturer'
                     ? `<button class="edit-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="editLecture(this)">Edit</button>`
                     : '';
-    
+
                 return `
                     <div class="sub-nav-item" data-lecture-id="${lecture.LectureID}">
-                        ${lecture.Title}
-                        <div class = "button-container">
+                        <h3>${lecture.Title}</h3>
+                        <div class="button-container">
                             ${deleteButton}
                             ${editButton}
                         </div>
@@ -241,31 +250,27 @@ function displayLectures(lectures) {
                 `;
             }).join('');
 
-
         navItem.innerHTML = `
             <div class="nav-title">
                 <h2>${chapterName}</h2>
                 ${deleteChapterButton}
-                <span><i class="fa-solid fa-caret-right" style ="font-size:30px;"></i></span>
+                <span class="rotate-icon fa-solid fa-caret-right" style="font-size:30px;"></span>
             </div>
-            <div class="sub-nav" style="display: none;">
+            <div class="sub-nav">
                 ${subNavItems}
             </div>
         `;
         sidebar.appendChild(navItem);
     }
 
-    const navTitles = document.querySelectorAll('.nav-title');
-    navTitles.forEach(title => {
-        title.addEventListener('click', () => {
-            const subNav = title.nextElementSibling;
-            subNav.style.display = subNav.style.display === "none" ? "block" : "none";
-        });
+    const rotateIcons = document.querySelectorAll('.rotate-icon');
+    rotateIcons.forEach(icon => {
+        icon.addEventListener('click', toggleSubNav);
     });
 
     const subNavItems = document.querySelectorAll('.sub-nav-item');
     subNavItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             const lectureID = this.getAttribute('data-lecture-id');
             displayLectureDetails(lectureID);
             setVideo(lectureID);
@@ -279,6 +284,7 @@ function displayLectures(lectures) {
         setVideo(firstLectureID);
     }
 }
+
 
 async function setVideo(lectureID) {
     const videoIframe = document.querySelector('.main-content iframe');

@@ -13,27 +13,6 @@
 
     <title>EduHelper | Lecture </title>
     <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
-    <style>
-        .rotate {
-            transition: transform 0.3s ease;
-        }
-
-        .rotate-down {
-            transform: rotate(90deg);
-        }
-
-        .sub-nav {
-            display: none;
-            transition: max-height 0.3s ease;
-            overflow: hidden;
-            max-height: 0; /* Initial state */
-        }
-
-        .sub-nav.show {
-            display: block;
-            max-height: 500px; /* Adjust this value based on your content */
-        }        
-    </style>
 </head>
 <body>
     <header>
@@ -64,11 +43,9 @@
                     <div class="nav-title">
                         <h2>Introduction</h2>
                         <button class="delete-chapter" style="display:block;" data-chapter-name="Introduction" onclick="deleteChapter(this)">Delete Chapter</button>
-
-                        <span id="rotate-icon" class="fa-solid fa-caret-right" style="font-size:30px;"></span>
+                        <span id="rotate-icon" class="fa-solid fa-caret-right" style="font-size:30px;" onclick="iconOrientation()"></span>
                     </div>
                     <div class="sub-nav" >
-                        <!-- style = "display: block;" -->
                             <div class="sub-nav-item" data-lecture-id="5">
                                 <h3>SEO Basics</h3>
                                 <div class = "button-container">
@@ -76,7 +53,6 @@
                                     <button class="edit-lecture" style="display:block;" data-lecture-id="5" onclick="editLecture(this)">Edit</button>    
                                 </div>
                             </div>
-                        
                     </div>
                 </div>
             </div>
@@ -168,17 +144,8 @@
             </div>
         </div>
     </footer>
-    <script>
-        const rotateIcon = document.getElementById('rotate-icon');
-        const subNav = rotateIcon.closest('.nav-item').querySelector('.sub-nav');
-
-        rotateIcon.addEventListener('click', () => {
-            rotateIcon.classList.toggle('rotate-down');
-            subNav.classList.toggle('show');
-        });
-    </script>
     <script src="JAVASCRIPT/JwtUtility.js"></script>
     <script src="JAVASCRIPT/lecture.js"></script>
-    <script src="JAVASCRIPT/review.js"></script>
+    <!-- <script src="JAVASCRIPT/review.js"></script> -->
 </body>
 </html>
