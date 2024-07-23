@@ -15,6 +15,7 @@ class Lectures {
         this.chapterName = chapterName;
     }
 
+    // get all lectures logic 
     static async getAllLectures() {
         let connection = await sql.connect(dbConfig);
         try {
@@ -39,6 +40,8 @@ class Lectures {
             await connection.close();
         }
     }
+
+    // get lecture details logic for lecture details container below the lecture video 
     static async getLectureDetails(id){
         let connection = await sql.connect(dbConfig);
         try{
@@ -59,6 +62,7 @@ class Lectures {
         }
     }
 
+    // get specfic lecture by id logic 
     static async getLectureByID(id) {
         let connection = await sql.connect(dbConfig);
         try {
@@ -92,6 +96,7 @@ class Lectures {
         }
     }
     
+    // update lecture logic 
     static async updateLecture(id, newLectureData) {
         let connection = await sql.connect(dbConfig);
         try {
@@ -139,6 +144,7 @@ class Lectures {
         }
     }
 
+    // create lecture logic 
     static async createLecture(id,newLectureData) {
         let pool;
         try {
@@ -169,6 +175,7 @@ class Lectures {
         }
     }
     
+    // this is for courses with multiple lectures, we need this so i know which position the new lecture should be in 
     static async getCurrentPositionInChapter(chapterName) {
         let connection = await sql.connect(dbConfig);
         try {
@@ -186,6 +193,7 @@ class Lectures {
         }
     }
 
+    // this is for lectures that are put under the previous chapter 
     static async getLastChapterName(userID) {
         let connection;
         try {
@@ -234,6 +242,7 @@ class Lectures {
         }
     }
 
+    // displaying lectures under the specific course 
     static async getLecturesByCourseID(courseID) {
         let connection;
         try {
@@ -256,6 +265,8 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
+
+    // delete specific lecture logic 
     static async deleteLecture(id) {
         let pool;
         try {
@@ -273,6 +284,7 @@ class Lectures {
         }
     }
 
+    // delete entire chapter logic 
     static async deletingChapterName(courseID, chapterName) {
         let connection = await sql.connect(dbConfig);
         try {
@@ -289,8 +301,6 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
-    
-    
         
 }
 module.exports = Lectures;
