@@ -37,7 +37,7 @@ const getAllLectures = async (req, res) => {
 
 /**
  * @swagger
- * /lectures/{id}:
+ * /lectures/lecture-details/{id}:
  *   get:
  *     summary: Get lecture details by ID
  *     tags: [Lectures]
@@ -60,15 +60,17 @@ const getAllLectures = async (req, res) => {
  *       500:
  *         description: Error retrieving lecture
  */
-// Retrieve details for a specific lecture by ID
 const getLectureDetails = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
-        const getLectureDetails = await Lectures.getLectureDetails(id);
-        res.json(getLectureDetails);
+        const lectureDetails = await Lectures.getLectureDetails(id);
+        if (!lectureDetails) {
+            return res.status(404).send('Lecture not found');
+        }
+        res.json(lectureDetails);
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error retrieving lectures');
+        res.status(500).send('Error retrieving lecture');
     }
 };
 
@@ -588,7 +590,7 @@ const getLecturesByCourseID = async (req, res) => {
 
 /**
  * @swagger
- * /lectures/user:
+ * /lectures/checking:
  *   get:
  *     summary: Check the current logged-in user ID
  *     tags: [Lectures]
