@@ -197,7 +197,6 @@ class User { // ----------------------------------------------------------------
         try {
             connection = await sql.connect(dbConfig); // ------------------------------------------- Establish a connection to the database
             
-            // Check if the profile picture exists
             const checkQuery = `SELECT * FROM ProfilePic WHERE user_id = @userId`; // -------------- SQL query to get the profile picture for the user
             const checkRequest = connection.request(); // ------------------------------------------ Create a request object for the check query
             checkRequest.input('userId', userId); // ----------------------------------------------- Add the userId as an input parameter for the check query
