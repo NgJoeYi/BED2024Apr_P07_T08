@@ -1,4 +1,4 @@
-const User = require('../models/User'); // ------------------------------------- Import Users model
+const User = require('../models/User'); // ------------------------------------- Import User model
 const bcrypt = require('bcryptjs'); // ----------------------------------------- Import the bcryptjs library for password hashing and comparison
 const jwt = require('jsonwebtoken'); // ---------------------------------------- Import the jsonwebtoken library for generating JWT tokens
 
