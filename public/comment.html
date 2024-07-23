@@ -58,14 +58,26 @@
         <!-- Comments will be dynamically inserted here -->
     </div>
 
+    <!-- Gignite Pop-up Integration -->
     <div class="popup" id="popup">
         <div class="popup-content">
-            <span class="close" onclick="closePopup()">&times;</span>
+            <!-- <span class="close" onclick="closePopup()">&times;</span> -->
             <h2>Leave a Comment</h2>
-            <textarea id="comment-text" placeholder="Comment.."></textarea>
-            <button  onclick="saveComment()">Save</button>
+            <div class="popup-body">
+                <div class="popup-user-info">
+                    <div class="avatar">
+                        <img src="images/profilePic.jpeg" alt="User Avatar">
+                    </div>
+                    <input type="text" id="comment-text" placeholder="Tell us what you're thinking...">
+                </div>
+            </div>
+            <div class="popup-actions">
+                <button class="btn cancel-btn" onclick="closePopup()">Cancel</button>
+                <button class="btn post-btn" onclick="saveComment()">Post</button>
+            </div>
         </div>
     </div>
+    <!-- End of Gignite Pop-up Integration -->
 
     <footer>
         <div class="footer">

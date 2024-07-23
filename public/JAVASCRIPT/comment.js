@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch elements
     const popup = document.getElementById('popup');
-    const closePopupBtn = document.querySelector('.popup .close');
+    // const closePopupBtn = document.querySelector('.popup .close');
     const addCommentBtn = document.getElementById('addCommentBtn'); 
 
     let editMode = false;
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentUserId = parseInt(sessionStorage.getItem('userId'), 10);  // Get the current user ID from session storage and not decode token bc decode token to get user Id pose security concerns since sensitive info can be found using token
 
     // Event listener to close pop up
-    closePopupBtn.addEventListener('click', closePopup);
+    // closePopupBtn.addEventListener('click', closePopup);
 
     // Only if have token, will show Add Comment button
     if (token) {
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const popupTitle = popup.querySelector('h2');
         const commentText = document.getElementById('comment-text');
         const saveButton = popup.querySelector('button');
+        const cancelButton = popup.querySelector('.cancel-btn'); // Gignite
 
         if (type === 'add') {
             popupTitle.textContent = 'Leave a Comment';
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             saveButton.onclick = saveComment; 
         }
 
+        cancelButton.onclick = closePopup; // Gignite
         popup.style.display = 'flex';
     }
 
