@@ -361,8 +361,8 @@ async function fetchReviews(courseId) {
 
             const likesText = `👍 ${review.likes || 0} Likes`;
             const dislikesText = `👎 ${review.dislikes || 0} Dislikes`;
-            // token &&
-            const reviewActions = ( token && review.user_id === currentUserId) ? `
+
+            const reviewActions = (token && review.user_id === currentUserId) ? `
                 <button onclick="editReview(this)">Edit</button>
                 <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
             ` : '';
