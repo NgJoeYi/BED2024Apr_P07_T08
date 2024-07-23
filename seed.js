@@ -285,30 +285,30 @@ async function run() {
 
         // Path to image files
         const imageFiles = {
-            colorBlindPlaceHolder: path.join(__dirname, 'public/Images/colourBlindQns2.jpg'),
+            colorBlindPlaceHolder: path.join(__dirname, 'public/Images/colourBlindPlaceHolder.jpg'),
             dyslexiaPlaceHolder: path.join(__dirname, 'public/Images/dyslexiaPlaceHolder.jpg'),
             depressionPlaceHolder: path.join(__dirname, 'public/Images/depressionPlaceHolder.jpg'),
             dysgraphiaPlaceHolder: path.join(__dirname, 'public/Images/dysgraphiaPlaceHolder.jpg'),
-            colorBlindQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
+            colorBlindQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns1.jpg'),
             colorBlindQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            colorBlindQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            colorBlindQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            colorBlindQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            visualAcuityQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            visualAcuityQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            visualAcuityQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            visualAcuityQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            visualAcuityQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            astigmatismQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            astigmatismQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            astigmatismQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            astigmatismQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            astigmatismQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            macularDegenerationQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            macularDegenerationQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            macularDegenerationQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            macularDegenerationQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg'),
-            macularDegenerationQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns2.jpg')
+            colorBlindQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns3.jpg'),
+            colorBlindQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns4.jpg'),
+            colorBlindQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/colourBlindQns5.jpg'),
+            visualAcuityQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/visualAcuityQns1.jpg'),
+            visualAcuityQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/visualAcuityQns2.jpg'),
+            visualAcuityQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/visualAcuityQns3.jpg'),
+            visualAcuityQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/visualAcuityQns4.jpg'),
+            visualAcuityQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/visualAcuityQns5.jpg'),
+            astigmatismQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/astigmatismQns1.jpg'),
+            astigmatismQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/astigmatismQns2.jpg'),
+            astigmatismQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/astigmatismQns3.jpg'),
+            astigmatismQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/astigmatismQns4.jpg'),
+            astigmatismQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/astigmatismQns5.jpg'),
+            macularDegenerationQns1: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/macularDegenerationQns1.jpg'),
+            macularDegenerationQns2: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/macularDegenerationQns2.jpg'),
+            macularDegenerationQns3: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/macularDegenerationQns3.jpg'),
+            macularDegenerationQns4: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/macularDegenerationQns4.jpg'),
+            macularDegenerationQns5: path.join(__dirname, '../BED2024Apr_P07_T08/public/Images/macularDegenerationQns5.jpg')
         };
 
         const imageBuffers = {};
@@ -340,11 +340,11 @@ async function run() {
         const insertQuestions = `
         INSERT INTO Questions (quiz_id, question_text, qnsImg, option_1, option_2, option_3, option_4, correct_option) VALUES
         -- Color Blindness Assessment Questions
-        (1, 'What number do you see in the image?', @colorBlindQns1, '12', '8', '5', 'None', '12'),
-        (1, 'Can you see a pattern in the following image?', @colorBlindQns2, 'Yes', 'No', 'Not sure', 'I see nothing', 'Yes'),
-        (1, 'What colors are visible in this image?', @colorBlindQns3, 'Red and Green', 'Blue and Yellow', 'Only Red', 'Only Green', 'Red and Green'),
-        (1, 'Identify the shapes in the image.', @colorBlindQns4, 'Circles', 'Squares', 'Triangles', 'None', 'Circles'),
-        (1, 'Do you see a number in this image?', @colorBlindQns5, 'Yes, it is 7', 'Yes, it is 3', 'No', 'Not sure', 'Yes, it is 7'),
+        (1, 'What number do you see in the image?', @colorBlindQns1, '8', '12', '5', 'None', '8'),
+        (1, 'What number do you see in the image?', @colorBlindQns2, '1', 'No', 'Not sure', 'I see nothing', '1'),
+        (1, 'What number do you see in the image?', @colorBlindQns3, '3', 'Blue and Yellow', 'Only Red', 'Only Green', '3'),
+        (1, 'What number do you see in the image?', @colorBlindQns4, '6', 'Squares', 'Triangles', 'None', '6'),
+        (1, 'Do you see a number in this image?', @colorBlindQns5, 'Yes, it is 5', 'Yes, it is 3', 'No', 'Not sure', 'Yes, it is 5'),
 
         -- Visual Acuity Test Questions
         (2, 'What is the smallest line you can read in this image?', @visualAcuityQns1, 'Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 3'),
