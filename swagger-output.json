@@ -10,46 +10,10 @@
   "schemes": [
     "http"
   ],
-  "tags": [ 
-  {
-    "name": "User",
-    "description": "Operations related to user accounts"
-  },
-  {
-    "name": "Quiz",
-    "description": "Operations related to quizzes"
-  },
-  {
-    "name": "Misc",
-    "description": "Miscellaneous operations"
-  },
-  {
-    "name": "Discussion",
-    "description": "Operations related to discussions"
-  },
-  {
-    "name": "Comment",
-    "description": "Operations related to comments"
-  },
-  {
-    "name": "Review",
-    "description": "Operations related to reviews"
-  },
-  {
-    "name": "Course",
-    "description": "Operations related to courses"
-  },
-  {
-    "name": "Lecture",
-    "description": "Operations related to lectures"
-  }
-]
-,
   "paths": {
     "/favicon.ico": {
       "get": {
         "description": "",
-        "tags": ["Misc"], 
         "responses": {
           "204": {
             "description": "No Content"
@@ -60,7 +24,6 @@
     "/register": {
       "post": {
         "description": "",
-        "tags": ["User"], 
         "parameters": [
           {
             "name": "body",
@@ -91,7 +54,6 @@
     "/login": {
       "post": {
         "description": "",
-        "tags": ["User"], 
         "parameters": [
           {
             "name": "body",
@@ -125,7 +87,6 @@
     "/account": {
       "get": {
         "description": "",
-        "tags": ["User"], 
         "parameters": [
           {
             "name": "authorization",
@@ -153,7 +114,6 @@
       },
       "put": {
         "description": "",
-        "tags": ["User"], 
         "parameters": [
           {
             "name": "authorization",
@@ -211,7 +171,6 @@
       },
       "delete": {
         "description": "",
-        "tags": ["User"], 
         "parameters": [
           {
             "name": "authorization",
@@ -232,8 +191,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "No Content"
           },
           "400": {
             "description": "Bad Request"
@@ -256,7 +215,6 @@
     "/account/profile": {
       "get": {
         "description": "",
-        "tags": ["User"],
         "parameters": [
           {
             "name": "authorization",
@@ -286,7 +244,6 @@
     "/account/getAllAttemptCount": {
       "get": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "authorization",
@@ -313,7 +270,6 @@
     "/account/getAttemptCountByQuizId": {
       "get": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "authorization",
@@ -340,7 +296,6 @@
     "/account/quizResult": {
       "get": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "authorization",
@@ -370,7 +325,6 @@
     "/account/uploadProfilePic": {
       "post": {
         "description": "",
-        "tags": ["User"], 
         "parameters": [
           {
             "name": "authorization",
@@ -412,7 +366,6 @@
     "/quizzes/statistics": {
       "get": {
         "description": "",
-        "tags": ["Quiz"], 
         "responses": {
           "200": {
             "description": "OK"
@@ -426,7 +379,6 @@
     "/quizzes": {
       "get": {
         "description": "",
-        "tags": ["Quiz"], 
         "responses": {
           "200": {
             "description": "OK"
@@ -441,7 +393,6 @@
       },
       "post": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "authorization",
@@ -489,7 +440,6 @@
     "/quizzes/{id}": {
       "get": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "id",
@@ -523,7 +473,6 @@
       },
       "put": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "id",
@@ -575,7 +524,6 @@
       },
       "delete": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "id",
@@ -614,7 +562,6 @@
     "/quizzes/{id}/questions": {
       "get": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "id",
@@ -648,7 +595,6 @@
       },
       "post": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "id",
@@ -699,7 +645,6 @@
     "/quizResult/{attemptId}": {
       "get": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "attemptId",
@@ -735,7 +680,6 @@
     "/submitQuiz": {
       "post": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "authorization",
@@ -786,7 +730,6 @@
     "/quizzes/{id}/questions/update": {
       "post": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "id",
@@ -840,7 +783,6 @@
     "/quizzes/{quizId}/questions/{questionId}": {
       "put": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "quizId",
@@ -913,7 +855,6 @@
       },
       "delete": {
         "description": "",
-        "tags": ["Quiz"], 
         "parameters": [
           {
             "name": "quizId",
@@ -961,7 +902,6 @@
     "/discussions": {
       "get": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "category",
@@ -990,7 +930,6 @@
       },
       "post": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "authorization",
@@ -1020,9 +959,6 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "401": {
             "description": "Unauthorized"
           },
@@ -1038,7 +974,6 @@
     "/discussions/user": {
       "get": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "authorization",
@@ -1065,7 +1000,6 @@
     "/discussions/{id}": {
       "get": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "id",
@@ -1099,7 +1033,6 @@
       },
       "put": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "id",
@@ -1132,9 +1065,6 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "401": {
             "description": "Unauthorized"
           },
@@ -1151,7 +1081,6 @@
       },
       "delete": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "id",
@@ -1187,7 +1116,6 @@
     "/discussions/{discussionId}/like": {
       "post": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "discussionId",
@@ -1220,7 +1148,6 @@
     "/discussions/{discussionId}/dislike": {
       "post": {
         "description": "",
-        "tags": ["Discussion"],
         "parameters": [
           {
             "name": "discussionId",
@@ -1253,7 +1180,6 @@
     "/discussions/{discussionId}/view": {
       "post": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "discussionId",
@@ -1286,7 +1212,6 @@
     "/discussions/{id}/pin": {
       "post": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "id",
@@ -1319,7 +1244,6 @@
     "/discussions/{id}/unpin": {
       "post": {
         "description": "",
-        "tags": ["Discussion"], 
         "parameters": [
           {
             "name": "id",
@@ -1352,7 +1276,6 @@
     "/comments": {
       "get": {
         "description": "",
-        "tags": ["Comment"], 
         "parameters": [
           {
             "name": "discussionId",
@@ -1371,7 +1294,6 @@
       },
       "post": {
         "description": "",
-        "tags": ["Comment"], 
         "parameters": [
           {
             "name": "authorization",
@@ -1416,14 +1338,6 @@
     "/comments/count": {
       "get": {
         "description": "",
-        "tags": ["Comment"], 
-        "parameters": [
-          {
-            "name": "discussionId",
-            "in": "query",
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -1437,7 +1351,6 @@
     "/comments/discussion/{discussionId}/count": {
       "get": {
         "description": "",
-        "tags": ["Comment"], 
         "parameters": [
           {
             "name": "discussionId",
@@ -1459,7 +1372,6 @@
     "/comments/{id}": {
       "put": {
         "description": "",
-        "tags": ["Comment"],
         "parameters": [
           {
             "name": "id",
@@ -1498,6 +1410,9 @@
           "403": {
             "description": "Forbidden"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1505,7 +1420,6 @@
       },
       "delete": {
         "description": "",
-        "tags": ["Comment"], 
         "parameters": [
           {
             "name": "id",
@@ -1529,6 +1443,51 @@
           "403": {
             "description": "Forbidden"
           },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/comments/{commentId}/like": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/comments/{commentId}/dislike": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1538,7 +1497,6 @@
     "/reviews": {
       "get": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "courseId",
@@ -1567,7 +1525,6 @@
       },
       "post": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "authorization",
@@ -1615,7 +1572,6 @@
     "/reviews/rating/{rating}": {
       "get": {
         "description": "",
-        "tags": ["Review"],
         "parameters": [
           {
             "name": "rating",
@@ -1637,7 +1593,6 @@
     "/reviews/sort/{sort}": {
       "get": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "sort",
@@ -1659,7 +1614,6 @@
     "/reviews/course/{courseId}": {
       "get": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "courseId",
@@ -1681,7 +1635,6 @@
     "/reviews/course/{courseId}/rating/{rating}": {
       "get": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "courseId",
@@ -1709,7 +1662,6 @@
     "/reviews/course/{courseId}/sort/{sort}": {
       "get": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "courseId",
@@ -1737,14 +1689,6 @@
     "/reviews/count": {
       "get": {
         "description": "",
-        "tags": ["Review"], 
-        "parameters": [
-          {
-            "name": "courseId",
-            "in": "query",
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -1758,7 +1702,6 @@
     "/reviews/course/{courseId}/count": {
       "get": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "courseId",
@@ -1780,7 +1723,6 @@
     "/reviews/user/{userId}/count": {
       "get": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "userId",
@@ -1802,7 +1744,6 @@
     "/reviews/{id}": {
       "put": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "id",
@@ -1857,7 +1798,6 @@
       },
       "delete": {
         "description": "",
-        "tags": ["Review"], 
         "parameters": [
           {
             "name": "id",
@@ -1890,10 +1830,51 @@
         }
       }
     },
+    "/reviews/{reviewId}/like": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "reviewId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/reviews/{reviewId}/dislike": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "reviewId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/courses/search": {
       "get": {
         "description": "",
-        "tags": ["Course"], 
         "parameters": [
           {
             "name": "term",
@@ -1920,7 +1901,6 @@
     "/courses": {
       "get": {
         "description": "",
-        "tags": ["Course"], 
         "responses": {
           "200": {
             "description": "OK"
@@ -1932,7 +1912,6 @@
       },
       "post": {
         "description": "",
-        "tags": ["Course"], 
         "parameters": [
           {
             "name": "authorization",
@@ -1974,7 +1953,6 @@
     "/courses/categories": {
       "get": {
         "description": "",
-        "tags": ["Course"],
         "responses": {
           "200": {
             "description": "OK"
@@ -1991,7 +1969,6 @@
     "/courses/filter": {
       "get": {
         "description": "",
-        "tags": ["Course"], 
         "parameters": [
           {
             "name": "category",
@@ -2015,7 +1992,6 @@
     "/courses/mostRecent": {
       "get": {
         "description": "",
-        "tags": ["Course"],
         "responses": {
           "200": {
             "description": "OK"
@@ -2032,7 +2008,6 @@
     "/courses/earliest": {
       "get": {
         "description": "",
-        "tags": ["Course"], 
         "responses": {
           "200": {
             "description": "OK"
@@ -2049,7 +2024,6 @@
     "/courses/{id}": {
       "get": {
         "description": "",
-        "tags": ["Course"], 
         "parameters": [
           {
             "name": "id",
@@ -2072,7 +2046,6 @@
       },
       "put": {
         "description": "",
-        "tags": ["Course"], 
         "parameters": [
           {
             "name": "id",
@@ -2118,7 +2091,6 @@
       },
       "delete": {
         "description": "",
-        "tags": ["Course"], 
         "parameters": [
           {
             "name": "id",
@@ -2154,7 +2126,6 @@
     "/courses/image/{id}": {
       "get": {
         "description": "",
-        "tags": ["Course"], 
         "produces": [
           "image/jpeg"
         ],
@@ -2182,7 +2153,6 @@
     "/courses/noLectures": {
       "delete": {
         "description": "",
-        "tags": ["Course"], 
         "parameters": [
           {
             "name": "authorization",
@@ -2209,10 +2179,32 @@
         }
       }
     },
+    "/lectures/checking": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
     "/lectures/last-chapter": {
       "get": {
         "description": "",
-        "tags": ["Lecture"], 
         "parameters": [
           {
             "name": "authorization",
@@ -2242,7 +2234,6 @@
     "/lectures": {
       "get": {
         "description": "",
-        "tags": ["Lecture"], 
         "responses": {
           "200": {
             "description": "OK"
@@ -2254,7 +2245,6 @@
       },
       "post": {
         "description": "",
-        "tags": ["Lecture"], 
         "parameters": [
           {
             "name": "authorization",
@@ -2308,7 +2298,6 @@
     "/lectures/max-course-id": {
       "get": {
         "description": "",
-        "tags": ["Lecture"], 
         "responses": {
           "200": {
             "description": "OK"
@@ -2322,7 +2311,6 @@
     "/lectures/course/{courseID}": {
       "get": {
         "description": "",
-        "tags": ["Lecture"], 
         "parameters": [
           {
             "name": "courseID",
@@ -2347,7 +2335,6 @@
     "/lectures/{id}": {
       "get": {
         "description": "",
-        "tags": ["Lecture"], 
         "parameters": [
           {
             "name": "id",
@@ -2370,7 +2357,6 @@
       },
       "put": {
         "description": "",
-        "tags": ["Lecture"], 
         "parameters": [
           {
             "name": "id",
@@ -2425,7 +2411,6 @@
       },
       "delete": {
         "description": "",
-        "tags": ["Lecture"], 
         "parameters": [
           {
             "name": "id",
@@ -2458,10 +2443,30 @@
         }
       }
     },
+    "/lectures/lecture-details/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/video/{lectureID}": {
       "get": {
         "description": "",
-        "tags": ["Lecture"], 
         "parameters": [
           {
             "name": "lectureID",
@@ -2486,7 +2491,6 @@
     "/lectures/course/{courseID}/chapter/{chapterName}": {
       "delete": {
         "description": "",
-        "tags": ["Lecture"], 
         "parameters": [
           {
             "name": "courseID",
@@ -2504,11 +2508,26 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "lectureIDs": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
