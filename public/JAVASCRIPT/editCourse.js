@@ -47,12 +47,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       });
 
       try {
-        const token = sessionStorage.getItem('token');
-        const response = await fetch(`/courses/${courseID}`, {
+        const response = await fetchWithAuth(`/courses/${courseID}`, {
           method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
           body: formData
         });
         if (!response.ok) {

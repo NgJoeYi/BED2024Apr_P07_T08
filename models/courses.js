@@ -15,6 +15,7 @@ class Courses {
         this.courseImage = courseImage;
     }
 
+    // getting all courses in the table 
     static async getAllCourses() {
         let pool;
         try {
@@ -30,6 +31,7 @@ class Courses {
         }
     }
 
+    // getting specific course by id 
     static async getCourseById(id) {
         let connection = await sql.connect(dbConfig);
         try {
@@ -60,7 +62,7 @@ class Courses {
         }
     }
 
-    // for filtering  by category
+    // getting all the categories for filtering by categories
     static async getAllCategories(){
         const connection = await sql.connect(dbConfig);
         try{
@@ -75,6 +77,7 @@ class Courses {
             await connection.close();
         }
     }
+    // for filtering  by category
     static async filterByCategory(category) {
         const connection = await sql.connect(dbConfig);
         try {
@@ -125,6 +128,7 @@ class Courses {
         }
     }
 
+    // updating courses logic 
     static async updateCourse(id, newCourseData) {
         const connection = await sql.connect(dbConfig);
         try {
@@ -157,6 +161,7 @@ class Courses {
         }
     }
 
+    // deleting courses with no lectures logic so all courses will have lectures inside it 
     static async deleteCourseWithNoLectures() {
         let connection;
         try {
@@ -184,6 +189,7 @@ class Courses {
         }
     }
     
+    // delete course logic 
     static async deleteCourse(id) {
         let pool;
         try {
@@ -204,7 +210,9 @@ class Courses {
             if (pool) await pool.close();
         }
     }
-        static async createCourse(newCourseData,id) {
+
+    // create course logic 
+    static async createCourse(newCourseData,id) {
         const connection = await sql.connect(dbConfig);
         try {
             const sqlQuery = `
@@ -232,7 +240,9 @@ class Courses {
         } finally {
             await connection.close();
         }
-    }    
+    }  
+    
+    // get course image for course.html course container 
     static async getCourseImage(id){
         const connection = await sql.connect(dbConfig);
         
@@ -253,6 +263,8 @@ class Courses {
         }
           
     }
+
+    // search course logic 
     static async searchCourses(searchTerm) {
         const connection = await sql.connect(dbConfig);
         try {
