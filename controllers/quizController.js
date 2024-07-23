@@ -449,14 +449,14 @@ const deleteQuestion = async (req, res) => {
 const submitQuiz = async (req, res) => {
     const { quizId, responses, timeTaken } = req.body; // ---------------------------------------------------- Extract quiz ID, responses, and time taken from the request body
     const userId = req.user.id; // --------------------------------------------------------------------------- Extract user ID
-    let totalScore = 0; // ----------------------------------------------------------------------------------- Initialize total score
+    let correctAnswersCount = 0; // Initialize count of correct answers
 
     try {
         const quizDetails = await Quiz.getQuizById(quizId); // ----------------------------------------------- Fetch the quiz details including total marks and total questions
         if (!quizDetails) {
             return res.status(404).json({ message: 'Quiz not found' }); // ----------------------------------- Return error if quiz not found
         }
-        // const totalMarks = quizDetails.total_marks; // need total marks to determine whether pass or fail 
+        const totalMarks = quizDetails.total_marks; // need total marks to determine whether pass or fail 
         const totalQuestions = quizDetails.total_questions; // ----------------------------------------------- Get total questions from quiz details
 
         // --------------------------------------------------------------------------------------------------- Check if all questions have responses
@@ -464,7 +464,7 @@ const submitQuiz = async (req, res) => {
             return res.status(400).json({ message: 'All questions must be answered.' });
         }
 
-        const attemptId = await Quiz.createQuizAttempt(userId, quizId, totalScore, false, timeTaken); // ----- Create the quiz attempt record before saving responses
+        const attemptId = await Quiz.createQuizAttempt(userId, quizId, 0, false, timeTaken); // -------------- Create the quiz attempt record before saving responses
 
         // ----------------------------------------------------------------------------------------------------Save each user response
         for (const response of responses) {
@@ -475,18 +475,18 @@ const submitQuiz = async (req, res) => {
             const correctOption = await Quiz.isCorrectAnswer(question_id); // -------------------------------- getting the correct option
             if (correctOption.toLowerCase() === selected_option.toLowerCase()) {
                 // console.log('each time i get correct');
-                totalScore++; // ----------------------------------------------------------------------------- Increment score for correct answers
+                correctAnswersCount++; // -------------------------------------------------------------------- Increment score for correct answers
             } else {
                 await Quiz.saveIncorrectAnswer(attemptId, question_id, selected_option, correctOption); // --- Save incorrect answer
             }
         }
 
-        const scorePercentage = (totalScore / totalQuestions) * 100; // ------------------------------------- Calculate score percentage
-        console.log('Score percentage:', scorePercentage);
-        const passed = scorePercentage >= 50; // more than 50% mean pass
+        const score = (correctAnswersCount / totalQuestions) * totalMarks;
+        console.log('Score percentage:', score);
+        const passed = (score / totalMarks) * 100 >= 50; // Determine if the user passed
         console.log('Passed:', passed);
 
-        await Quiz.updateQuizAttempt(attemptId, scorePercentage, passed); // -------------------------------- Update the quiz attempt record with the calculated score and passing status
+        await Quiz.updateQuizAttempt(attemptId, score, passed); // -------------------------------- Update the quiz attempt record with the calculated score and passing status
 
         res.status(200).json({ attemptId }); // ------------------------------------------------------------- Return the attempt ID
     } catch (error) {
