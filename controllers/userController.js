@@ -1,237 +1,103 @@
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); 
+const User = require('../models/User'); // ------------------------------------- Import Users model
+const bcrypt = require('bcryptjs'); // ----------------------------------------- Import the bcryptjs library for password hashing and comparison
+const jwt = require('jsonwebtoken'); // ---------------------------------------- Import the jsonwebtoken library for generating JWT tokens
 
-/**
- * @swagger
- * /users/current:
- *   get:
- *     summary: Retrieve the currently logged-in user by ID
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: User retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       404:
- *         description: User does not exist
- *       500:
- *         description: Server error
- */
+// Function to get a user by their ID
 const getUserById = async (req, res) => {
     //const userId = parseInt(req.params.id);
-    const userId = req.user.id;
+    const userId = req.user.id; // ------------------------------------------------------------------- Get the user ID from the request object
     try {
-        const user = await User.getUserById(userId);
+        const user = await User.getUserById(userId); // ---------------------------------------------- Fetch the user from the database using the user ID
         if (!user) {
-            return res.status(404).send('User does not exist');
+            return res.status(404).send('User does not exist'); // ----------------------------------- If user does not exist, send a 404 response
         }
-        res.status(200).json(user);
+        res.status(200).json(user); // --------------------------------------------------------------- Send the user data in the response
     } catch (error) {
-        console.error('Server error:', error); // Log error details
+        console.error('Server error:', error); // ---------------------------------------------------- Log error details
         res.status(500).send('Server error');
     }
 };
 
-/*
-// Commented out function
-const checkUserExist = async (req, res) => {
-    const { email } = req.body;
-    try {
-        const checkUser = await User.checkUserExist(email);
-        if (!checkUser) {
-            return res.status(404).send('User does not exist');
-        }
-        res.status(200).send(checkUser);
-    } catch (error) {
-        console.error('Server error:', error); // Log error details
-        res.status(500).send('Server error');
-    }
-};
-*/
-
-/**
- * @swagger
- * /users:
- *   post:
- *     summary: Create a new user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/User'
- *     responses:
- *       201:
- *         description: User created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 userId:
- *                   type: integer
- *       400:
- *         description: Email is already in use or could not create an account
- *       500:
- *         description: Server error
- */
+// Function to create a new user
 const createUser = async (req, res) => {
-    const newUserData = req.body;
+    const newUserData = req.body; // ----------------------------------------------------------------- Get the new user data from the request body
     try {
-        // Check if user already exists
-        const existingUser = await User.getUserByEmail(newUserData);
+        const existingUser = await User.getUserByEmail(newUserData); // ------------------------------ Check if a user with the provided email already exists
         if (existingUser) {
             return res.status(400).json({ message: 'Email is already in use' });
         } 
         // Hash the password
         const hashedPassword = await bcrypt.hash(newUserData.password, 10);
-        newUserData.password = hashedPassword; // Replace plain text password with hashed password  
+        newUserData.password = hashedPassword; // ---------------------------------------------------- Replace plain text password with hashed password  
                
-        const newUser = await User.createUser(newUserData); 
-        if (!newUser) {
+        const newUser = await User.createUser(newUserData); // --------------------------------------- Create a new user in the database
+        if (!newUser) { // --------------------------------------------------------------------------- If user creation fails, log and send an error response
             console.error('Error: User creation failed');
             return res.status(400).json({ message: 'Could not create an account' });
         }
-        res.status(201).json({ userId: newUser.id });
+        res.status(201).json({ userId: newUser.id }); // --------------------------------------------- Send the new user's ID in the response
     } catch (error) {
-        console.error('Server error:', error); // Log error details
+        console.error('Server error:', error); // ---------------------------------------------------- Log error details
         res.status(500).send('Server error');
     }
 };
 
-// --------------------------------------- JWT ---------------------------------------
-/**
- * @swagger
- * /users/login:
- *   post:
- *     summary: Log in a user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: User logged in successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                 role:
- *                   type: string
- *                 userId:
- *                   type: integer
- *       404:
- *         description: Invalid email or password
- *       500:
- *         description: Server error
- */
+// ************************************** JWT **************************************
+// Function to log in a user
 const loginUser = async (req, res) => {
-    const { email, password } = req.body; // user filled in email and password field
+    const { email, password } = req.body; // --------------------------------------------------------- Get the email and password from the request body
     try {
         // if (!password) {
         //     return res.status(400).json({ message: 'Please enter your password' });
-        // }
+        // } did it in middleware alr
 
-        const loginSuccess = await User.getUserByEmail({ email });
-        if (!loginSuccess) {
+        const loginSuccess = await User.getUserByEmail({ email }); // -------------------------------- Fetch the user by email
+        if (!loginSuccess) { // ---------------------------------------------------------------------- If no user is found, send a 404 response
             return res.status(404).send( { message: 'Invalid email. No user found'} );
         }
-        const matchPassword = await bcrypt.compare(password, loginSuccess.password);
-        if (!matchPassword) {
+        const matchPassword = await bcrypt.compare(password, loginSuccess.password); // -------------- Compare the provided password with the stored hashed password
+        if (!matchPassword) { // --------------------------------------------------------------------- If the password does not match, send a 404 response
             return res.status(404).json( { message: 'Invalid password. Please try again'} );
         }
 
-        const payload = {
+        const payload = { // ------------------------------------------------------------------------- Create a JWT payload with the user's ID and role
             id: loginSuccess.id,
             role: loginSuccess.role,
         };
-        const token = jwt.sign(payload, process.env.SECRET_TOKEN, { expiresIn: '3600s' });
-        res.status(200).json({ token, role: loginSuccess.role,  userId: loginSuccess.id });
+        const token = jwt.sign(payload, process.env.SECRET_TOKEN, { expiresIn: '3600s' }); // -------- Generate a JWT token with a 1-hour expiration time
+        res.status(200).json({ token, role: loginSuccess.role,  userId: loginSuccess.id }); // ------- Send the token, role, and user ID in the response, user id is for front end visibility purpose.
         //res.status(200).json(loginSuccess);
     } catch (error) {
-        console.error('Server error:', error); // Log error details
+        console.error('Server error:', error); // ---------------------------------------------------- Log error details
         res.status(500).send('Server error');
     }
 };
-// --------------------------------------- JWT ---------------------------------------
+// ************************************** JWT **************************************
 
-/**
- * @swagger
- * /users:
- *   put:
- *     summary: Update the current user's information
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               dob:
- *                 type: string
- *               currentPassword:
- *                 type: string
- *               newPassword:
- *                 type: string
- *     responses:
- *       200:
- *         description: User updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       400:
- *         description: Current password is required, email is already in use, or other validation errors
- *       404:
- *         description: User does not exist
- *       500:
- *         description: Server error
- */
+// Function to update user data
 const updateUser = async (req, res) => {
-    const userId = req.user.id;
-    const newUserData = req.body;
+    const userId = req.user.id; // ------------------------------------------------------------------ Get the user ID from the request object
+    const newUserData = req.body; // ---------------------------------------------------------------- Get the new user data from the request body
     try {
-        // get the current user 
-        const user = await User.getUserById(userId);
-        if (!user) {
+        const user = await User.getUserById(userId); // --------------------------------------------- Get the current user 
+        if (!user) { // ----------------------------------------------------------------------------- If user does not exist, send a 404 response
             return res.status(404).json({ message: 'User does not exist' });
         }
 
-        // if there were changes made to the email, check if the email alr exists
-        if (newUserData.email !== user.email) {
+        if (newUserData.email !== user.email) { // -------------------------------------------------- If there were changes made to the email, check if the email alr exists
             const checkEmailExist = await User.getUserByEmail(newUserData);
             if (checkEmailExist) {
-                return res.status(400).json({ message: 'Email is already in use' }); // -- checked message appears
+                return res.status(400).json({ message: 'Email is already in use' }); // note to self: check message appears (edit: done)
             }
         }
 
-        if (newUserData.newPassword) {
+        if (newUserData.newPassword) { // ----------------------------------------------------------- Check if the user wants to change their password
             if (!newUserData.currentPassword) {
                 return res.status(400).json({ message: 'Current password is required to set a new password' });
             }
             const isPasswordMatch = await bcrypt.compare(newUserData.currentPassword, user.password);
             if (!isPasswordMatch) {
-                return res.status(400).json({ message: 'Current password is incorrect' }); // -- checked message appears
+                return res.status(400).json({ message: 'Current password is incorrect' }); // note to self: check message appears. (edit: done)
             }
             if (newUserData.newPassword === newUserData.currentPassword) {
                 return res.status(400).json({ message: 'New password cannot be the same as the current password' });
@@ -241,163 +107,90 @@ const updateUser = async (req, res) => {
             newUserData.password = user.password;
         }
 
-        const updatedUser = await User.updateUser(userId, {
+        const updatedUser = await User.updateUser(userId, { // -------------------------------------- Update the user data in the database
             name: newUserData.name || user.name,
             email: newUserData.email || user.email,
             dob: newUserData.dob || user.dob,
             password: newUserData.password
         });
 
-        res.status(200).json(updatedUser);
+        res.status(200).json(updatedUser); // ------------------------------------------------------ Send the updated user data in the response
     } catch (error) {
-        console.error('Server error:', error); // Log error details
+        console.error('Server error:', error); // -------------------------------------------------- Log error details
         res.status(500).send('Server error');
     }
 };
 
 
-/**
- * @swagger
- * /users:
- *   delete:
- *     summary: Delete the current user account
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               password:
- *                 type: string
- *     responses:
- *       204:
- *         description: Account deleted successfully
- *       400:
- *         description: Please enter your password or password is incorrect
- *       404:
- *         description: User does not exist
- *       500:
- *         description: Server error
- */
-// after implementing the basics i want to prompt user to enter password before account is actually deleted (edit: done)
+// note to self: after implementing the basics i want to prompt user 
+// to enter password before account is actually deleted (edit: done)
+// Function to delete a user account
 const deleteUser = async (req, res) => {
-    const userId = req.user.id;
-    const { password } = req.body;
+    const userId = req.user.id;    // ------------------------------------------------------------- Get the user ID from the request object
+    const { password } = req.body; // ------------------------------------------------------------- Get the password from the request body
     try {
-        if (!password) {
-            return res.status(400).json({ message: 'Please enter your password' }); // -- checked message appears
+        if (!password) { // ----------------------------------------------------------------------- If no password is provided, send a 400 response
+            return res.status(400).json({ message: 'Please enter your password' }); // note to self: check message appears (edit: done)
         }
 
-        const checkUser = await User.getUserById(userId);
-        if (!checkUser) {
+        const checkUser = await User.getUserById(userId); // -------------------------------------- Fetch the user data from the database
+        if (!checkUser) { // ---------------------------------------------------------------------- If user does not exist, send a 404 response
             return res.status(404).json({ message: 'User does not exist' });
         }
 
-        // Compare current password and the password in the database 
-        const isPasswordMatch = await bcrypt.compare(password, checkUser.password);
-        if (!isPasswordMatch) {
-            return res.status(400).json({ message: 'Password is incorrect' }); // -- checked message appears
+        const isPasswordMatch = await bcrypt.compare(password, checkUser.password); // ------------ Compare current password and the password in the database 
+        if (!isPasswordMatch) { // ---------------------------------------------------------------- If the password does not match, send a 400 response
+            return res.status(400).json({ message: 'Password is incorrect' }); // note to self: check message appears (edit: done)
         }
 
-        const deleteFK = await User.deleteUtility();
-        if (!deleteFK) {
+        const deleteFK = await User.deleteUtility(); // ------------------------------------------- Delete user-related records (foreign keys)
+        if (!deleteFK) { // ----------------------------------------------------------------------- If deletion of user-related records fails, send a 500 response
             return res.status(500).json({ message: 'Failed to delete user-related records' });
         }
-        const userDeleted = await User.deleteUser(userId);
-        if (!userDeleted) {
+        const userDeleted = await User.deleteUser(userId); // ------------------------------------- Delete the user from the database
+        if (!userDeleted) { // -------------------------------------------------------------------- If user deletion fails, send a 500 response
             return res.status(500).json({ message: 'Failed to delete user' });
         }
-        res.status(204).json({ message: 'Account deleted successfully' }); // -- checked message appears
+        res.status(204).json({ message: 'Account deleted successfully' }); // --------------------- Send a success response with no content
     } catch (error) {
-        console.error('Server error:', error);
+        console.error('Server error:', error); // ------------------------------------------------- Log error details
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
-/**
- * @swagger
- * /users/profile-pic:
- *   put:
- *     summary: Update the profile picture of the currently logged-in user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               profilePic:
- *                 type: string
- *     responses:
- *       200:
- *         description: Profile picture updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 profilePic:
- *                   type: string
- *       400:
- *         description: Failed to update profile picture
- *       500:
- *         description: Server error
- */
+// Function to update the user's profile picture
 const updateProfilePic = async (req, res) => {
-    const userId = req.user.id;
-    const { profilePic } = req.body;
+    const userId = req.user.id; // --------------------------------------------------------------- Get the user ID from the request object
+    const { profilePic } = req.body; // ---------------------------------------------------------- Get the new profile picture URL from the request body
 
     try {
-        const updatedProfilePic = await User.updateProfilePic(userId, profilePic);
-        if (!updatedProfilePic) {
+        const updatedProfilePic = await User.updateProfilePic(userId, profilePic); // ------------ Update the profile picture in the database
+        if (!updatedProfilePic) { // ------------------------------------------------------------- If profile picture update fails, send a 400 response
             return res.status(400).send('Failed to update profile picture');
         }
-        res.status(200).json(updatedProfilePic);
+        res.status(200).json(updatedProfilePic); // ---------------------------------------------- Send the updated profile picture data in the response
     } catch (error) {
-        console.error('Server error:', error);
+        console.error('Server error:', error); // ------------------------------------------------ Log error details
         res.status(500).send('Server error');
     }
 };
 
-/**
- * @swagger
- * /users/profile-pic:
- *   get:
- *     summary: Get the profile picture of the currently logged-in user
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: Profile picture retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 profilePic:
- *                   type: string
- *       404:
- *         description: User does not exist
- *       500:
- *         description: Server error
- */
+// Function to get the user's profile picture by their ID
 const getProfilePicByUserId = async (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user.id; // -------------------------------------------------------------- Get the user ID from the request object
     try {
-        const user = await User.getUserById(userId);
-        if (!user) {
+        const user = await User.getUserById(userId); // ----------------------------------------- Fetch the user data from the database
+        if (!user) { // ------------------------------------------------------------------------- If user does not exist, send a 404 response
             return res.status(404).send('User does not exist');
         }
 
-        let profilePic = await User.getProfilePicByUserId(userId);
-        if (!profilePic) {
+        let profilePic = await User.getProfilePicByUserId(userId); // -------------------------- Fetch the profile picture from the database
+        if (!profilePic) { // ------------------------------------------------------------------ If no profile picture is found, set a default profile picture
             profilePic = 'images/profilePic.jpeg'; // Default profile picture
         }
-        res.status(200).json({ profilePic });
+        res.status(200).json({ profilePic }); // ----------------------------------------------- Send the profile picture data in the response
     } catch (error) {
-        console.error('Server error:', error);
+        console.error('Server error:', error); // ---------------------------------------------- Log error details
         res.status(500).send('Server error');
     }
 };
