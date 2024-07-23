@@ -1,31 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const attemptId = urlParams.get('attemptId');
-    fetchQuizResult(attemptId);
+    const urlParams = new URLSearchParams(window.location.search); // Parse URL parameters
+    const attemptId = urlParams.get('attemptId'); // Get the attempt ID from the URL
+    fetchQuizResult(attemptId); // Fetch the quiz result for the given attempt ID
 });
 
+// Function to fetch quiz result
 function fetchQuizResult(attemptId) {
     fetchWithAuth(`/quizResult/${attemptId}`) // ------------------------------------------------- headers in jwtutility.js
     .then(response => {
         if (!response) return; // ********************** jwt
-        return response.json();
+        return response.json(); // Parse the JSON response
     })
     .then(result => {
         console.log('Quiz result:', result); // Log the result to debug
         if (result) {
-            displayResult(result);
+            displayResult(result); // Display the result if available
         } else {
-            console.error('Quiz result not found');
-            document.getElementById('result-container').innerText = 'Quiz result not available.';
+            console.error('Quiz result not found'); // Log error if result not found
+            document.getElementById('result-container').innerText = 'Quiz result not available.'; // Display error message
         }
     })
-    .catch(error => console.error('Error fetching quiz result:', error));
+    .catch(error => console.error('Error fetching quiz result:', error));  // Log any errors that occur
 }
 
+// Function to display quiz result
 function displayResult(result) {
-    const resultContainer = document.getElementById('result-container');
+    const resultContainer = document.getElementById('result-container');  // Get the result container element
 
-    const attemptDateStr = result.AttemptDate;
+    const attemptDateStr = result.AttemptDate; // Get the attempt date
 
     // Split the date string into date and time parts
     const [datePart, timePart] = attemptDateStr.split('T');
@@ -36,7 +38,7 @@ function displayResult(result) {
     const formattedDate = `${day}/${month}/${year} ${hour}:${minute}:${second.slice(0, 2)}`;
 
 
-
+    // Set the inner HTML of the result container
     resultContainer.innerHTML = `
         <div class="result-card">
             <h2>Quiz Results</h2>
@@ -63,16 +65,18 @@ function displayResult(result) {
                         </div>
                     `).join('')}
             </div>
-            <button id="retake-quiz" onclick="retakeQuiz(${result.QuizID})">Retake Quiz</button>
+            <button id="retake-quiz" onclick="retakeQuiz()">Back to Quiz</button>
             <button id="back-to-home" onclick="backToQuizzes()">Back to home</button>
         </div>
     `;
 }
 
-function retakeQuiz(quizId) {
-    window.location.href = `quiz.html?quizId=${quizId}`;
+// Function to retake the quiz
+function retakeQuiz() {
+    window.location.href = `quiz.html`;
 }
 
+// Function to go back to the quizzes
 function backToQuizzes() {
     window.location.href = 'index.html';
 }
