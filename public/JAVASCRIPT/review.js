@@ -44,25 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const hamburger = document.querySelector('.hamburger');
-    const sidebar = document.querySelector('.sidebar');
-    hamburger.addEventListener('click', () => {
-
-        // Basially when sidebar = 250px, means hamburger is already opened. So when user click the already opened hamburger, they will close the hamburger by making hamburger narrower and hiding all of the sub-navs
-        if (sidebar.style.width === "250px" || sidebar.style.width === "") {
-            sidebar.style.width = "60px";
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.style.display = 'none'; // Hide all nav-item
-            });
-        // Hamburger not opened yet. So when user clicks, hamburger will open
-        } else {
-            sidebar.style.width = "250px";
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.style.display = 'block'; // Display all nav-item
-            });
-        }
-    });
-
     const reviewStars = document.querySelectorAll('.review .fa-star');
     reviewStars.forEach(star => {
         star.addEventListener('click', () => {

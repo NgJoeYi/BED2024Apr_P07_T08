@@ -6,7 +6,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-
+// Retrieve and display all lectures
 const getAllLectures = async (req, res) => {
     try {
         const getAllLectures = await Lectures.getAllLectures();
@@ -16,6 +16,8 @@ const getAllLectures = async (req, res) => {
         res.status(500).send('Error retrieving lectures');
     }
 };
+
+// Retrieve details for a specific lecture by ID
 const getLectureDetails = async (req,res)=>{
     const id  = parseInt(req.params.id);
     try{
@@ -28,6 +30,8 @@ const getLectureDetails = async (req,res)=>{
     }
 }
 
+
+// Retrieve a specific lecture by ID
 const getLectureByID = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -42,6 +46,7 @@ const getLectureByID = async (req, res) => {
     }
 };
 
+// Delete a specific lecture by ID, ensuring the user has permission
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
     const userID = req.user.id;
@@ -66,6 +71,8 @@ const deleteLecture = async (req, res) => {
     }
 };
 
+
+// Delete a chapter by its name, ensuring the user has permission
 const deletingChapterName = async (req, res) => {
     const { courseID, chapterName } = req.params;
     const { lectureIDs } = req.body;
@@ -98,7 +105,7 @@ const deletingChapterName = async (req, res) => {
     }
 };
 
-
+// Update a lecture's information, ensuring the user has permission
 const updateLecture = async (req, res) => {
     const userID = req.user.id; // user id that logged on now 
     // lecture id 
@@ -140,6 +147,7 @@ const updateLecture = async (req, res) => {
     }
 };
 
+// Retrieve the name of the last chapter for the current user so user can have multiple lecture under a chapter
 const getLastChapterName = async (req, res) => {
     const userID = req.user.id;
     try {
@@ -153,6 +161,9 @@ const getLastChapterName = async (req, res) => {
         res.status(500).send('Error getting chapter name');
     }
 };
+
+
+// Retrieve the maximum course ID from the database so we can create new course id
 const getMaxCourseID = async (req, res) => {
     try {
         const maxCourseID = await Lectures.getMaxCourseID();
@@ -163,6 +174,7 @@ const getMaxCourseID = async (req, res) => {
     }
 };
 
+// Create a new lecture
 const createLecture = async (req, res) => {
     const { Title, Duration, Description, ChapterName, CourseID } = req.body;
     const UserID = req.user.id;
