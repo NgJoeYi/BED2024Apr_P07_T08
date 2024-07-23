@@ -6,7 +6,24 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Retrieve and display all lectures
+/**
+ * @swagger
+ * /lectures:
+ *   get:
+ *     summary: Get all lectures
+ *     tags: [Lectures]
+ *     responses:
+ *       200:
+ *         description: A list of lectures
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Lecture'
+ *       500:
+ *         description: Error retrieving lectures
+ */
 const getAllLectures = async (req, res) => {
     try {
         const getAllLectures = await Lectures.getAllLectures();
@@ -17,21 +34,67 @@ const getAllLectures = async (req, res) => {
     }
 };
 
-// Retrieve details for a specific lecture by ID
-const getLectureDetails = async (req,res)=>{
-    const id  = parseInt(req.params.id);
-    try{
+/**
+ * @swagger
+ * /lectures/{id}:
+ *   get:
+ *     summary: Get lecture details by ID
+ *     tags: [Lectures]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The lecture ID
+ *     responses:
+ *       200:
+ *         description: Lecture details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Lecture'
+ *       404:
+ *         description: Lecture not found
+ *       500:
+ *         description: Error retrieving lecture
+ */
+const getLectureDetails = async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
         const getLectureDetails = await Lectures.getLectureDetails(id);
         res.json(getLectureDetails);
-
-    }catch (error) {
+    } catch (error) {
         console.error(error);
         res.status(500).send('Error retrieving lectures');
     }
-}
+};
 
-
-// Retrieve a specific lecture by ID
+/**
+ * @swagger
+ * /lectures/{id}:
+ *   get:
+ *     summary: Get lecture by ID
+ *     tags: [Lectures]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The lecture ID
+ *     responses:
+ *       200:
+ *         description: Lecture data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Lecture'
+ *       404:
+ *         description: Lecture not found
+ *       500:
+ *         description: Error retrieving lecture
+ */
 const getLectureByID = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -46,14 +109,36 @@ const getLectureByID = async (req, res) => {
     }
 };
 
-// Delete a specific lecture by ID, ensuring the user has permission
+/**
+ * @swagger
+ * /lectures/{id}:
+ *   delete:
+ *     summary: Delete a lecture by ID
+ *     tags: [Lectures]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The lecture ID
+ *     responses:
+ *       204:
+ *         description: Lecture successfully deleted
+ *       403:
+ *         description: Permission denied
+ *       404:
+ *         description: Lecture not found
+ *       500:
+ *         description: Error deleting lecture
+ */
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
     const userID = req.user.id;
     try {
         const lecture = await Lectures.getLectureByID(lectureID);
         if (!lecture) {
-          return res.status(404).json({ message: "Lecture not found" });
+            return res.status(404).json({ message: "Lecture not found" });
         }
         // Check if the user is the creator of the lecture
         if (lecture.userID !== userID) {
@@ -71,8 +156,48 @@ const deleteLecture = async (req, res) => {
     }
 };
 
-
-// Delete a chapter by its name, ensuring the user has permission
+/**
+ * @swagger
+ * /lectures/{courseID}/{chapterName}:
+ *   delete:
+ *     summary: Delete a chapter by name
+ *     tags: [Lectures]
+ *     parameters:
+ *       - in: path
+ *         name: courseID
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The course ID
+ *       - in: path
+ *         name: chapterName
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The chapter name
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               lectureIDs:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       204:
+ *         description: Chapter successfully deleted
+ *       400:
+ *         description: Invalid lecture IDs provided
+ *       403:
+ *         description: Permission denied
+ *       404:
+ *         description: Chapter not found
+ *       500:
+ *         description: Error deleting chapter
+ */
 const deletingChapterName = async (req, res) => {
     const { courseID, chapterName } = req.params;
     const { lectureIDs } = req.body;
@@ -105,7 +230,58 @@ const deletingChapterName = async (req, res) => {
     }
 };
 
-// Update a lecture's information, ensuring the user has permission
+/**
+ * @swagger
+ * /lectures/{id}:
+ *   put:
+ *     summary: Update a lecture by ID
+ *     tags: [Lectures]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The lecture ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               chapterName:
+ *                 type: string
+ *               duration:
+ *                 type: string
+ *               video:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Lecture updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Lecture'
+ *                 userID:
+ *                   type: integer
+ *       403:
+ *         description: Permission denied
+ *       404:
+ *         description: Lecture not found
+ *       500:
+ *         description: Error updating lecture
+ */
 const updateLecture = async (req, res) => {
     const userID = req.user.id; // user id that logged on now 
     // lecture id 
@@ -133,21 +309,41 @@ const updateLecture = async (req, res) => {
         Video: video
     };
     try {
-        if(userID != existingLecture.userID){
+        if (userID != existingLecture.userID) {
             return res.status(403).send('You do not have permission to edit the lecture');
         }
         const updateResult = await Lectures.updateLecture(id, newLectureData);
         if (!updateResult) {
             return res.status(404).send('Lecture not found!');
         }
-        res.json({ message: 'Lecture updated successfully', data: updateResult, userID : userID });
+        res.json({ message: 'Lecture updated successfully', data: updateResult, userID: userID });
     } catch (error) {
         console.error('Error updating lecture:', error);
         res.status(500).send('Error updating lecture');
     }
 };
 
-// Retrieve the name of the last chapter for the current user so user can have multiple lecture under a chapter
+/**
+ * @swagger
+ * /lectures/last-chapter:
+ *   get:
+ *     summary: Get the last chapter name for the logged-in user
+ *     tags: [Lectures]
+ *     responses:
+ *       200:
+ *         description: Chapter name retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 chapterName:
+ *                   type: string
+ *       404:
+ *         description: Chapter name not found
+ *       500:
+ *         description: Error getting chapter name
+ */
 const getLastChapterName = async (req, res) => {
     const userID = req.user.id;
     try {
@@ -162,8 +358,25 @@ const getLastChapterName = async (req, res) => {
     }
 };
 
-
-// Retrieve the maximum course ID from the database so we can create new course id
+/**
+ * @swagger
+ * /lectures/max-course-id:
+ *   get:
+ *     summary: Get the maximum course ID
+ *     tags: [Lectures]
+ *     responses:
+ *       200:
+ *         description: Max course ID retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 maxCourseID:
+ *                   type: integer
+ *       500:
+ *         description: Error retrieving max course ID
+ */
 const getMaxCourseID = async (req, res) => {
     try {
         const maxCourseID = await Lectures.getMaxCourseID();
@@ -174,7 +387,59 @@ const getMaxCourseID = async (req, res) => {
     }
 };
 
-// Create a new lecture
+/**
+ * @swagger
+ * /lectures:
+ *   post:
+ *     summary: Create a new lecture
+ *     tags: [Lectures]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               Title:
+ *                 type: string
+ *               Duration:
+ *                 type: string
+ *               Description:
+ *                 type: string
+ *               ChapterName:
+ *                 type: string
+ *               CourseID:
+ *                 type: integer
+ *               Video:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Lecture created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 LectureID:
+ *                   type: integer
+ *                 Title:
+ *                   type: string
+ *                 Duration:
+ *                   type: string
+ *                 Description:
+ *                   type: string
+ *                 Position:
+ *                   type: integer
+ *                 ChapterName:
+ *                   type: string
+ *                 Video:
+ *                   type: string
+ *       400:
+ *         description: UserID or CourseID not provided
+ *       500:
+ *         description: Error creating lecture
+ */
 const createLecture = async (req, res) => {
     const { Title, Duration, Description, ChapterName, CourseID } = req.body;
     const UserID = req.user.id;
@@ -211,7 +476,34 @@ const createLecture = async (req, res) => {
     }
 };
 
- 
+/**
+ * @swagger
+ * /lectures/video/{lectureID}:
+ *   get:
+ *     summary: Get lecture video by ID
+ *     tags: [Lectures]
+ *     parameters:
+ *       - in: path
+ *         name: lectureID
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The lecture ID
+ *     responses:
+ *       200:
+ *         description: Video data
+ *         content:
+ *           video/mp4:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Invalid lecture ID
+ *       404:
+ *         description: Video not found
+ *       500:
+ *         description: Internal server error
+ */
 const getLectureVideoByID = async (req, res) => {
     const lectureID = parseInt(req.params.lectureID, 10);
 
@@ -237,6 +529,33 @@ const getLectureVideoByID = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /lectures/course/{courseID}:
+ *   get:
+ *     summary: Get lectures by course ID
+ *     tags: [Lectures]
+ *     parameters:
+ *       - in: path
+ *         name: courseID
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The course ID
+ *     responses:
+ *       200:
+ *         description: A list of lectures
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Lecture'
+ *       400:
+ *         description: Invalid course ID
+ *       500:
+ *         description: Internal server error
+ */
 const getLecturesByCourseID = async (req, res) => {
     const courseID = parseInt(req.params.courseID);
     console.log(`Received courseID: ${courseID}`);
@@ -256,12 +575,28 @@ const getLecturesByCourseID = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /lectures/user:
+ *   get:
+ *     summary: Check the current logged-in user ID
+ *     tags: [Lectures]
+ *     responses:
+ *       200:
+ *         description: Current logged-in user ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userID:
+ *                   type: integer
+ */
 const checkingUserID = async (req, res) => {
     const userID = req.user.id;
     console.log('Current logged-in user ID:', userID);
     res.json({ userID });
 };
-
 
 module.exports = {
     getAllLectures,

@@ -2,6 +2,42 @@ const sql = require('mssql');
 const dbConfig = require('../dbConfig');
 const reviewModel = require('../models/Review');
 
+/**
+ * @swagger
+ * /reviews:
+ *   get:
+ *     summary: Get all reviews
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: query
+ *         name: courseId
+ *         schema:
+ *           type: string
+ *         description: ID of the course to filter reviews
+ *       - in: query
+ *         name: filter
+ *         schema:
+ *           type: string
+ *           default: all
+ *         description: Filter for reviews
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           default: mostRecent
+ *         description: Sort order of reviews
+ *     responses:
+ *       200:
+ *         description: A list of reviews
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       500:
+ *         description: Error retrieving reviews
+ */
 const getReviews = async (req, res) => {
     const { courseId, filter = 'all', sort = 'mostRecent' } = req.query;
     try {
@@ -18,6 +54,44 @@ const getReviews = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews:
+ *   post:
+ *     summary: Create a new review
+ *     tags: [Reviews]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - review_text
+ *               - rating
+ *               - courseId
+ *             properties:
+ *               review_text:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *               courseId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Review created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Review'
+ *       500:
+ *         description: Error creating review
+ */
 const createReview = async (req, res) => {
     const { review_text, rating, courseId } = req.body;
     const userId = req.user.id;
@@ -31,6 +105,49 @@ const createReview = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/{id}:
+ *   put:
+ *     summary: Update a review
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the review to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               review_text:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *               courseId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Review updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Review'
+ *       404:
+ *         description: Review not found
+ *       500:
+ *         description: Error updating review
+ */
 const updateReview = async (req, res) => {
     const { id } = req.params; // Review Id
     const { review_text, rating, courseId } = req.body;
@@ -42,10 +159,6 @@ const updateReview = async (req, res) => {
             return res.status(404).json({ error: 'Review not found' });
         }
 
-        // ******** DONT NEED DO THIS BC TO CHECK USERID IS ALREADY DONE USING verifyJWT MIDDLEWARE ******
-        // if (review.user_id !== userId) {
-        //     return res.status(403).json({ error: 'You can only edit your own reviews.' });
-        // } 
         const result = await reviewModel.updateReview(id, review_text, rating, courseId);
         res.status(200).json({ message: 'Review updated successfully', data: result });
 
@@ -55,6 +168,36 @@ const updateReview = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/{id}:
+ *   delete:
+ *     summary: Delete a review
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the review to delete
+ *     responses:
+ *       200:
+ *         description: Review deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/Review'
+ *       404:
+ *         description: Review not found
+ *       500:
+ *         description: Error deleting review
+ */
 const deleteReview = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
@@ -67,12 +210,6 @@ const deleteReview = async (req, res) => {
             return res.status(404).json({ error: 'Review not found' });
         }
         
-        // ******** DONT NEED DO THIS BC TO CHECK USERID IS ALREADY DONE USING verifyJWT MIDDLEWARE ******
-        // if (parseInt(review.user_id, 10) !== parseInt(userId, 10)) {
-        //     console.error('User not authorized to delete this review');
-        //     return res.status(403).send('You can only delete your own reviews.');
-        // }
-        
         const result = await reviewModel.deleteReview(id);
         res.status(200).json({ message: 'Review deleted successfully', data: result });
         
@@ -82,6 +219,25 @@ const deleteReview = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/count:
+ *   get:
+ *     summary: Get review count
+ *     tags: [Reviews]
+ *     responses:
+ *       200:
+ *         description: Review count
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: number
+ *       500:
+ *         description: Error fetching review count
+ */
 const getReviewCount = async (req, res) => {
     try {
         const count = await reviewModel.getReviewCount();
@@ -92,7 +248,33 @@ const getReviewCount = async (req, res) => {
     }
 }
 
-const getReviewCountByCourseId= async (req, res) => {
+/**
+ * @swagger
+ * /reviews/count/course/{courseId}:
+ *   get:
+ *     summary: Get review count by course ID
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the course
+ *     responses:
+ *       200:
+ *         description: Review count by course ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: number
+ *       500:
+ *         description: Error fetching review count by course ID
+ */
+const getReviewCountByCourseId = async (req, res) => {
     const { courseId } = req.params;
     try {
         const count = await reviewModel.getReviewCountByCourseId(courseId);
@@ -103,6 +285,32 @@ const getReviewCountByCourseId= async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/count/user/{userId}:
+ *   get:
+ *     summary: Get review count by user ID
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the user
+ *     responses:
+ *       200:
+ *         description: Review count by user ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: number
+ *       500:
+ *         description: Error fetching review count by user ID
+ */
 const getReviewCountByUserId = async (req, res) => {
     const { userId } = req.params;
     try {
@@ -114,7 +322,31 @@ const getReviewCountByUserId = async (req, res) => {
     }
 }
 
-
+/**
+ * @swagger
+ * /reviews/rating/{rating}:
+ *   get:
+ *     summary: Get reviews by rating
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: rating
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: Rating to filter reviews
+ *     responses:
+ *       200:
+ *         description: Reviews by rating
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       500:
+ *         description: Error retrieving reviews by rating
+ */
 const getReviewsByRating = async (req, res) => {
     const { rating } = req.params;
     try {
@@ -126,6 +358,31 @@ const getReviewsByRating = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/sort/{sort}:
+ *   get:
+ *     summary: Get reviews sorted by rating
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: sort
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Sort order of reviews
+ *     responses:
+ *       200:
+ *         description: Reviews sorted by rating
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       500:
+ *         description: Error retrieving reviews sorted by rating
+ */
 const getReviewsSortedByRating = async (req, res) => {
     const { sort } = req.params;
     try {
@@ -137,6 +394,31 @@ const getReviewsSortedByRating = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/course/{courseId}:
+ *   get:
+ *     summary: Get reviews by course ID
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the course
+ *     responses:
+ *       200:
+ *         description: Reviews by course ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       500:
+ *         description: Error retrieving reviews by course ID
+ */
 const getReviewsByCourseId = async (req, res) => {
     const { courseId } = req.params;
     try {
@@ -148,6 +430,37 @@ const getReviewsByCourseId = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/course/{courseId}/rating/{rating}:
+ *   get:
+ *     summary: Get reviews by course ID and rating
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the course
+ *       - in: path
+ *         name: rating
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: Rating to filter reviews
+ *     responses:
+ *       200:
+ *         description: Reviews by course ID and rating
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       500:
+ *         description: Error retrieving reviews by course ID and rating
+ */
 const getReviewsByCourseIdAndRating = async (req, res) => {
     const { courseId, rating } = req.params;
     try {
@@ -159,6 +472,37 @@ const getReviewsByCourseIdAndRating = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/course/{courseId}/sort/{sort}:
+ *   get:
+ *     summary: Get reviews by course ID and sort order
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the course
+ *       - in: path
+ *         name: sort
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Sort order of reviews
+ *     responses:
+ *       200:
+ *         description: Reviews by course ID and sort order
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Review'
+ *       500:
+ *         description: Error retrieving reviews by course ID and sort order
+ */
 const getReviewsByCourseIdAndSort = async (req, res) => {
     const { courseId, sort } = req.params;
     try {
@@ -170,6 +514,34 @@ const getReviewsByCourseIdAndSort = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/{reviewId}/likes:
+ *   post:
+ *     summary: Increment likes on a review
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the review to like
+ *     responses:
+ *       200:
+ *         description: Successfully incremented likes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 likes:
+ *                   type: number
+ *       500:
+ *         description: Error incrementing likes
+ */
 const incrementLikes = async (req, res) => {
     try {
         const reviewId = req.params.reviewId;
@@ -181,6 +553,34 @@ const incrementLikes = async (req, res) => {
     }
 }
 
+/**
+ * @swagger
+ * /reviews/{reviewId}/dislikes:
+ *   post:
+ *     summary: Increment dislikes on a review
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: reviewId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the review to dislike
+ *     responses:
+ *       200:
+ *         description: Successfully incremented dislikes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 dislikes:
+ *                   type: number
+ *       500:
+ *         description: Error incrementing dislikes
+ */
 const incrementDislikes = async (req, res) => {
     try {
         const reviewId = req.params.reviewId;
@@ -191,7 +591,6 @@ const incrementDislikes = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 }
-
 
 module.exports = {
     getReviews,
