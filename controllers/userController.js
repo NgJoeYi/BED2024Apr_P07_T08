@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken'); // ----------------------------------------
 // Function to get a user by their ID
 const getUserById = async (req, res) => {
     //const userId = parseInt(req.params.id);
-    const userId = req.user.id; // ------------------------------------------------------------------- Get the user ID from the request object
+    const userId = req.user.id; // ------------------------------------------------------------------- Get the user ID
     try {
         const user = await User.getUserById(userId); // ---------------------------------------------- Fetch the user from the database using the user ID
         if (!user) {
@@ -26,8 +26,8 @@ const createUser = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ message: 'Email is already in use' });
         } 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(newUserData.password, 10);
+
+        const hashedPassword = await bcrypt.hash(newUserData.password, 10); // ----------------------- Hash the password
         newUserData.password = hashedPassword; // ---------------------------------------------------- Replace plain text password with hashed password  
                
         const newUser = await User.createUser(newUserData); // --------------------------------------- Create a new user in the database
@@ -65,7 +65,7 @@ const loginUser = async (req, res) => {
             role: loginSuccess.role,
         };
         const token = jwt.sign(payload, process.env.SECRET_TOKEN, { expiresIn: '3600s' }); // -------- Generate a JWT token with a 1-hour expiration time
-        res.status(200).json({ token, role: loginSuccess.role,  userId: loginSuccess.id }); // ------- Send the token, role, and user ID in the response, user id is for front end visibility purpose.
+        res.status(200).json({ token, role: loginSuccess.role,  userId: loginSuccess.id }); // ------- Send the token, role, and user ID in the response, user id is for front end visibility purposes.
         //res.status(200).json(loginSuccess);
     } catch (error) {
         console.error('Server error:', error); // ---------------------------------------------------- Log error details
@@ -76,7 +76,7 @@ const loginUser = async (req, res) => {
 
 // Function to update user data
 const updateUser = async (req, res) => {
-    const userId = req.user.id; // ------------------------------------------------------------------ Get the user ID from the request object
+    const userId = req.user.id; // ------------------------------------------------------------------ Get the user ID
     const newUserData = req.body; // ---------------------------------------------------------------- Get the new user data from the request body
     try {
         const user = await User.getUserById(userId); // --------------------------------------------- Get the current user 
@@ -126,7 +126,7 @@ const updateUser = async (req, res) => {
 // to enter password before account is actually deleted (edit: done)
 // Function to delete a user account
 const deleteUser = async (req, res) => {
-    const userId = req.user.id;    // ------------------------------------------------------------- Get the user ID from the request object
+    const userId = req.user.id;    // ------------------------------------------------------------- Get the user ID
     const { password } = req.body; // ------------------------------------------------------------- Get the password from the request body
     try {
         if (!password) { // ----------------------------------------------------------------------- If no password is provided, send a 400 response
@@ -160,7 +160,7 @@ const deleteUser = async (req, res) => {
 
 // Function to update the user's profile picture
 const updateProfilePic = async (req, res) => {
-    const userId = req.user.id; // --------------------------------------------------------------- Get the user ID from the request object
+    const userId = req.user.id; // --------------------------------------------------------------- Get the user ID
     const { profilePic } = req.body; // ---------------------------------------------------------- Get the new profile picture URL from the request body
 
     try {
