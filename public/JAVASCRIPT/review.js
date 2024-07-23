@@ -278,6 +278,13 @@ async function editReview(button) {
 
 async function incrementReviewLikes(reviewId, likeButton, dislikeButton) {
     try {
+
+        // Check if the user already disliked the review
+        if (dislikeButton.getAttribute('data-disliked') === 'true') {
+            alert('You can only choose to like or dislike a review.');
+            return;
+        }
+
         // Send POST request to increment like count for particular review
         const response = await fetch(`/reviews/${reviewId}/like`, {
             // *** Like & Dislike is POST, not PUT because they are not considered to be updating anything. Instead, they are a new action, not an update to an existing action.
@@ -299,6 +306,13 @@ async function incrementReviewLikes(reviewId, likeButton, dislikeButton) {
 
 async function incrementReviewDislikes(reviewId, likeButton, dislikeButton) {
     try {
+
+        // Check if the user already liked the review
+        if (likeButton.getAttribute('data-liked') === 'true') {
+            alert('You can only choose to like or dislike a review.');
+            return;
+        }
+
         const response = await fetch(`/reviews/${reviewId}/dislike`, {
             method: 'POST'
         });
@@ -337,7 +351,8 @@ async function fetchReviews(courseId) {
     }
 
     try {
-        const response = await fetchWithAuth(url, { 
+        // const response = await fetchWithAuth(url, { 
+        const response = await fetch(url, {  // ''fetch' and not 'fetchWithAuth' so that users not logged in can see the reviews
             method: 'GET'
         });
         if (!response.ok) {
@@ -371,6 +386,11 @@ async function fetchReviews(courseId) {
                 <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
             ` : '';
 
+            const likeDislikeButtons = token ? `
+                <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
+                <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
+            ` : '';
+
             reviewElement.innerHTML = `
                 <div class="review-content">
                     <div class="review-author">
@@ -389,8 +409,7 @@ async function fetchReviews(courseId) {
                     </div>
                 </div>
                 <div class="review-actions">
-                    <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
-                    <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
+                    ${likeDislikeButtons}
                     ${reviewActions}
                 </div>
             `;
@@ -398,21 +417,35 @@ async function fetchReviews(courseId) {
             const likeButton = reviewElement.querySelector('.like-button');
             const dislikeButton = reviewElement.querySelector('.dislike-button');
 
-            likeButton.addEventListener('click', function () {
-                if (this.getAttribute('data-liked') === 'true') {
-                    alert('You have already liked this review.');
-                    return;
-                }
-                incrementReviewLikes(review.review_id, this, dislikeButton);
-            });
+            if (likeButton){
+                likeButton.addEventListener('click', function () {
+                    if (this.getAttribute('data-liked') === 'true') {
+                        alert('You have already liked this review.');
+                        return;
+                    }
+    
+                    if (dislikeButton.getAttribute('data-disliked') === 'true') {
+                        alert('You can only choose to like or dislike a review.');
+                        return;
+                    }
+                    incrementReviewLikes(review.review_id, this, dislikeButton);
+                });
+            }
 
-            dislikeButton.addEventListener('click', function () {
-                if (this.getAttribute('data-disliked') === 'true') {
-                    alert('You have already disliked this review.');
-                    return;
-                }
-                incrementReviewDislikes(review.review_id, likeButton, this);
-            });
+            if (dislikeButton){
+                dislikeButton.addEventListener('click', function () {
+                    if (this.getAttribute('data-disliked') === 'true') {
+                        alert('You have already disliked this review.');
+                        return;
+                    }
+    
+                    if (likeButton.getAttribute('data-liked') === 'true') {
+                        alert('You can only choose to like or dislike a review.');
+                        return;
+                    }
+                    incrementReviewDislikes(review.review_id, likeButton, this);
+                });
+            }
             
             reviewsContainer.appendChild(reviewElement);
         });
@@ -423,7 +456,8 @@ async function fetchReviews(courseId) {
 
 async function fetchReviewCountByCourseId(courseId) {
     try {
-        const response = await fetchWithAuth(`/reviews/course/${courseId}/count`, { 
+        // const response = await fetchWithAuth(`/reviews/course/${courseId}/count`, { 
+        const response = await fetch(`/reviews/course/${courseId}/count`, { 
             method: 'GET'
         });
 
@@ -439,8 +473,15 @@ async function fetchReviewCountByCourseId(courseId) {
         const data = JSON.parse(responseText);
         console.log('Parsed data:', data); // Debug 
 
-        const totalReviewsElement = document.getElementById('total-reviews');
-        totalReviewsElement.textContent = data.count;
+        // const totalReviewsElement = document.getElementById('total-reviews');
+        // totalReviewsElement.textContent = data.count;
+        // const totalReviewsElement = document.getElementById('total-reviews');
+        // if (totalReviewsElement) {
+        //     totalReviewsElement.textContent = data.count;
+        // } else {
+        //     console.error('total-reviews element not found');
+        // }
+
     } catch (error) {
         console.error('Error fetching review count by course ID:', error);
     }
