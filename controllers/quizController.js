@@ -3,7 +3,7 @@ const Quiz = require('../models/quiz');
 // Function to convert base64 image data to buffer
 function base64ToBuffer(base64String) {
     if (!base64String) {
-        return null;
+        return null; // Return null if the base64 string is not provided
     }
     return Buffer.from(base64String, 'base64');
 }
@@ -37,7 +37,7 @@ const createQuiz = async (req, res) => {
         }
         const quiz = await Quiz.createQuiz(newQuizData);
         if (!quiz) {
-            return res.status(400).json({ message: 'Failed to create a new quiz' });
+            return res.status(500).json({ message: 'Failed to create a new quiz' });
         }
         res.status(201).json({ message: 'Quiz created successfully', quiz });
     } catch (error) {
@@ -63,7 +63,7 @@ const createQuestionAfterQuizCreation = async (req, res) => { // utilise this in
 
         const question = await Quiz.createQuestion(newQuestionData);
         if (!question) {
-            return res.status(400).json({ message: "Failed to create question" });
+            return res.status(500).json({ message: "Failed to create question" });
         }
         res.status(201).json({ message: 'Question created successfully', question });
     } catch (error) {
@@ -87,7 +87,7 @@ const createQuestionOnUpdate = async (req, res) => { // utilise this in editQues
         
         const question = await Quiz.createQuestion(newQuestionData);
         if (!question) {
-            return res.status(400).json({ message: "Failed to create question" });
+            return res.status(500).json({ message: "Failed to create question" });
         }
 
         // ------------------------ update the total question here --------------------
@@ -101,7 +101,7 @@ const createQuestionOnUpdate = async (req, res) => { // utilise this in editQues
         };
         const updateTotalQuestion = await Quiz.updateQuiz(newQuestionData.quiz_id, updatedQuizData);
         if (!updateTotalQuestion) {
-            return res.status(400).json({ message: 'Could not update total questions in the quiz' });
+            return res.status(500).json({ message: 'Could not update total questions in the quiz' });
         }
 
         // ------------------------ retrieiving the users response to recalc the score to be displayed to the user ------------------------
@@ -163,20 +163,6 @@ const getQuizById = async (req, res) => {
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
-
-// const getAllQuiz = async (req, res) => {
-//     try {
-//         const quiz = await Quiz.getAllQuiz();
-//         if (!quiz) {
-//             return res.status(404).json({ message: 'Quiz does not exist' });
-//         }
-//         res.status(200).json(quiz);
-//     } catch (error) {
-//         console.error('Get All Quiz - Server Error:', error); // Log error details
-//         res.status(500).json({ message: 'Server error. Please try again later.' });
-//     }
-// };
-
 
 const getAllQuizWithCreatorName = async (req, res) => {
     try {
@@ -284,7 +270,7 @@ const deleteQuiz = async (req, res) => {
         if (quiz) {
             res.status(204).json({ message: 'Quiz successfully deleted' });
         } else {
-            res.status(400).json({ message: 'Failed to delete quiz' });
+            res.status(500).json({ message: 'Failed to delete quiz' });
         }
     } catch (error) {
         console.error('Delete Quiz - Server Error:', error); // Log error details
@@ -409,7 +395,7 @@ const deleteQuestion = async (req, res) => {
         // Delete the question
         const deleteQns = await Quiz.deleteQuestionByQuestionId(qnsId);
         if (!deleteQns) {
-            return res.status(400).json({ message: 'Could not delete question' });
+            return res.status(500).json({ message: 'Could not delete question' });
         }
 
         // ------------------------ update the total question here --------------------
@@ -424,7 +410,7 @@ const deleteQuestion = async (req, res) => {
 
         const updateTotalQuestion = await Quiz.updateQuiz(quizId, updatedQuizData);
         if (!updateTotalQuestion) {
-            return res.status(400).json({ message: 'Could not update total questions in the quiz' });
+            return res.status(500).json({ message: 'Could not update total questions in the quiz' });
         }
 
         // ------------------------ retrieiving the users response to recalc the score to be displayed to the user ------------------------
@@ -558,7 +544,7 @@ const getUserQuizResult = async (req, res) => {
     try {
         const result = await Quiz.getUserQuizResult(userId, attemptId);
         if (!result) {
-            return res.status(400).json({ message: 'Failed to retrieve user\'s quiz result' });
+            return res.status(404).json({ message: 'Failed to retrieve user\'s quiz result' });
         }
         res.status(200).json(result);
     } catch (error) {
@@ -573,7 +559,7 @@ const getAllQuizResultsForUser = async (req, res) => { // for account page
     try {
         const results = await Quiz.getAllQuizResultsForUser(userId);
         if (!results) {
-            return res.status(400).json({ message: 'No quiz completed' });
+            return res.status(404).json({ message: 'No quiz completed' });
         }
         res.status(200).json(results);
     } catch (error) {
