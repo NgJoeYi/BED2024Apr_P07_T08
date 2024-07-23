@@ -24,6 +24,7 @@ const upload = multer({ storage: storage });
  *       500:
  *         description: Error retrieving courses
  */
+// For displaying all courses 
 const getAllCourses = async (req, res) => {
   try {
     const courses = await Courses.getAllCourses();
@@ -64,6 +65,7 @@ const getAllCourses = async (req, res) => {
  *       500:
  *         description: Error retrieving course
  */
+// getting specific course by ID 
 const getCoursesById = async (req, res) => {
   const courseID = parseInt(req.params.id);
   try {
@@ -98,6 +100,7 @@ const getCoursesById = async (req, res) => {
  *       500:
  *         description: Error retrieving categories
  */
+// Getting all the categories to filter from  
 const getAllCategories = async (req, res) => {
   try {
     const categories = await Courses.getAllCategories();
@@ -137,6 +140,7 @@ const getAllCategories = async (req, res) => {
  *       500:
  *         description: Error retrieving courses by category
  */
+// actual filter for category 
 const filterByCategory = async (req, res) => {
   try {
     const { category } = req.query;
@@ -171,6 +175,7 @@ const filterByCategory = async (req, res) => {
  *       500:
  *         description: Error retrieving recent courses
  */
+// For filtering by recent courses 
 const getMostRecentCourses = async(req,res)=>{
   try{
     const categories = await Courses.getMostRecentCourses();
@@ -204,6 +209,7 @@ const getMostRecentCourses = async(req,res)=>{
  *       500:
  *         description: Error retrieving earliest courses
  */
+// For filtering by earliest courses 
 const getEarliestCourses = async(req,res)=>{
   try{
     const categories = await Courses.getEarliestCourses();
@@ -245,6 +251,7 @@ const getEarliestCourses = async(req,res)=>{
  *       500:
  *         description: Error creating course
  */
+// Creating course 
 const createCourse = async (req, res) => {
   const newCourse = req.body;
   const userID = req.user.id;
@@ -299,6 +306,7 @@ const createCourse = async (req, res) => {
  *       500:
  *         description: Error updating course
  */
+// Update course if the user has permission 
 const updateCourse = async (req, res) => {
   const userID = req.user.id; // user id that logged on now
   const courseID = parseInt(req.params.id);
@@ -357,6 +365,7 @@ const updateCourse = async (req, res) => {
  *       500:
  *         description: Error deleting course
  */
+// Deleting course if the user has permission 
 const deleteCourse = async (req, res) => {
   const courseID = parseInt(req.params.id);
   const userID = req.user.id; 
@@ -396,6 +405,7 @@ const deleteCourse = async (req, res) => {
  *       500:
  *         description: Error deleting courses with no lectures
  */
+// If user creates course but exists the page the course will not be created successfully
 const deleteCourseWithNoLectures = async (req, res) => {
   try {
     const success = await Courses.deleteCourseWithNoLectures();
@@ -438,6 +448,7 @@ const deleteCourseWithNoLectures = async (req, res) => {
  *       500:
  *         description: Error fetching course image
  */
+// For the course.html
 const getCourseImage = async (req, res) => {
   const courseID = parseInt(req.params.id);
   try {
@@ -482,6 +493,7 @@ const getCourseImage = async (req, res) => {
  *       500:
  *         description: Error searching for courses
  */
+// For users to search for courses in the search container 
 const searchCourses = async (req, res) => {
   try {
     const searchTerm = req.query.term;

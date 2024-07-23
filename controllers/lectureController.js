@@ -24,6 +24,7 @@ const upload = multer({ storage: storage });
  *       500:
  *         description: Error retrieving lectures
  */
+// Retrieve and display all lectures
 const getAllLectures = async (req, res) => {
     try {
         const getAllLectures = await Lectures.getAllLectures();
@@ -59,6 +60,7 @@ const getAllLectures = async (req, res) => {
  *       500:
  *         description: Error retrieving lecture
  */
+// Retrieve details for a specific lecture by ID
 const getLectureDetails = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -95,6 +97,7 @@ const getLectureDetails = async (req, res) => {
  *       500:
  *         description: Error retrieving lecture
  */
+// Retrieve a specific lecture by ID
 const getLectureByID = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -132,6 +135,7 @@ const getLectureByID = async (req, res) => {
  *       500:
  *         description: Error deleting lecture
  */
+// Delete a specific lecture by ID, ensuring the user has permission
 const deleteLecture = async (req, res) => {
     const lectureID = parseInt(req.params.id);
     const userID = req.user.id;
@@ -198,6 +202,7 @@ const deleteLecture = async (req, res) => {
  *       500:
  *         description: Error deleting chapter
  */
+// Delete a chapter by its name, ensuring the user has permission
 const deletingChapterName = async (req, res) => {
     const { courseID, chapterName } = req.params;
     const { lectureIDs } = req.body;
@@ -282,6 +287,7 @@ const deletingChapterName = async (req, res) => {
  *       500:
  *         description: Error updating lecture
  */
+// Update a lecture's information, ensuring the user has permission
 const updateLecture = async (req, res) => {
     const userID = req.user.id; // user id that logged on now 
     // lecture id 
@@ -344,6 +350,7 @@ const updateLecture = async (req, res) => {
  *       500:
  *         description: Error getting chapter name
  */
+// Retrieve the name of the last chapter for the current user, so user can add multiple lecture under chapter
 const getLastChapterName = async (req, res) => {
     const userID = req.user.id;
     try {
@@ -377,6 +384,7 @@ const getLastChapterName = async (req, res) => {
  *       500:
  *         description: Error retrieving max course ID
  */
+// Retrieve the maximum course ID from the database, so we can create new courseID 
 const getMaxCourseID = async (req, res) => {
     try {
         const maxCourseID = await Lectures.getMaxCourseID();
@@ -440,6 +448,7 @@ const getMaxCourseID = async (req, res) => {
  *       500:
  *         description: Error creating lecture
  */
+// Create a new lecture
 const createLecture = async (req, res) => {
     const { Title, Duration, Description, ChapterName, CourseID } = req.body;
     const UserID = req.user.id;
@@ -504,6 +513,7 @@ const createLecture = async (req, res) => {
  *       500:
  *         description: Internal server error
  */
+// So the right lecture video will play according to the lecture
 const getLectureVideoByID = async (req, res) => {
     const lectureID = parseInt(req.params.lectureID, 10);
 
@@ -556,6 +566,7 @@ const getLectureVideoByID = async (req, res) => {
  *       500:
  *         description: Internal server error
  */
+// When user press into course the lectures under it will show
 const getLecturesByCourseID = async (req, res) => {
     const courseID = parseInt(req.params.courseID);
     console.log(`Received courseID: ${courseID}`);

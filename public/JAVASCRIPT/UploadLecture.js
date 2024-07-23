@@ -6,6 +6,7 @@ function closeModal() {
     document.getElementById('newFileModal').style.display = 'none';
 }
 
+// so user can add multiple lectures under the same chapter name asa the previous 
 async function fetchLastChapterName() {
     try {
         const response = await fetchWithAuth(`/lectures/last-chapter`); // ------------------------------------------------- headers in jwtutility.js
@@ -88,7 +89,7 @@ async function addFiles() {
     }
 }
 
-
+// generates html code to display the lecture 
 function displayNewLecture(newLecture, videoFiles) {
     const courseArrangement = document.getElementById('course-arrangement');
 
@@ -181,6 +182,7 @@ async function cancelCourse() {
     }
 }
 
+// so when the user submits the course details they are not allowed to edit the fields anymore 
 function makeFieldsUneditable() {
     document.getElementById('level').setAttribute('disabled', 'disabled');
     document.getElementById('duration').setAttribute('disabled', 'disabled');

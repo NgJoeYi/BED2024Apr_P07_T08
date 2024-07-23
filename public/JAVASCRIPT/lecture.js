@@ -1,16 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    getLecturesByCourse();
-
-    // const navTitles = document.querySelectorAll('.nav-title');
-    // navTitles.forEach(title => {
-    //     title.addEventListener('click', () => {
-    //         const subNav = title.nextElementSibling;
-    //         subNav.style.display = subNav.style.display === "none" ? "block" : "none";
-    //     });
-    // });    
+    getLecturesByCourse();   
+    // Calls getLecturesByCourse function once the DOM content is fully loaded.
 });
 
-
+// Getting the lectures under the specific course 
 async function getLecturesByCourse() {
     const urlParams = new URLSearchParams(window.location.search);
     const courseID = urlParams.get('courseID');
@@ -18,6 +11,7 @@ async function getLecturesByCourse() {
     if (!courseID) {
         console.error('No course ID found in URL.');
         return;
+        // Logs an error if the courseID is not found in the URL and exits the function.
     }
 
     try {
@@ -25,19 +19,22 @@ async function getLecturesByCourse() {
         if (!response.ok) throw new Error('Network response was not ok');
         const lectures = await response.json();
         displayLectures(lectures);
+        // Fetches lectures for the given courseID, then displays them using displayLectures.
     } catch (error) {
         console.error('Error fetching lectures:', error);
+        // Logs any errors encountered while fetching lectures.
     }
 }
 
+// Allows user to delete a specific lecture if they have the permission to 
 async function deleteLecture(button) {
     const lectureID = button.dataset.lectureId;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
-    const token = sessionStorage.getItem('token');
 
     const userConfirmed = confirm('Are you sure you want to delete this lecture?');
     if (!userConfirmed) {
         return;
+        // Prompts the user for confirmation before proceeding with deletion.
     }
 
     try {
@@ -82,29 +79,24 @@ async function deleteLecture(button) {
     }
 }
 
+// Clears video playing in the container when the user deletes the lecture 
 function clearVideo() {
     const videoIframe = document.querySelector('.main-content iframe');
     videoIframe.src = ''; // Clear the video source
     videoIframe.dataset.lectureId = ''; // Clear the data attribute
 }
 
+// Allows user to delete the entire chapter of the lecture if they have permission
 async function deleteChapter(button) {
     const chapterName = button.dataset.chapterName;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
 
-    const token = sessionStorage.getItem('token');  // Retrieve the JWT token from sessionStorage
-    if (!token) {
-        alert('User not authenticated. Please log in.');
-        return;
-    }
-
-    // Confirmation dialog
     const userConfirmed = confirm('Are you sure you want to delete this chapter?');
     if (!userConfirmed) {
         return; 
+        // Prompts the user for confirmation before proceeding with chapter deletion.
     }
 
-    // Collect all lecture IDs under the chapter
     const lecturesResponse = await fetch(`/lectures/course/${courseID}`);
     const lectures = await lecturesResponse.json();
     const lectureIDs = lectures.filter(lecture => lecture.ChapterName === chapterName).map(lecture => lecture.LectureID);
@@ -112,15 +104,12 @@ async function deleteChapter(button) {
     if (lectureIDs.length === 0) {
         alert(`No lectures found for chapter: ${chapterName}`);
         return;
+        // Alerts if no lectures are found for the chapter and exits the function.
     }
 
     try {
-        const response = await fetch(`/lectures/course/${courseID}/chapter/${chapterName}`, {
+        const response = await fetchWithAuth(`/lectures/course/${courseID}/chapter/${chapterName}`, {
             method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
             body: JSON.stringify({ lectureIDs })
         });
 
@@ -128,17 +117,12 @@ async function deleteChapter(button) {
             alert(`Chapter ${chapterName} deleted successfully!`);
             button.closest('.nav-item').remove();
 
-            // Check if there are any remaining lectures for the course
             const remainingLecturesResponse = await fetch(`/lectures/course/${courseID}`);
             const remainingLectures = await remainingLecturesResponse.json();
 
             if (remainingLectures.length === 0) {
-                // No more lectures, delete the course
-                const deleteCourseResponse = await fetch(`/courses/${courseID}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const deleteCourseResponse = await fetchWithAuth(`/courses/${courseID}`, {
+                    method: 'DELETE'
                 });
                 if (deleteCourseResponse.ok) {
                     alert('Course deleted successfully!');
@@ -148,7 +132,6 @@ async function deleteChapter(button) {
                     alert('Failed to delete the course.');
                 }
             } else {
-                // If there are remaining lectures, reload them
                 getLecturesByCourse();
                 window.location.href = `lecture.html?courseID=${courseID}`;
             }
@@ -164,48 +147,55 @@ async function deleteChapter(button) {
     }
 }
 
+// Populates details of the lectures in the lecture details container below the lecture video 
 async function displayLectureDetails(lectureID) {
     try {
         const response = await fetch(`/lectures/lecture-details/${lectureID}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         
-        // Update the HTML elements with the fetched data
         document.getElementById('title').innerHTML = `<strong>Title:</strong> ${data.Title}`;
         document.getElementById('description').innerHTML = `<strong>Description:</strong> ${data.Description}`;
         document.getElementById('duration').innerHTML = `<strong>Duration:</strong> ${data.Duration}`;
         document.getElementById('createdAt').innerHTML = `<strong>Created At:</strong> ${data.CreatedAt}`;
+        // Updates the HTML elements with the fetched lecture data.
     } catch (error) {
         console.error('Error fetching lecture details:', error);
+        // Logs any errors encountered while fetching lecture details.
     }
 }
 
-function iconOrientation(){
+// For the arrow icon at the navigation
+function iconOrientation() {
     const rotateIcon = document.getElementById('rotate-icon');
     const subNav = rotateIcon.closest('.nav-item').querySelector('.sub-nav');
 
     rotateIcon.addEventListener('click', () => {
         rotateIcon.classList.toggle('rotate-down');
         subNav.classList.toggle('show');
+        // Toggles the rotation of the icon and visibility of the sub-navigation on click.
     });
 }
 
+// Only when the arrow is rotated downwards will the sub navigation items show 
 function toggleSubNav(event) {
     const rotateIcon = event.target;
     const subNav = rotateIcon.closest('.nav-item').querySelector('.sub-nav');
     rotateIcon.classList.toggle('rotate-down');
     subNav.classList.toggle('show');
+    // Toggles the rotation of the icon and visibility of the sub-navigation items.
 }
 
-
+// Creating the HTML to display lectures and populate information on the navigation sidebar 
 function displayLectures(lectures) {
     const userRole = sessionStorage.getItem('role');
     const sidebar = document.querySelector('.sidebar .nav');
     if (!sidebar) {
         console.error('Sidebar element not found.');
         return;
+        // Logs an error if the sidebar element is not found and exits the function.
     }
-    sidebar.innerHTML = ''; // Clear existing content
+    sidebar.innerHTML = ''; // Clears existing content
 
     const groupedLectures = {};
 
@@ -214,12 +204,13 @@ function displayLectures(lectures) {
             groupedLectures[lecture.ChapterName] = [];
         }
         groupedLectures[lecture.ChapterName].push(lecture);
+        // Groups lectures by chapter name.
     });
 
-    // Check if there are any lectures
     if (Object.keys(groupedLectures).length === 0) {
         window.location.href = 'courses.html';
         return;
+        // Redirects to the courses page if no lectures are found.
     }
 
     for (const chapterName in groupedLectures) {
@@ -266,6 +257,7 @@ function displayLectures(lectures) {
     const rotateIcons = document.querySelectorAll('.rotate-icon');
     rotateIcons.forEach(icon => {
         icon.addEventListener('click', toggleSubNav);
+        // Adds click event listeners to rotate icons.
     });
 
     const subNavItems = document.querySelectorAll('.sub-nav-item');
@@ -276,6 +268,7 @@ function displayLectures(lectures) {
             setVideo(lectureID);
             subNavItems.forEach(item => item.style.fontWeight = 'normal');
             this.style.fontWeight = 'bold';
+            // Adds click event listeners to sub-navigation items for displaying lecture details and setting video.
         });
     });
     if (lectures.length > 0) {
@@ -285,7 +278,7 @@ function displayLectures(lectures) {
     }
 }
 
-
+// For showing the lecture video 
 async function setVideo(lectureID) {
     const videoIframe = document.querySelector('.main-content iframe');
 
@@ -298,42 +291,35 @@ async function setVideo(lectureID) {
         videoIframe.dataset.lectureId = lectureID; // Set the data attribute
     } catch (error) {
         console.error('Error setting video:', error);
+        // Logs any errors encountered while setting the video.
     }
 }
 
+// Brings user to the edit lecture page if they have permission
 async function editLecture(button) {
-    // Getting user ID of lecture 
     const lectureID = button.dataset.lectureId;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
-    const token = sessionStorage.getItem('token');
     try {
-        // Getting user ID of logged on now 
-        const checkingUserIDResponse = await  fetchWithAuth(`/lectures/checking`);
+        const checkingUserIDResponse = await fetchWithAuth(`/lectures/checking`);
         if (!checkingUserIDResponse.ok) {
             throw new Error('Network response not ok');
         }
         const { userID: userIDLoggedon } = await checkingUserIDResponse.json();
-        console.log('Logged-on user ID:', userIDLoggedon);
-
+        console.log(userIDLoggedon,'HII');
         const response = await fetch(`/lectures/${lectureID}`);
         if (!response.ok) {
             throw new Error('Network response not ok');
         }
         const lecture = await response.json();
         const userIDInLecture = lecture.userID;
-        console.log('Lecture user ID:', userIDInLecture);
 
         if (userIDLoggedon === userIDInLecture) {
-            // Redirect to edit lecture page with lectureID and courseID as query parameters
             window.location.href = `editLecture.html?courseID=${courseID}&lectureID=${lectureID}`;
         } else {
             alert('You do not have permission to edit this lecture.');
         }
     } catch (error) {
         console.error('Error getting lecture or user ID:', error);
+        // Logs any errors encountered while checking user permission or getting lecture details.
     }
 }
-
-
-
-
