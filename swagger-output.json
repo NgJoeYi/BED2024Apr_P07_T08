@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "My API",
-    "description": "Description of your API",
+    "title": "EduHelper.",
+    "description": "Unlocking potential, one lesson at a time",
     "version": "1.0.0"
   },
   "host": "localhost:3000",
