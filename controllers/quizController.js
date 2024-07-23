@@ -449,14 +449,14 @@ const deleteQuestion = async (req, res) => {
 const submitQuiz = async (req, res) => {
     const { quizId, responses, timeTaken } = req.body; // ---------------------------------------------------- Extract quiz ID, responses, and time taken from the request body
     const userId = req.user.id; // --------------------------------------------------------------------------- Extract user ID
-    let correctAnswersCount = 0; // Initialize count of correct answers
+    let correctAnswersCount = 0; // -------------------------------------------------------------------------- Initialize count of correct answers
 
     try {
         const quizDetails = await Quiz.getQuizById(quizId); // ----------------------------------------------- Fetch the quiz details including total marks and total questions
         if (!quizDetails) {
             return res.status(404).json({ message: 'Quiz not found' }); // ----------------------------------- Return error if quiz not found
         }
-        const totalMarks = quizDetails.total_marks; // need total marks to determine whether pass or fail 
+        const totalMarks = quizDetails.total_marks; // ------------------------------------------------------- need total marks to determine whether pass or fail 
         const totalQuestions = quizDetails.total_questions; // ----------------------------------------------- Get total questions from quiz details
 
         // --------------------------------------------------------------------------------------------------- Check if all questions have responses
@@ -481,12 +481,12 @@ const submitQuiz = async (req, res) => {
             }
         }
 
-        const score = (correctAnswersCount / totalQuestions) * totalMarks;
+        const score = (correctAnswersCount / totalQuestions) * totalMarks; // ------------------------------- Calc the score
         console.log('Score percentage:', score);
-        const passed = (score / totalMarks) * 100 >= 50; // Determine if the user passed
+        const passed = (score / totalMarks) * 100 >= 50; // ------------------------------------------------- Determine if the user passed
         console.log('Passed:', passed);
 
-        await Quiz.updateQuizAttempt(attemptId, score, passed); // -------------------------------- Update the quiz attempt record with the calculated score and passing status
+        await Quiz.updateQuizAttempt(attemptId, score, passed); // ------------------------------------------ Update the quiz attempt record with the calculated score and passing status
 
         res.status(200).json({ attemptId }); // ------------------------------------------------------------- Return the attempt ID
     } catch (error) {
