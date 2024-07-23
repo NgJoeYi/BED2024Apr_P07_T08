@@ -236,6 +236,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function incrementLikes(commentId, likeButton, dislikeButton) {
         try {
+
+            // Check if the user already disliked the review
+            if (dislikeButton.getAttribute('data-disliked') === 'true') {
+                alert('You can only choose to like or dislike a comment.');
+                return;
+            }
+
             const response = await fetchWithAuth(`/comments/${commentId}/like`, {
                 method: 'POST'
             });
@@ -255,6 +262,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function incrementDislikes(commentId, likeButton, dislikeButton) {
         try {
+            // Check if the user already liked the review
+            if (likeButton.getAttribute('data-liked') === 'true') {
+                alert('You can only choose to like or dislike a comment.');
+                return;
+            }
+        
             const response = await fetchWithAuth(`/comments/${commentId}/dislike`, {
                 method: 'POST'
             });
@@ -322,12 +335,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('You have already liked this comment.');
                     return;
                 }
+                if (dislikeButton.getAttribute('data-disliked') === 'true') {
+                    alert('You can only choose to like or dislike a comment.');
+                    return;
+                }
                 incrementLikes(comment.id, this, dislikeButton);
             });
 
             dislikeButton.addEventListener('click', function () {
                 if (this.getAttribute('data-disliked') === 'true') {
                     alert('You have already disliked this comment.');
+                    return;
+                }
+                if (likeButton.getAttribute('data-liked') === 'true') {
+                    alert('You can only choose to like or dislike a review.');
                     return;
                 }
                 incrementDislikes(comment.id, likeButton, this);

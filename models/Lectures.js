@@ -39,6 +39,25 @@ class Lectures {
             await connection.close();
         }
     }
+    static async getLectureDetails(id){
+        let connection = await sql.connect(dbConfig);
+        try{
+            const sqlQuery = `SELECT Title, Description , Duration, CreatedAt FROM Lectures WHERE LectureID = @lectureID;`;
+            const request = await connection.request();
+            request.input('lectureID',sql.Int, id);
+            const result = await request.query(sqlQuery);
+            
+            if (result.recordset.length === 0) {
+                return null;
+            }
+            return result.recordset[0];
+        }catch (error) {
+            console.error('Error retrieving lecture details: ', error);
+            throw error;
+        } finally {
+            await connection.close();
+        }
+    }
 
     static async getLectureByID(id) {
         let connection = await sql.connect(dbConfig);

@@ -1,3 +1,16 @@
+document.addEventListener('DOMContentLoaded', () => {
+    getLecturesByCourse();
+
+    // const navTitles = document.querySelectorAll('.nav-title');
+    // navTitles.forEach(title => {
+    //     title.addEventListener('click', () => {
+    //         const subNav = title.nextElementSibling;
+    //         subNav.style.display = subNav.style.display === "none" ? "block" : "none";
+    //     });
+    // });    
+});
+
+
 async function getLecturesByCourse() {
     const urlParams = new URLSearchParams(window.location.search);
     const courseID = urlParams.get('courseID');
@@ -17,50 +30,35 @@ async function getLecturesByCourse() {
     }
 }
 
-function clearVideo() {
-    const videoIframe = document.querySelector('.main-content iframe');
-    videoIframe.src = ''; // Clear the video source
-    videoIframe.dataset.lectureId = ''; // Clear the data attribute
-}
-
 async function deleteLecture(button) {
     const lectureID = button.dataset.lectureId;
     const courseID = new URLSearchParams(window.location.search).get('courseID');
     const token = sessionStorage.getItem('token');
 
-    // Confirmation dialog
     const userConfirmed = confirm('Are you sure you want to delete this lecture?');
     if (!userConfirmed) {
-        return; 
+        return;
     }
+
     try {
-        const response = await fetch(`/lectures/${lectureID}`, { 
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetchWithAuth(`/lectures/${lectureID}`, {
+            method: 'DELETE'
         });
         if (response.status === 204) {
             alert('Lecture deleted successfully!');
             button.closest('.sub-nav-item').remove();
 
-            // Clear video if the deleted lecture is currently playing
             const currentVideoLectureID = document.querySelector('.main-content iframe').dataset.lectureId;
             if (currentVideoLectureID === lectureID) {
                 clearVideo();
             }
 
-            // Check if there are any remaining lectures for the course
             const lecturesResponse = await fetch(`/lectures/course/${courseID}`);
             const lectures = await lecturesResponse.json();
 
             if (lectures.length === 0) {
-                // No more lectures, delete the course
-                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { 
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const deleteCourseResponse = await fetchWithAuth(`/courses/${courseID}`, {
+                    method: 'DELETE'
                 });
                 if (deleteCourseResponse.ok) {
                     alert('Course deleted successfully!');
@@ -70,7 +68,6 @@ async function deleteLecture(button) {
                     alert('Failed to delete the course.');
                 }
             } else {
-                // There are remaining lectures, update UI or redirect as needed
                 window.location.href = `lecture.html?courseID=${courseID}`;
             }
         } else if (response.status === 403) {
@@ -85,6 +82,11 @@ async function deleteLecture(button) {
     }
 }
 
+function clearVideo() {
+    const videoIframe = document.querySelector('.main-content iframe');
+    videoIframe.src = ''; // Clear the video source
+    videoIframe.dataset.lectureId = ''; // Clear the data attribute
+}
 
 async function deleteChapter(button) {
     const chapterName = button.dataset.chapterName;
@@ -95,11 +97,13 @@ async function deleteChapter(button) {
         alert('User not authenticated. Please log in.');
         return;
     }
+
     // Confirmation dialog
-    const userConfirmed = confirm('Are you sure you want to delete this lecture?');
+    const userConfirmed = confirm('Are you sure you want to delete this chapter?');
     if (!userConfirmed) {
         return; 
     }
+
     // Collect all lecture IDs under the chapter
     const lecturesResponse = await fetch(`/lectures/course/${courseID}`);
     const lectures = await lecturesResponse.json();
@@ -111,13 +115,13 @@ async function deleteChapter(button) {
     }
 
     try {
-        const response = await fetch(`/lectures/course/${courseID}/chapter/${chapterName}`, { 
+        const response = await fetch(`/lectures/course/${courseID}/chapter/${chapterName}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ lectureIDs })  // Send lecture IDs in the request body
+            body: JSON.stringify({ lectureIDs })
         });
 
         if (response.status === 204) {
@@ -130,7 +134,7 @@ async function deleteChapter(button) {
 
             if (remainingLectures.length === 0) {
                 // No more lectures, delete the course
-                const deleteCourseResponse = await fetch(`/courses/${courseID}`, { 
+                const deleteCourseResponse = await fetch(`/courses/${courseID}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -160,11 +164,42 @@ async function deleteChapter(button) {
     }
 }
 
+async function displayLectureDetails(lectureID) {
+    try {
+        const response = await fetch(`/lectures/lecture-details/${lectureID}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        
+        // Update the HTML elements with the fetched data
+        document.getElementById('title').innerHTML = `<strong>Title:</strong> ${data.Title}`;
+        document.getElementById('description').innerHTML = `<strong>Description:</strong> ${data.Description}`;
+        document.getElementById('duration').innerHTML = `<strong>Duration:</strong> ${data.Duration}`;
+        document.getElementById('createdAt').innerHTML = `<strong>Created At:</strong> ${data.CreatedAt}`;
+    } catch (error) {
+        console.error('Error fetching lecture details:', error);
+    }
+}
+
+function iconOrientation(){
+    const rotateIcon = document.getElementById('rotate-icon');
+    const subNav = rotateIcon.closest('.nav-item').querySelector('.sub-nav');
+
+    rotateIcon.addEventListener('click', () => {
+        rotateIcon.classList.toggle('rotate-down');
+        subNav.classList.toggle('show');
+    });
+}
+
+function toggleSubNav(event) {
+    const rotateIcon = event.target;
+    const subNav = rotateIcon.closest('.nav-item').querySelector('.sub-nav');
+    rotateIcon.classList.toggle('rotate-down');
+    subNav.classList.toggle('show');
+}
+
 
 function displayLectures(lectures) {
     const userRole = sessionStorage.getItem('role');
-    const token = sessionStorage.getItem('token');
-
     const sidebar = document.querySelector('.sidebar .nav');
     if (!sidebar) {
         console.error('Sidebar element not found.');
@@ -191,69 +226,65 @@ function displayLectures(lectures) {
         const navItem = document.createElement('div');
         navItem.className = 'nav-item';
 
-        const deleteChapterButton = 
-            token && userRole === 'lecturer'
-            ? `<button class="delete-chapter" style="display:block;" data-chapter-name="${chapterName}" onclick="deleteChapter(this)">Delete Chapter</button>` 
+        const deleteChapterButton = userRole === 'lecturer'
+            ? `<button class="delete-chapter" style="display:block;" data-chapter-name="${chapterName}" onclick="deleteChapter(this)">Delete Chapter</button>`
             : '';
 
         const subNavItems = groupedLectures[chapterName]
             .map(lecture => {
-                const deleteButton = 
-                     token && userRole === 'lecturer'
-                    ? `<button class="delete-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>` 
+                const deleteButton = userRole === 'lecturer'
+                    ? `<button class="delete-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="deleteLecture(this)">Delete</button>`
                     : '';
-                const editButton = 
-                     token && userRole === 'lecturer'
+                const editButton = userRole === 'lecturer'
                     ? `<button class="edit-lecture" style="display:block;" data-lecture-id="${lecture.LectureID}" onclick="editLecture(this)">Edit</button>`
                     : '';
-    
+
                 return `
                     <div class="sub-nav-item" data-lecture-id="${lecture.LectureID}">
-                        ${lecture.Title}
-                        ${deleteButton}
-                        ${editButton}
+                        <h3>${lecture.Title}</h3>
+                        <div class="button-container">
+                            ${deleteButton}
+                            ${editButton}
+                        </div>
                     </div>
                 `;
             }).join('');
 
-
         navItem.innerHTML = `
             <div class="nav-title">
-                ${chapterName}
-                <span>&#9660;</span>
+                <h2>${chapterName}</h2>
                 ${deleteChapterButton}
+                <span class="rotate-icon fa-solid fa-caret-right" style="font-size:30px;"></span>
             </div>
-            <div class="sub-nav" style="display: none;">
+            <div class="sub-nav">
                 ${subNavItems}
             </div>
         `;
-
         sidebar.appendChild(navItem);
     }
 
-    const navTitles = document.querySelectorAll('.nav-title');
-    navTitles.forEach(title => {
-        title.addEventListener('click', () => {
-            const subNav = title.nextElementSibling;
-            subNav.style.display = subNav.style.display === "none" ? "block" : "none";
-        });
+    const rotateIcons = document.querySelectorAll('.rotate-icon');
+    rotateIcons.forEach(icon => {
+        icon.addEventListener('click', toggleSubNav);
     });
 
     const subNavItems = document.querySelectorAll('.sub-nav-item');
     subNavItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             const lectureID = this.getAttribute('data-lecture-id');
+            displayLectureDetails(lectureID);
             setVideo(lectureID);
             subNavItems.forEach(item => item.style.fontWeight = 'normal');
             this.style.fontWeight = 'bold';
         });
     });
-
     if (lectures.length > 0) {
         const firstLectureID = lectures[0].LectureID;
+        displayLectureDetails(firstLectureID);
         setVideo(firstLectureID);
     }
 }
+
 
 async function setVideo(lectureID) {
     const videoIframe = document.querySelector('.main-content iframe');
@@ -277,11 +308,7 @@ async function editLecture(button) {
     const token = sessionStorage.getItem('token');
     try {
         // Getting user ID of logged on now 
-        const checkingUserIDResponse = await fetch(`/lectures/checking`,{
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const checkingUserIDResponse = await  fetchWithAuth(`/lectures/checking`);
         if (!checkingUserIDResponse.ok) {
             throw new Error('Network response not ok');
         }
@@ -308,25 +335,5 @@ async function editLecture(button) {
 }
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    getLecturesByCourse();
-
-    const navTitles = document.querySelectorAll('.nav-title');
-    navTitles.forEach(title => {
-        title.addEventListener('click', () => {
-            const subNav = title.nextElementSibling;
-            subNav.style.display = subNav.style.display === "none" || subNav.style.display === "" ? "block" : "none";
-        });
-    });
-
-    const hamburger = document.querySelector('.hamburger');
-    const sidebar = document.querySelector('.sidebar');
-    hamburger.addEventListener('click', () => {
-        sidebar.style.width = sidebar.style.width === "250px" || sidebar.style.width === "" ? "60px" : "250px";
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.style.display = sidebar.style.width === "250px" ? 'block' : 'none';
-        });
-    });
-});
 
 

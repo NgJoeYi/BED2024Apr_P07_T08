@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
+
     <title>EduHelper | Lecture </title>
     <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
 </head>
@@ -29,19 +30,43 @@
         </nav>
     </header>
 
+    <!-- inspired from gignite:
+        1. sidebar
+        2. video container
+        3. lecture information -->
+        
     <div class="container">
         <div class="sidebar">
-            <div class="hamburger">
-                <span>&#9776;</span>
-            </div>
             <div class="nav">
                 <!-- Lecture navigation will be dynamically inserted here -->
+                <div class="nav-item">
+                    <div class="nav-title">
+                        <h2>Introduction</h2>
+                        <button class="delete-chapter" style="display:block;" data-chapter-name="Introduction" onclick="deleteChapter(this)">Delete Chapter</button>
+                        <span id="rotate-icon" class="fa-solid fa-caret-right" style="font-size:30px;" onclick="iconOrientation()"></span>
+                    </div>
+                    <div class="sub-nav" >
+                            <div class="sub-nav-item" data-lecture-id="5">
+                                <h3>SEO Basics</h3>
+                                <div class = "button-container">
+                                    <button class="delete-lecture" style="display:block;" data-lecture-id="5" onclick="deleteLecture(this)">Delete</button>
+                                    <button class="edit-lecture" style="display:block;" data-lecture-id="5" onclick="editLecture(this)">Edit</button>    
+                                </div>
+                            </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="main-content">
             <div class="video-container">
-                <iframe width="100%" height="100%" src="../public/lectureVideos/video1.mp4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class = "lecture-details-card">
+                <p id = "title">Title: </p>
+                <p id = "description">Description: </p>
+                <p id = "duration">Duration: </p>
+                <p id = "createdAt">Created At: </p>
             </div>
         </div>
         
@@ -119,9 +144,8 @@
             </div>
         </div>
     </footer>
-
     <script src="JAVASCRIPT/JwtUtility.js"></script>
     <script src="JAVASCRIPT/lecture.js"></script>
-    <script src="JAVASCRIPT/review.js"></script>
+    <!-- <script src="JAVASCRIPT/review.js"></script> -->
 </body>
 </html>
