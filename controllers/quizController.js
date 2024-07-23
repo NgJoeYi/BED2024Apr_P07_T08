@@ -3,24 +3,24 @@ const Quiz = require('../models/quiz');
 // Function to convert base64 image data to buffer
 function base64ToBuffer(base64String) {
     if (!base64String) {
-        return null; // Return null if the base64 string is not provided
+        return null; // ------------------------------------------------------------------------ Return null if the base64 string is not provided
     }
-    return Buffer.from(base64String, 'base64');
+    return Buffer.from(base64String, 'base64'); // --------------------------------------------- Convert base64 string to buffer
 }
 
-
+// Function to create a new quiz
 const createQuiz = async (req, res) => {
-    const newQuizData = req.body;
-    const userId = req.user.id;
+    const newQuizData = req.body; // ----------------------------------------------------------- Extract new quiz data from the request body
+    const userId = req.user.id; // ------------------------------------------------------------- Extract user ID
     try {
 
-        const getAllTitles = await Quiz.getAllQuizWithCreatorName();
-        // Check for duplicate titles
-        const newTitle = newQuizData.title.trim().toLowerCase(); // Trim and convert new title to lower case
+        const getAllTitles = await Quiz.getAllQuizWithCreatorName(); // ----------------------- Retrieve all quiz titles with creator names
+        // ------------------------------------------------------------------------------------ Check for duplicate titles
+        const newTitle = newQuizData.title.trim().toLowerCase(); // --------------------------- Trim and convert new title to lower case
         for (const quiz of getAllTitles) {
-            const existingTitle = quiz.title.trim().toLowerCase(); // Trim and convert existing title to lower case
-            if (newTitle === existingTitle) { // Compare titles
-                return res.status(400).json({ message: 'Title already exists' });
+            const existingTitle = quiz.title.trim().toLowerCase(); // ------------------------- Trim and convert existing title to lower case
+            if (newTitle === existingTitle) { // ---------------------------------------------- Compare titles
+                return res.status(400).json({ message: 'Title already exists' }); // ---------- Return error if title already exists
             }
         }
 
@@ -29,72 +29,70 @@ const createQuiz = async (req, res) => {
         1. all required fields are filled 
         */
 
-        newQuizData.created_by = userId;
+        newQuizData.created_by = userId;  // ------------------------------------------------ Assign the user ID to the new quiz data
 
-        // Convert img_url to buffer if it's a base64 string
-        if (newQuizData.quizImg) {
+        if (newQuizData.quizImg) { // ------------------------------------------------------- Convert img_url to buffer if it's a base64 string
             newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg);
         }
-        const quiz = await Quiz.createQuiz(newQuizData);
+        const quiz = await Quiz.createQuiz(newQuizData); // --------------------------------- Create a new quiz
         if (!quiz) {
-            return res.status(500).json({ message: 'Failed to create a new quiz' });
+            return res.status(500).json({ message: 'Failed to create a new quiz' }); // ----- Return error if quiz creation fails
         }
-        res.status(201).json({ message: 'Quiz created successfully', quiz });
+        res.status(201).json({ message: 'Quiz created successfully', quiz }); // ------------ Return success message and created quiz
     } catch (error) {
-        console.error('Create Quiz - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Create Quiz - Server Error:', error); // ----------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // ------ Return server error
     }
 };
 
-
-const createQuestionAfterQuizCreation = async (req, res) => { // utilise this in quiz.js 
-    const newQuestionData = req.body;
-    const quizId = parseInt(req.params.id);
+// Function to create a question after quiz creation
+const createQuestionAfterQuizCreation = async (req, res) => {
+    const newQuestionData = req.body;  // --------------------------------------------------- Extract new question data from the request body
+    const quizId = parseInt(req.params.id); // ---------------------------------------------- Extract quiz ID from the request parameters
     try {
-        const checkQuiz = await Quiz.getQuizById(quizId);
+        const checkQuiz = await Quiz.getQuizById(quizId); // -------------------------------- Check if the quiz exists
         if (!checkQuiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // ------------- Return error if quiz does not exist
         }
 
-        // if there is image then buffer it
-        if (newQuestionData.qnsImg) {
+        if (newQuestionData.qnsImg) { // ---------------------------------------------------- Convert question image to buffer if it's a base64 string
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
 
-        const question = await Quiz.createQuestion(newQuestionData);
+        const question = await Quiz.createQuestion(newQuestionData); // --------------------- Create a new question
         if (!question) {
-            return res.status(500).json({ message: "Failed to create question" });
+            return res.status(500).json({ message: "Failed to create question" }); // ------- Return error if question creation fails
         }
-        res.status(201).json({ message: 'Question created successfully', question });
+        res.status(201).json({ message: 'Question created successfully', question }); // ---- Return success message and created question
     } catch (error) {
-        console.error('Error creating question:', error);
-        return res.status(500).json({ message: "Internal Server Error" });
+        console.error('Error creating question:', error); // -------------------------------- Log error details
+        return res.status(500).json({ message: "Internal Server Error" }); // --------------- Return server error
     }
 };
 
-
+// Function to create a question when updating the quiz
 const createQuestionOnUpdate = async (req, res) => { // utilise this in editQuestion.js 
-    const newQuestionData = req.body;
+    const newQuestionData = req.body; // --------------------------------------------------- Extract new question data from the request body
     try {
-        const checkQuiz = await Quiz.getQuizById(newQuestionData.quiz_id);
+        const checkQuiz = await Quiz.getQuizById(newQuestionData.quiz_id); // -------------- Check if the quiz exists
         if (!checkQuiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // ------------ Return error if quiz does not exist
         }
 
-        if (newQuestionData.qnsImg) {
+        if (newQuestionData.qnsImg) { // --------------------------------------------------- Convert question image to buffer if it's a base64 string
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
         
-        const question = await Quiz.createQuestion(newQuestionData);
+        const question = await Quiz.createQuestion(newQuestionData); // -------------------- Create a new question
         if (!question) {
-            return res.status(500).json({ message: "Failed to create question" });
+            return res.status(500).json({ message: "Failed to create question" });  // ----- Return error if question creation fails
         }
 
         // ------------------------ update the total question here --------------------
         const updatedQuizData = {
             title: checkQuiz.title,
             description: checkQuiz.description,
-            total_questions: checkQuiz.total_questions + 1,
+            total_questions: checkQuiz.total_questions + 1,  // ---------------------------- Increment total questions
             total_marks: checkQuiz.total_marks,
             created_by: checkQuiz.created_by,
             quizImg: checkQuiz.quizImg
@@ -119,118 +117,115 @@ const createQuestionOnUpdate = async (req, res) => { // utilise this in editQues
            same applies for the deletion of question
         */
 
-        // Retrieve all quiz attempts for the quiz
+        // ----------------------------------------------------------------------------------------------------- Retrieve all quiz attempts for the quiz
         const userAttempts = await Quiz.getAllQuizResultsByQuizId(newQuestionData.quiz_id);
         if (userAttempts) {
             for (const attempt of userAttempts) {
-                // Retrieve the user's responses for the current attempt
-                const userResponses = await Quiz.getUserResponsesByAttemptId(attempt.attempt_id);
+                // --------------------------------------------------------------------------------------------- Retrieve the user's responses for the current attempt
+                const userResponses = await Quiz.getUserResponsesByAttemptId(attempt.attempt_id); // ----------- Retrieve user responses
 
                 // Recalculate the score
                 let newScore = 0;
                 for (const response of userResponses) {
-                    const correctOption = await Quiz.isCorrectAnswer(response.question_id);
+                    const correctOption = await Quiz.isCorrectAnswer(response.question_id); // ----------------- Check if the answer is correct
                     if (response.selected_option === correctOption) {
-                        newScore += 1;
+                        newScore += 1; // ---------------------------------------------------------------------- Increment score for correct answers
                     }
                 }
-                const totalQuestions = checkQuiz.total_questions + 1; // Including the newly added question
-                const newPercentage = (newScore / totalQuestions) * 100;
+                const totalQuestions = checkQuiz.total_questions + 1; // --------------------------------------- Including the newly added question
+                const newPercentage = (newScore / totalQuestions) * 100; // ------------------------------------ Calculate new percentage
 
-                // Update the user's quiz attempt with the new score
-                await Quiz.updateQuizAttempt(attempt.attempt_id, newPercentage, newPercentage >= 50);
+                await Quiz.updateQuizAttempt(attempt.attempt_id, newPercentage, newPercentage >= 50); // ------- Update the user's quiz attempt with the new score
             }
         }
 
-        return res.status(201).json({ message: "Question created successfully", question });
+        return res.status(201).json({ message: "Question created successfully", question }); // ---------------- Return success message and created question
     } catch (error) {
-        console.error('Error creating question:', error);
-        return res.status(500).json({ message: "Internal Server Error" });
+        console.error('Error creating question:', error); // --------------------------------------------------- Log error details
+        return res.status(500).json({ message: "Internal Server Error" }); // ---------------------------------- Return server error
     }
 };
 
-
+// Function to get a quiz by ID
 const getQuizById = async (req, res) => {
-    const quizId = parseInt(req.params.id);
+    const quizId = parseInt(req.params.id); // ---------------------------------------------------------------- Extract quiz ID from the request parameters
     try {
-        const quiz = await Quiz.getQuizById(quizId);
+        const quiz = await Quiz.getQuizById(quizId); // ------------------------------------------------------- Retrieve quiz by ID
         if (!quiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // ------------------------------- Return error if quiz does not exist
         }
-        res.status(200).json(quiz);
+        res.status(200).json(quiz); // ------------------------------------------------------------------------ Return retrieved quiz
     } catch (error) {
-        console.error('Get Single Quiz - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Get Single Quiz - Server Error:', error); // ------------------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // ------------------------ Return server error
     }
 };
 
+// Function to get all quizzes with creator name
 const getAllQuizWithCreatorName = async (req, res) => {
     try {
-        const quiz = await Quiz.getAllQuizWithCreatorName();
+        const quiz = await Quiz.getAllQuizWithCreatorName(); // ---------------------------------------------- Retrieve all quizzes with creator names
         if (!quiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // ------------------------------ Return error if no quizzes found
         }
-        res.status(200).json(quiz);
+        res.status(200).json(quiz); // ----------------------------------------------------------------------- Return retrieved quizzes
     } catch (error) {
-        console.error('Get All Quiz - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Get All Quiz - Server Error:', error); // --------------------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // ----------------------- Return server error
     }
 };
 
-
+// Function to update a quiz
 const updateQuiz = async (req, res) => {
-    const quizId = parseInt(req.params.id);
-    const newQuizData = req.body;
-    const userId = req.user.id;
+    const quizId = parseInt(req.params.id); // -------------------------------------------------------------- Extract quiz ID from the request parameters
+    const newQuizData = req.body; // ------------------------------------------------------------------------ Extract new quiz data from the request body
+    const userId = req.user.id; // -------------------------------------------------------------------------- Extract user ID
     try {
 
-        const getAllTitles = await Quiz.getAllQuizWithCreatorName();
-        // Check for duplicate titles, excluding the current quiz being updated
-        const newTitle = newQuizData.title.trim().toLowerCase(); // Trim and convert new title to lower case
+        const getAllTitles = await Quiz.getAllQuizWithCreatorName(); // ------------------------------------- Retrieve all quiz titles with creator names
+        // -------------------------------------------------------------------------------------------------- Check for duplicate titles, excluding the current quiz being updated
+        const newTitle = newQuizData.title.trim().toLowerCase(); // ----------------------------------------- Trim and convert new title to lower case
         for (const quiz of getAllTitles) {
-            const existingTitle = quiz.title.trim().toLowerCase(); // Trim and convert existing title to lower case
-            if (newTitle === existingTitle && quiz.id !== quizId) { // Exclude the current quiz from duplicate check
-                return res.status(400).json({ message: 'Title already exists' });
+            const existingTitle = quiz.title.trim().toLowerCase(); // --------------------------------------- Trim and convert existing title to lower case
+            if (newTitle === existingTitle && quiz.id !== quizId) { // -------------------------------------- Exclude the current quiz from duplicate check
+                return res.status(400).json({ message: 'Title already exists' }); // ------------------------ Return error if title already exists
             }
         }
 
-        const checkQuiz = await Quiz.getQuizById(quizId);
+        const checkQuiz = await Quiz.getQuizById(quizId); // ------------------------------------------------ Check if the quiz exists
         if (!checkQuiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // ----------------------------- Return error if quiz does not exist
         }
 
-        // only users that created the quiz can delete the quiz ---------------------------------------------------------------
-        if (checkQuiz.created_by !== userId){
-            return res.status(403).json({ message: 'You are not authorized to update this quiz' });
+        if (checkQuiz.created_by !== userId){ // ------------------------------------------------------------ only users that created the quiz can delete the quiz
+            return res.status(403).json({ message: 'You are not authorized to update this quiz' });  // ----- Return error if not authorized
         }
-        // Convert img_url to buffer if it's a base64 string
-        if (newQuizData.quizImg) {
+
+        if (newQuizData.quizImg) { // ---------------------------------------------------------------------- Convert img_url to buffer if it's a base64 string
             newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg);
-        } else {
-            // If no new image is provided, retain the existing image buffer
+        } else { // ---------------------------------------------------------------------------------------- If no new image is provided, retain the existing image buffer
             newQuizData.quizImg = checkQuiz.quizImg;
         }
-        const quiz = await Quiz.updateQuiz(quizId, newQuizData);
-        res.status(200).json({ message: 'successfully updated', quiz});
+        const quiz = await Quiz.updateQuiz(quizId, newQuizData); // ---------------------------------------- Update the quiz
+        res.status(200).json({ message: 'successfully updated', quiz}); // --------------------------------- Return success message and updated quiz
     } catch (error) {
-        console.error('Update Quiz - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Update Quiz - Server Error:', error); // -------------------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // --------------------- Return server error
     }
 };
 
-
+// Function to delete a quiz
 const deleteQuiz = async (req, res) => {
-    const quizId = parseInt(req.params.id);
-    const userId = req.user.id;
+    const quizId = parseInt(req.params.id); // ------------------------------------------------------------ Extract quiz ID from the request parameters
+    const userId = req.user.id; // ------------------------------------------------------------------------ Extract user ID
     try {
-        const checkQuiz = await Quiz.getQuizById(quizId);
+        const checkQuiz = await Quiz.getQuizById(quizId); // ---------------------------------------------- Check if the quiz exists
         if (!checkQuiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // --------------------------- Return error if quiz does not exist
         }
 
-        // only users that created the quiz can delete the quiz
-        if (checkQuiz.created_by !== userId) {
-            return res.status(403).json({ message: 'You are not authorized to delete this quiz' });
+        if (checkQuiz.created_by !== userId) { // --------------------------------------------------------- only users that created the quiz can delete the quiz
+            return res.status(403).json({ message: 'You are not authorized to delete this quiz' }); // ---- Return error if not authorized
         }
 
         /* ----------------------------------- DELETING FKs ----------------------------------- */
@@ -246,9 +241,9 @@ const deleteQuiz = async (req, res) => {
         // if (!deleteUserResponses) {
         //     return res.status(400).json({ message: 'Failed to delete user responses related to the quiz' });
         // }
-        await Quiz.deleteUserResponsesByQuizId(quizId);
-        await Quiz.deleteIncorrectAnswersByQuizId(quizId);
-        await Quiz.deleteUserAttempts(quizId);
+        await Quiz.deleteUserResponsesByQuizId(quizId); // ------------------------------------------------- Delete related user responses
+        await Quiz.deleteIncorrectAnswersByQuizId(quizId); // ---------------------------------------------- Delete related incorrect answers
+        await Quiz.deleteUserAttempts(quizId); // ---------------------------------------------------------- Delete related user attempts
 
         // const deleteIncorrectAnswers = await Quiz.deleteIncorrectAnswers(quizId);
         // if (!deleteIncorrectAnswers) {
@@ -260,59 +255,57 @@ const deleteQuiz = async (req, res) => {
         //     return res.status(400).json({ message: 'Failed to delete user attempts related to the quiz' });
         // }
 
-        const deleteQns = await Quiz.deleteQuestionByQuizId(quizId);
+        const deleteQns = await Quiz.deleteQuestionByQuizId(quizId); // ------------------------------------ Delete related questions
         if (!deleteQns) {
-            return res.status(400).json({ message: 'Failed to delete questions related to the quiz' });
+            return res.status(400).json({ message: 'Failed to delete questions related to the quiz' }); // - Return error if question deletion fails
         }
         /* ----------------------------------- DELETING FKs ----------------------------------- */
 
-        const quiz = await Quiz.deleteQuiz(quizId);
+        const quiz = await Quiz.deleteQuiz(quizId); // ----------------------------------------------------- Delete the quiz
         if (quiz) {
-            res.status(204).json({ message: 'Quiz successfully deleted' });
+            res.status(204).json({ message: 'Quiz successfully deleted' }); // ----------------------------- Return success message if quiz deletion is successful
         } else {
-            res.status(500).json({ message: 'Failed to delete quiz' });
+            res.status(500).json({ message: 'Failed to delete quiz' }); // --------------------------------- Return error if quiz deletion fails
         }
     } catch (error) {
-        console.error('Delete Quiz - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Delete Quiz - Server Error:', error); // -------------------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // --------------------- Return server error
     }
 };
 
-
+// Function to get a quiz with its questions by quiz ID
 const getQuizWithQuestions = async (req, res) => {
-    const quizId = parseInt(req.params.id);
+    const quizId = parseInt(req.params.id); // ------------------------------------------------------------- Extract quiz ID from the request parameters
     try {
-        const quiz = await Quiz.getQuizWithQuestions(quizId);
+        const quiz = await Quiz.getQuizWithQuestions(quizId); // ------------------------------------------- Retrieve quiz with questions by quiz ID
         if (!quiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // ---------------------------- Return error if quiz does not exist
         }
-        res.status(200).json(quiz);
+        res.status(200).json(quiz); // --------------------------------------------------------------------- Return retrieved quiz with questions
     } catch (error) {
-        console.error('Get Quiz With Questions - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Get Quiz With Questions - Server Error:', error); // -------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // --------------------- Return server error
     }
 };
 
-// need to check if the correct option updated is the same with one of the options given
-const updateQuestion = async (req, res) => { // get back to here
-    const qnsId = parseInt(req.params.questionId);
-    const quizId = parseInt(req.params.quizId);
-    const newQuestionData = req.body;
+// Function to update a question
+// need to check if the correct option updated is the same with one of the options given (edit: done))
+const updateQuestion = async (req, res) => {
+    const qnsId = parseInt(req.params.questionId); // ----------------------------------------------------- Extract question ID from the request parameters
+    const quizId = parseInt(req.params.quizId); // -------------------------------------------------------- Extract quiz ID from the request parameters
+    const newQuestionData = req.body; // ------------------------------------------------------------------ Extract new question data from the request body
     try {
-
-        // Check if the quiz exists
-        const checkQuiz = await Quiz.getQuizById(quizId);
+        const checkQuiz = await Quiz.getQuizById(quizId); // ---------------------------------------------- Check if the quiz exists
         if (!checkQuiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // --------------------------- Return error if quiz does not exist
         }
 
-        // Check if the question exists
-        const checkQns = await Quiz.getQuestionById(qnsId);
+        const checkQns = await Quiz.getQuestionById(qnsId); // -------------------------------------------- Check if the question exists
         if (!checkQns) {
-            return res.status(404).json({ message: 'Question does not exist' });
+            return res.status(404).json({ message: 'Question does not exist' }); // ----------------------- Return error if question does not exist
         }
 
-        // Validate that the correct option is one of the provided options
+        // ------------------------------------------------------------------------------------------------ Validate that the correct option is one of the provided options
         const options = [
             newQuestionData.option_1.toLowerCase(),
             newQuestionData.option_2.toLowerCase(),
@@ -320,58 +313,55 @@ const updateQuestion = async (req, res) => { // get back to here
             newQuestionData.option_4.toLowerCase()
         ];
 
-        const correctOptionExists = options.includes(newQuestionData.correct_option.toLowerCase()); // compare options in lower case
+        const correctOptionExists = options.includes(newQuestionData.correct_option.toLowerCase()); // ------ compare options in lower case
         if (!correctOptionExists) {
-            return res.status(400).json({ message: 'Correct option must be one of the given options' });
+            return res.status(400).json({ message: 'Correct option must be one of the given options' }); // - Return error if correct option is not valid
         }
 
-        if (newQuestionData.question_text) { // make sure sentences starts with caps 
+        if (newQuestionData.question_text) { // ------------------------------------------------------------- Make sure sentences starts with caps 
             newQuestionData.question_text = newQuestionData.question_text.charAt(0).toUpperCase() + newQuestionData.question_text.slice(1);
         }
 
-        if (newQuestionData.qnsImg) { // if image is provided
+        if (newQuestionData.qnsImg) { // -------------------------------------------------------------------- if image is provided
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
-        } else { // if image is not provided get the initial image
+        } else { // ----------------------------------------------------------------------------------------- if image is not provided get the initial image
             newQuestionData.qnsImg = checkQns.qnsImg;
         }
 
-        const updateQns = await Quiz.updateQuestion(quizId, qnsId, newQuestionData);
+        const updateQns = await Quiz.updateQuestion(quizId, qnsId, newQuestionData); // --------------------- Update the question
         if (!updateQns) {
-            return res.status(400).json({ message: 'Could not update question' });
+            return res.status(400).json({ message: 'Could not update question' }); // ----------------------- Return error if question update fails
         }
-        res.status(200).json({ message: 'Question updated successfully' });
+        res.status(200).json({ message: 'Question updated successfully' }); // ------------------------------ Return success message if question update is successful
     } catch (error) {
-        console.error('Update Question - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Update Question - Server Error:', error); // ----------------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // ---------------------- Return server error
     }
 };
 
-// FOR DELETE QUESTION, WHEN I DELETE QUESTION I MUST ALSO UPDATE THE TOTAL QUESTION IN QUIZZES
-// if user wants to delete one last question, also prompt them if they want to delete the quiz -------------------------------------
+// Function to delete a question
+// FOR DELETE QUESTION, WHEN I DELETE QUESTION I MUST ALSO UPDATE THE TOTAL QUESTION IN QUIZZES (edit: done)
+// if user wants to delete one last question, also prompt them if they want to delete the quiz (edit: done)
 const deleteQuestion = async (req, res) => {
-    const qnsId = req.params.questionId;
-    const quizId = req.params.quizId;
+    const qnsId = req.params.questionId; // ----------------------------------------------------------------- Extract question ID from the request parameters
+    const quizId = req.params.quizId; // -------------------------------------------------------------------- Extract quiz ID from the request parameters
     try {
-
-        // Check if the quiz exists
-        const checkQuiz = await Quiz.getQuizById(quizId);
+        const checkQuiz = await Quiz.getQuizById(quizId); // ------------------------------------------------ Check if the quiz exists
         if (!checkQuiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' });
+            return res.status(404).json({ message: 'Quiz does not exist' }); // ----------------------------- Return error if quiz does not exist
         }
 
         // ------------ check whether the quiz has atleast 1 question ------------
         if (checkQuiz.total_questions <= 1) {
-            // Prompt the user for confirmation to delete the quiz
-            return res.status(200).json({ 
+            return res.status(200).json({  // --------------------------------------------------------------- Return message prompting to delete the entire quiz if it's the last question
                 message: 'This is the last question. Do you want to delete the entire quiz?', 
                 confirmDeleteQuiz: true 
             });
         }
         
-        // Check if the question exists
-        const checkQns = await Quiz.getQuestionById(qnsId);
+        const checkQns = await Quiz.getQuestionById(qnsId); // ---------------------------------------------- Check if the question exists
         if (!checkQns) {
-            return res.status(404).json({ message: 'Question does not exist' });
+            return res.status(404).json({ message: 'Question does not exist' }); // ------------------------- Return error if question does not exist
         }
 
         /* ----------------------------------- DELETING FKs ----------------------------------- */
@@ -382,8 +372,8 @@ const deleteQuestion = async (req, res) => {
         //     return res.status(400).json({ message: 'Could not delete user responses related to the question' });
         // }
 
-        await Quiz.deleteUserResponsesByQuestionId(qnsId);
-        await Quiz.deleteIncorrectAnswersByQuestionId(qnsId);
+        await Quiz.deleteUserResponsesByQuestionId(qnsId); // ----------------------------------------------- Delete related user responses
+        await Quiz.deleteIncorrectAnswersByQuestionId(qnsId); // -------------------------------------------- Delete related incorrect answers
         // Delete related incorrect answers
         // const deleteIncorrectAnswers = await Quiz.deleteIncorrectAnswersByQuestionId(qnsId);
         // if (!deleteIncorrectAnswers) {
@@ -392,25 +382,24 @@ const deleteQuestion = async (req, res) => {
 
         /* ----------------------------------- DELETING FKs ----------------------------------- */
 
-        // Delete the question
-        const deleteQns = await Quiz.deleteQuestionByQuestionId(qnsId);
+        const deleteQns = await Quiz.deleteQuestionByQuestionId(qnsId); // ---------------------------------- Delete the question
         if (!deleteQns) {
-            return res.status(500).json({ message: 'Could not delete question' });
+            return res.status(500).json({ message: 'Could not delete question' }); // ----------------------- Return error if question deletion fails
         }
 
         // ------------------------ update the total question here --------------------
         const updatedQuizData = {
             title: checkQuiz.title,
             description: checkQuiz.description,
-            total_questions: checkQuiz.total_questions - 1,
+            total_questions: checkQuiz.total_questions - 1, // ---------------------------------------------- Decrement total questions
             total_marks: checkQuiz.total_marks,
             created_by: checkQuiz.created_by,
             quizImg: checkQuiz.quizImg
         };
 
-        const updateTotalQuestion = await Quiz.updateQuiz(quizId, updatedQuizData);
+        const updateTotalQuestion = await Quiz.updateQuiz(quizId, updatedQuizData); // --------------------- Update the quiz with new total questions
         if (!updateTotalQuestion) {
-            return res.status(500).json({ message: 'Could not update total questions in the quiz' });
+            return res.status(500).json({ message: 'Could not update total questions in the quiz' }); // --- Return error if quiz update fails
         }
 
         // ------------------------ retrieiving the users response to recalc the score to be displayed to the user ------------------------
@@ -420,162 +409,155 @@ const deleteQuestion = async (req, res) => {
         the total percentage should become 100% since there is only one question left in 
         the quiz and the question left was the one that the user got it right */
 
-        // Retrieve all quiz attempts for the quiz
-        const userAttempts = await Quiz.getAllQuizResultsByQuizId(quizId);
+        const userAttempts = await Quiz.getAllQuizResultsByQuizId(quizId); // ------------------------------ Retrieve all quiz attempts for the quiz
         if (userAttempts) {
             for (const attempt of userAttempts) {
                 // Retrieve the user's responses for the current attempt
-                const userResponses = await Quiz.getUserResponsesByAttemptId(attempt.attempt_id);
+                const userResponses = await Quiz.getUserResponsesByAttemptId(attempt.attempt_id); // ------- Retrieve user responses
 
                 // Recalculate the score
                 let newScore = 0;
                 for (const response of userResponses) {
-                    const correctOption = await Quiz.isCorrectAnswer(response.question_id);
+                    const correctOption = await Quiz.isCorrectAnswer(response.question_id); // -------------- Check if the answer is correct
                     if (response.selected_option === correctOption) {
-                        newScore += 1;
+                        newScore += 1;  // ------------------------------------------------------------------ Increment score for correct answers
                     }
                 }
-                const totalQuestions = userResponses.length;
-                const newPercentage = (newScore / totalQuestions) * 100;
+                const totalQuestions = userResponses.length; // --------------------------------------------- Calculate total questions after deletion
+                const newPercentage = (newScore / totalQuestions) * 100; // --------------------------------- Calculate new percentage
 
-                // Update the user's quiz attempt with the new score
-                await Quiz.updateQuizAttempt(attempt.attempt_id, newPercentage, newPercentage >= 50);
+                await Quiz.updateQuizAttempt(attempt.attempt_id, newPercentage, newPercentage >= 50); // ---- Update the user's quiz attempt with the new score
             }
         }
-
-
-        res.status(204).json({ message: 'Question deleted successfully' });
+        res.status(204).json({ message: 'Question deleted successfully' }); // ------------------------------ Return success message if question deletion is successful
     } catch (error) {
-        console.error('Delete Questions - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Delete Questions - Server Error:', error); // ---------------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // ---------------------- Return server error
     }
 };
 
+// note to self:
 // flow of content for below so i dont get confused
 // 1. user submit quiz
 // 2. when user submit quiz count how many attempt the user has 
 // 3. display the result to the user
 // 4. also display it in the user's profile page
-
 // maybe for incorrect answers table, can use it to create pie chart to represent statistics of ppl's score
 
+// Function to submit a quiz
 // check if all qns r attempted
 const submitQuiz = async (req, res) => {
-    const { quizId, responses, timeTaken } = req.body;
-    const userId = req.user.id;
-    let totalScore = 0;
+    const { quizId, responses, timeTaken } = req.body; // ---------------------------------------------------- Extract quiz ID, responses, and time taken from the request body
+    const userId = req.user.id; // --------------------------------------------------------------------------- Extract user ID
+    let totalScore = 0; // ----------------------------------------------------------------------------------- Initialize total score
 
     try {
-        // Fetch the quiz details including total marks and total questions
-        const quizDetails = await Quiz.getQuizById(quizId);
+        const quizDetails = await Quiz.getQuizById(quizId); // ----------------------------------------------- Fetch the quiz details including total marks and total questions
         if (!quizDetails) {
-            return res.status(404).json({ message: 'Quiz not found' });
+            return res.status(404).json({ message: 'Quiz not found' }); // ----------------------------------- Return error if quiz not found
         }
-        const totalMarks = quizDetails.total_marks; // need total marks to determine whether pass or fail 
-        const totalQuestions = quizDetails.total_questions;
+        // const totalMarks = quizDetails.total_marks; // need total marks to determine whether pass or fail 
+        const totalQuestions = quizDetails.total_questions; // ----------------------------------------------- Get total questions from quiz details
 
-        // Check if all questions have responses
+        // --------------------------------------------------------------------------------------------------- Check if all questions have responses
         if (responses.length < totalQuestions || responses.some(response => response.selected_option === null)) {
             return res.status(400).json({ message: 'All questions must be answered.' });
         }
 
-        // Create the quiz attempt record before saving responses
-        const attemptId = await Quiz.createQuizAttempt(userId, quizId, totalScore, false, timeTaken);
+        const attemptId = await Quiz.createQuizAttempt(userId, quizId, totalScore, false, timeTaken); // ----- Create the quiz attempt record before saving responses
 
-        // Save each user response
+        // ----------------------------------------------------------------------------------------------------Save each user response
         for (const response of responses) {
             const { question_id, selected_option } = response;
             await Quiz.saveUserResponse(attemptId, question_id, selected_option);
 
-            // Check each answer and calculate the total score
-            const correctOption = await Quiz.isCorrectAnswer(question_id); // getting the correct option
+            // ----------------------------------------------------------------------------------------------- Check each answer and calculate the total score
+            const correctOption = await Quiz.isCorrectAnswer(question_id); // -------------------------------- getting the correct option
             if (correctOption.toLowerCase() === selected_option.toLowerCase()) {
                 // console.log('each time i get correct');
-                totalScore++;
+                totalScore++; // ----------------------------------------------------------------------------- Increment score for correct answers
             } else {
-                await Quiz.saveIncorrectAnswer(attemptId, question_id, selected_option, correctOption);
+                await Quiz.saveIncorrectAnswer(attemptId, question_id, selected_option, correctOption); // --- Save incorrect answer
             }
         }
-        // Calculate score percentage -- need to revisit this when i am awake
-        const scorePercentage = (totalScore / totalQuestions) * 100;
+
+        const scorePercentage = (totalScore / totalQuestions) * 100; // ------------------------------------- Calculate score percentage
         console.log('Score percentage:', scorePercentage);
         const passed = scorePercentage >= 50; // more than 50% mean pass
         console.log('Passed:', passed);
-        // Calculate score percentage -- need to revisit this when i am awake
 
-        // Update the quiz attempt record with the calculated score and passing status
-        await Quiz.updateQuizAttempt(attemptId, scorePercentage, passed);
+        await Quiz.updateQuizAttempt(attemptId, scorePercentage, passed); // -------------------------------- Update the quiz attempt record with the calculated score and passing status
 
-        res.status(200).json({ attemptId });
+        res.status(200).json({ attemptId }); // ------------------------------------------------------------- Return the attempt ID
     } catch (error) {
-        console.error('Error submitting quiz:', error);
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Error submitting quiz:', error); // -------------------------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // ---------------------- Return server error
     }
 };
 
-
-const getAttemptCountByQuizId = async (req, res) => { // so i can display number of attempts to user
-    const userId = req.user.id;
+// Function to get the attempt count by quiz ID
+const getAttemptCountByQuizId = async (req, res) => { // --------------------------------------------------- so i can display number of attempts to user
+    const userId = req.user.id; // ------------------------------------------------------------------------- Extract user ID
     try {
-        const count = await Quiz.getAttemptCountByQuizId(userId);
-        res.status(200).json(count);
+        const count = await Quiz.getAttemptCountByQuizId(userId); // --------------------------------------- Get attempt count by quiz ID
+        res.status(200).json(count); // -------------------------------------------------------------------- Return attempt count
     } catch (error) {
-        console.error('Get Attempt Count By Quiz Id - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Get Attempt Count By Quiz Id - Server Error:', error); // --------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // --------------------- Return server error
     }
 };
 
-
-const getAllAttemptCount = async (req, res) => { // so i can display number of attempts to user
-    const userId = req.user.id;
+// Function to get all attempt counts for a user
+const getAllAttemptCount = async (req, res) => { // ------------------------------------------------------- so i can display number of attempts to user
+    const userId = req.user.id; // ------------------------------------------------------------------------ Extract user ID
     try {
-        const count = await Quiz.getAllAttemptCount(userId);
-        res.status(200).json(count);
+        const count = await Quiz.getAllAttemptCount(userId); // ------------------------------------------- Get all attempt counts for the user
+        res.status(200).json(count); // ------------------------------------------------------------------- Return attempt count
     } catch (error) {
-        console.error('Get All Attempt Count - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Get All Attempt Count - Server Error:', error); // --------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // -------------------- Return server error
     }
 };
 
-
+// Function to get a user's quiz result by attempt ID
 const getUserQuizResult = async (req, res) => {
-    const userId = req.user.id;
-    const attemptId = parseInt(req.params.attemptId);
+    const userId = req.user.id; // ----------------------------------------------------------------------- Extract user ID
+    const attemptId = parseInt(req.params.attemptId); // ------------------------------------------------- Extract attempt ID from the request parameters
     try {
-        const result = await Quiz.getUserQuizResult(userId, attemptId);
+        const result = await Quiz.getUserQuizResult(userId, attemptId); // ------------------------------- Get user's quiz result by attempt ID
         if (!result) {
-            return res.status(404).json({ message: 'Failed to retrieve user\'s quiz result' });
+            return res.status(404).json({ message: 'Failed to retrieve user\'s quiz result' }); // ------- Return error if quiz result not found
         }
-        res.status(200).json(result);
+        res.status(200).json(result); // ----------------------------------------------------------------- Return user's quiz result
     } catch (error) {
-        console.error('Get User\'s Quiz results - Server Error:', error); // Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Get User\'s Quiz results - Server Error:', error); // ----------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // ------------------- Return server error
     }
 };
 
-
-const getAllQuizResultsForUser = async (req, res) => { // for account page
-    const userId = req.user.id;
+// Function to get all quiz results for a user
+const getAllQuizResultsForUser = async (req, res) => { // ------------------------------------------------ for account page
+    const userId = req.user.id; // ----------------------------------------------------------------------- Extract user ID
     try {
-        const results = await Quiz.getAllQuizResultsForUser(userId);
+        const results = await Quiz.getAllQuizResultsForUser(userId); // ---------------------------------- Get all quiz results for the user
         if (!results) {
-            return res.status(404).json({ message: 'No quiz completed' });
+            return res.status(404).json({ message: 'No quiz completed' }); // ---------------------------- Return error if no quiz results found
         }
-        res.status(200).json(results);
+        res.status(200).json(results); // ---------------------------------------------------------------- Return quiz results
     } catch (error) {
-        console.error('Error fetching quiz results:', error);
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        console.error('Error fetching quiz results:', error); // ----------------------------------------- Log error details
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // ------------------- Return server error
     }
 };
 
-
+// Function to get quiz pass/fail statistics
 const getQuizPassFailStatistics = async (req, res) => {
     try {
-        const stats = await Quiz.getQuizPassFailStatistics();
-        res.status(200).json(stats);
+        const stats = await Quiz.getQuizPassFailStatistics(); // ---------------------------------------- Get quiz pass/fail statistics
+        res.status(200).json(stats); // ----------------------------------------------------------------- Return statistics
     } catch (error) {
-        console.error('Error fetching pass/fail statistics:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Error fetching pass/fail statistics:', error); // -------------------------------- Log error details
+        res.status(500).json({ message: 'Internal server error' }); // ---------------------------------- Return server error
     }
 };
 
