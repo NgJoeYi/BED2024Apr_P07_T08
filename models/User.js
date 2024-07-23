@@ -35,28 +35,6 @@ class User {
         }
     }
 
-    // just want to check if user exist, hence returns true or false
-    /*
-    static async checkUserExist(emailInput) {
-        let connection;
-        try {
-            connection = await sql.connect(dbConfig);
-            const sqlQuery = `SELECT * FROM Users WHERE email=@emailInput`;
-            const request = connection.request();
-            request.input('emailInput', emailInput);
-            const result = await request.query(sqlQuery);
-            return result.recordset.length > 0;
-        } catch(error) {
-            console.error('Error retrieving a user:', error);
-            throw error;
-        } finally {
-            if (connection) {
-                await connection.close();
-            }
-        }
-    }
-    */
-
     // newUserData sent in req.body rmb to extract
     static async createUser(newUserData) {
         let connection;
