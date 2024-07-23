@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const token = getToken();
     const currentUserId = parseInt(sessionStorage.getItem('userId'), 10);  // Get the current user ID from session storage and not decode token bc decode token to get user Id pose security concerns since sensitive info can be found using token
+    const currentUser = { // Define the currentUser object (added this because of Gignite)
+        profilePic: sessionStorage.getItem('profilePic') || 'images/profilePic.jpeg'
+    };
 
     // Event listener to close pop up
     // closePopupBtn.addEventListener('click', closePopup);
@@ -30,10 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentText = document.getElementById('comment-text');
         const saveButton = popup.querySelector('button');
         const cancelButton = popup.querySelector('.cancel-btn'); // Gignite
+        const avatarImg = popup.querySelector('.avatar img'); // Fetch the avatar img element
 
         if (type === 'add') {
             popupTitle.textContent = 'Leave a Comment';
             commentText.value = '';
+            avatarImg.src = currentUser.profilePic;  // Set the current user's profile picture
             editMode = false;
             currentComment = null;
             currentCommentId = null;
@@ -41,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             popupTitle.textContent = 'Edit Comment';
             commentText.value = currentComment.querySelector('.comment-content').textContent.trim();
+            avatarImg.src = currentComment.querySelector('.avatar img').src; // Use the current comment's profile picture (default or own pfp etc)
             editMode = true;
             saveButton.onclick = saveComment; 
         }
