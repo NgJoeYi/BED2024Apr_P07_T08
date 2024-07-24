@@ -60,8 +60,10 @@
     <div class="tabs-container" style="margin-bottom: 24px;">
         <div class="filter-sort-tabs">
             <div class="tabs">
-                <button class="tab-btn active" onclick="showTab('following')">Following</button>
+                
                 <button class="tab-btn" onclick="showTab('mainFeed')">Main Feed</button>
+                <button class="tab-btn active" onclick="showTab('following')">Following</button>
+                
             </div>
             <div class="filter-sort">
                 <div class="filter-unique">
@@ -87,19 +89,17 @@
     </div>
 
 
-    <div id="following" class="tab-content" style="display: none;">
-        <!-- Content for 'Following' tab -->
-    </div>
     <div id="mainFeed" class="tab-content" style="display: block;">
-        <!-- Content for 'Main Feed' tab -->
+        <div class="activity-feed"></div>
+    </div>
+    <div id="following" class="tab-content" style="display: none;">
+        <div class="activity-feed"></div>
     </div>
     
     
 
 
-    <div class="activity-feed">
-        <!-- Discussions will be dynamically added here by JavaScript -->
-    </div>
+   
 
     <!-- Popup for Adding Discussion -->
      
