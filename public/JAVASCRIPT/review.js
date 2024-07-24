@@ -1,9 +1,10 @@
+let currentReviewId = null;
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // Get course ID
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get('courseID'); 
-
     // Log the courseId for debugging purposes
     console.log('Retrieved courseId:', courseId);
 
@@ -129,20 +130,37 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sort').value = 'mostRecent';
 });
 
-function showPopup(type) {
+
+function showPopup(type, review = null) {
+    const currentUser = { // Define the currentUser object (added this because of Gignite)
+        profilePic: sessionStorage.getItem('profilePic') || 'images/profilePic.jpeg'
+    };
     const popup = document.getElementById('popup');
     const popupContent = popup.querySelector('.popup-content h2');
+    const avatarImg = popup.querySelector('.avatar img'); // Fetch the avatar img element
     popupContent.textContent = type === 'add' ? 'Leave a Review' : 'Edit Review'; // Pop Up title based on Pop Up type
     popup.style.display = 'flex'; // Display popup
 
     if (type === 'add') {
+        avatarImg.src = currentUser.profilePic;  // Set the current user's profile picture
         document.getElementById('review-text').value = ''; // No review text since is 'Add' Pop Up
         document.querySelectorAll('.popup .fa-star').forEach(star => { // Reset star ratings
             star.classList.remove('selected');
         });
+        currentReviewId = null; // Clear the current review ID
 
-        const postButton = document.querySelector('.popup-content button');
-        postButton.onclick = postReview;
+    } else if (type === 'edit' && review) {
+        avatarImg.src = review.querySelector('.author-avatar').src;
+        document.getElementById('review-text').value = review.querySelector('.review-details p').textContent;
+        const rating = Array.from(review.querySelectorAll('.fa-star')).filter(star => star.classList.contains('selected')).length;
+        document.querySelectorAll('.popup .fa-star').forEach(star => {
+            if (star.getAttribute('data-value') <= rating) {
+                star.classList.add('selected');
+            } else {
+                star.classList.remove('selected');
+            }
+        });
+        currentReviewId = review.getAttribute('data-id'); // Set the current review ID
     }
 
     // 'Edit' Pop Up type is dealt within 'editReview' function itself
@@ -182,8 +200,11 @@ async function postReview() {
     const reviewText = document.getElementById('review-text').value;
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
 
+    const endpoint = currentReviewId ? `/reviews/${currentReviewId}` : '/reviews'; // Determine endpoint
+    const method = currentReviewId ? 'PUT' : 'POST'; // Determine method
+
     fetchWithAuth('/reviews', { 
-        method: 'POST',
+        method: method,
         body: JSON.stringify({ review_text: reviewText, rating: rating, courseId: courseId })
     })
     .then(response => {
@@ -213,6 +234,10 @@ async function editReview(button) {
     const reviewStars = review.querySelectorAll('.fa-star');
     const popupStars = document.querySelectorAll('.popup .fa-star');
 
+    // Define avatarImg here (Added this for Gignite)
+    const avatarImg = document.querySelector('.popup .avatar img');
+    avatarImg.src = review.querySelector('.author-avatar').src; // Use the current comment's profile picture
+
     document.getElementById('review-text').value = reviewText;
 
     const rating = Array.from(reviewStars).filter(star => star.classList.contains('selected')).length;
@@ -225,35 +250,40 @@ async function editReview(button) {
         }
     });
 
-    showPopup('edit'); // 'Edit' type for showPopup
+    showPopup('edit', review); // 'Edit' type for showPopup
 
-    const postButton = document.querySelector('.popup-content button');
-    postButton.onclick = () => {
+    const postButton = document.querySelector('.popup-content .btn.post-btn');
+    postButton.onclick = async () => {
         const updatedText = document.getElementById('review-text').value;
         const updatedRating = document.querySelectorAll('.popup .fa-star.selected').length;
         const reviewId = review.getAttribute('data-id');
         const courseId = parseInt(new URLSearchParams(window.location.search).get('courseID'), 10);
 
-        fetchWithAuth(`/reviews/${reviewId}`, { 
-            method: 'PUT',
-            body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId })
-        })
-        .then(response => {
-            if (!response) return; // !response is to catch unexpected code issues + if !reponse, will just stop execution of 'editReview' here
-            if (!response.ok) {    // !response.ok is examine status code see when have error like 500 Internal Server Error or 404 
-                return response.json().then(err => { throw err; }); // If !response.ok, will hv error msg + move to 'catch' error bc you got 'throw err' here
+        try {
+            const response = await fetchWithAuth(`/reviews/${reviewId}`, { 
+                method: 'PUT',
+                body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId })
+            });
+            
+            if (!response) return;
+            if (!response.ok) {
+                const error = await response.json();
+                throw error;
             }
-            return response.json();
-        })
-        .then(data => {
+
+            const data = await response.json();
             alert(data.message); // Success message
             closePopup();
             fetchReviews(courseId);
-        })
-        .catch(error => {
+        } catch (error) {
             console.error('Error updating review:', error);
             alert(`${error.error || 'Internal Server Error'}`);
-        });
+        }
+    };
+
+    const cancelButton = document.querySelector('.popup-content .btn.cancel-btn');
+    cancelButton.onclick = () => {
+        closePopup();
     };
 }
 
