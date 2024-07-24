@@ -4,15 +4,15 @@ let totalPages = 1;
 let coursesData = [];
 
 // GETTING ALL COURSES
-async function fetchCourses(category = 'all', sortBy = 'most-recent') {
+async function fetchCourses(category = 'All', sortBy = 'most-recent') {
   try {
     const token = sessionStorage.getItem('token');
     const userRole = sessionStorage.getItem('role');
     let response;
 
-    if (category === 'all' && sortBy === 'most-recent') {
+    if (category === 'All' && sortBy === 'most-recent') {
       response = await fetch('/courses/mostRecent');
-    } else if (category === 'all' && sortBy === 'oldest') {
+    } else if (category === 'All' && sortBy === 'oldest') {
       response = await fetch('/courses/earliest');
     } else if (sortBy === 'most-recent') {
       response = await fetch(`/courses/filter?category=${category}&sort=most-recent`);
@@ -30,7 +30,6 @@ async function fetchCourses(category = 'all', sortBy = 'most-recent') {
     totalPages = Math.ceil(coursesData.length / itemsPerPage);
     deleteCourseWithNoLectures();
     displayCourses();
-    filter();
     
   } catch (error) {
     console.error('Error fetching courses:', error);
@@ -161,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
     currentPage = 1 // reset to first page
     const selectedCategory = this.value;
     fetchCourses(selectedCategory);
+    
   });
 
   // add event listener for sorting by date
@@ -182,7 +182,10 @@ async function filter() {
     const filterCategory = document.getElementById('filter-category');
 
     // Clear existing options
-    filterCategory.innerHTML = '<option value="all">All</option>';
+    filterCategory.innerHTML = '';
+
+    // Add the "All" category to the beginning of the categories array
+    categories.unshift({ Category: 'All' });
 
     // Appending new categories
     categories.forEach(categoryContent => {
