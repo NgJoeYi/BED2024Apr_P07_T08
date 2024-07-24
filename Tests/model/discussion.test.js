@@ -1,6 +1,6 @@
 const sql = require('mssql');
-const Discussion = require('../models/Discussion');
-const dbConfig = require('../dbConfig');
+const Discussion = require('../../models/Discussion');
+const dbConfig = require('../../dbConfig');
 
 jest.mock('mssql');
 
