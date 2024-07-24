@@ -1,7 +1,7 @@
-const discussionController = require('../controllers/discussionController');
-const discussionModel = require('../models/Discussion');
+const discussionController = require('../../controllers/discussionController');
+const discussionModel = require('../../models/Discussion');
 
-jest.mock('../models/Discussion'); // Mock the discussion model
+jest.mock('../../models/Discussion'); // Mock the discussion model
 
 describe('discussionController', () => {
     beforeEach(() => {
