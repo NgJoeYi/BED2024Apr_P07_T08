@@ -49,7 +49,7 @@ const loginUser = async (req, res) => {
     try {
         const loginSuccess = await User.getUserByEmail({ email }); // -------------------------------- Fetch the user by email
         if (!loginSuccess) { // ---------------------------------------------------------------------- If no user is found, send a 404 response
-            return res.status(404).send({ message: 'Invalid email. No user found' });
+            return res.status(404).json({ message: 'Invalid email. No user found' });
         }
 
         const matchPassword = await bcrypt.compare(password, loginSuccess.password); // -------------- Compare the provided password with the stored hashed password
