@@ -114,7 +114,7 @@ const updateUser = async (req, res) => {
         res.status(200).json(updatedUser); // ------------------------------------------------------ Send the updated user data in the response
     } catch (error) {
         console.error('Server error:', error); // -------------------------------------------------- Log error details
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
