@@ -59,6 +59,24 @@ const createQuestionAfterQuizCreation = async (req, res) => {
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
 
+
+        // Define options from newQuestionData
+        const options = [
+            newQuestionData.option_1,
+            newQuestionData.option_2,
+            newQuestionData.option_3,
+            newQuestionData.option_4
+        ];
+        // Convert correct_option to a zero-based index
+        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
+        // Check if the index is valid and within the bounds of the options array
+        if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
+            // Map correct_option to its content
+            newQuestionData.correct_option = options[correctOptionIndex];
+        }
+        console.log(newQuestionData);
+
+
         const question = await Quiz.createQuestion(newQuestionData); // --------------------- Create a new question
         if (!question) {
             return res.status(500).json({ message: "Failed to create question" }); // ------- Return error if question creation fails
@@ -206,6 +224,16 @@ const updateQuiz = async (req, res) => {
         } else { // ---------------------------------------------------------------------------------------- If no new image is provided, retain the existing image buffer
             newQuizData.quizImg = checkQuiz.quizImg;
         }
+
+        // Check if any changes were made
+        const changesMade = Object.keys(newQuizData).some(
+            key => newQuizData[key] !== checkQuiz[key]
+        );
+
+        if (!changesMade) {
+            return res.status(400).json({ message: 'No changes were made.' });
+        }
+
         const quiz = await Quiz.updateQuiz(quizId, newQuizData); // ---------------------------------------- Update the quiz
         res.status(200).json({ message: 'successfully updated', quiz}); // --------------------------------- Return success message and updated quiz
     } catch (error) {
