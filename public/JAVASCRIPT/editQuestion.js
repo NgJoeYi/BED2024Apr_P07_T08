@@ -260,21 +260,24 @@ function deleteQuestion(questionId) {
         method: 'DELETE'
     })
     .then(response => {
-        return response.json();
-    })
-    .then(data => {
-        console.log('Delete response data:', data);
-        if (data.message === 'Question deleted successfully') {
+        if (response.status === 204) { // -------- changes made here
             alert('Question deleted successfully');
             // Remove the question from the UI
             const questionCard = document.querySelector(`textarea[data-question-id="${questionId}"]`).parentElement;
             questionCard.remove();
-        } else if (data.confirmDeleteQuiz) { 
+        } else if (response.status === 200) {
+            return response.json(); // Get the response as JSON for additional cases
+        } else {
+            throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+    })
+    .then(data => {
+        if (data && data.confirmDeleteQuiz) { 
             const confirmDelete = confirm(data.message);
             if (confirmDelete) {
                 deleteQuizById(quizId); // Call function to delete the quiz
             }
-        } else {
+        } else if (data) {
             console.error('Error deleting question:', data.message);
         }
     })
@@ -286,9 +289,15 @@ function deleteQuizById(quizId) {
     fetchWithAuth(`/quizzes/${quizId}`, { // ------------------------------------------------- headers in jwtutility.js
         method: 'DELETE'
     })
-    .then(response => response.json())
+    .then(response => {
+        if (response.status === 204) { // -------- changes made here
+            return { message: 'Quiz successfully deleted' }; // Return a consistent message object
+        } else {
+            return response.json(); // Get the response as JSON for additional cases
+        }
+    })
     .then(data => {
-        if (data.message === 'Quiz successfully deleted') {
+        if (data.message === 'Quiz successfully deleted') { // -------- changes made here
             alert('Quiz deleted successfully');
             window.location.href = '/quiz.html'; // Redirect to quizzes list
         } else {
