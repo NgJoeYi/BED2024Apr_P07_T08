@@ -263,7 +263,7 @@ const deleteQuiz = async (req, res) => {
 
         const quiz = await Quiz.deleteQuiz(quizId); // ----------------------------------------------------- Delete the quiz
         if (quiz) {
-            res.status(204).json({ message: 'Quiz successfully deleted' }); // ----------------------------- Return success message if quiz deletion is successful
+            res.status(204).send(); // --------------------------------------------------------------------- Return success message if quiz deletion is successful
         } else {
             res.status(500).json({ message: 'Failed to delete quiz' }); // --------------------------------- Return error if quiz deletion fails
         }
@@ -429,7 +429,7 @@ const deleteQuestion = async (req, res) => {
                 await Quiz.updateQuizAttempt(attempt.attempt_id, newPercentage, newPercentage >= 50); // ---- Update the user's quiz attempt with the new score
             }
         }
-        res.status(204).json({ message: 'Question deleted successfully' }); // ------------------------------ Return success message if question deletion is successful
+        res.status(204).send(); // ------------------------------ Return success message if question deletion is successful
     } catch (error) {
         console.error('Delete Questions - Server Error:', error); // ---------------------------------------- Log error details
         res.status(500).json({ message: 'Server error. Please try again later.' }); // ---------------------- Return server error
