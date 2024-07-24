@@ -51,7 +51,7 @@ const loginUser = async (req, res) => {
         if (!loginSuccess) { // ---------------------------------------------------------------------- If no user is found, send a 404 response
             return res.status(404).send({ message: 'Invalid email. No user found' });
         }
-        
+
         const matchPassword = await bcrypt.compare(password, loginSuccess.password); // -------------- Compare the provided password with the stored hashed password
         if (!matchPassword) { // --------------------------------------------------------------------- If the password does not match, send a 404 response
             return res.status(404).json({ message: 'Invalid password. Please try again' });
@@ -66,7 +66,7 @@ const loginUser = async (req, res) => {
         //res.status(200).json(loginSuccess);
     } catch (error) {
         console.error('Server error:', error); // ---------------------------------------------------- Log error details
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error' });
     }
 };
 // ************************************** JWT **************************************
