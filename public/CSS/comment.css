@@ -4,6 +4,7 @@
     overflow-x: hidden; /* Get rid of excess white space horizontally */
 }
 
+/* Center the content and adjust layout */
 body {
     display: flex;
     justify-content: center;
@@ -13,6 +14,7 @@ body {
     flex-direction: column;
 }
 
+/* Styles for the main post section */
 #main-post.post{
     border: none;
     box-shadow: none;
@@ -20,6 +22,7 @@ body {
     background-color: white;
 }
 
+/* General styles for posts */
 .post {
     border: none;
     box-shadow: none;
@@ -35,7 +38,7 @@ body {
     margin-top: 60px;
 }
 
-
+/* Styles for individual comments */
 .comment{
     background-color: #ffffff;
     margin-top: 30px;
@@ -47,10 +50,12 @@ body {
     transition: box-shadow 0.3s;
 }
 
+/* Hover effects */
 .post:hover, .comment:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+/* Styles for user info in comments */
 .user-info {
     display: flex;
     align-items: center;
@@ -74,6 +79,7 @@ body {
     object-fit: cover; /* Ensures the image covers the container */
 }
 
+/* Styles for username */
 .username {
     font-weight: 900;
     font-size: 23px;
@@ -81,6 +87,7 @@ body {
     margin-left: 5px;
 }
 
+/* Styles for post and comment content */
 .post-content, .comment-content {
     margin-top: 10px;
     color: #546e7a;
@@ -88,6 +95,7 @@ body {
     
 }
 
+/* Styles for post and comment actions */
 .post-actions, .comment-actions {
     margin-top: 10px;
 }
@@ -96,334 +104,12 @@ body {
     margin-right: 10px;
 }
 
-.comments-title {
-    margin-top: 30px;
-    margin-left: 700px; /* Ensure there's no left margin */
-    text-align: left; /* Align the text to the left */
-    width: 100%; /* Ensure it spans the full width */
-}
-
-
-.comments-section {
-    width: 90%;
-    max-width: 1200px;
-    /* margin-top: 20px; */
-    display: flex;
-    margin: 20px;
-    flex-direction: column;
-    align-items: center; /* Center-align the comments section */
-}
-
-#addCommentBtn {
-    background-color: #1b2b40;
-    margin-bottom: 10px;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    display: block;
-    margin-left: 880px;
-    transition: background-color 0.3s;
-}
-
-#addCommentBtn:hover {
-    background-color: white;
-    color: black;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.close {
-    color: #aaa;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-textarea {
-    width: 100%;
-    height: 180px;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    font-family: 'Roboto', sans-serif;
-    font-size: 17px;
-    color: #333;
-    resize: none;
-}
-
-button {
-    color: white;
-    background-color: #1b2b40;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    align-self: flex-end;
-    transition: background-color 0.3s;
-    font-size: 15px;
-}
-
-button:hover {
-    background-color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-h3 {
-    color: #37474f;
-    margin-left: 10px;
-}
-
-.avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin: 20px;
-}
-
-/* Gignite Pop-up Integration Styles */
-.popup {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1rem;
-  margin-top: 2rem; /* Adjusted margin */
-}
-
-.popup-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 700px;
-  height: 50%;
-  max-height: 600px;
-  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.popup-content h2{
-  font-size: 30px;
-  margin-top: 1rem;
-  margin-left: 2rem;
-}
-
-
-.popup-body {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 1rem;
-  margin-top: 3rem;
-}
-
-.popup-user-info {
-  display: flex;
-  gap: 1rem;
-  /* align-items: center; */
-  align-items: flex-start; /* Changed from center to flex-start */
-}
-
-.popup-user-info .avatar {
-  width: 6rem;
-  height: 4rem;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-top: -9px; /* Added negative margin to shift the avatar up */
-}
-
-.popup-user-info .avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.popup-user-info input {
-  width: 450px;
-  height: 200px;
-  padding: 0.5rem;
-  border: 1px solid #dcdcdc;
-  border-radius: 0.25rem;
-  font-size: 20px;
-}
-
-.popup-actions {
-  text-align: right;
-}
-
-.popup-actions .btn {
-  color: white;
-  background-color: #000;
-  border-radius: 0.25rem;
-  padding: 0.5rem 1.5rem;
-  border: none;
-  cursor: pointer;
-  margin-top: 50px;
-  margin-right: 1.5rem;
-}
-
-.popup-actions .cancel-btn {
-  background-color: white;
-  color: black;
-  border: 1px solid #dcdcdc;
-  margin-right: 0.5rem;
-}
-
-.popup-actions .cancel-btn:hover,
-.popup-actions .post-btn:hover {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-/* End of Gignite Pop-up Integration Styles */
-
-.comment-date{
-    color: #bbb9b9;
-    margin-top: 10px;
-    font-size: 18px;
-}
-
-.role{
-  color: #bbb9b9;
-  margin-left: 10px;
-}
-
-
-
-.footer{
-    margin-top: 60px;
-    width: 1700px;
-    height: 250px;
-}
-
-
-
-
-
-
-
-
-
-
-
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1; 
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto; 
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4); 
-  }
-  
-  .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; 
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%; 
-  }
-  
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-  }
-  
-  .close:hover,
-  .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  
-
-
-  /* footer */
-
-  /* New footer terying out */
-  .footer {
-    background: #1b2b40;
-    padding: 30px 0px;
-    font-family: 'Play', sans-serif;
-    text-align: center;
-  }
-  
-  .footer .row {
-    width: 100%;
-    margin: 1% 0%;
-    padding: 0.6% 0%;
-    color: #d9aa52;
-    font-size: 0.8em;
-  }
-  
-  .footer .row a {
-    text-decoration: none;
-    color: #d9aa52;
-    transition: 0.5s;
-  }
-  
-  .footer .row a:hover {
-    color: #fff;
-  }
-  
-  .footer .row ul {
-    width: 100%;
-  }
-  
-  .footer .row ul li {
-    display: inline-block;
-    margin: 0px 30px;
-  }
-  
-  .footer .row a i {
-    font-size: 2em;
-    margin: 0% 1%;
-  }
-  
-  @media (max-width: 600px) {
-    .footer {
-        text-align: left;
-        padding: 5%;
-    }
-  
-    .footer .row ul li {
-        display: block;
-        margin: 10px 0px;
-        text-align: left;
-    }
-  
-    .footer .row a i {
-        margin: 0% 3%;
-    }
-  }
-
-
-  /* for discussion css  */
+  /* Styles for Main post/discussion/comment */
   .post {
     border: 1px solid #E5E5E5;
     border-radius: 10px;
     padding: 20px;
-    margin: 10px 0;
+    margin: 50px 0;
     background-color: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
@@ -504,4 +190,265 @@ h3 {
   .like-button:focus, .dislike-button:focus {
     outline: none;
   }
+
+/* Title styles for comments section */
+.comments-title {
+    margin-top: 30px;
+    margin-left: 700px; /* Ensure there's no left margin */
+    text-align: left; /* Align the text to the left */
+    width: 100%; /* Ensure it spans the full width */
+}
+
+/* Container for comments section */
+.comments-section {
+    width: 90%;
+    max-width: 1200px;
+    /* margin-top: 20px; */
+    display: flex;
+    margin: 20px;
+    flex-direction: column;
+    align-items: center; /* Center-align the comments section */
+}
+
+/* Style button to add a new comment */
+#addCommentBtn {
+    background-color: #1b2b40;
+    margin-bottom: 10px;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    margin-left: 880px;
+    transition: background-color 0.3s;
+}
+
+/* Button hover effect */
+#addCommentBtn:hover {
+    background-color: white;
+    color: black;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles for textarea elements */
+textarea {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-family: 'Roboto', sans-serif;
+    font-size: 17px;
+    color: #333;
+    resize: none;
+}
+
+/* Styles for button elements */
+button {
+    color: white;
+    background-color: #1b2b40;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: background-color 0.3s;
+    font-size: 15px;
+}
+
+button:hover {
+    background-color: white;
+    color: black;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+h3 {
+    color: #37474f;
+    margin-left: 10px;
+}
+
+/* Styles for avatar image */
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden; /* Hide overflow outside the circle */
+  margin: 20px;
+}
+
+/* ------------------------------------------ Gignite Popup Integration Styles ---------------------------------------------- */
+.popup {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  margin-top: 2rem; /* Adjusted margin */
+}
+
+/* Popup content styling */
+.popup-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  height: 50%;
+  max-height: 600px;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.popup-content h2{
+  font-size: 30px;
+  margin-top: 1rem;
+  margin-left: 2rem;
+}
+
+
+.popup-body {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  margin-top: 3rem;
+}
+
+/* Popup user info styling */
+.popup-user-info {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start; 
+}
+
+.popup-user-info .avatar {
+  width: 6rem;
+  height: 4rem;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-top: -9px; /* Added negative margin to shift the avatar up */
+}
+
+/* Popup user info img styling */
+.popup-user-info .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.popup-user-info input {
+  width: 450px;
+  height: 200px;
+  padding: 0.5rem;
+  border: 1px solid #dcdcdc;
+  border-radius: 0.25rem;
+  font-size: 20px;
+}
+
+/* Popup actions aka buttons */
+.popup-actions {
+  text-align: right;
+}
+
+/* Button styling inside popup */
+.popup-actions .btn {
+  color: white;
+  background-color: #000;
+  border-radius: 0.25rem;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 50px;
+  margin-right: 1.5rem;
+}
+
+/* Button to cancel */
+.popup-actions .cancel-btn {
+  background-color: white;
+  color: black;
+  border: 1px solid #dcdcdc;
+  margin-right: 0.5rem;
+}
+
+/* Button hover effect inside popup */
+.popup-actions .cancel-btn:hover,
+.popup-actions .post-btn:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+/* ----------------------------------- End of Gignite Pop-up Integration Styles ------------------------------------------------------- */
+
+.comment-date{
+    color: #bbb9b9;
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+.role{
+  color: #bbb9b9;
+  margin-left: 10px;
+}
+
+/* Footer styling */
+  .footer {
+    background: #1b2b40;
+    padding: 30px 0px;
+    font-family: 'Play', sans-serif;
+    text-align: center;
+    width: 1700px;
+  }
   
+  .footer .row {
+    width: 100%;
+    margin: 1% 0%;
+    padding: 0.6% 0%;
+    color: #d9aa52;
+    font-size: 0.8em;
+  }
+  
+  .footer .row a {
+    text-decoration: none;
+    color: #d9aa52;
+    transition: 0.5s;
+  }
+  
+  .footer .row a:hover {
+    color: #fff;
+  }
+  
+  .footer .row ul {
+    width: 100%;
+  }
+  
+  .footer .row ul li {
+    display: inline-block;
+    margin: 0px 30px;
+  }
+  
+  .footer .row a i {
+    font-size: 2em;
+    margin: 0% 1%;
+  }
+  
+  @media (max-width: 600px) {
+    .footer {
+        text-align: left;
+        padding: 5%;
+    }
+  
+    .footer .row ul li {
+        display: block;
+        margin: 10px 0px;
+        text-align: left;
+    }
+  
+    .footer .row a i {
+        margin: 0% 3%;
+    }
+  }  
