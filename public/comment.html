@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saturday | Comment Section</title>
+    <title>EduHelper | Comment Section</title>
+
+    <!-- Font imports -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
@@ -13,13 +15,18 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
+
+    <!-- Stylesheets -->
     <!-- <link rel="stylesheet" href="style.css"> -->
     <link rel="stylesheet" href="CSS/navbar.css">
     <link rel="stylesheet" href="CSS/comment.css">
 </head>
 <body>
+     <!-- Header with navigation bar -->
     <header>
         <nav class="navbar" >
+
+             <!-- Logo and navigation menu -->
             <a class="logo" href="Index.html" ><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
             <ul class="menu-links">
                 <span id="close-menu-btn" class="material-symbols-outlined">close</span>
@@ -32,6 +39,7 @@
                
             </ul>
 
+            <!-- Authentication links -->
             <div class="auth-links" id="auth-links">
                 <a href="Login.html" id="navbar-login">LOG IN</a>
                 <a href="Register.html" id="navbar-signup">SIGN UP</a>
@@ -40,20 +48,25 @@
         </nav>
     </header>
 
+    <!-- Spacing for layout adjustment -->
     <br><br><br><br><br><br>
 
-    <div id="main-post" class="post" data-main-comment-id="1"> <!-- Add data attribute for main comment ID -->
-        <!-- Main post will be dynamically inserted here -->
+    <!-- Main post aka Main discussion/Main comment section -->
+    <div id="main-post" class="post" data-main-comment-id="1"> <!-- Add data attribute for main comment aka main post aka main discussion ID -->
+        <!-- Main post aka Main discussion aka Main comment will be dynamically inserted here -->
     </div>
 
+    <!-- Section title for comments -->
     <div class="comments-title">
         <h2> Comments </h2>
     </div>
 
+    <!-- Button to add a new comment -->
     <div class="add-comment-container">
         <button id="addCommentBtn" class="btn">Add Comment</button> <!-- Add Comment Button -->
     </div>
 
+    <!-- Section for displaying comments -->
     <div class="comments-section">
         <!-- Comments will be dynamically inserted here -->
     </div>
@@ -79,9 +92,11 @@
     </div>
     <!-- End of Gignite Pop-up Integration -->
 
+     <!-- Footer section -->
     <footer>
         <div class="footer">
             <div class="row">
+                <!-- Social medias -->
                 <a href="#"><i class="fa fa-facebook"></i></a>
                 <a href="#"><i class="fa fa-instagram"></i></a>
                 <a href="#"><i class="fa fa-youtube"></i></a>
@@ -102,6 +117,7 @@
         </div>
     </footer>
 
+    <!-- JavaScript files -->
     <script src="JAVASCRIPT/JwtUtility.js"></script>
     <script src="JAVASCRIPT/comment.js"></script>
     <script src="JAVASCRIPT/script.js"></script>
