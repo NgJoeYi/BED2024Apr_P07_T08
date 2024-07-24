@@ -317,7 +317,6 @@ async function createQuizRequest(data) {
         const response = await fetchWithAuth('/quizzes', {
             method: 'POST',
             body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' } // Ensure correct header is set
         });
         const body = await response.json();
         if (!response.ok) {
@@ -346,7 +345,6 @@ async function createQuestionRequest(data) {
         const response = await fetchWithAuth(`/quizzes/${data.quiz_id}/questions`, {
             method: 'POST',
             body: JSON.stringify(data),
-            headers: { 'Content-Type': 'application/json' } // Ensure correct header is set
         });
         const body = await response.json();
         if (!response.ok) {
@@ -455,25 +453,27 @@ function closeUpdateModal() {
     document.getElementById('update-modal').style.display = 'none'; 
 } 
 
-// Handle quiz update form submission
-async function handleUpdateQuizFormSubmit(event) { 
-    event.preventDefault(); 
-    const formData = new FormData(event.target); 
-    const quizData = Object.fromEntries(formData.entries()); 
-    const imgFile = document.getElementById('update_quizImg').files[0]; 
 
-    if (imgFile) { 
-        const reader = new FileReader(); 
-        reader.onloadend = async () => { 
-            quizData.quizImg = reader.result.split(',')[1]; 
-            await updateQuizRequest(quizData); 
-        }; 
-        reader.readAsDataURL(imgFile); 
-    } else { 
-        quizData.quizImg = document.getElementById('current_quiz_img').value; 
-        await updateQuizRequest(quizData); 
-    } 
-} 
+document.getElementById('update-quiz-form').addEventListener('submit', handleUpdateQuizFormSubmit);
+
+async function handleUpdateQuizFormSubmit(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const quizData = Object.fromEntries(formData.entries());
+    const imgFile = document.getElementById('update_quizImg').files[0];
+
+    if (imgFile) {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            quizData.quizImg = reader.result.split(',')[1];
+            await updateQuizRequest(quizData);
+        };
+        reader.readAsDataURL(imgFile);
+    } else {
+        quizData.quizImg = document.getElementById('current_quiz_img').value; // Use the stored current image
+        await updateQuizRequest(quizData);
+    }
+}
 
 // Send request to update quiz
 async function updateQuizRequest(data) { 
@@ -481,7 +481,6 @@ async function updateQuizRequest(data) {
         const response = await fetchWithAuth(`/quizzes/${data.quiz_id}`, { 
             method: 'PUT', 
             body: JSON.stringify(data), 
-            headers: { 'Content-Type': 'application/json' } 
         }); 
         const body = await response.json(); 
         if (!response.ok) { 
@@ -508,6 +507,7 @@ async function handleDeleteQuiz(quizId) {
         } 
         alert('Quiz deleted successfully'); 
         fetchQuizzes(); 
+        location.reload(); 
     } catch (error) { 
         console.error('Error deleting quiz:', error); 
         alert(`Error deleting quiz: ${error.message}`); 
