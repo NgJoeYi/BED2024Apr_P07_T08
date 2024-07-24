@@ -20,6 +20,10 @@
       "description": "Endpoints related to quizzes and their questions"
     },
     {
+      "name": "Follow",
+      "description": "Endpoints related to Follow/unfollow user for discussion"
+    },
+    {
       "name": "Discussions",
       "description": "Endpoints related to discussions and comments"
     },
@@ -941,6 +945,140 @@
         }
       }
     },
+      "/follow": {
+        "post": {
+          "description": "Follow a user",
+          "tags": ["Follow"],
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "type": "string"
+            },
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "followeeId": {
+                    "type": "integer",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "400": {
+              "description": "Invalid followee ID"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/unfollow": {
+        "delete": {
+          "description": "Unfollow a user",
+          "tags": ["Follow"],
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "type": "string"
+            },
+            {
+              "name": "body",
+              "in": "body",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "followeeId": {
+                    "type": "integer",
+                    "example": 2
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "400": {
+              "description": "Invalid followee ID"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/followed-discussions": {
+        "get": {
+          "description": "Get discussions followed by the user",
+          "tags": ["Discussions"],
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/following-status": {
+        "get": {
+          "description": "Check if the user is following another user",
+          "tags": ["Follow"],
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "type": "string"
+            },
+            {
+              "name": "followeeId",
+              "in": "query",
+              "type": "integer",
+              "example": 2
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK"
+            },
+            "401": {
+              "description": "Unauthorized"
+            },
+            "500": {
+              "description": "Internal Server Error"
+            }
+          }
+        }
+      },
     "/discussions": {
       "get": {
         "description": "",
@@ -1326,6 +1464,7 @@
         }
       }
     },
+
     "/comments": {
       "get": {
         "description": "",
