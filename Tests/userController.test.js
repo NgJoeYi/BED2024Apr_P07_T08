@@ -473,109 +473,359 @@ describe('userController.updateUser', () => {
 
 
 
+// -------------------------------------------------------------------------------------------------------------------------
 
 
 
+describe('userController.deleteUser', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should return 400 if password is not provided', async () => {
+        const req = {
+            user: { id: 1 },
+            body: {} // No password provided
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await userController.deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Please enter your password' });
+    });
+
+    it('should return 404 if user does not exist', async () => {
+        User.getUserById.mockResolvedValue(null);
+
+        const req = {
+            user: { id: 1 },
+            body: { password: 'password' }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await userController.deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({ message: 'User does not exist' });
+    });
+
+    it('should return 400 if password is incorrect', async () => {
+        const existingUser = {
+            id: 1,
+            password: 'hashedpassword'
+        };
+
+        User.getUserById.mockResolvedValue(existingUser);
+        bcrypt.compare.mockResolvedValue(false); // Password does not match
+
+        const req = {
+            user: { id: 1 },
+            body: { password: 'wrongpassword' }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await userController.deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Password is incorrect' });
+    });
+
+    it('should return 500 if deleting user-related records fails', async () => {
+        const existingUser = {
+            id: 1,
+            password: 'hashedpassword'
+        };
+
+        User.getUserById.mockResolvedValue(existingUser);
+        bcrypt.compare.mockResolvedValue(true);
+        User.deleteUtility.mockResolvedValue(false); // Simulate failure in deleting user-related records
+
+        const req = {
+            user: { id: 1 },
+            body: { password: 'correctpassword' }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await userController.deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Failed to delete user-related records' });
+    });
+
+    it('should return 500 if deleting user fails', async () => {
+        const existingUser = {
+            id: 1,
+            password: 'hashedpassword'
+        };
+
+        User.getUserById.mockResolvedValue(existingUser);
+        bcrypt.compare.mockResolvedValue(true);
+        User.deleteUtility.mockResolvedValue(true);
+        User.deleteUser.mockResolvedValue(false); // Simulate failure in deleting user
+
+        const req = {
+            user: { id: 1 },
+            body: { password: 'correctpassword' }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await userController.deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Failed to delete user' });
+    });
+
+    it('should delete user successfully', async () => {
+        const existingUser = {
+            id: 1,
+            password: 'hashedpassword'
+        };
+
+        User.getUserById.mockResolvedValue(existingUser);
+        bcrypt.compare.mockResolvedValue(true);
+        User.deleteUtility.mockResolvedValue(true);
+        User.deleteUser.mockResolvedValue(true);
+
+        const req = {
+            user: { id: 1 },
+            body: { password: 'correctpassword' }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await userController.deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(204);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Account deleted successfully' });
+    });
+
+    it('should handle server errors gracefully', async () => {
+        User.getUserById.mockRejectedValue(new Error('Server error'));
+
+        const req = {
+            user: { id: 1 },
+            body: { password: 'password' }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        await userController.deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Server error', error: 'Server error' });
+    });
+});
 
 
 
+// -------------------------------------------------------------------------------------------------------------------------
 
+describe('userController.updateProfilePic', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
+    it('should update the profile picture and return updated data', async () => {
+        const userId = 1;
+        const base64ProfilePic = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgAAAAASUVORK5CYII=';
 
+        // Mock User.updateProfilePic implementation
+        User.updateProfilePic = jest.fn().mockResolvedValue({ userId, profilePic: base64ProfilePic });
 
+        const req = {
+            user: { id: userId },
+            body: { profilePic: base64ProfilePic }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await userController.updateProfilePic(req, res);
+
+        expect(User.updateProfilePic).toHaveBeenCalledWith(userId, base64ProfilePic);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ userId, profilePic: base64ProfilePic });
+    });
+
+    it('should return 400 if the update fails', async () => {
+        const userId = 1;
+        const base64ProfilePic = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgAAAAASUVORK5CYII=';
+
+        // Mock User.updateProfilePic to return null to simulate failure
+        User.updateProfilePic = jest.fn().mockResolvedValue(null);
+
+        const req = {
+            user: { id: userId },
+            body: { profilePic: base64ProfilePic }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn()
+        };
+
+        await userController.updateProfilePic(req, res);
+
+        expect(User.updateProfilePic).toHaveBeenCalledWith(userId, base64ProfilePic);
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.send).toHaveBeenCalledWith('Failed to update profile picture');
+    });
+
+    it('should handle server errors', async () => {
+        const userId = 1;
+        const base64ProfilePic = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgAAAAASUVORK5CYII=';
+
+        // Mock User.updateProfilePic to throw an error
+        User.updateProfilePic = jest.fn().mockRejectedValue(new Error('Database error'));
+
+        const req = {
+            user: { id: userId },
+            body: { profilePic: base64ProfilePic }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn()
+        };
+
+        await userController.updateProfilePic(req, res);
+
+        expect(User.updateProfilePic).toHaveBeenCalledWith(userId, base64ProfilePic);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith('Server error');
+    });
+});
 
 
 
 // -------------------------------------------------------------------------------------------------------------------------
 
 
+describe('userController.getProfilePicByUserId', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
 
+    it('should return the profile picture if it exists', async () => {
+        const userId = 1;
+        const base64ProfilePic = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgAAAAASUVORK5CYII=';
 
+        // Mock User.getUserById and User.getProfilePicByUserId implementations
+        User.getUserById = jest.fn().mockResolvedValue({ id: userId });
+        User.getProfilePicByUserId = jest.fn().mockResolvedValue(base64ProfilePic);
 
+        const req = {
+            user: { id: userId }
+        };
 
-// // -------------------------------------------------------------------------------------------------------------------------
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
 
+        await userController.getProfilePicByUserId(req, res);
 
+        expect(User.getUserById).toHaveBeenCalledWith(userId);
+        expect(User.getProfilePicByUserId).toHaveBeenCalledWith(userId);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ profilePic: base64ProfilePic });
+    });
 
-// describe("userController.updateProfilePic", () => {
-//     const req = {
-//         user: {userId: 1},
-//         file: {path: "/path/img.png"}
+    it('should return default profile picture if no profile picture is found', async () => {
+        const userId = 1;
+        const defaultProfilePic = 'images/profilePic.jpeg';
 
-//     }
+        // Mock User.getUserById and User.getProfilePicByUserId implementations
+        User.getUserById = jest.fn().mockResolvedValue({ id: userId });
+        User.getProfilePicByUserId = jest.fn().mockResolvedValue(null);
 
-//     beforeEach(() => {
-//       jest.clearAllMocks(); // Clear mock calls before each test
-//       jest.spyOn(console, 'error').mockImplementation(jest.fn())
-//     });
-  
-//     it("should update the user's profile picture and return a success message with status 201", async () => {
-//       //mock User.getUserById
-//       User.getUserById.mockResolvedValue(true)
-//       // Mock the model function (null)
-//       User.updateProfilePic.mockResolvedValue(null)
-      
-//       //Mock fs
-//       fs.readFileSync.mockResolvedValue(null)
-//       fs.unlinkSync.mockResolvedValue(null)
+        const req = {
+            user: { id: userId }
+        };
 
-//       const res = {
-//         send: jest.fn(), // Mock the res.json function
-//         status: jest.fn().mockReturnThis()
-//       };
-      
-//       await userController.updateProfilePic(req, res)
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
 
-//       expect(res.send).toHaveBeenCalledWith("Profile picture updated successfully"); // Check the response body
-//       expect(res.status).toHaveBeenCalledWith(201)
-//     })
+        await userController.getProfilePicByUserId(req, res);
 
-//     it("should handle case where no file is uploaded and return a error message with status 400", async () => {
-//         const reqNoFile = {
-//             user: {userId: 1},
-    
-//         }
-  
-//         const res = {
-//           send: jest.fn(), // Mock the res.json function
-//           status: jest.fn().mockReturnThis()
-//         };
-        
-//         await userController.updateProfilePic(reqNoFile, res)
-  
-//         expect(res.send).toHaveBeenCalledWith("No file uploaded"); // Check the response body
-//         expect(res.status).toHaveBeenCalledWith(400)
-//     })
+        expect(User.getUserById).toHaveBeenCalledWith(userId);
+        expect(User.getProfilePicByUserId).toHaveBeenCalledWith(userId);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ profilePic: defaultProfilePic });
+    });
 
-//     it("should handle case where user is not found and return a error message with status 404", async () => {
-//         //mock User.getUserbyId to return null (no user)
-//         User.getUserById.mockResolvedValue(null)
-//         const res = {
-//           send: jest.fn(), // Mock the res.json function
-//           status: jest.fn().mockReturnThis()
-//         };
-        
-//         await userController.updateProfilePic(req, res)
-  
-//         expect(res.send).toHaveBeenCalledWith("User not found"); // Check the response body
-//         expect(res.status).toHaveBeenCalledWith(404)
-//     })
-  
-//     it("should handle errors and return a 500 status with error message", async () => {
-//       const errorMessage = "Database error";
-//       //mock User.getUserbyId to return true (theres a user)
-//       User.getUserById.mockResolvedValue(true)
-//       User.updateProfilePic.mockRejectedValue(new Error(errorMessage)); // Simulate an error
-        
-//       const res = {
-//         status: jest.fn().mockReturnThis(),
-//         send: jest.fn()
-//       }
+    it('should return 404 if user does not exist', async () => {
+        const userId = 1;
 
-//       //call function
-//       await userController.updateProfilePic(req, res);
-//       //compare status and error message
-//       expect(res.status).toHaveBeenCalledWith(500);
-//       expect(res.send).toHaveBeenCalledWith("Error updating profile picture");
-//     })
-// })
+        // Mock User.getUserById to return null
+        User.getUserById = jest.fn().mockResolvedValue(null);
+
+        const req = {
+            user: { id: userId }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn()
+        };
+
+        await userController.getProfilePicByUserId(req, res);
+
+        expect(User.getUserById).toHaveBeenCalledWith(userId);
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.send).toHaveBeenCalledWith('User does not exist');
+    });
+
+    it('should handle server errors', async () => {
+        const userId = 1;
+
+        // Mock User.getUserById to throw an error
+        User.getUserById = jest.fn().mockRejectedValue(new Error('Database error'));
+
+        const req = {
+            user: { id: userId }
+        };
+
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            send: jest.fn()
+        };
+
+        await userController.getProfilePicByUserId(req, res);
+
+        expect(User.getUserById).toHaveBeenCalledWith(userId);
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.send).toHaveBeenCalledWith('Server error');
+    });
+});
