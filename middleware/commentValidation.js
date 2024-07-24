@@ -1,10 +1,10 @@
-const Joi = require('joi');
+const Joi = require('joi'); // Importing Joi for validation
 
 // Defining schema (set of rules 2 validate comment)
 const commentSchema = Joi.object({
     content: Joi.string() // Content must be string
         .trim() // Remove leading and trailing whitespace
-        .pattern(/^(?![\p{P}\s]+$).+/u) // Ensure not only punctuation or whitespace
+        .pattern(/^(?![\p{P}\s]+$).+/u) // Ensure not only punctuation
         .max(150) // Maximum length of 150 characters
         .required() // Content is required
         .messages({

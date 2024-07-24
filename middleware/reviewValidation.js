@@ -1,12 +1,14 @@
-const Joi = require('joi');
+const Joi = require('joi'); // Importing Joi for validation
 
+// Define the schema for validating a review
 const reviewSchema = Joi.object({
-    review_text: Joi.string()
-        .trim()
-        .pattern(/^(?![\p{P}\s]+$).+/u)
-        .max(250)
-        .required()
+    review_text: Joi.string() // Review text must be a string
+        .trim() // Remove leading and trailing whitespace
+        .pattern(/^(?![\p{P}\s]+$).+/u) /// Ensure not only punctuation
+        .max(250) // Maximum length of 250 characters
+        .required() // Required field
         .messages({
+            // Custom messages
             'string.empty': 'Reviews cannot be empty.',
             'string.max': 'Reviews cannot exceed 250 words.',
             'string.pattern.base': 'Reviews cannot consist solely of punctuations.'
@@ -15,27 +17,30 @@ const reviewSchema = Joi.object({
         .integer()
         .min(1)
         .max(5)
-        .required()
+        .required() // Required field
         .messages({
+            // Custom messages
             'number.base': 'Reviews must have a valid number of stars.',
             'number.min': 'Reviews should have a minimum of 1 star.',
             'number.max': 'Reviews can have a maximum of 5 stars.'
         }),
-    courseId: Joi.number()
+    courseId: Joi.number() // Course ID must be a number (integer)
         .integer()
-        .required()
+        .required() // Required field
         .messages({
+            // Custom messages
             'number.base': 'Course ID must be a valid number.',
             'number.empty': 'Course ID is required.'
         })
 });
 
+// Middleware function to validate the review
 function validateReview(req, res, next) {
-    const { error } = reviewSchema.validate(req.body);
+    const { error } = reviewSchema.validate(req.body); // Validate request body against the schema
     if (error) {
-        return res.status(400).json({ error: error.details[0].message });
+        return res.status(400).json({ error: error.details[0].message }); // Return error message if validation fails
     }
-    next();
+    next(); // Otherwise, proceed to the next middleware if validation passes
 }
 
-module.exports = validateReview;
+module.exports = validateReview; // Export the validation function

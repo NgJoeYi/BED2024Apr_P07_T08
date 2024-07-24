@@ -1,594 +1,197 @@
-const sql = require('mssql');
-const dbConfig = require('../dbConfig');
-const reviewModel = require('../models/Review');
+const sql = require('mssql'); // Importing the 'mssql' library for SQL Server operations
+const dbConfig = require('../dbConfig'); // Importing database configuration
+const reviewModel = require('../models/Review'); // Importing the Review model
 
-/**
- * @swagger
- * /reviews:
- *   get:
- *     summary: Get all reviews
- *     tags: [Reviews]
- *     parameters:
- *       - in: query
- *         name: courseId
- *         schema:
- *           type: string
- *         description: ID of the course to filter reviews
- *       - in: query
- *         name: filter
- *         schema:
- *           type: string
- *           default: all
- *         description: Filter for reviews
- *       - in: query
- *         name: sort
- *         schema:
- *           type: string
- *           default: mostRecent
- *         description: Sort order of reviews
- *     responses:
- *       200:
- *         description: A list of reviews
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Review'
- *       500:
- *         description: Error retrieving reviews
- */
+// Get reviews based on course ID, filter, and sort criteria
 const getReviews = async (req, res) => {
     const { courseId, filter = 'all', sort = 'mostRecent' } = req.query;
     try {
         let reviews;
-        if (courseId) {
+        if (courseId) { // If courseId exists, 
             reviews = await reviewModel.getAllReviews(courseId, filter, sort); // Basically Getting reviews by course Id
-        } else {
-            reviews = await reviewModel.getAllReviews();
+        } else { // If no courseId, 
+            reviews = await reviewModel.getAllReviews(); // Get all reviews
         }
-        res.json(reviews);
+        res.json(reviews); // Send the reviews as JSON response
+
     } catch (err) {
         console.error('Server error:', err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews:
- *   post:
- *     summary: Create a new review
- *     tags: [Reviews]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - review_text
- *               - rating
- *               - courseId
- *             properties:
- *               review_text:
- *                 type: string
- *               rating:
- *                 type: number
- *               courseId:
- *                 type: string
- *     responses:
- *       201:
- *         description: Review created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 data:
- *                   $ref: '#/components/schemas/Review'
- *       500:
- *         description: Error creating review
- */
+// To create a new review
 const createReview = async (req, res) => {
     const { review_text, rating, courseId } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.id; // Get user ID from the authenticated user
 
     try {
-        const result = await reviewModel.createReview(userId, review_text, rating, courseId);
-        res.status(201).json({ message: 'Review created successfully', data: result });
+        const result = await reviewModel.createReview(userId, review_text, rating, courseId); // Create a new review
+        res.status(201).json({ message: 'Review created successfully', data: result }); // Send success response
     } catch (err) {
         console.error('Error creating review:', err.message);
-        res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
+        res.status(500).json({ error: 'Internal Server Error. Please try again later.' }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/{id}:
- *   put:
- *     summary: Update a review
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the review to update
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               review_text:
- *                 type: string
- *               rating:
- *                 type: number
- *               courseId:
- *                 type: string
- *     responses:
- *       200:
- *         description: Review updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 data:
- *                   $ref: '#/components/schemas/Review'
- *       404:
- *         description: Review not found
- *       500:
- *         description: Error updating review
- */
+// To update an existing review
 const updateReview = async (req, res) => {
-    const { id } = req.params; // Review Id
+    const { id } = req.params; // Get review ID from request parameters
     const { review_text, rating, courseId } = req.body;
-    const userId = req.user.id; // User Id
+    const userId = req.user.id; // Get user ID from the authenticated user
 
     try {
-        const review = await reviewModel.getReviewById(id);
+        const review = await reviewModel.getReviewById(id); // Get the review by ID
         if (!review) {
-            return res.status(404).json({ error: 'Review not found' });
+            return res.status(404).json({ error: 'Review not found' }); // Send error response if review not found
         }
 
-        const result = await reviewModel.updateReview(id, review_text, rating, courseId);
-        res.status(200).json({ message: 'Review updated successfully', data: result });
+        const result = await reviewModel.updateReview(id, review_text, rating, courseId);  // Update the review
+        res.status(200).json({ message: 'Review updated successfully', data: result }); // Send success response
 
     } catch (err) {
         console.error('Error updating review:', err.message);
-        res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
+        res.status(500).json({ error: 'Internal Server Error. Please try again later.' }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/{id}:
- *   delete:
- *     summary: Delete a review
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the review to delete
- *     responses:
- *       200:
- *         description: Review deleted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 data:
- *                   $ref: '#/components/schemas/Review'
- *       404:
- *         description: Review not found
- *       500:
- *         description: Error deleting review
- */
 const deleteReview = async (req, res) => {
-    const { id } = req.params;
-    const userId = req.user.id;
+    const { id } = req.params; // Get review ID from request parameters
+    const userId = req.user.id; // Get user ID from the authenticated user
 
     try {
-        const review = await reviewModel.getReviewById(id);
+        const review = await reviewModel.getReviewById(id); // Get the review by ID
         
         if (!review) {
             console.error('Review not found');
-            return res.status(404).json({ error: 'Review not found' });
+            return res.status(404).json({ error: 'Review not found' }); // Send error response if review not found
         }
         
-        const result = await reviewModel.deleteReview(id);
-        res.status(200).json({ message: 'Review deleted successfully', data: result });
+        const result = await reviewModel.deleteReview(id); // Delete the review
+        res.status(200).json({ message: 'Review deleted successfully', data: result }); // Send success response
         
     } catch (err) {
         console.error('Error deleting review:', err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/count:
- *   get:
- *     summary: Get review count
- *     tags: [Reviews]
- *     responses:
- *       200:
- *         description: Review count
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 count:
- *                   type: number
- *       500:
- *         description: Error fetching review count
- */
+// To get the count of all reviews
 const getReviewCount = async (req, res) => {
     try {
-        const count = await reviewModel.getReviewCount();
-        res.json({ count });
+        const count = await reviewModel.getReviewCount(); // Get the total count of reviews
+        res.json({ count }); // Send the count as JSON response
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching review count");
+        res.status(500).send("Error fetching review count"); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/count/course/{courseId}:
- *   get:
- *     summary: Get review count by course ID
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: courseId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the course
- *     responses:
- *       200:
- *         description: Review count by course ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 count:
- *                   type: number
- *       500:
- *         description: Error fetching review count by course ID
- */
+// To get the count of reviews by course ID
 const getReviewCountByCourseId = async (req, res) => {
-    const { courseId } = req.params;
+    const { courseId } = req.params; // Get course ID from request parameters
     try {
-        const count = await reviewModel.getReviewCountByCourseId(courseId);
-        res.json({ count });
+        const count = await reviewModel.getReviewCountByCourseId(courseId); // Get the count of reviews by course ID
+        res.json({ count }); // Send the count as JSON response
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching review count by course ID");
+        res.status(500).send("Error fetching review count by course ID"); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/count/user/{userId}:
- *   get:
- *     summary: Get review count by user ID
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the user
- *     responses:
- *       200:
- *         description: Review count by user ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 count:
- *                   type: number
- *       500:
- *         description: Error fetching review count by user ID
- */
+// To get the count of reviews by user ID
 const getReviewCountByUserId = async (req, res) => {
-    const { userId } = req.params;
+    const { userId } = req.params; // Get user ID from request parameters
     try {
-        const count = await reviewModel.getReviewCountByUserId(userId);
-        res.json({ count });
+        const count = await reviewModel.getReviewCountByUserId(userId);  // Get the count of reviews by user ID
+        res.json({ count }); // Send the count as JSON response
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching review count by user ID");
+        res.status(500).send("Error fetching review count by user ID"); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/rating/{rating}:
- *   get:
- *     summary: Get reviews by rating
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: rating
- *         schema:
- *           type: number
- *         required: true
- *         description: Rating to filter reviews
- *     responses:
- *       200:
- *         description: Reviews by rating
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Review'
- *       500:
- *         description: Error retrieving reviews by rating
- */
+// To get reviews filtered by star ratings
 const getReviewsByRating = async (req, res) => {
-    const { rating } = req.params;
+    const { rating } = req.params; // Get rating from request parameters
     try {
-        const reviews = await reviewModel.getAllReviews(null, rating);
-        res.status(200).json(reviews);
+        const reviews = await reviewModel.getAllReviews(null, rating); // Get reviews by rating + eg can also be 'getAllReviews(sort, null)'
+        res.status(200).json(reviews); // Send the reviews as JSON response
     } catch (err) {
         console.error('Server error:', err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/sort/{sort}:
- *   get:
- *     summary: Get reviews sorted by rating
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: sort
- *         schema:
- *           type: string
- *         required: true
- *         description: Sort order of reviews
- *     responses:
- *       200:
- *         description: Reviews sorted by rating
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Review'
- *       500:
- *         description: Error retrieving reviews sorted by rating
- */
+// To get reviews sorted by star ratings
 const getReviewsSortedByRating = async (req, res) => {
-    const { sort } = req.params;
+    const { sort } = req.params; // Get sort criteria from request parameters
     try {
-        const reviews = await reviewModel.getAllReviews(null, 'all', sort);
-        res.status(200).json(reviews);
+        const reviews = await reviewModel.getAllReviews(null, 'all', sort); // Get reviews sorted by rating
+        res.status(200).json(reviews);  // Send the reviews as JSON response
     } catch (err) {
-        console.error('Server error:', err.message);
-        res.status(500).json({ error: err.message });
+        console.error('Server error:', err.message); 
+        res.status(500).json({ error: err.message }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/course/{courseId}:
- *   get:
- *     summary: Get reviews by course ID
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: courseId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the course
- *     responses:
- *       200:
- *         description: Reviews by course ID
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Review'
- *       500:
- *         description: Error retrieving reviews by course ID
- */
+// To get reviews by course ID
 const getReviewsByCourseId = async (req, res) => {
-    const { courseId } = req.params;
+    const { courseId } = req.params; // Get course ID from request parameters
     try {
-        const reviews = await reviewModel.getAllReviews(courseId);
-        res.status(200).json(reviews);
+        const reviews = await reviewModel.getAllReviews(courseId); // Get reviews by course ID
+        res.status(200).json(reviews); // Send the reviews as JSON response
     } catch (err) {
         console.error('Server error:', err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/course/{courseId}/rating/{rating}:
- *   get:
- *     summary: Get reviews by course ID and rating
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: courseId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the course
- *       - in: path
- *         name: rating
- *         schema:
- *           type: number
- *         required: true
- *         description: Rating to filter reviews
- *     responses:
- *       200:
- *         description: Reviews by course ID and rating
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Review'
- *       500:
- *         description: Error retrieving reviews by course ID and rating
- */
+// To get reviews by course ID and star ratings
 const getReviewsByCourseIdAndRating = async (req, res) => {
-    const { courseId, rating } = req.params;
+    const { courseId, rating } = req.params; // Get course ID and rating from request parameters
     try {
-        const reviews = await reviewModel.getAllReviews(courseId, rating);
-        res.status(200).json(reviews);
+        const reviews = await reviewModel.getAllReviews(courseId, rating); // Get reviews by course ID and rating
+        res.status(200).json(reviews); // Send the reviews as JSON response
     } catch (err) {
         console.error('Server error:', err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/course/{courseId}/sort/{sort}:
- *   get:
- *     summary: Get reviews by course ID and sort order
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: courseId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the course
- *       - in: path
- *         name: sort
- *         schema:
- *           type: string
- *         required: true
- *         description: Sort order of reviews
- *     responses:
- *       200:
- *         description: Reviews by course ID and sort order
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Review'
- *       500:
- *         description: Error retrieving reviews by course ID and sort order
- */
+// To get reviews by course ID and sort condition
 const getReviewsByCourseIdAndSort = async (req, res) => {
-    const { courseId, sort } = req.params;
+    const { courseId, sort } = req.params; // Get course ID and sort criteria from request parameters
     try {
-        const reviews = await reviewModel.getAllReviews(courseId, 'all', sort);
-        res.status(200).json(reviews);
+        const reviews = await reviewModel.getAllReviews(courseId, 'all', sort); // Get reviews by course ID and sort criteria
+        res.status(200).json(reviews); // Send the reviews as JSON response
     } catch (err) {
         console.error('Server error:', err.message);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message }); // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/{reviewId}/likes:
- *   post:
- *     summary: Increment likes on a review
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: reviewId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the review to like
- *     responses:
- *       200:
- *         description: Successfully incremented likes
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 likes:
- *                   type: number
- *       500:
- *         description: Error incrementing likes
- */
+// To increment likes of reviews
 const incrementLikes = async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
-        const likes = await reviewModel.incrementLikes(reviewId);
-        res.json({ success: true, likes });
+        const reviewId = req.params.reviewId; // Get review ID from request parameters
+        const likes = await reviewModel.incrementLikes(reviewId); // Increment the likes of the review
+        res.json({ success: true, likes }); // Send the updated likes as JSON response
     } catch (err) {
         console.error('Error incrementing likes:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message });  // Send error response
     }
 }
 
-/**
- * @swagger
- * /reviews/{reviewId}/dislikes:
- *   post:
- *     summary: Increment dislikes on a review
- *     tags: [Reviews]
- *     parameters:
- *       - in: path
- *         name: reviewId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID of the review to dislike
- *     responses:
- *       200:
- *         description: Successfully incremented dislikes
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 dislikes:
- *                   type: number
- *       500:
- *         description: Error incrementing dislikes
- */
+// To increment dislikes of reviews
 const incrementDislikes = async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
-        const dislikes = await reviewModel.incrementDislikes(reviewId);
-        res.json({ success: true, dislikes });
+        const reviewId = req.params.reviewId; // Get review ID from request parameters
+        const dislikes = await reviewModel.incrementDislikes(reviewId); // Increment the dislikes of the review
+        res.json({ success: true, dislikes }); // Send the updated dislikes as JSON response
     } catch (err) {
         console.error('Error incrementing dislikes:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message }); // Send error response
     }
 }
 
