@@ -5,7 +5,7 @@ const User = require("../../models/User");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-jest.mock("../models/User"); // Mock the user model
+jest.mock("../../models/User"); // Mock the user model
 jest.mock("bcryptjs"); // Mock bcrypt
 jest.mock("jsonwebtoken"); // Mock jwt
 
