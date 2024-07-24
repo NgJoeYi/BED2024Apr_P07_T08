@@ -1,281 +1,121 @@
-const sql = require('mssql');
-const dbConfig = require('../dbConfig');
-const commentModel = require('../models/Comment');
+const sql = require('mssql'); // Importing the 'mssql' library for SQL Server operations
+const dbConfig = require('../dbConfig'); // Importing database configuration
+const commentModel = require('../models/Comment'); // Importing the Comment model
 
 
-/**
- * @swagger
- * /comments:
- *   get:
- *     summary: Get all comments or comments by discussion ID
- *     tags: [Comments]
- *     parameters:
- *       - in: query
- *         name: discussionId
- *         schema:
- *           type: integer
- *         description: ID of the discussion to fetch comments for
- *     responses:
- *       200:
- *         description: A list of comments
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Comment'
- *       500:
- *         description: Error fetching comments
- */
 const getComments = async (req, res) => {
-    const { discussionId } = req.query;
+    const { discussionId } = req.query; // Extract discussionId from query parameters
     try {
         let comments;
+        // Check if discussionId is provided
         if (discussionId) {
-            comments = await commentModel.getCommentsByDiscussionId(discussionId);
+            comments = await commentModel.getCommentsByDiscussionId(discussionId); // Fetch comments for the specific discussion ID if discussion Id exists
         } else {
-            comments = await commentModel.getAllComments();
+            comments = await commentModel.getAllComments(); 
         }
-        res.json(comments);
+        res.json(comments); // Send the comments as a JSON response
     } catch (err) {
-        console.error(err);
-        res.status(500).send("Error fetching comments");
+        console.error(err); // Log the error
+        res.status(500).send("Error fetching comments"); // Send 500 status code if an error occurs
     } 
 }
 
-/**
- * @swagger
- * /comments:
- *   post:
- *     summary: Create a new comment
- *     tags: [Comments]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               content:
- *                 type: string
- *               discussionId:
- *                 type: integer
- *     responses:
- *       201:
- *         description: Comment created successfully
- *       500:
- *         description: Error creating comment
- */
 const createComment = async (req, res) => {
-    const { content, discussionId } = req.body;
-    const userId = req.user.id;
+    const { content, discussionId } = req.body;  // Extract content and discussionId from request body
+    const userId = req.user.id; // Extract user ID from authenticated user
     try {
+        // Create a new comment in the database
         const result = await commentModel.createComment(content, userId, discussionId);
+        // Send the created comment as JSON response with 201 status
         res.status(201).json(result);
     } catch (err) {
         console.error('Error creating comment:', err.message);
-        res.status(500).send("Error creating comment");
+        res.status(500).send("Error creating comment"); // Send 500 status code if an error occurs
     } 
 }
 
-/**
- * @swagger
- * /comments/{id}:
- *   put:
- *     summary: Update a comment
- *     tags: [Comments]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the comment to update
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               content:
- *                 type: string
- *     responses:
- *       200:
- *         description: Comment updated successfully
- *       404:
- *         description: Comment not found
- *       500:
- *         description: Error updating comment
- */
 const updateComment = async (req, res) => {
-    const { id } = req.params;
-    const { content } = req.body;
-    const userId = req.user.id;
+    const { id } = req.params;  // Extract the comment ID from request parameters
+    const { content } = req.body; // Extract content from request body
+    const userId = req.user.id; // Extract user ID from authenticated user
     try {
-        const comment = await commentModel.getCommentById(id);
+        const comment = await commentModel.getCommentById(id); // Fetch existing comment by ID
 
         if (!comment) {
-            return res.status(404).json({ error: 'Comment not found' });
+            return res.status(404).json({ error: 'Comment not found' }); // Return 404 if comment not found
         }
 
+        // Update the comment content in the database
         const updatedComment = await commentModel.updateComment(id, content);
-        res.json(updatedComment);
+        res.json(updatedComment); // Send the updated comment as JSON response
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error updating comment");
+        res.status(500).send("Error updating comment"); // Send 500 status code if an error occurs
     }
 }
 
-/**
- * @swagger
- * /comments/{id}:
- *   delete:
- *     summary: Delete a comment
- *     tags: [Comments]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the comment to delete
- *     responses:
- *       200:
- *         description: Comment deleted successfully
- *       404:
- *         description: Comment not found
- *       500:
- *         description: Error deleting comment
- */
 const deleteComment = async (req, res) => {
-    const { id } = req.params;
-    const userId = req.user.id;
+    const { id } = req.params; // Extract comment ID from request params
+    const userId = req.user.id; // Extract user ID from authenticated user
     try {
-        const comment = await commentModel.getCommentById(id);
+        const comment = await commentModel.getCommentById(id); // Fetch the existing comment by ID
 
         if (!comment) {
             console.error('Comment not found');
-            return res.status(404).json({ error: 'Comment not found' });
+            return res.status(404).json({ error: 'Comment not found' }); // Return 404 if comment not found
         }
 
+        // Delete the comment from the database
         const deletedComment = await commentModel.deleteComment(id);
-        res.json(deletedComment);
+        res.json(deletedComment); // Send confirmation as JSON response
+
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error deleting comment");
+        res.status(500).send("Error deleting comment"); // Send 500 status code if an error occurs
     } 
 }
 
-/**
- * @swagger
- * /comments/count:
- *   get:
- *     summary: Get the total count of comments
- *     tags: [Comments]
- *     responses:
- *       200:
- *         description: Total count of comments
- *       500:
- *         description: Error fetching comment count
- */
 const getCommentCount = async (req, res) => {
     try {
-        const count = await commentModel.getCommentCount();
-        res.json({ count });
+        const count = await commentModel.getCommentCount(); // Fetch the total count of comments from the database
+        res.json({ count }); // Send count as JSON response
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching comment count");
+        res.status(500).send("Error fetching comment count"); // Send 500 status code if an error occurs
     }
 }
 
-/**
- * @swagger
- * /comments/discussion/{discussionId}/count:
- *   get:
- *     summary: Get the count of comments for a specific discussion
- *     tags: [Comments]
- *     parameters:
- *       - in: path
- *         name: discussionId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the discussion
- *     responses:
- *       200:
- *         description: Count of comments for the discussion
- *       500:
- *         description: Error fetching comment count by discussion ID
- */
 const getCommentCountByDiscussionId = async (req, res) => {
-    const { discussionId } = req.params;
+    const { discussionId } = req.params; // Extract discussion ID from request parameters
     try {
+        // Fetch the count of comments for the specific discussion
         const count = await commentModel.getCommentCountByDiscussionId(discussionId);
-        res.json({ count });
+        res.json({ count }); // Send the count as JSON response
     } catch (err) {
         console.error(err);
-        res.status(500).send("Error fetching comment count by discussion ID");
+        res.status(500).send("Error fetching comment count by discussion ID"); // Send 500 status code if an error occurs
     }
 }
 
-/**
- * @swagger
- * /comments/{commentId}/like:
- *   post:
- *     summary: Increment likes for a comment
- *     tags: [Comments]
- *     parameters:
- *       - in: path
- *         name: commentId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the comment to like
- *     responses:
- *       200:
- *         description: Likes incremented successfully
- *       500:
- *         description: Error incrementing likes
- */
 const incrementLikes = async (req, res) => {
     try {
-        const commentId = req.params.commentId;
-        const likes = await commentModel.incrementLikes(commentId);
-        res.json({ success: true, likes });
+        const commentId = req.params.commentId; // Get comment ID from request parameters
+        const likes = await commentModel.incrementLikes(commentId); // Increment likes for comment in the database
+        res.json({ success: true, likes }); // Send the new like count as JSON response
     } catch (err) {
         console.error('Error incrementing likes:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message }); // Send 500 status code if an error occurs
     }
 }
 
-/**
- * @swagger
- * /comments/{commentId}/dislike:
- *   post:
- *     summary: Increment dislikes for a comment
- *     tags: [Comments]
- *     parameters:
- *       - in: path
- *         name: commentId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the comment to dislike
- *     responses:
- *       200:
- *         description: Dislikes incremented successfully
- *       500:
- *         description: Error incrementing dislikes
- */
 const incrementDislikes = async (req, res) => {
     try {
-        const commentId = req.params.commentId;
-        const dislikes = await commentModel.incrementDislikes(commentId);
-        res.json({ success: true, dislikes });
+        const commentId = req.params.commentId; // Get comment ID from request parameters
+        const dislikes = await commentModel.incrementDislikes(commentId); // Increment dislikes for comment in the database
+        res.json({ success: true, dislikes }); // Send the new dislike count as JSON response
     } catch (err) {
         console.error('Error incrementing dislikes:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message }); // Send 500 status code if an error occurs
     }
 }
 

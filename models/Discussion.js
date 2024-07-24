@@ -191,7 +191,7 @@ class Discussion {
     static async updateDiscussion(discussionId, description, category, userId) {
         try {
             const pool = await sql.connect(dbConfig);
-            await pool.request()
+            const result = await pool.request()
                 .input('discussionId', sql.Int, discussionId)
                 .input('description', sql.NVarChar, description)
                 .input('category', sql.NVarChar, category)
@@ -201,11 +201,13 @@ class Discussion {
                     SET description = @description, category = @category
                     WHERE id = @discussionId AND user_id = @userId
                 `);
-            return true;
+    
+            return result.rowsAffected[0] > 0;
         } catch (err) {
             throw new Error(`Error updating discussion: ${err.message}`);
         }
     }
+    
 
     static async deleteDiscussion(discussionId, userId) {
         try {

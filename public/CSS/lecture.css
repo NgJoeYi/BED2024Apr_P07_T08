@@ -1,9 +1,11 @@
+/* General styles for all elements */
 * {
   margin: 0px;
   padding: 0px;
   overflow-x: hidden; /* Get rid of excess white space horizontally */
 }
 
+/* Body styling */
 body {
   font-family: 'Roboto', sans-serif;
   background-color: #f7f7f7;
@@ -15,6 +17,7 @@ body {
   flex-direction: column;
 }  
 
+/* Main container styling */
 .container {
   display: flex;
   gap: 16px; 
@@ -63,6 +66,7 @@ inspired from gignite:
   font-weight: normal;
 }
 
+/* Icon rotation animation */
 .rotate {
   transition: transform 0.3s ease;
 }
@@ -71,6 +75,7 @@ inspired from gignite:
   transform: rotate(90deg);
 }
 
+/* Sub-navigation styling */
 .sub-nav {
   display: none;
   transition: max-height 0.3s ease;
@@ -107,13 +112,14 @@ inspired from gignite:
   font-size: 20px; 
 }
 
+/* Button container styling */
 .button-container{
   display: flex;
   flex-direction: row;
   gap: 10px;
 }
 
-/* DELETE BUTTON */
+/* Delete lecture button styling */
 .delete-lecture {
   width:100px;
   background-color: red;
@@ -134,7 +140,7 @@ inspired from gignite:
   background-color: #ff2d29;
 }
 
-
+/* Delete chapter button styling */
 .delete-chapter {
   background-color: #FF312E;
   color: black;
@@ -154,7 +160,7 @@ inspired from gignite:
   background-color: #ff2d29;
 }
 
-/* edit lecture button*/
+/* Edit lecture button styling */
 .edit-lecture {
   width:100px;
   background-color: #B4D2E7;
@@ -175,7 +181,7 @@ inspired from gignite:
   background-color: #C0E6DE;
 }
 
-
+/* Main content styling */
 .main-content {
   display: flex;
   flex-direction: column; 
@@ -185,6 +191,7 @@ inspired from gignite:
   margin-top: 100px;
 }
 
+/* Video container styling */
 .video-container {
   position: relative;
   width: 950px; /* Adjust width as needed */
@@ -202,6 +209,7 @@ inspired from gignite:
   height: 100%;
 }
 
+/* Lecture details card styling */
 .lecture-details-card{
   background-color: white;
   border: 1px solid #e0e0e0;
@@ -213,6 +221,7 @@ inspired from gignite:
   line-height: 30px;
 }
 
+/* Review section styling */
 .review-section {
   margin-top: 30px;
   width: 80%;
@@ -449,6 +458,8 @@ inspired from gignite:
 }
 /* End of Gignite Pop-up Integration Styles */
 
+
+/* Rating stars styling */
 .rating .fa-star {
   color: #ddd;
   font-size: 24px;
@@ -470,6 +481,7 @@ inspired from gignite:
   pointer-events: none;
 }
 
+/* General button styling */
 button { /* Add Review , Show more review button */
   cursor: pointer;
   padding: 10px 20px;
@@ -488,8 +500,7 @@ button:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
- 
-/* New footer terying out */
+/* Footer styling */
 .footer {
   background: #F4D9C6;
   padding: 20px 0px;
@@ -532,6 +543,7 @@ button:hover {
   margin: 0% 1%;
 }
 
+/* Footer styling for mobile devices */
 @media (max-width: 600px) {
 .footer {
   text-align: left;

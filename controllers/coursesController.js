@@ -6,24 +6,6 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-/**
- * @swagger
- * /courses:
- *   get:
- *     summary: Get all courses
- *     tags: [Courses]
- *     responses:
- *       200:
- *         description: A list of courses
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Course'
- *       500:
- *         description: Error retrieving courses
- */
 // For displaying all courses 
 const getAllCourses = async (req, res) => {
   try {
@@ -35,36 +17,6 @@ const getAllCourses = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/{id}:
- *   get:
- *     summary: Get course by ID
- *     tags: [Courses]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The course ID
- *     responses:
- *       200:
- *         description: The course description by ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 course:
- *                   $ref: '#/components/schemas/Course'
- *                 userID:
- *                   type: integer
- *       404:
- *         description: Course not found
- *       500:
- *         description: Error retrieving course
- */
 // getting specific course by ID 
 const getCoursesById = async (req, res) => {
   const courseID = parseInt(req.params.id);
@@ -80,26 +32,6 @@ const getCoursesById = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/categories:
- *   get:
- *     summary: Get all course categories
- *     tags: [Courses]
- *     responses:
- *       200:
- *         description: A list of categories
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: string
- *       404:
- *         description: Categories not found
- *       500:
- *         description: Error retrieving categories
- */
 // Getting all the categories to filter from  
 const getAllCategories = async (req, res) => {
   try {
@@ -114,32 +46,6 @@ const getAllCategories = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/filter:
- *   get:
- *     summary: Filter courses by category
- *     tags: [Courses]
- *     parameters:
- *       - in: query
- *         name: category
- *         schema:
- *           type: string
- *         description: The category to filter by
- *     responses:
- *       200:
- *         description: A list of courses in the category
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Course'
- *       404:
- *         description: Courses not found
- *       500:
- *         description: Error retrieving courses by category
- */
 // actual filter for category 
 const filterByCategory = async (req, res) => {
   try {
@@ -155,26 +61,6 @@ const filterByCategory = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/mostRecent:
- *   get:
- *     summary: Get the most recent courses
- *     tags: [Courses]
- *     responses:
- *       200:
- *         description: A list of the most recent courses
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Course'
- *       404:
- *         description: Most recent courses not found
- *       500:
- *         description: Error retrieving recent courses
- */
 // For filtering by recent courses 
 const getMostRecentCourses = async(req,res)=>{
   try{
@@ -189,26 +75,6 @@ const getMostRecentCourses = async(req,res)=>{
   }
 }
 
-/**
- * @swagger
- * /courses/earliest:
- *   get:
- *     summary: Get the earliest courses
- *     tags: [Courses]
- *     responses:
- *       200:
- *         description: A list of the earliest courses
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Course'
- *       404:
- *         description: Earliest courses not found
- *       500:
- *         description: Error retrieving earliest courses
- */
 // For filtering by earliest courses 
 const getEarliestCourses = async(req,res)=>{
   try{
@@ -223,34 +89,6 @@ const getEarliestCourses = async(req,res)=>{
   }
 }
 
-/**
- * @swagger
- * /courses:
- *   post:
- *     summary: Create a new course
- *     tags: [Courses]
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               courseImage:
- *                 type: string
- *                 format: binary
- *     responses:
- *       201:
- *         description: Course created successfully
- *       400:
- *         description: Course image not provided
- *       500:
- *         description: Error creating course
- */
 // Creating course 
 const createCourse = async (req, res) => {
   const newCourse = req.body;
@@ -271,41 +109,6 @@ const createCourse = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/{id}:
- *   put:
- *     summary: Update a course
- *     tags: [Courses]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The course ID
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               courseImage:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Course updated successfully
- *       404:
- *         description: Course not found
- *       500:
- *         description: Error updating course
- */
 // Update course if the user has permission 
 const updateCourse = async (req, res) => {
   const userID = req.user.id; // user id that logged on now
@@ -342,29 +145,6 @@ const updateCourse = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/{id}:
- *   delete:
- *     summary: Delete a course
- *     tags: [Courses]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The course ID
- *     responses:
- *       204:
- *         description: Course deleted successfully
- *       403:
- *         description: You do not have permission to delete this course
- *       404:
- *         description: Course not found
- *       500:
- *         description: Error deleting course
- */
 // Deleting course if the user has permission 
 const deleteCourse = async (req, res) => {
   const courseID = parseInt(req.params.id);
@@ -391,20 +171,6 @@ const deleteCourse = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/noLectures:
- *   delete:
- *     summary: Delete courses with no lectures
- *     tags: [Courses]
- *     responses:
- *       204:
- *         description: Courses deleted successfully
- *       404:
- *         description: No courses with no lectures found
- *       500:
- *         description: Error deleting courses with no lectures
- */
 // If user creates course but exists the page the course will not be created successfully
 const deleteCourseWithNoLectures = async (req, res) => {
   try {
@@ -422,32 +188,6 @@ const deleteCourseWithNoLectures = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/image/{id}:
- *   get:
- *     summary: Retrieve the image for a course
- *     tags: [Courses]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: The course ID
- *     responses:
- *       200:
- *         description: The image for the course
- *         content:
- *           image/jpeg:
- *             schema:
- *               type: string
- *               format: binary
- *       404:
- *         description: Image not found
- *       500:
- *         description: Error fetching course image
- */
 // For the course.html
 const getCourseImage = async (req, res) => {
   const courseID = parseInt(req.params.id);
@@ -464,35 +204,6 @@ const getCourseImage = async (req, res) => {
   }
 };
 
-/**
- * @swagger
- * /courses/search:
- *   get:
- *     summary: Search for courses
- *     tags: [Courses]
- *     parameters:
- *       - in: query
- *         name: term
- *         required: true
- *         schema:
- *           type: string
- *         description: The search term
- *     responses:
- *       200:
- *         description: A list of courses matching the search term
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Course'
- *       400:
- *         description: Search term is required
- *       404:
- *         description: No courses found
- *       500:
- *         description: Error searching for courses
- */
 // For users to search for courses in the search container 
 const searchCourses = async (req, res) => {
   try {
