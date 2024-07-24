@@ -526,12 +526,14 @@ async function deleteQuiz(event) {
         const response = await fetchWithAuth(`/quizzes/${quizId}`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'DELETE'
         });
-        const body = await response.json();
-        if (!response.ok) throw new Error(body.message);
-
-        alert('Quiz successfully deleted');
-        document.getElementById('update-modal').style.display = 'none';
-        fetchQuizzes(); // Refresh the quizzes list
+        if (response.status === 204) { // -------- changes made here
+            alert('Quiz successfully deleted');
+            document.getElementById('update-modal').style.display = 'none';
+            fetchQuizzes(); // Refresh the quizzes list
+        } else {
+            const body = await response.json(); // Get the response as JSON for additional cases
+            if (!response.ok) throw new Error(body.message);
+        }
     } catch (error) {
         console.error('Error deleting quiz:', error);
         alert(`Error deleting quiz: ${error.message}`);
