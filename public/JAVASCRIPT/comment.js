@@ -214,19 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // async function fetchComments(discussionId) {
-    //     try {
-    //         const response = await fetch(`/comments?discussionId=${discussionId}`);
-    //         if (!response.ok) {
-    //             throw new Error(`Error fetching comments: ${response.statusText}`);
-    //         }
-    //         const comments = await response.json();
-    //         displayComments(comments);
-    //     } catch (error) {
-    //         console.error('Error fetching comments:', error);
-    //     }
-    // }
-
     async function fetchComments(discussionId) {
         try {
             const response = await fetchWithAuth(`/comments?discussionId=${discussionId}`, {
@@ -328,8 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="comment-content">${comment.content}</div>
                 <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
                 <div class="comment-actions">
-                    <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
-                    <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
+                    <button class="like-button" style="color: black;" data-liked="${likedByUser}">${likesText}</button>
+                    <button class="dislike-button " style="color: black;" data-disliked="${dislikedByUser}">${dislikesText}</button>
                     ${token && comment.user_id === currentUserId ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
                                                                     <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
                 </div>
