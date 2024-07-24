@@ -4,31 +4,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizButton = document.getElementById('quiz-button');
     const statisticsButton = document.getElementById('statistics-button');
 
+    // Mark the quiz button as active and statistics button as inactive
     quizButton.classList.add('active');
     quizButton.classList.remove('inactive');
     statisticsButton.classList.remove('active');
     statisticsButton.classList.add('inactive');
 
+    // Navigate to quiz.html when the quiz button is clicked
     quizButton.addEventListener('click', () => {
         window.location.href = 'quiz.html'; // Navigate to quiz.html
     });
 
+    // Navigate to statistics.html when the statistics button is clicked
     statisticsButton.addEventListener('click', () => {
         window.location.href = 'statistics.html'; // Navigate to statistics.html
     });
 
     // checkSessionToken();
-    fetchQuizzes();
+    fetchQuizzes(); // Fetch the list of quizzes
 
     // Check the role from session storage and show/hide the create quiz button
     const userRole = sessionStorage.getItem('role');
     const createQuizBtn = document.getElementById('create-quiz-btn');
     if (userRole !== 'lecturer') {
-        createQuizBtn.style.display = 'none';
-        updateButton.style.display = 'none';
+        createQuizBtn.style.display = 'none'; // Hide the create quiz button if the user is not a lecturer
+        updateButton.style.display = 'none'; // Hide the update button if the user is not a lecturer
 
     }
 
+    // Modal elements
     const quizModal = document.getElementById('quiz-modal');
     const updateModal = document.getElementById('update-modal');
     const questionModal = document.getElementById('question-modal');
@@ -36,14 +40,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeUpdateModalBtn = document.querySelector('.close-update-modal-btn');
     // const closeQuestionModalBtn = document.querySelector('.close-question-modal-btn');
 
+    // Show the quiz creation modal
     createQuizBtn.addEventListener('click', () => {
         quizModal.style.display = 'block';
     });
 
+    // Close the quiz creation modal
     closeQuizModalBtn.addEventListener('click', () => {
         quizModal.style.display = 'none';
     });
 
+    // Close the quiz update modal
     closeUpdateModalBtn.addEventListener('click', () => {  
         updateModal.style.display = 'none';  
     });  
@@ -62,19 +69,20 @@ document.addEventListener('DOMContentLoaded', () => {
     //     }
     // });
 
+    // Form submission event listeners
     const quizForm = document.getElementById('quiz-form');
     if (quizForm) {
-        quizForm.addEventListener('submit', createQuiz);
+        quizForm.addEventListener('submit', createQuiz); // Attach event listener to the quiz form
     }
 
     const updateQuizForm = document.getElementById('update-quiz-form');  
     if (updateQuizForm) {  
-        updateQuizForm.addEventListener('submit', updateQuiz);  
+        updateQuizForm.addEventListener('submit', updateQuiz); // Attach event listener to the update quiz form
     }  
 
     const questionForm = document.getElementById('question-form');
     if (questionForm) {
-        questionForm.addEventListener('submit', createQuestion);
+        questionForm.addEventListener('submit', createQuestion);  // Attach event listener to the question form
     }
 
     // const prevButton = document.getElementById('prev-question');
@@ -82,14 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
     //     prevButton.addEventListener('click', showPreviousQuestion);
     // }
 
+    // Next question button event listener
     const nextButton = document.getElementById('next-question');
     if (nextButton) {
-        nextButton.addEventListener('click', showNextQuestion);
+        nextButton.addEventListener('click', showNextQuestion); // Attach event listener to the next question button
     }
 
+    // Delete quiz button event listener
     const deleteQuizBtn = document.getElementById('delete-quiz-btn');
     if (deleteQuizBtn) {
-        deleteQuizBtn.addEventListener('click', (event) => deleteQuiz(event));
+        deleteQuizBtn.addEventListener('click', (event) => deleteQuiz(event)); // Attach event listener to the delete quiz button
     }
 });
 
@@ -100,13 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
 //         window.location.href = '/login.html'; // Redirect to the login page
 //     }
 // }
-
+// Fetch quizzes from the server
 function fetchQuizzes() {
     fetch('/quizzes')
         .then(response => response.json())
         .then(quizzes => {
             if (quizzes && quizzes.length > 0) {
-                displayQuizzes(quizzes);
+                displayQuizzes(quizzes);  // Display quizzes if found
             } else {
                 console.error('No quizzes found');
                 document.getElementById('quiz-container').innerText = 'No quizzes available.';
@@ -115,6 +125,7 @@ function fetchQuizzes() {
         .catch(error => console.error('Error fetching quizzes:', error));
 }
 
+// Display quizzes on the page
 function displayQuizzes(quizzes) {
     const quizContainer = document.getElementById('quiz-container');
     quizContainer.innerHTML = '';
@@ -128,6 +139,7 @@ function displayQuizzes(quizzes) {
         const quizCard = document.createElement('div');
         quizCard.className = 'quiz-card';
 
+        // Create and append quiz image
         const quizImage = document.createElement('img');
         // Convert binary data to base64 string and set it as the image source
         if (quiz.quizImg && quiz.quizImg.data) {
@@ -139,6 +151,7 @@ function displayQuizzes(quizzes) {
         }
         quizCard.appendChild(quizImage);
 
+        // Create and append quiz card content
         const quizCardContent = document.createElement('div');
         quizCardContent.className = 'quiz-card-content';
 
@@ -161,6 +174,7 @@ function displayQuizzes(quizzes) {
             const buttonContainer = document.createElement('div');  
             buttonContainer.className = 'button-container';  
     
+        // Create and append start quiz button
             const startButton = document.createElement('button');
             startButton.innerText = 'Start Quiz';
             startButton.onclick = () => window.location.href = `/question.html?quizId=${quiz.quiz_id}`;
@@ -208,7 +222,7 @@ function displayQuizzes(quizzes) {
         quizContainer.appendChild(quizCard);
     });
 
-    // CHANGED FOR DROP DOWN: Event delegation for dropdown toggles
+    // Event delegation for dropdown toggles
     document.addEventListener('click', (event) => {
         const isDropdownToggle = event.target.matches('.dropdown-toggle');
         if (!isDropdownToggle && event.target.closest('.dropdown-menu') == null) {
@@ -221,6 +235,7 @@ function displayQuizzes(quizzes) {
     });
 }
 
+// Convert ArrayBuffer to base64 string
 function arrayBufferToBase64(buffer) {
     let binary = '';
     const bytes = new Uint8Array(buffer);
@@ -232,7 +247,7 @@ function arrayBufferToBase64(buffer) {
 }
 
 // ------------------------------- CREATE QUIZ -------------------------------
-
+// Handle quiz creation form submission
 async function createQuiz(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
@@ -241,6 +256,7 @@ async function createQuiz(event) {
     await handleImageUploadForCreate(quizData);
 }
 
+// Handle image upload for quiz creation
 async function handleImageUploadForCreate(data) {
     const imgFile = document.getElementById('quizImg').files[0];
     if (imgFile) {
@@ -257,6 +273,7 @@ async function handleImageUploadForCreate(data) {
     }
 }
 
+// Send request to create quiz
 async function createQuizRequest(data) {
     try {
         const response = await fetchWithAuth('/quizzes', { // ------------------------------------------------- headers in jwtutility.js
@@ -273,6 +290,7 @@ async function createQuizRequest(data) {
     }
 }
 
+// Handle response from quiz creation
 function handleQuizCreationResponse(data) {
     if (data.quiz && data.quiz.quiz_id) {
         alert(`${data.message}`);
@@ -289,9 +307,9 @@ function handleQuizCreationResponse(data) {
 
 // ------------------------------- CREATE QUESTION -------------------------------
 
-let currentQuestionIndex = 0;
-let totalQuestions = 0;
-
+let currentQuestionIndex = 0; // Initialize current question index
+let totalQuestions = 0; // Initialize total questions
+// Create form for new question
 function createQuestionForm() {
     const questionsContainer = document.getElementById('questions-container');
     questionsContainer.innerHTML = `
@@ -333,8 +351,8 @@ function createQuestionForm() {
     document.getElementById('submit-questions').style.display = currentQuestionIndex === totalQuestions - 1 ? 'inline-block' : 'none';
 }
 
-
-async function createQuestion(event) { // CHANGED FOR CREATION: Modify to handle "Next" button click
+// Handle question creation form submission
+async function createQuestion(event) { // Modify to handle "Next" button click
     event.preventDefault();
     const formData = new FormData(event.target);
     const questionData = Object.fromEntries(formData.entries());
@@ -359,6 +377,7 @@ async function createQuestion(event) { // CHANGED FOR CREATION: Modify to handle
     await handleImageUploadForQuestion(questionData);
 }
 
+// Handle image upload for question creation
 async function handleImageUploadForQuestion(data) {
     const imgFile = document.getElementById('qnsImg').files[0];
     if (imgFile) {
@@ -376,6 +395,7 @@ async function handleImageUploadForQuestion(data) {
     }
 }
 
+// Send request to create question
 async function createQuestionRequest(data) {
     try { 
         const response = await fetchWithAuth(`/quizzes/${data.quiz_id}/questions`, { // ------------------------------------------------- headers in jwtutility.js
@@ -392,11 +412,12 @@ async function createQuestionRequest(data) {
     }
 }
 
+// Handle response from question creation
 function handleQuestionCreationResponse(response, body) {
     if (response.ok) {
         if (currentQuestionIndex < totalQuestions - 1) {
             currentQuestionIndex++;
-            createQuestionForm();
+            createQuestionForm(); // Create form for the next question
         } else {
             alert('All questions have been created successfully.');
             document.getElementById('question-modal').style.display = 'none';
@@ -414,13 +435,14 @@ function handleQuestionCreationResponse(response, body) {
 //     }
 // }
 
+// Show the next question form
 function showNextQuestion() {
     const questionForm = document.getElementById('question-form');
     questionForm.dispatchEvent(new Event('submit'));
 }
 
 // ------------------------------- UPDATE QUIZ -------------------------------
-
+// Open the update quiz modal and prefill the fields
 function openUpdateModal(quiz) {  // prefill the modal fields
     document.getElementById('update_quiz_id').value = quiz.quiz_id;  
     document.getElementById('update_title').value = quiz.title;  
@@ -442,6 +464,7 @@ function openUpdateModal(quiz) {  // prefill the modal fields
     document.getElementById('update-modal').style.display = 'block';
 } 
 
+// Handle quiz update form submission
 async function updateQuiz(event) {  
     event.preventDefault();  
     const formData = new FormData(event.target);  
@@ -466,6 +489,7 @@ async function updateQuiz(event) {
     }
 }
 
+// Send request to update quiz
 async function updateQuizRequest(data) {
     try {
         const response = await fetchWithAuth(`/quizzes/${data.quiz_id}`, { // ------------------------------------------------- headers in jwtutility.js
@@ -482,21 +506,22 @@ async function updateQuizRequest(data) {
     }
 }
 
+// Handle response from quiz update
 function handleUpdateQuizResponse(response, body) {  
     if (response.status === 200) {  
         alert(`${body.message}`);  
         document.getElementById('update-modal').style.display = 'none';  
-        fetchQuizzes();  
+        fetchQuizzes();  // Refresh quizzes list
     } else {  
         alert(`Failed to update quiz: ${body.message}`);  
     }  
 }
 
 // ------------------------------- DELETE QUIZ -------------------------------
-
+// Handle quiz deletion
 async function deleteQuiz(event) {
     event.preventDefault();
-    const quizId = document.getElementById('update_quiz_id').value;
+    const quizId = document.getElementById('update_quiz_id').value; // Get quiz ID from the update modal
     try {
         const response = await fetchWithAuth(`/quizzes/${quizId}`, { // ------------------------------------------------- headers in jwtutility.js
             method: 'DELETE'
