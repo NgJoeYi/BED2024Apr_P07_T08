@@ -10,10 +10,29 @@
   "schemes": [
     "http"
   ],
+  "tags": [
+    {
+      "name": "Account Management",
+      "description": "Endpoints related to user accounts"
+    },
+    {
+      "name": "Quizzes",
+      "description": "Endpoints related to quizzes and their questions"
+    },
+    {
+      "name": "Discussions",
+      "description": "Endpoints related to discussions and comments"
+    },
+    {
+      "name": "Courses",
+      "description": "Endpoints related to courses and lectures"
+    }
+  ],
   "paths": {
     "/favicon.ico": {
       "get": {
         "description": "",
+        "tags": ["General"],
         "responses": {
           "204": {
             "description": "No Content"
@@ -24,6 +43,7 @@
     "/register": {
       "post": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "body",
@@ -54,6 +74,7 @@
     "/login": {
       "post": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "body",
@@ -87,6 +108,7 @@
     "/account": {
       "get": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -114,6 +136,7 @@
       },
       "put": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -171,6 +194,7 @@
       },
       "delete": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -215,6 +239,7 @@
     "/account/profile": {
       "get": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -244,6 +269,7 @@
     "/account/getAllAttemptCount": {
       "get": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -270,6 +296,7 @@
     "/account/getAttemptCountByQuizId": {
       "get": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -296,6 +323,7 @@
     "/account/quizResult": {
       "get": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -325,6 +353,7 @@
     "/account/uploadProfilePic": {
       "post": {
         "description": "",
+        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -366,6 +395,7 @@
     "/quizzes/statistics": {
       "get": {
         "description": "",
+        "tags": ["Quizzes"],
         "responses": {
           "200": {
             "description": "OK"
@@ -379,6 +409,7 @@
     "/quizzes": {
       "get": {
         "description": "",
+        "tags": ["Quizzes"],
         "responses": {
           "200": {
             "description": "OK"
@@ -393,6 +424,7 @@
       },
       "post": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "authorization",
@@ -440,6 +472,7 @@
     "/quizzes/{id}": {
       "get": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "id",
@@ -473,6 +506,7 @@
       },
       "put": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "id",
@@ -524,6 +558,7 @@
       },
       "delete": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "id",
@@ -562,6 +597,7 @@
     "/quizzes/{id}/questions": {
       "get": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "id",
@@ -595,6 +631,7 @@
       },
       "post": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "id",
@@ -645,6 +682,7 @@
     "/quizResult/{attemptId}": {
       "get": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "attemptId",
@@ -680,6 +718,7 @@
     "/submitQuiz": {
       "post": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "authorization",
@@ -730,6 +769,7 @@
     "/quizzes/{id}/questions/update": {
       "post": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "id",
@@ -783,6 +823,7 @@
     "/quizzes/{quizId}/questions/{questionId}": {
       "put": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "quizId",
@@ -855,6 +896,7 @@
       },
       "delete": {
         "description": "",
+        "tags": ["Quizzes"],
         "parameters": [
           {
             "name": "quizId",
@@ -902,6 +944,7 @@
     "/discussions": {
       "get": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "category",
@@ -930,6 +973,7 @@
       },
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "authorization",
@@ -974,6 +1018,7 @@
     "/discussions/user": {
       "get": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "authorization",
@@ -1000,6 +1045,7 @@
     "/discussions/{id}": {
       "get": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1033,6 +1079,7 @@
       },
       "put": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1081,6 +1128,7 @@
       },
       "delete": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1116,6 +1164,7 @@
     "/discussions/{discussionId}/like": {
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "discussionId",
@@ -1148,6 +1197,7 @@
     "/discussions/{discussionId}/dislike": {
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "discussionId",
@@ -1180,6 +1230,7 @@
     "/discussions/{discussionId}/view": {
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "discussionId",
@@ -1212,6 +1263,7 @@
     "/discussions/{id}/pin": {
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1244,6 +1296,7 @@
     "/discussions/{id}/unpin": {
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1276,6 +1329,7 @@
     "/comments": {
       "get": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "discussionId",
@@ -1294,6 +1348,7 @@
       },
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "authorization",
@@ -1338,6 +1393,7 @@
     "/comments/count": {
       "get": {
         "description": "",
+        "tags": ["Discussions"],
         "responses": {
           "200": {
             "description": "OK"
@@ -1351,6 +1407,7 @@
     "/comments/discussion/{discussionId}/count": {
       "get": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "discussionId",
@@ -1372,6 +1429,7 @@
     "/comments/{id}": {
       "put": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1420,6 +1478,7 @@
       },
       "delete": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1455,6 +1514,7 @@
     "/comments/{commentId}/like": {
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "commentId",
@@ -1476,6 +1536,7 @@
     "/comments/{commentId}/dislike": {
       "post": {
         "description": "",
+        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "commentId",
@@ -1497,6 +1558,7 @@
     "/reviews": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1525,6 +1587,7 @@
       },
       "post": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -1572,6 +1635,7 @@
     "/reviews/rating/{rating}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "rating",
@@ -1593,6 +1657,7 @@
     "/reviews/sort/{sort}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "sort",
@@ -1614,6 +1679,7 @@
     "/reviews/course/{courseId}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1635,6 +1701,7 @@
     "/reviews/course/{courseId}/rating/{rating}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1662,6 +1729,7 @@
     "/reviews/course/{courseId}/sort/{sort}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1689,6 +1757,7 @@
     "/reviews/count": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -1702,6 +1771,7 @@
     "/reviews/course/{courseId}/count": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1723,6 +1793,7 @@
     "/reviews/user/{userId}/count": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "userId",
@@ -1744,6 +1815,7 @@
     "/reviews/{id}": {
       "put": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -1798,6 +1870,7 @@
       },
       "delete": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -1833,6 +1906,7 @@
     "/reviews/{reviewId}/like": {
       "post": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "reviewId",
@@ -1854,6 +1928,7 @@
     "/reviews/{reviewId}/dislike": {
       "post": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "reviewId",
@@ -1875,6 +1950,7 @@
     "/courses/search": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "term",
@@ -1901,6 +1977,7 @@
     "/courses": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -1912,6 +1989,7 @@
       },
       "post": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -1953,6 +2031,7 @@
     "/courses/categories": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -1969,6 +2048,7 @@
     "/courses/filter": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "category",
@@ -1992,6 +2072,7 @@
     "/courses/mostRecent": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -2008,6 +2089,7 @@
     "/courses/earliest": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -2024,6 +2106,7 @@
     "/courses/{id}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2046,6 +2129,7 @@
       },
       "put": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2091,6 +2175,7 @@
       },
       "delete": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2126,6 +2211,7 @@
     "/courses/image/{id}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "produces": [
           "image/jpeg"
         ],
@@ -2153,6 +2239,7 @@
     "/courses/noLectures": {
       "delete": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -2182,6 +2269,7 @@
     "/lectures/checking": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -2205,6 +2293,7 @@
     "/lectures/last-chapter": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -2234,6 +2323,7 @@
     "/lectures": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -2245,6 +2335,7 @@
       },
       "post": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -2298,6 +2389,7 @@
     "/lectures/max-course-id": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -2311,6 +2403,7 @@
     "/lectures/course/{courseID}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseID",
@@ -2335,6 +2428,7 @@
     "/lectures/{id}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2357,6 +2451,7 @@
       },
       "put": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2411,6 +2506,7 @@
       },
       "delete": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2446,6 +2542,7 @@
     "/lectures/lecture-details/{id}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2470,6 +2567,7 @@
     "/video/{lectureID}": {
       "get": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "lectureID",
@@ -2494,6 +2592,7 @@
     "/lectures/course/{courseID}/chapter/{chapterName}": {
       "delete": {
         "description": "",
+        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseID",

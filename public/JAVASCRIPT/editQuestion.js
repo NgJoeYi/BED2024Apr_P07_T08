@@ -1,6 +1,6 @@
 function initializeEditQuestion() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const quizId = urlParams.get('quizId');
+    const urlParams = new URLSearchParams(window.location.search); // Parse URL parameters
+    const quizId = urlParams.get('quizId');  // Get quiz ID from URL
     const isEditMode = urlParams.get('edit-mode') === 'true'; // Check if edit mode is enabled
 
     console.log(`quizId: ${quizId}, isEditMode: ${isEditMode}`);
@@ -10,26 +10,27 @@ function initializeEditQuestion() {
     if (stylesheetLink) { // Check if the stylesheet link element exists
         if (isEditMode) {
             console.log('using edit css');
-            stylesheetLink.href = '/CSS/editQuestion.css';
+            stylesheetLink.href = '/CSS/editQuestion.css'; // Load edit mode stylesheet
         } else {
-            stylesheetLink.href = '/CSS/question.css';
+            stylesheetLink.href = '/CSS/question.css';  // Load regular mode stylesheet
         }
     }
 
     if (isEditMode) {
-        fetchQuizWithQuestionsForEdit(quizId, isEditMode);
+        fetchQuizWithQuestionsForEdit(quizId, isEditMode);  // Fetch quiz questions for edit mode
     }
 }
 
-let editQuestions = []; // Renamed variable to avoid conflicts
+let editQuestions = []; // Array to store questions for editing
 
+// Function to fetch quiz questions for editing
 function fetchQuizWithQuestionsForEdit(quizId, isEditMode) {
     fetchWithAuth(`/quizzes/${quizId}/questions`) // ------------------------------------------------- headers in jwtutility.js
     .then(response => response.json())
     .then(quiz => {
         if (quiz && quiz.questions) {
-            editQuestions = quiz.questions;
-            displayQuestionsForEdit(isEditMode);
+            editQuestions = quiz.questions; // Store quiz questions
+            displayQuestionsForEdit(isEditMode); // Display questions for editing
         } else {
             console.error('Quiz or questions not found');
             document.getElementById('questions-container').innerText = 'Quiz or questions not available.';
@@ -38,59 +39,60 @@ function fetchQuizWithQuestionsForEdit(quizId, isEditMode) {
     .catch(error => console.error('Error fetching quiz with questions:', error));
 }
 
+// Function to display questions for editing
 function displayQuestionsForEdit(isEditMode) {
-    const questionsContainer = document.getElementById('questions-container');
-    questionsContainer.innerHTML = '';
+    const questionsContainer = document.getElementById('questions-container'); // Get the questions container
+    questionsContainer.innerHTML = ''; // Clear previous questions
 
-    editQuestions.forEach((question, index) => {
+    editQuestions.forEach((question, index) => { // Iterate over questions
         const questionCard = document.createElement('div');
-        questionCard.className = 'question-card';
+        questionCard.className = 'question-card'; // Create question card
 
         const questionTitle = document.createElement('h3');
-        questionTitle.innerText = `Q${index + 1}:`;
-        questionCard.appendChild(questionTitle);
+        questionTitle.innerText = `Q${index + 1}:`; // Set question title
+        questionCard.appendChild(questionTitle); // Add title to card
 
         const questionInput = document.createElement('textarea');
-        questionInput.value = question.question_text;
+        questionInput.value = question.question_text;  // Set question text
         questionInput.dataset.questionId = question.question_id; // Use correct ID field
-        questionCard.appendChild(questionInput);
+        questionCard.appendChild(questionInput); // Add text input to card
 
-        if (question.qnsImg && question.qnsImg.data) {
-            const base64String = arrayBufferToBase64(question.qnsImg.data);
+        if (question.qnsImg && question.qnsImg.data) { // Check if question has an image
+            const base64String = arrayBufferToBase64(question.qnsImg.data);  // Convert image to base64
             const questionImage = document.createElement('img');
-            questionImage.src = `data:image/jpeg;base64,${base64String}`;
-            questionCard.appendChild(questionImage);
+            questionImage.src = `data:image/jpeg;base64,${base64String}`; // Set image source
+            questionCard.appendChild(questionImage);  // Add image to card
 
             const imageInput = document.createElement('input');
-            imageInput.type = 'file';
+            imageInput.type = 'file'; // Create file input for image
             imageInput.dataset.questionId = question.question_id; // Use correct ID field
-            questionCard.appendChild(imageInput);
+            questionCard.appendChild(imageInput); // Add file input to card
         }
 
-        const options = [question.option_1, question.option_2, question.option_3, question.option_4];
-        options.forEach((option, i) => {
+        const options = [question.option_1, question.option_2, question.option_3, question.option_4]; // Get options
+        options.forEach((option, i) => {  // Iterate over options
             const optionInput = document.createElement('input');
             optionInput.type = 'text';
-            optionInput.value = option;
+            optionInput.value = option;  // Set option value
             optionInput.dataset.questionId = question.question_id; // Use correct ID field
-            optionInput.dataset.optionIndex = i;
-            questionCard.appendChild(optionInput);
+            optionInput.dataset.optionIndex = i; // Set option index
+            questionCard.appendChild(optionInput); // Add option input to card
         });
 
         const correctOptionInput = document.createElement('input');
         correctOptionInput.type = 'text';
-        correctOptionInput.value = question.correct_option;
+        correctOptionInput.value = question.correct_option; // Set correct option value
         correctOptionInput.dataset.questionId = question.question_id; // Use correct ID field
-        correctOptionInput.dataset.correctOption = true;
-        questionCard.appendChild(correctOptionInput);
+        correctOptionInput.dataset.correctOption = true; // Mark as correct option
+        questionCard.appendChild(correctOptionInput); // Add correct option input to card
 
         // Add Delete button in edit mode
         const deleteButton = document.createElement('button');
         deleteButton.innerText = 'Delete';
-        deleteButton.onclick = () => deleteQuestion(question.question_id); // Use correct ID field
-        questionCard.appendChild(deleteButton);
+        deleteButton.onclick = () => deleteQuestion(question.question_id); // Set delete action
+        questionCard.appendChild(deleteButton); // Add delete button to card
 
-        questionsContainer.appendChild(questionCard);
+        questionsContainer.appendChild(questionCard); // Add question card to container
     });
 
     // Add button container
@@ -109,7 +111,7 @@ function displayQuestionsForEdit(isEditMode) {
     const saveButton = document.createElement('button');
     saveButton.id = 'save-changes'; // Make sure the button has this ID
     saveButton.innerText = 'Save Changes';
-    saveButton.onclick = saveChanges;
+    saveButton.onclick = saveChanges; // Set save action
     buttonContainer.appendChild(saveButton);   
 
     // Hide or remove the submit quiz button in edit mode
@@ -140,11 +142,12 @@ function displayQuestionsForEdit(isEditMode) {
 // --------------------------------------------------------- CREATE QUESTION ---------------------------------------------------------
 
 function createNewQuestionForm() {
-    const questionsContainer = document.getElementById('questions-container');
+    const questionsContainer = document.getElementById('questions-container'); // Get questions container
     const questionCard = document.createElement('div');
-    questionCard.className = 'question-card';
+    questionCard.className = 'question-card'; // Create question card
     questionCard.style.position = 'relative'; // Ensure the card is positioned relative for the button to work
 
+    // Add close button to remove question card
     const closeButton = document.createElement('button');  
     closeButton.innerText = 'X'; 
     closeButton.style.position = 'absolute';  
@@ -156,44 +159,46 @@ function createNewQuestionForm() {
     questionCard.appendChild(closeButton);
 
     const questionTitle = document.createElement('h3');
-    questionTitle.innerText = `New Question:`;
+    questionTitle.innerText = `New Question:`; // Set new question title
     questionCard.appendChild(questionTitle);
 
     const questionInput = document.createElement('textarea');
-    questionInput.placeholder = 'Enter question text here';
-    questionCard.appendChild(questionInput);
+    questionInput.placeholder = 'Enter question text here'; // Set placeholder for question text
+    questionCard.appendChild(questionInput); // Add question input to card
 
     const imageInput = document.createElement('input');
-    imageInput.type = 'file';
-    questionCard.appendChild(imageInput);
+    imageInput.type = 'file'; // Create file input for image
+    questionCard.appendChild(imageInput);  // Add file input to card
 
     const optionInputs = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++) { // Create inputs for options
         const optionInput = document.createElement('input');
         optionInput.type = 'text';
-        optionInput.placeholder = `Option ${i + 1}`;
-        questionCard.appendChild(optionInput);
+        optionInput.placeholder = `Option ${i + 1}`; // Set placeholder for option
+        questionCard.appendChild(optionInput); // Add option input to card
         optionInputs.push(optionInput); // Collecting option inputs
     }
 
     const correctOptionInput = document.createElement('input');
     correctOptionInput.type = 'text';
-    correctOptionInput.placeholder = 'Correct option';
-    questionCard.appendChild(correctOptionInput);
+    correctOptionInput.placeholder = 'Correct option'; // Set placeholder for correct option
+    questionCard.appendChild(correctOptionInput); // Add correct option input to card
 
     // Add save button to save the new question
     const saveNewQuestionButton = document.createElement('button');
     saveNewQuestionButton.innerText = 'Save Question';
     saveNewQuestionButton.onclick = () => saveNewQuestion(questionCard, questionInput, imageInput, optionInputs, correctOptionInput);
-    questionCard.appendChild(saveNewQuestionButton);
+    questionCard.appendChild(saveNewQuestionButton); // Add save button to card
 
-    questionsContainer.appendChild(questionCard);
+    questionsContainer.appendChild(questionCard);  // Add question card to container
 }
 
+// Function to save a new question
 async function saveNewQuestion(questionCard, questionInput, imageInput, optionInputs, correctOptionInput) {
     const urlParams = new URLSearchParams(window.location.search);
-    const quizId = urlParams.get('quizId');
+    const quizId = urlParams.get('quizId'); // Get quiz ID from URL
 
+    // Collect new question data from form inputs
     const newQuestionData = {
         quiz_id: quizId,
         question_text: questionInput.value,
@@ -206,7 +211,7 @@ async function saveNewQuestion(questionCard, questionInput, imageInput, optionIn
     };
 
     const imgFile = imageInput.files[0];
-    if (imgFile) {
+    if (imgFile) {  // If an image is uploaded, convert it to base64
         newQuestionData.qnsImg = await new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -226,9 +231,9 @@ async function saveNewQuestion(questionCard, questionInput, imageInput, optionIn
         const data = await response.json();
         if (response.ok) {
             alert('Question created successfully');
-            questionCard.remove();
-            newQuestionData.question_id = data.question_id; 
-            editQuestions.push(newQuestionData); 
+            questionCard.remove(); // Remove the question card after saving
+            newQuestionData.question_id = data.question_id;  // Add the new question ID to the data
+            editQuestions.push(newQuestionData); // Add new question to the questions array
             displayQuestionsForEdit(true); // Refresh the questions list in edit mode
             window.location.reload(); // Refresh the page to reload the data
         } else {
@@ -244,10 +249,10 @@ async function saveNewQuestion(questionCard, questionInput, imageInput, optionIn
 
 
 // --------------------------------------------------------- DELETE QUESTION ---------------------------------------------------------
-
+// Function to delete a question
 function deleteQuestion(questionId) {
     const urlParams = new URLSearchParams(window.location.search);
-    const quizId = urlParams.get('quizId');
+    const quizId = urlParams.get('quizId'); // Get quiz ID from URL
 
     console.log(`Deleting question with id: ${questionId} from quiz: ${quizId}`);
 
@@ -267,7 +272,7 @@ function deleteQuestion(questionId) {
         } else if (data.confirmDeleteQuiz) { 
             const confirmDelete = confirm(data.message);
             if (confirmDelete) {
-                deleteQuizById(quizId);
+                deleteQuizById(quizId); // Call function to delete the quiz
             }
         } else {
             console.error('Error deleting question:', data.message);
@@ -276,6 +281,7 @@ function deleteQuestion(questionId) {
     .catch(error => console.error('Error deleting question:', error));
 }
 
+// Function to delete a quiz
 function deleteQuizById(quizId) {
     fetchWithAuth(`/quizzes/${quizId}`, { // ------------------------------------------------- headers in jwtutility.js
         method: 'DELETE'
@@ -292,39 +298,40 @@ function deleteQuizById(quizId) {
     .catch(error => console.error('Error deleting quiz:', error));
 }
 
+// Function to save changes to questions
 async function saveChanges() {
     const updatedQuestions = [];
     const urlParams = new URLSearchParams(window.location.search);
-    const quizId = urlParams.get('quizId');
-    let hasErrors = false; 
+    const quizId = urlParams.get('quizId'); // Get quiz ID from URL
+    let hasErrors = false; // Flag to check for errors
 
-    for (const question of editQuestions) {
+    for (const question of editQuestions) {  // Iterate over questions
         const questionId = question.question_id; // Use correct ID field
         const questionTextElement = document.querySelector(`textarea[data-question-id="${questionId}"]`);
-        if (!questionTextElement) {
+        if (!questionTextElement) { // Skip if question text element is not found
             continue;
         }
-        const questionText = questionTextElement.value;
-        const options = [];
-        for (let i = 0; i < 4; i++) {
-            options.push(document.querySelector(`input[data-question-id="${questionId}"][data-option-index="${i}"]`).value);
+        const questionText = questionTextElement.value; // Get updated question text
+        const options = []; // Array to store updated options
+        for (let i = 0; i < 4; i++) { // Iterate over options
+            options.push(document.querySelector(`input[data-question-id="${questionId}"][data-option-index="${i}"]`).value); // Get updated option value
         }
-        const correctOption = document.querySelector(`input[data-question-id="${questionId}"][data-correct-option="true"]`).value;
+        const correctOption = document.querySelector(`input[data-question-id="${questionId}"][data-correct-option="true"]`).value; // Get updated correct option value
 
-        const imageInput = document.querySelector(`input[data-question-id="${questionId}"][type="file"]`); 
-        const imgFile = imageInput ? imageInput.files[0] : null; 
-        let qnsImg = null;
+        const imageInput = document.querySelector(`input[data-question-id="${questionId}"][type="file"]`);  // Get image input element
+        const imgFile = imageInput ? imageInput.files[0] : null;  // Get selected image file, if any
+        let qnsImg = null; // Variable to store base64 image data
 
-        if (imgFile) {
+        if (imgFile) { // If an image is uploaded, convert it to base64
             qnsImg = await new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
-                    resolve(reader.result.split(',')[1]);
+                    resolve(reader.result.split(',')[1]); // Get base64 data
                 };
-                reader.onerror = reject;
-                reader.readAsDataURL(imgFile);
+                reader.onerror = reject; // Handle error
+                reader.readAsDataURL(imgFile); // Read image file as data URL
             });
-        } else {
+        } else { // If no new image is uploaded, use existing image data
             qnsImg = question.qnsImg ? arrayBufferToBase64(question.qnsImg.data) : null;
         }
 
@@ -341,25 +348,25 @@ async function saveChanges() {
     }
 
     try {
-        for (const updatedQuestion of updatedQuestions) {
+        for (const updatedQuestion of updatedQuestions) { // Send updated question data to the server
             const response = await fetchWithAuth(`/quizzes/${quizId}/questions/${updatedQuestion.question_id}`, { // ------------------------------------------------- headers in jwtutility.js
                 method: 'PUT',
-                body: JSON.stringify(updatedQuestion)
+                body: JSON.stringify(updatedQuestion) // Convert question data to JSON
             });
-            const data = await response.json();
-            if (!response.ok) {   
+            const data = await response.json(); // Parse server response
+            if (!response.ok) {   // If response is not OK, log and alert the error
                 console.error(`Error updating question ${updatedQuestion.question_id}:`, data.message);
                 alert(`Error updating question ${updatedQuestion.question_id}: ${data.message}`);   
                 hasErrors = true;   
-            } else {
+            } else { // If response is OK, log success message
                 console.log(`Question ${updatedQuestion.question_id} updated successfully`);
             }
         }
-        if (!hasErrors) {   
+        if (!hasErrors) {    // If no errors occurred, alert success and redirect to quiz page
             alert('Questions updated successfully');   
-            window.location.href = `/quiz.html?quizId=${quizId}`;   
+            window.location.href = `/quiz.html?quizId=${quizId}`; // Redirect to quiz page   
         }
-    } catch (error) {
+    } catch (error) { // Handle any errors that occur during the process
         console.error('Error saving changes:', error);
         alert(`Error saving changes: ${error.message}`);
     }

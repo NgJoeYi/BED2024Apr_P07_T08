@@ -1,16 +1,18 @@
 let alertShown = false; // Flag to ensure alert is shown only once
 
+// Function to fetch data with authentication
 async function fetchWithAuth(url, options = {}) {
-    const token = sessionStorage.getItem('token');
-    if (!token) {
+    const token = sessionStorage.getItem('token'); // Retrieve the token from session storage
+    if (!token) { // If no token is found
         if (!alertShown) {
-            alert('No token found. Please log in.');
-            alertShown = true;
-            window.location.href = 'login.html';
+            alert('No token found. Please log in.'); // Alert the user to log in
+            alertShown = true; // Set flag to prevent multiple alerts
+            window.location.href = 'login.html'; // Redirect to login page
         }
-        return;
+        return; // Exit function
     }
 
+    // Add the Authorization header with the token
     options.headers = {
         ...options.headers,
         'Authorization': `Bearer ${token}`,
@@ -23,35 +25,35 @@ async function fetchWithAuth(url, options = {}) {
     }
 
     try {
-        const response = await fetch(url, options);
-        if (response.status === 401) {
+        const response = await fetch(url, options); // Perform the fetch request
+        if (response.status === 401) { // If the response status is 401 (Unauthorized)
             const errorData = await response.json();
-            if (errorData.message === 'Token expired') {
-                sessionStorage.removeItem('token');
+            if (errorData.message === 'Token expired') { // If the token has expired
+                sessionStorage.removeItem('token'); // Remove token from session storage
                 sessionStorage.removeItem('role');
                 sessionStorage.removeItem('userId');
                 if (!alertShown) {
-                    alert('Session expired. Please log in again.');
-                    alertShown = true;
-                    window.location.href = 'login.html';
+                    alert('Session expired. Please log in again.'); // Alert the user
+                    alertShown = true; // Set flag to prevent multiple alerts
+                    window.location.href = 'login.html'; // Redirect to login page
                 }
-            } else {
+            } else { // For other unauthorized access errors
                 if (!alertShown) {
-                    alert(errorData.message || 'Unauthorized access');
-                    alertShown = true;
-                    window.location.href = 'login.html';
+                    alert(errorData.message || 'Unauthorized access'); // Alert the user
+                    alertShown = true; // Set flag to prevent multiple alerts
+                    window.location.href = 'login.html'; // Redirect to login page
                 }
             }
-            return null;
+            return null; // Return null for unauthorized response
         }
-        return response;
+        return response; // Return the response if no errors
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error('Fetch error:', error); // Log fetch errors
         if (!alertShown) {
-            alert('An error occurred. Please try again.');
-            alertShown = true;
+            alert('An error occurred. Please try again.');  // Alert the user of the error
+            alertShown = true; // Set flag to prevent multiple alerts
         }
-        return null;
+        return null;  // Return null if fetch fails
     }
 }
 
