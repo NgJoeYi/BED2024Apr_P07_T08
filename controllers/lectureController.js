@@ -61,7 +61,7 @@ const getAllLectures = async (req, res) => {
  *         description: Error retrieving lecture
  */
 const getLectureDetails = async (req, res) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     try {
         const lectureDetails = await Lectures.getLectureDetails(id);
         if (!lectureDetails) {
@@ -101,7 +101,7 @@ const getLectureDetails = async (req, res) => {
  */
 // Retrieve a specific lecture by ID
 const getLectureByID = async (req, res) => {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     try {
         const lecture = await Lectures.getLectureByID(id);
         if (!lecture) {
