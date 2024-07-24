@@ -118,7 +118,7 @@
         <button id="addReviewBtn" class="add-review" onclick="showPopup('add')">Add review</button>
     </div>
 
-    <div class="popup" id="popup">
+    <!-- <div class="popup" id="popup">
         <div class="popup-content">
             <span class="close" onclick="closePopup()">&times;</span>
             <h2>Leave a Review</h2>
@@ -132,7 +132,35 @@
             <textarea id="review-text" placeholder="Review.."></textarea>
             <button onclick="postReview()">Post!</button>
         </div>
+    </div> -->
+
+    <!-- Gignite Pop-up Integration -->
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <h2>Leave a Review</h2>
+            <div class="stars-popup">
+                <i class="fa fa-star" data-value="1"></i>
+                <i class="fa fa-star" data-value="2"></i>
+                <i class="fa fa-star" data-value="3"></i>
+                <i class="fa fa-star" data-value="4"></i>
+                <i class="fa fa-star" data-value="5"></i>
+            </div>    
+            <div class="popup-body">
+                <div class="popup-user-info">
+                    <div class="avatar">
+                        <img src="images/profilePic.jpeg" alt="User Avatar">
+                    </div>
+                    <input type="text" id="review-text" placeholder="Tell us what you're thinking...">
+                </div>
+            </div>
+            <div class="popup-actions">
+                <button class="btn cancel-btn" onclick="closePopup()">Cancel</button>
+                <button class="btn post-btn" onclick="postReview()">Post</button>
+            </div>
+        </div>
     </div>
+    <!-- End of Gignite Pop-up Integration -->
+    
 
     <footer>
         <div class="footer">
