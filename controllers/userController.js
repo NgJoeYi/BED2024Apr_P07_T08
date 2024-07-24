@@ -47,17 +47,14 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body; // --------------------------------------------------------- Get the email and password from the request body
     try {
-        // if (!password) {
-        //     return res.status(400).json({ message: 'Please enter your password' });
-        // } did it in middleware alr
-
         const loginSuccess = await User.getUserByEmail({ email }); // -------------------------------- Fetch the user by email
         if (!loginSuccess) { // ---------------------------------------------------------------------- If no user is found, send a 404 response
-            return res.status(404).send( { message: 'Invalid email. No user found'} );
+            return res.status(404).json({ message: 'Invalid email. No user found' });
         }
+
         const matchPassword = await bcrypt.compare(password, loginSuccess.password); // -------------- Compare the provided password with the stored hashed password
         if (!matchPassword) { // --------------------------------------------------------------------- If the password does not match, send a 404 response
-            return res.status(404).json( { message: 'Invalid password. Please try again'} );
+            return res.status(404).json({ message: 'Invalid password. Please try again' });
         }
 
         const payload = { // ------------------------------------------------------------------------- Create a JWT payload with the user's ID and role
@@ -69,7 +66,7 @@ const loginUser = async (req, res) => {
         //res.status(200).json(loginSuccess);
     } catch (error) {
         console.error('Server error:', error); // ---------------------------------------------------- Log error details
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error' });
     }
 };
 // ************************************** JWT **************************************
@@ -117,7 +114,7 @@ const updateUser = async (req, res) => {
         res.status(200).json(updatedUser); // ------------------------------------------------------ Send the updated user data in the response
     } catch (error) {
         console.error('Server error:', error); // -------------------------------------------------- Log error details
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
