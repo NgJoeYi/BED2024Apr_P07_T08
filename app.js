@@ -8,7 +8,7 @@ const dotenv = require('dotenv');
 const multer = require('multer');
 //implemented swagger 
 const swaggerUi = require("swagger-ui-express");
-const swaggerDocument = require("./swagger-output.json");
+const swaggerDocument = require("./documentation/swagger-output.json");
 
 // const swaggerUi = require("swagger-ui-express"); 
 // const swaggerSpecs = require("./swagger-config"); // Import Swagger specs
