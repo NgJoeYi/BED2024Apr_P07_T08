@@ -68,6 +68,15 @@ async function run() {
             FOREIGN KEY (user_id) REFERENCES Users(id)
         );
 
+        CREATE TABLE Follow (
+            Id INT IDENTITY(1,1) PRIMARY KEY,
+            FollowerId INT NOT NULL,
+            FolloweeId INT NOT NULL,
+            CONSTRAINT FK_Follower FOREIGN KEY (FollowerId) REFERENCES Users(Id),
+            CONSTRAINT FK_Followee FOREIGN KEY (FolloweeId) REFERENCES Users(Id)
+        );
+
+
 
         CREATE TABLE user_comments (
             id INT IDENTITY(1,1) PRIMARY KEY,

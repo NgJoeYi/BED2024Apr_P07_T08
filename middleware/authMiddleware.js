@@ -42,6 +42,11 @@ function verifyJWT(req, res, next) {
             'DELETE /discussions/:id': ['student', 'lecturer'],
             'POST /discussions/:id/pin': ['student', 'lecturer'],  // Add this line for pin
             'POST /discussions/:id/unpin': ['student', 'lecturer'],  // Add this line for unpin
+            'POST /follow':  ['student', 'lecturer'],
+            'DELETE /unfollow':  ['student', 'lecturer'],
+            'GET /followed-discussions':  ['student', 'lecturer'],
+            'GET /following-status':  ['student', 'lecturer'],
+
             
             'GET /comments': ['student', 'lecturer'],
             'PUT /comments/:id': ['student', 'lecturer'],

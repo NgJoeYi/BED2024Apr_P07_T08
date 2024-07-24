@@ -21,7 +21,7 @@ class Discussion {
         try {
             let query = `
                 SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, d.views, u.name AS username, 
-                       ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role, d.pinned
+                       ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role, d.pinned, d.user_id
                 FROM Discussions d
                 LEFT JOIN Users u ON d.user_id = u.id
                 LEFT JOIN ProfilePic p ON u.id = p.user_id
@@ -35,7 +35,7 @@ class Discussion {
             if (search) {
                 query += ` AND (d.title LIKE @search OR d.description LIKE @search)`;
             }
-
+    
             query += ` ORDER BY d.pinned DESC, d.posted_date DESC`; // Sort pinned discussions to the top
     
             const pool = await sql.connect(dbConfig);
@@ -50,9 +50,21 @@ class Discussion {
             }
     
             const result = await request.query(query);
-            return result.recordset.map(row => new Discussion(
-                row.id, row.title, row.description, row.category, row.posted_date, row.likes, row.dislikes, row.views, row.username, row.profilePic, row.role, row.pinned
-            ));
+            return result.recordset.map(row => ({
+                id: row.id,
+                title: row.title,
+                description: row.description,
+                category: row.category,
+                posted_date: row.posted_date,
+                likes: row.likes,
+                dislikes: row.dislikes,
+                views: row.views,
+                username: row.username,
+                profilePic: row.profilePic,
+                role: row.role,
+                pinned: row.pinned,
+                user_id: row.user_id // Ensure this is included
+            }));
         } catch (err) {
             throw new Error(`Error getting discussions: ${err.message}`);
         }

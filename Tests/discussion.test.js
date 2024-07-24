@@ -24,7 +24,8 @@ describe('Discussion Model', () => {
                     username: 'john_doe',
                     profilePic: 'images/profilePic.jpeg',
                     role: 'user',
-                    pinned: false
+                    pinned: false,
+                    user_id: 1
                 },
                 {
                     id: 2,
@@ -38,7 +39,8 @@ describe('Discussion Model', () => {
                     username: 'jane_smith',
                     profilePic: 'images/profilePic.jpeg',
                     role: 'user',
-                    pinned: true
+                    pinned: true,
+                    user_id: 2
                 }
             ];
 
@@ -59,7 +61,7 @@ describe('Discussion Model', () => {
             expect(mockPool.request).toHaveBeenCalledTimes(1);
             expect(mockRequest.query).toHaveBeenCalledWith(expect.any(String));
             expect(discussions).toHaveLength(2);
-            expect(discussions[0]).toBeInstanceOf(Discussion);
+            expect(discussions[0]).toBeInstanceOf(Object);
             expect(discussions[0].id).toBe(1);
             expect(discussions[0].title).toBe('Coding for python');
             expect(discussions[0].description).toBe('Python design philosophy emphasizes code readability...');
@@ -71,6 +73,20 @@ describe('Discussion Model', () => {
             expect(discussions[0].profilePic).toBe('images/profilePic.jpeg');
             expect(discussions[0].role).toBe('user');
             expect(discussions[0].pinned).toBe(false);
+            expect(discussions[0].user_id).toBe(1);
+
+            expect(discussions[1].id).toBe(2);
+            expect(discussions[1].title).toBe('Advanced Algebra');
+            expect(discussions[1].description).toBe('Advanced algebra is a branch of mathematics...');
+            expect(discussions[1].category).toBe('math');
+            expect(discussions[1].likes).toBe(5);
+            expect(discussions[1].dislikes).toBe(0);
+            expect(discussions[1].views).toBe(50);
+            expect(discussions[1].username).toBe('jane_smith');
+            expect(discussions[1].profilePic).toBe('images/profilePic.jpeg');
+            expect(discussions[1].role).toBe('user');
+            expect(discussions[1].pinned).toBe(true);
+            expect(discussions[1].user_id).toBe(2);
         });
 
         it('should handle errors when retrieving discussions', async () => {
