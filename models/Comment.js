@@ -15,6 +15,7 @@ class Comment {
         this.dislikes = dislikes;
     }
 
+    // Function to fetch all comments
     static async getAllComments() {
         const query = `
             SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, u.id AS user_id, u.name AS username,
@@ -41,6 +42,7 @@ class Comment {
         }
     }
     
+    // Function to fetch comments by user ID
     static async getCommentById(id) {
         const query = `
             SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, uc.user_id, u.name AS username,
@@ -71,6 +73,7 @@ class Comment {
         }
     }
     
+    // Function to fetch comments by discussion ID
     static async getCommentsByDiscussionId(discussionId) {
         const query = `
             SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, uc.likes, uc.dislikes, u.id AS user_id, u.name AS username,
@@ -100,7 +103,7 @@ class Comment {
         }
     }
 
-    
+    // Function to create a new comment
     static async createComment(content, userId, discussion_id) {
         const query = `
             INSERT INTO user_comments (content, user_id, discussion_id, created_at)
@@ -127,6 +130,7 @@ class Comment {
         }
     }
     
+    // Function to update comment
     static async updateComment(id, content) {
         const query = `
             UPDATE user_comments
@@ -151,6 +155,8 @@ class Comment {
         }
     }
     
+    
+    // Function to delete comment
     static async deleteComment(id) {
         const query = `
             DELETE FROM user_comments
@@ -173,6 +179,7 @@ class Comment {
         }
     }
 
+    // Function to fetch total count of comments
     static async getCommentCount() {
         const query = `SELECT COUNT(*) AS count FROM user_comments`;
         let connection;
@@ -190,6 +197,7 @@ class Comment {
         }
     }
 
+    // Function to fetch the count of comments by discussion ID
     static async getCommentCountByDiscussionId(discussionId) {
         const query = `
             SELECT COUNT(*) AS count
@@ -212,6 +220,7 @@ class Comment {
         }
     }   
 
+    // Function to increment likes for a comment
     static async incrementLikes(id) { // UPDATE to increase like count, SELECT to retrieve the new like count
         const query = `
             UPDATE user_comments 
@@ -235,6 +244,7 @@ class Comment {
         }
     }
 
+    // Function to increment dislikes for a comment
     static async incrementDislikes(id) {
         const query = `
             UPDATE user_comments
