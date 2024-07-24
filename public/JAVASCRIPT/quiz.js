@@ -281,12 +281,24 @@ async function createQuizRequest(data) {
             body: JSON.stringify(data)
         });
         const body = await response.json();
-        if (!response.ok) throw new Error(body.message);
+        if (!response.ok) {
+            // Check if the response contains validation errors
+            if (body.errors && body.errors.length > 0) {
+                const error = new Error(body.message);
+                error.errors = body.errors;
+                throw error;
+            }
+            throw new Error(body.message);
+        }
 
         handleQuizCreationResponse(body);
     } catch (error) {
         console.error('Error creating quiz:', error);
-        alert(`Error creating quiz: ${error.message}`);
+        if (error.errors && error.errors.length > 0) { // -------- changes made here
+            alert(`Error creating quiz: ${error.errors.join(', ')}`); // Display specific validation errors
+        } else {
+            alert(`Error creating quiz: ${error.message}`);
+        }
     }
 }
 
@@ -403,12 +415,24 @@ async function createQuestionRequest(data) {
             body: JSON.stringify(data)
         });
         const body = await response.json();
-        if (!response.ok) throw new Error(body.message);
+        if (!response.ok) {
+            // Check if the response contains validation errors
+            if (body.errors && body.errors.length > 0) {
+                const error = new Error(body.message);
+                error.errors = body.errors;
+                throw error;
+            }
+            throw new Error(body.message);
+        }
 
         handleQuestionCreationResponse(response, body);
     } catch (error) {
         console.error('Error creating question:', error);
-        alert(`Error creating question: ${error.message}`);
+        if (error.errors && error.errors.length > 0) { // -------- changes made here
+            alert(`Error creating question: ${error.errors.join(', ')}`); // Display specific validation errors
+        } else {
+            alert(`Error creating question: ${error.message}`);
+        }
     }
 }
 
