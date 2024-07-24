@@ -21,6 +21,7 @@ dotenv.config();
 
 const userController = require('./controllers/userController');
 const quizController = require('./controllers/quizController');
+const followController = require('./controllers/followController');
 const discussionController = require('./controllers/discussionController');
 const commentController = require('./controllers/commentController');
 const reviewController = require('./controllers/reviewController');
@@ -32,6 +33,7 @@ const userValidation = require('./middleware/userValidation');
 const updateValidation = require('./middleware/updateValidation');
 const commentValidation = require('./middleware/commentValidation');
 const reviewValidation = require('./middleware/reviewValidation'); 
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -92,6 +94,12 @@ app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdat
 app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
 app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
+
+// for follow
+app.post('/follow',  jwtAuthorization.verifyJWT,  followController.followUser);
+app.delete('/unfollow',  jwtAuthorization.verifyJWT,  followController.unfollowUser);
+app.get('/followed-discussions',  jwtAuthorization.verifyJWT,  followController.getFollowedDiscussions);
+app.get('/following-status', jwtAuthorization.verifyJWT, followController.checkFollowingStatus);
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
