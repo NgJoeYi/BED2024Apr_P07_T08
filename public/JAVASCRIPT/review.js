@@ -1,8 +1,8 @@
-let currentReviewId = null;
+let currentReviewId = null; // Initialize the current review ID to null
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Get course ID
+    // Get course ID from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get('courseID'); 
     // Log the courseId for debugging purposes
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Add event listeners for navigation titles
     const navTitles = document.querySelectorAll('.nav-title');
     navTitles.forEach(title => { // Adding event listening for each navTitles
         title.addEventListener('click', () => { // When is clicked, 
@@ -45,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+     // Add event listeners for review stars
     const reviewStars = document.querySelectorAll('.review .fa-star');
     reviewStars.forEach(star => {
         star.addEventListener('click', () => {
@@ -73,49 +75,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const popupStars = document.querySelectorAll('.popup .fa-star');
+    // Add event listeners for popup stars
+    const popupStars = document.querySelectorAll('.stars-popup .fa-star');
     popupStars.forEach(star => {
-        star.addEventListener('mouseover', () => {
-            const value = star.getAttribute('data-value');
-            popupStars.forEach(s => {
-                if (s.getAttribute('data-value') <= value) {
-                    s.classList.add('hover');
-                } else {
-                    s.classList.remove('hover');
-                }
-            });
-        });
-
-        star.addEventListener('mouseout', () => {
-            popupStars.forEach(s => s.classList.remove('hover'));
-        });
-
         star.addEventListener('click', () => {
             const value = star.getAttribute('data-value');
             if (star.classList.contains('selected') && value === '1') {
-                popupStars.forEach(s => s.classList.remove('selected'));
+                popupStars.forEach(s => s.classList.remove('selected')); // Deselect all stars if the first star is clicked again
             } else {
                 popupStars.forEach(s => {
                     if (s.getAttribute('data-value') <= value) {
-                        s.classList.add('selected');
+                        s.classList.add('selected'); // Select stars up to the clicked star
                     } else {
-                        s.classList.remove('selected');
+                        s.classList.remove('selected'); // Deselect stars above the clicked star
                     }
                 });
             }
         });
     });
 
+    // Add event listener for filter change
     document.getElementById('filter').addEventListener('change', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('courseID');
         if (courseId && !isNaN(courseId)) {
-            fetchReviews(courseId);
+            fetchReviews(courseId); 
         } else {
             console.error('Invalid course ID');
         }
     });
     
+    // Add event listener for sort change
     document.getElementById('sort').addEventListener('change', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('courseID');
@@ -130,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sort').value = 'mostRecent';
 });
 
-
+// Function to show the popup for adding or editing a review
 function showPopup(type, review = null) {
     const currentUser = { // Define the currentUser object (added this because of Gignite)
         profilePic: sessionStorage.getItem('profilePic') || 'images/profilePic.jpeg'
@@ -142,7 +132,7 @@ function showPopup(type, review = null) {
     popup.style.display = 'flex'; // Display popup
 
     if (type === 'add') {
-        avatarImg.src = currentUser.profilePic;  // Set the current user's profile picture
+        avatarImg.src = currentUser.profilePic;  // Set the current user's profile picture (Added for Gignite)
         document.getElementById('review-text').value = ''; // No review text since is 'Add' Pop Up
         document.querySelectorAll('.popup .fa-star').forEach(star => { // Reset star ratings
             star.classList.remove('selected');
@@ -150,14 +140,14 @@ function showPopup(type, review = null) {
         currentReviewId = null; // Clear the current review ID
 
     } else if (type === 'edit' && review) {
-        avatarImg.src = review.querySelector('.author-avatar').src;
-        document.getElementById('review-text').value = review.querySelector('.review-details p').textContent;
+        avatarImg.src = review.querySelector('.author-avatar').src; // Set the avatar image (Added for Gignite)
+        document.getElementById('review-text').value = review.querySelector('.review-details p').textContent; // Set review text
         const rating = Array.from(review.querySelectorAll('.fa-star')).filter(star => star.classList.contains('selected')).length;
         document.querySelectorAll('.popup .fa-star').forEach(star => {
             if (star.getAttribute('data-value') <= rating) {
-                star.classList.add('selected');
+                star.classList.add('selected'); // Select stars up to the current rating
             } else {
-                star.classList.remove('selected');
+                star.classList.remove('selected'); // Deselect stars above the current rating
             }
         });
         currentReviewId = review.getAttribute('data-id'); // Set the current review ID
@@ -166,23 +156,25 @@ function showPopup(type, review = null) {
     // 'Edit' Pop Up type is dealt within 'editReview' function itself
 }
 
+// Function to close the popup
 function closePopup() {
     const popup = document.getElementById('popup');
     popup.style.display = 'none';
 }
 
+// Function to delete a review
 async function deleteReview(button) {
     const review = button.closest('.review');
     const reviewId = review.getAttribute('data-id');
 
     try {
         const response = await fetchWithAuth(`reviews/${reviewId}`, {
-            method: 'DELETE'
+            method: 'DELETE' // Send a DELETE request
         });
 
         if (!response) return; 
         if (response.ok) {
-            review.remove();
+            review.remove(); // Remove the review element
             alert('Review deleted successfully!');
         } else {
             const errorMessage = await response.text();
@@ -194,6 +186,7 @@ async function deleteReview(button) {
     }
 }
 
+// Function to post a new review or edit an existing review
 async function postReview() {
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = parseInt(urlParams.get('courseID'), 10); // Ensure courseId is an integer
@@ -201,11 +194,11 @@ async function postReview() {
     const rating = document.querySelectorAll('.popup .fa-star.selected').length;
 
     const endpoint = currentReviewId ? `/reviews/${currentReviewId}` : '/reviews'; // Determine endpoint
-    const method = currentReviewId ? 'PUT' : 'POST'; // Determine method
+    const method = currentReviewId ? 'PUT' : 'POST'; // Determine method based on currentReviewId
 
     fetchWithAuth('/reviews', { 
-        method: method,
-        body: JSON.stringify({ review_text: reviewText, rating: rating, courseId: courseId })
+        method: method, // POST for new review, PUT for updating existing review
+        body: JSON.stringify({ review_text: reviewText, rating: rating, courseId: courseId }) // Send review data
     })
     .then(response => {
         if (!response.ok) {
@@ -216,8 +209,8 @@ async function postReview() {
     .then(data => { // Data = Response Data incld. review_text, rating etc
         console.log('Review posted successfully:', data); // Debug log
         alert(data.message);
-        closePopup();
-        fetchReviews(courseId); // Ensure courseId is passed to fetchReviews
+        closePopup();  // Close the popup
+        fetchReviews(courseId);  // Refresh the reviews
     })
     .catch(error => {
         console.error('Error posting review:', error);
@@ -225,6 +218,7 @@ async function postReview() {
     });
 }
 
+// Function to edit a review
 async function editReview(button) {
     const review = button.closest('.review');
     const reviewUserId = parseInt(review.dataset.userId, 10);
@@ -236,7 +230,7 @@ async function editReview(button) {
 
     // Define avatarImg here (Added this for Gignite)
     const avatarImg = document.querySelector('.popup .avatar img');
-    avatarImg.src = review.querySelector('.author-avatar').src; // Use the current comment's profile picture
+    avatarImg.src = review.querySelector('.author-avatar').src; // To be able to use the current comment's profile picture
 
     document.getElementById('review-text').value = reviewText;
 
@@ -244,9 +238,9 @@ async function editReview(button) {
 
     popupStars.forEach(star => {
         if (star.getAttribute('data-value') <= rating) {
-            star.classList.add('selected');
+            star.classList.add('selected'); // Select stars up to the current rating
         } else {
-            star.classList.remove('selected');
+            star.classList.remove('selected'); // Deselect stars above the current rating
         }
     });
 
@@ -261,7 +255,7 @@ async function editReview(button) {
 
         try {
             const response = await fetchWithAuth(`/reviews/${reviewId}`, { 
-                method: 'PUT',
+                method: 'PUT', // Send a PUT request to update the review
                 body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId })
             });
             
@@ -273,8 +267,8 @@ async function editReview(button) {
 
             const data = await response.json();
             alert(data.message); // Success message
-            closePopup();
-            fetchReviews(courseId);
+            closePopup(); // Close the popup
+            fetchReviews(courseId); // Refresh the reviews
         } catch (error) {
             console.error('Error updating review:', error);
             alert(`${error.error || 'Internal Server Error'}`);
@@ -283,10 +277,11 @@ async function editReview(button) {
 
     const cancelButton = document.querySelector('.popup-content .btn.cancel-btn');
     cancelButton.onclick = () => {
-        closePopup();
+        closePopup(); // Close the popup without saving changes
     };
 }
 
+// Function to increment the likes of a review
 async function incrementReviewLikes(reviewId, likeButton, dislikeButton) {
     try {
 
@@ -299,13 +294,13 @@ async function incrementReviewLikes(reviewId, likeButton, dislikeButton) {
         // Send POST request to increment like count for particular review
         const response = await fetch(`/reviews/${reviewId}/like`, {
             // *** Like & Dislike is POST, not PUT because they are not considered to be updating anything. Instead, they are a new action, not an update to an existing action.
-            method: 'POST' 
+            method: 'POST' // Send a POST request to increment likes
         });
         const data = await response.json();
         if (data.success) {
-            likeButton.textContent = `👍 ${data.likes} Likes`;
-            likeButton.setAttribute('data-liked', 'true');
-            dislikeButton.setAttribute('data-disliked', 'false');
+            likeButton.textContent = `👍 ${data.likes} Likes`; // Update the like button text
+            likeButton.setAttribute('data-liked', 'true'); // Set the review as liked
+            dislikeButton.setAttribute('data-disliked', 'false'); // Set the review as not disliked
         } else {
             alert('Error adding like.');
         }
@@ -315,6 +310,7 @@ async function incrementReviewLikes(reviewId, likeButton, dislikeButton) {
     }
 }
 
+// Function to increment the dislikes of a review
 async function incrementReviewDislikes(reviewId, likeButton, dislikeButton) {
     try {
 
@@ -325,13 +321,13 @@ async function incrementReviewDislikes(reviewId, likeButton, dislikeButton) {
         }
 
         const response = await fetch(`/reviews/${reviewId}/dislike`, {
-            method: 'POST'
+            method: 'POST' // Send a POST request to increment dislikes
         });
         const data = await response.json();
         if (data.success) {
-            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
-            dislikeButton.setAttribute('data-disliked', 'true');
-            likeButton.setAttribute('data-liked', 'false');
+            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`; // Update the dislike button text
+            dislikeButton.setAttribute('data-disliked', 'true'); // Set the review as disliked
+            likeButton.setAttribute('data-liked', 'false'); // Set the review as not liked
         } else {
             alert('Error adding dislike.');
         }
@@ -341,10 +337,11 @@ async function incrementReviewDislikes(reviewId, likeButton, dislikeButton) {
     }
 }
 
+// Function to fetch reviews based on course ID
 async function fetchReviews(courseId) {
 
     if (isNaN(courseId)) {
-        console.error('Invalid course ID:', courseId); // Debug log
+        console.error('Invalid course ID:', courseId); // Log an error if the course ID is invalid
         return;
     }
 
@@ -355,19 +352,19 @@ async function fetchReviews(courseId) {
 
     let url = `/reviews/course/${courseId}`;
     if (filter !== 'all') {
-        url += `/rating/${filter}`;
+        url += `/rating/${filter}`; // Add filter to the URL
     }
     if (sort !== 'mostRecent') {
-        url += `/sort/${sort}`;
+        url += `/sort/${sort}`; // Add sort option to the URL
     }
 
     try {
         // const response = await fetchWithAuth(url, { 
         const response = await fetch(url, {  // ''fetch' and not 'fetchWithAuth' so that users not logged in can see the reviews
-            method: 'GET'
+            method: 'GET'  // Send a GET request to fetch reviews
         });
         if (!response.ok) {
-            console.error('Failed to fetch reviews:', response.statusText); // Debug log
+            console.error('Failed to fetch reviews:', response.statusText); // Log an error if the request fails
             throw new Error('Failed to fetch reviews');
         }
         const reviews = await response.json();
@@ -439,7 +436,7 @@ async function fetchReviews(courseId) {
                         alert('You can only choose to like or dislike a review.');
                         return;
                     }
-                    incrementReviewLikes(review.review_id, this, dislikeButton);
+                    incrementReviewLikes(review.review_id, this, dislikeButton); // Increment likes
                 });
             }
 
@@ -454,22 +451,23 @@ async function fetchReviews(courseId) {
                         alert('You can only choose to like or dislike a review.');
                         return;
                     }
-                    incrementReviewDislikes(review.review_id, likeButton, this);
+                    incrementReviewDislikes(review.review_id, likeButton, this); // Increment dislikes
                 });
             }
             
-            reviewsContainer.appendChild(reviewElement);
+            reviewsContainer.appendChild(reviewElement); // Append the review element to the container
         });
     } catch (error) {
         console.error('Error fetching reviews:', error);
     }
 }
 
+// Function to fetch the review count by course ID
 async function fetchReviewCountByCourseId(courseId) {
     try {
         // const response = await fetchWithAuth(`/reviews/course/${courseId}/count`, { 
         const response = await fetch(`/reviews/course/${courseId}/count`, { 
-            method: 'GET'
+            method: 'GET' // Send a GET request to fetch review count
         });
 
         console.log('Response status:', response.status); // Debug
@@ -483,15 +481,6 @@ async function fetchReviewCountByCourseId(courseId) {
 
         const data = JSON.parse(responseText);
         console.log('Parsed data:', data); // Debug 
-
-        // const totalReviewsElement = document.getElementById('total-reviews');
-        // totalReviewsElement.textContent = data.count;
-        // const totalReviewsElement = document.getElementById('total-reviews');
-        // if (totalReviewsElement) {
-        //     totalReviewsElement.textContent = data.count;
-        // } else {
-        //     console.error('total-reviews element not found');
-        // }
 
     } catch (error) {
         console.error('Error fetching review count by course ID:', error);
