@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizModal = document.getElementById('quiz-modal');
     const questionModal = document.getElementById('question-modal');
     const closeQuizModalBtn = document.querySelector('.close-quiz-modal-btn');
+    const closeUpdateModalBtn = document.querySelector('.close-update-modal-btn'); // @@@@
+
 
     // Show the quiz creation modal
     createQuizBtn.addEventListener('click', () => {
@@ -49,6 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
         quizForm.addEventListener('submit', handleQuizFormSubmit);
     }
 
+    // Close the quiz update modal // @@@@
+    closeUpdateModalBtn.addEventListener('click', () => { // @@@@
+        closeUpdateModal(); // @@@@
+    }); // @@@@
+
     const questionForm = document.getElementById('question-form');
     if (questionForm) {
         questionForm.addEventListener('submit', handleQuestionFormSubmit);
@@ -59,6 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nextButton) {
         nextButton.addEventListener('click', showNextQuestion);
     }
+
+    // Delete quiz button event listener 
+    const deleteQuizBtn = document.getElementById('delete-quiz-btn'); 
+    if (deleteQuizBtn) { 
+        deleteQuizBtn.addEventListener('click', () => { 
+            const quizId = document.getElementById('update_quiz_id').value; 
+            handleDeleteQuiz(quizId); 
+        }); 
+    } 
 });
 
 // Fetch quizzes from the server
@@ -399,3 +415,101 @@ function showNextQuestion() {
     const questionForm = document.getElementById('question-form');
     questionForm.dispatchEvent(new Event('submit'));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// %%%%%%%% Add missing functions for update and delete operations
+
+// Open the update quiz modal and prefill the fields
+function openUpdateModal(quiz) { 
+    const updateQuizForm = document.getElementById('update-quiz-form'); 
+    updateQuizForm.reset(); 
+    document.getElementById('update_quiz_id').value = quiz.quiz_id; 
+    document.getElementById('update_title').value = quiz.title; 
+    document.getElementById('update_description').value = quiz.description; 
+    document.getElementById('update_total_questions').value = quiz.total_questions; 
+    document.getElementById('update_total_marks').value = quiz.total_marks; 
+
+    const currentImage = quiz.quizImg ? `data:image/jpeg;base64,${arrayBufferToBase64(quiz.quizImg.data)}` : ''; 
+    document.getElementById('update_quiz_img_preview').src = currentImage; 
+    document.getElementById('update_quiz_img_preview').style.display = currentImage ? 'block' : 'none'; 
+
+    document.getElementById('update-modal').style.display = 'block'; 
+} 
+
+// Close the update quiz modal
+function closeUpdateModal() { 
+    document.getElementById('update-modal').style.display = 'none'; 
+} 
+
+// Handle quiz update form submission
+async function handleUpdateQuizFormSubmit(event) { 
+    event.preventDefault(); 
+    const formData = new FormData(event.target); 
+    const quizData = Object.fromEntries(formData.entries()); 
+    const imgFile = document.getElementById('update_quizImg').files[0]; 
+
+    if (imgFile) { 
+        const reader = new FileReader(); 
+        reader.onloadend = async () => { 
+            quizData.quizImg = reader.result.split(',')[1]; 
+            await updateQuizRequest(quizData); 
+        }; 
+        reader.readAsDataURL(imgFile); 
+    } else { 
+        quizData.quizImg = document.getElementById('current_quiz_img').value; 
+        await updateQuizRequest(quizData); 
+    } 
+} 
+
+// Send request to update quiz
+async function updateQuizRequest(data) { 
+    try { 
+        const response = await fetchWithAuth(`/quizzes/${data.quiz_id}`, { 
+            method: 'PUT', 
+            body: JSON.stringify(data), 
+            headers: { 'Content-Type': 'application/json' } 
+        }); 
+        const body = await response.json(); 
+        if (!response.ok) { 
+            throw new Error(body.message); 
+        } 
+        alert('Quiz updated successfully'); 
+        closeUpdateModal(); 
+        fetchQuizzes(); 
+        location.reload(); 
+    } catch (error) { 
+        console.error('Error updating quiz:', error); 
+        alert(`Error updating quiz: ${error.message}`); 
+    } 
+} 
+
+// Handle delete quiz
+async function handleDeleteQuiz(quizId) { 
+    try { 
+        const response = await fetchWithAuth(`/quizzes/${quizId}`, { 
+            method: 'DELETE' 
+        }); 
+        if (!response.ok) { 
+            throw new Error('Failed to delete quiz'); 
+        } 
+        alert('Quiz deleted successfully'); 
+        fetchQuizzes(); 
+    } catch (error) { 
+        console.error('Error deleting quiz:', error); 
+        alert(`Error deleting quiz: ${error.message}`); 
+    } 
+} 
