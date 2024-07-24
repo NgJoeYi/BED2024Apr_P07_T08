@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
     // Set active state based on the current page
     const quizButton = document.getElementById('quiz-button');
     const statisticsButton = document.getElementById('statistics-button');
@@ -12,15 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Navigate to quiz.html when the quiz button is clicked
     quizButton.addEventListener('click', () => {
-        window.location.href = 'quiz.html'; // Navigate to quiz.html
+        window.location.href = 'quiz.html';
     });
 
     // Navigate to statistics.html when the statistics button is clicked
     statisticsButton.addEventListener('click', () => {
-        window.location.href = 'statistics.html'; // Navigate to statistics.html
+        window.location.href = 'statistics.html';
     });
 
-    // checkSessionToken();
     fetchQuizzes(); // Fetch the list of quizzes
 
     // Check the role from session storage and show/hide the create quiz button
@@ -28,17 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const createQuizBtn = document.getElementById('create-quiz-btn');
     if (userRole !== 'lecturer') {
         createQuizBtn.style.display = 'none'; // Hide the create quiz button if the user is not a lecturer
-        updateButton.style.display = 'none'; // Hide the update button if the user is not a lecturer
-
     }
 
     // Modal elements
     const quizModal = document.getElementById('quiz-modal');
-    const updateModal = document.getElementById('update-modal');
     const questionModal = document.getElementById('question-modal');
     const closeQuizModalBtn = document.querySelector('.close-quiz-modal-btn');
-    const closeUpdateModalBtn = document.querySelector('.close-update-modal-btn');
-    // const closeQuestionModalBtn = document.querySelector('.close-question-modal-btn');
 
     // Show the quiz creation modal
     createQuizBtn.addEventListener('click', () => {
@@ -50,73 +43,31 @@ document.addEventListener('DOMContentLoaded', () => {
         quizModal.style.display = 'none';
     });
 
-    // Close the quiz update modal
-    closeUpdateModalBtn.addEventListener('click', () => {  
-        updateModal.style.display = 'none';  
-    });  
-
-    // closeQuestionModalBtn.addEventListener('click', () => {
-    //     questionModal.style.display = 'none';
-    // });
-
-    // window.addEventListener('click', (event) => {
-    //     if (event.target == quizModal) {
-    //         quizModal.style.display = 'none';
-    //     } else if (event.target == updateModal) {  
-    //         updateModal.style.display = 'none';  
-    //     } else if (event.target == questionModal) {
-    //         questionModal.style.display = 'none';
-    //     }
-    // });
-
     // Form submission event listeners
     const quizForm = document.getElementById('quiz-form');
     if (quizForm) {
-        quizForm.addEventListener('submit', createQuiz); // Attach event listener to the quiz form
+        quizForm.addEventListener('submit', handleQuizFormSubmit);
     }
-
-    const updateQuizForm = document.getElementById('update-quiz-form');  
-    if (updateQuizForm) {  
-        updateQuizForm.addEventListener('submit', updateQuiz); // Attach event listener to the update quiz form
-    }  
 
     const questionForm = document.getElementById('question-form');
     if (questionForm) {
-        questionForm.addEventListener('submit', createQuestion);  // Attach event listener to the question form
+        questionForm.addEventListener('submit', handleQuestionFormSubmit);
     }
-
-    // const prevButton = document.getElementById('prev-question');
-    // if (prevButton) {
-    //     prevButton.addEventListener('click', showPreviousQuestion);
-    // }
 
     // Next question button event listener
     const nextButton = document.getElementById('next-question');
     if (nextButton) {
-        nextButton.addEventListener('click', showNextQuestion); // Attach event listener to the next question button
-    }
-
-    // Delete quiz button event listener
-    const deleteQuizBtn = document.getElementById('delete-quiz-btn');
-    if (deleteQuizBtn) {
-        deleteQuizBtn.addEventListener('click', (event) => deleteQuiz(event)); // Attach event listener to the delete quiz button
+        nextButton.addEventListener('click', showNextQuestion);
     }
 });
 
-// function checkSessionToken() {
-//     const token = sessionStorage.getItem('token');
-//     if (!token) {
-//         alert('You are not logged in. Please log in to continue.');
-//         window.location.href = '/login.html'; // Redirect to the login page
-//     }
-// }
 // Fetch quizzes from the server
 function fetchQuizzes() {
     fetch('/quizzes')
         .then(response => response.json())
         .then(quizzes => {
             if (quizzes && quizzes.length > 0) {
-                displayQuizzes(quizzes);  // Display quizzes if found
+                displayQuizzes(quizzes);
             } else {
                 console.error('No quizzes found');
                 document.getElementById('quiz-container').innerText = 'No quizzes available.';
@@ -130,24 +81,16 @@ function displayQuizzes(quizzes) {
     const quizContainer = document.getElementById('quiz-container');
     quizContainer.innerHTML = '';
     const userId = parseInt(sessionStorage.getItem('userId')); // current user's ID from session storage
-    // console.log('userId:', userId);
-
 
     quizzes.forEach(quiz => {
-        // console.log('Quiz data:', quiz); // Log quiz data to check if quizImg is present
-
         const quizCard = document.createElement('div');
         quizCard.className = 'quiz-card';
 
         // Create and append quiz image
         const quizImage = document.createElement('img');
-        // Convert binary data to base64 string and set it as the image source
         if (quiz.quizImg && quiz.quizImg.data) {
             const base64String = arrayBufferToBase64(quiz.quizImg.data);
             quizImage.src = `data:image/jpeg;base64,${base64String}`;
-            // console.log('Base64 Image String:', base64String); // Log the base64 image string
-        } else {
-            console.log('cannot get image.....');
         }
         quizCard.appendChild(quizImage);
 
@@ -169,19 +112,18 @@ function displayQuizzes(quizzes) {
             <strong>Total Questions:</strong> ${quiz.total_questions} | 
             <strong>Total Marks:</strong> ${quiz.total_marks} | 
             <strong>Created By:</strong> ${quiz.creator_name}`;
-            quizCardContent.appendChild(quizDetails);
+        quizCardContent.appendChild(quizDetails);
 
-            const buttonContainer = document.createElement('div');  
-            buttonContainer.className = 'button-container';  
-    
+        const buttonContainer = document.createElement('div');  
+        buttonContainer.className = 'button-container';  
+
         // Create and append start quiz button
-            const startButton = document.createElement('button');
-            startButton.innerText = 'Start Quiz';
-            startButton.onclick = () => window.location.href = `/question.html?quizId=${quiz.quiz_id}`;
-            buttonContainer.appendChild(startButton);  
-    
+        const startButton = document.createElement('button');
+        startButton.innerText = 'Start Quiz';
+        startButton.onclick = () => window.location.href = `/question.html?quizId=${quiz.quiz_id}`;
+        buttonContainer.appendChild(startButton);  
+
         // Add dropdown menu only if the current user is the creator of the quiz
-        console.log('Comparing userId:', userId, 'with quiz.created_by:', quiz.created_by);
         if (userId === quiz.created_by) {
             const dropdown = document.createElement('div');
             dropdown.className = 'dropdown';
@@ -246,43 +188,123 @@ function arrayBufferToBase64(buffer) {
     return window.btoa(binary);
 }
 
-// ------------------------------- CREATE QUIZ -------------------------------
-// Handle quiz creation form submission
-async function createQuiz(event) {
+// ------------------------------- HANDLE FORMS -------------------------------
+// Handle quiz form submission
+function handleQuizFormSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const quizData = Object.fromEntries(formData.entries());
-    console.log('Quiz Data:', quizData);
-    await handleImageUploadForCreate(quizData);
-}
 
-// Handle image upload for quiz creation
-async function handleImageUploadForCreate(data) {
+    // Handle image upload for quiz creation
     const imgFile = document.getElementById('quizImg').files[0];
     if (imgFile) {
         const reader = new FileReader();
-        reader.onloadend = async () => {
-            data['quizImg'] = reader.result.split(',')[1];
-            // console.log('Data with Image:', data);
-            await createQuizRequest(data);
+        reader.onloadend = () => {
+            quizData.quizImg = reader.result.split(',')[1]; // Convert image to base64 string
+            console.log('Quiz Data with Image:', quizData);
+            storeQuizData(quizData);
         };
         reader.readAsDataURL(imgFile);
     } else {
-        console.log('Data without Image:', data);
-        await createQuizRequest(data);
+        quizData.quizImg = null; // No image provided
+        console.log('Quiz Data without Image:', quizData);
+        storeQuizData(quizData);
     }
+}
+
+// Store quiz data temporarily and show the question modal
+function storeQuizData(quizData) {
+    sessionStorage.setItem('quizData', JSON.stringify(quizData));
+    document.getElementById('quiz-modal').style.display = 'none';
+    document.getElementById('question-modal').style.display = 'block';
+    currentQuestionIndex = 0; // Initialize the current question index
+    totalQuestions = parseInt(quizData.total_questions); // Get the total questions
+    createQuestionForm();
+}
+
+// Handle question form submission
+async function handleQuestionFormSubmit(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const questionData = Object.fromEntries(formData.entries());
+
+    // Handle image upload for question creation
+    const imgFile = document.getElementById('qnsImg').files[0];
+    if (imgFile) {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            questionData.qnsImg = reader.result.split(',')[1]; // Convert image to base64 string
+            console.log('Question Data with Image:', questionData);
+            await storeQuestionData(questionData);
+        };
+        reader.readAsDataURL(imgFile);
+    } else {
+        questionData.qnsImg = null; // No image provided
+        console.log('Question Data without Image:', questionData);
+        await storeQuestionData(questionData);
+    }
+}
+
+// Store question data and move to the next question or submit
+async function storeQuestionData(questionData) {
+    let questions = JSON.parse(sessionStorage.getItem('questions')) || [];
+    questions.push(questionData);
+    sessionStorage.setItem('questions', JSON.stringify(questions));
+    console.log('Stored Questions:', questions); // Add logging here
+
+    if (currentQuestionIndex < totalQuestions - 1) {
+        currentQuestionIndex++;
+        createQuestionForm(); // Create form for the next question
+    } else {
+        await submitQuizAndQuestions();
+        alert('All questions have been created successfully.');
+        document.getElementById('question-modal').style.display = 'none';
+        resetQuizForm(); // Reset quiz form fields
+        fetchQuizzes();
+    }
+}
+
+// Reset quiz form fields
+function resetQuizForm() {
+    const quizForm = document.getElementById('quiz-form');
+    quizForm.reset();
+}
+
+// Submit quiz and questions to the server
+async function submitQuizAndQuestions() {
+    const quizData = JSON.parse(sessionStorage.getItem('quizData'));
+    const questions = JSON.parse(sessionStorage.getItem('questions'));
+
+    // Check that questions are stored as an array
+    if (!Array.isArray(questions)) {
+        console.error('Questions are not an array:', questions);
+        return;
+    }
+
+    // Send quiz data to the server and get the created quiz ID
+    const createdQuiz = await createQuizRequest(quizData);
+
+    // Send each question to the server
+    for (let question of questions) {
+        question.quiz_id = createdQuiz.quiz_id;
+        await createQuestionRequest(question);
+    }
+
+    // Clear the temporary data
+    sessionStorage.removeItem('quizData');
+    sessionStorage.removeItem('questions');
 }
 
 // Send request to create quiz
 async function createQuizRequest(data) {
     try {
-        const response = await fetchWithAuth('/quizzes', { // ------------------------------------------------- headers in jwtutility.js
+        const response = await fetchWithAuth('/quizzes', {
             method: 'POST',
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' } // Ensure correct header is set
         });
         const body = await response.json();
         if (!response.ok) {
-            // Check if the response contains validation errors
             if (body.errors && body.errors.length > 0) {
                 const error = new Error(body.message);
                 error.errors = body.errors;
@@ -291,36 +313,46 @@ async function createQuizRequest(data) {
             throw new Error(body.message);
         }
 
-        handleQuizCreationResponse(body);
+        return body.quiz;
     } catch (error) {
         console.error('Error creating quiz:', error);
-        if (error.errors && error.errors.length > 0) { // -------- changes made here
-            alert(`Error creating quiz: ${error.errors.join(', ')}`); // Display specific validation errors
+        if (error.errors && error.errors.length > 0) {
+            alert(`Error creating quiz: ${error.errors.join(', ')}`);
         } else {
             alert(`Error creating quiz: ${error.message}`);
         }
     }
 }
 
-// Handle response from quiz creation
-function handleQuizCreationResponse(data) {
-    if (data.quiz && data.quiz.quiz_id) {
-        alert(`${data.message}`);
-        document.getElementById('quiz_id').value = data.quiz.quiz_id;
-        document.getElementById('quiz-modal').style.display = 'none';
-        document.getElementById('question-modal').style.display = 'block';
-        currentQuestionIndex = 0; // Initialize the current question index
-        totalQuestions = parseInt(data.quiz.total_questions); // Get the total questions
-        createQuestionForm();
-    } else {
-        alert('Failed to create quiz');
+// Send request to create question
+async function createQuestionRequest(data) {
+    try {
+        const response = await fetchWithAuth(`/quizzes/${data.quiz_id}/questions`, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: { 'Content-Type': 'application/json' } // Ensure correct header is set
+        });
+        const body = await response.json();
+        if (!response.ok) {
+            if (body.errors && body.errors.length > 0) {
+                const error = new Error(body.message);
+                error.errors = body.errors;
+                throw error;
+            }
+            throw new Error(body.message);
+        }
+
+        return body;
+    } catch (error) {
+        console.error('Error creating question:', error);
+        if (error.errors && error.errors.length > 0) {
+            alert(`Error creating question: ${error.errors.join(', ')}`);
+        } else {
+            alert(`Error creating question: ${error.message}`);
+        }
     }
 }
 
-// ------------------------------- CREATE QUESTION -------------------------------
-
-let currentQuestionIndex = 0; // Initialize current question index
-let totalQuestions = 0; // Initialize total questions
 // Create form for new question
 function createQuestionForm() {
     const questionsContainer = document.getElementById('questions-container');
@@ -358,208 +390,12 @@ function createQuestionForm() {
     // Display the current question number
     const questionNumberElement = document.getElementById('question-number');
     questionNumberElement.innerText = `Question ${currentQuestionIndex + 1}/${totalQuestions}`;
-    // document.getElementById('prev-question').disabled = currentQuestionIndex === 0;
     document.getElementById('next-question').style.display = currentQuestionIndex < totalQuestions - 1 ? 'inline-block' : 'none';
     document.getElementById('submit-questions').style.display = currentQuestionIndex === totalQuestions - 1 ? 'inline-block' : 'none';
 }
-
-// Handle question creation form submission
-async function createQuestion(event) { // Modify to handle "Next" button click
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const questionData = Object.fromEntries(formData.entries());
-    const quizId = document.getElementById('quiz_id').value;
-    console.log('************** QUIZ ID:', quizId);
-    questionData.quiz_id = quizId;
-
-    // // Validate correct option
-    // const options = [questionData.option_1, questionData.option_2, questionData.option_3, questionData.option_4];
-    // if (!options.includes(questionData.correct_option)) {
-    //     alert("Correct option must be one of the provided options.");
-    //     return;
-    // }
-
-    // // Validate uniqueness of options
-    // const uniqueOptions = new Set(options);
-    // if (uniqueOptions.size !== options.length) {
-    //     alert("All options must be unique.");
-    //     return;
-    // }
-
-    await handleImageUploadForQuestion(questionData);
-}
-
-// Handle image upload for question creation
-async function handleImageUploadForQuestion(data) {
-    const imgFile = document.getElementById('qnsImg').files[0];
-    if (imgFile) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            data['qnsImg'] = reader.result.split(',')[1];
-            // console.log('Data with Image:', data);
-            await createQuestionRequest(data);
-        };
-        reader.readAsDataURL(imgFile);
-    } else {
-        console.log('Data without Image:', data);
-        data['qnsImg'] = null;
-        await createQuestionRequest(data);
-    }
-}
-
-// Send request to create question
-async function createQuestionRequest(data) {
-    try { 
-        const response = await fetchWithAuth(`/quizzes/${data.quiz_id}/questions`, { // ------------------------------------------------- headers in jwtutility.js
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-        const body = await response.json();
-        if (!response.ok) {
-            // Check if the response contains validation errors
-            if (body.errors && body.errors.length > 0) {
-                const error = new Error(body.message);
-                error.errors = body.errors;
-                throw error;
-            }
-            throw new Error(body.message);
-        }
-
-        handleQuestionCreationResponse(response, body);
-    } catch (error) {
-        console.error('Error creating question:', error);
-        if (error.errors && error.errors.length > 0) { // -------- changes made here
-            alert(`Error creating question: ${error.errors.join(', ')}`); // Display specific validation errors
-        } else {
-            alert(`Error creating question: ${error.message}`);
-        }
-    }
-}
-
-// Handle response from question creation
-function handleQuestionCreationResponse(response, body) {
-    if (response.ok) {
-        if (currentQuestionIndex < totalQuestions - 1) {
-            currentQuestionIndex++;
-            createQuestionForm(); // Create form for the next question
-        } else {
-            alert('All questions have been created successfully.');
-            document.getElementById('question-modal').style.display = 'none';
-            fetchQuizzes();
-        }
-    } else {
-        alert(`Failed to create question: ${body.message}`);
-    }
-}
-
-// function showPreviousQuestion() {
-//     if (currentQuestionIndex > 0) {
-//         currentQuestionIndex--;
-//         createQuestionForm();
-//     }
-// }
 
 // Show the next question form
 function showNextQuestion() {
     const questionForm = document.getElementById('question-form');
     questionForm.dispatchEvent(new Event('submit'));
-}
-
-// ------------------------------- UPDATE QUIZ -------------------------------
-// Open the update quiz modal and prefill the fields
-function openUpdateModal(quiz) {  // prefill the modal fields
-    document.getElementById('update_quiz_id').value = quiz.quiz_id;  
-    document.getElementById('update_title').value = quiz.title;  
-    document.getElementById('update_description').value = quiz.description;  
-    document.getElementById('update_total_questions').value = quiz.total_questions;  
-    document.getElementById('update_total_marks').value = quiz.total_marks;  
-    // Store the current image data in a hidden input
-    if (quiz.quizImage && quiz.quizImage.data) {
-        const base64String = arrayBufferToBase64(quiz.quizImage.data);
-        document.getElementById('current_quiz_img').value = base64String;
-        const quizImgPreview = document.getElementById('update_quiz_img_preview');
-        quizImgPreview.src = `data:image/jpeg;base64,${base64String}`;
-        quizImgPreview.style.display = 'block'; // Show the image preview
-    } else {
-        document.getElementById('update_quiz_img_preview').style.display = 'none';
-    }
-
-    // Open the modal
-    document.getElementById('update-modal').style.display = 'block';
-} 
-
-// Handle quiz update form submission
-async function updateQuiz(event) {  
-    event.preventDefault();  
-    const formData = new FormData(event.target);  
-    const quizData = Object.fromEntries(formData.entries());  
-    delete quizData.created_by; // don't need to send this to back end
-    console.log('********************* quiz data:',quizData);
-
-    // Check if a new image file is selected
-    const imgFile = document.getElementById('update_quizImg').files[0];
-    if (imgFile) {
-        // If a new image is provided, read it
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            quizData['quizImg'] = reader.result.split(',')[1];
-            await updateQuizRequest(quizData);
-        };
-        reader.readAsDataURL(imgFile);
-    } else {
-        // If no new image is provided, use the existing image data
-        quizData['quizImg'] = document.getElementById('current_quiz_img').value;
-        await updateQuizRequest(quizData);
-    }
-}
-
-// Send request to update quiz
-async function updateQuizRequest(data) {
-    try {
-        const response = await fetchWithAuth(`/quizzes/${data.quiz_id}`, { // ------------------------------------------------- headers in jwtutility.js
-            method: 'PUT',
-            body: JSON.stringify(data)
-        });
-        const body = await response.json();
-        if (!response.ok) throw new Error(body.message);
-
-        handleUpdateQuizResponse(response, body);
-    } catch (error) {
-        console.error('Error updating quiz:', error);
-        alert(`Error updating quiz: ${error.message}`);
-    }
-}
-
-// Handle response from quiz update
-function handleUpdateQuizResponse(response, body) {  
-    if (response.status === 200) {  
-        alert(`${body.message}`);  
-        document.getElementById('update-modal').style.display = 'none';  
-        fetchQuizzes();  // Refresh quizzes list
-    } else {  
-        alert(`Failed to update quiz: ${body.message}`);  
-    }  
-}
-
-// ------------------------------- DELETE QUIZ -------------------------------
-// Handle quiz deletion
-async function deleteQuiz(event) {
-    event.preventDefault();
-    const quizId = document.getElementById('update_quiz_id').value; // Get quiz ID from the update modal
-    try {
-        const response = await fetchWithAuth(`/quizzes/${quizId}`, { // ------------------------------------------------- headers in jwtutility.js
-            method: 'DELETE'
-        });
-        if (response.status === 204) { // -------- changes made here
-            alert('Quiz successfully deleted');
-            document.getElementById('update-modal').style.display = 'none';
-            fetchQuizzes(); // Refresh the quizzes list
-        } else {
-            const body = await response.json(); // Get the response as JSON for additional cases
-            if (!response.ok) throw new Error(body.message);
-        }
-    } catch (error) {
-        console.error('Error deleting quiz:', error);
-        alert(`Error deleting quiz: ${error.message}`);
-    }
 }
