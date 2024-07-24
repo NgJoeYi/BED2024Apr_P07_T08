@@ -101,6 +101,22 @@ const createQuestionOnUpdate = async (req, res) => { // utilise this in editQues
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
         
+        // Define options from newQuestionData
+        const options = [
+            newQuestionData.option_1,
+            newQuestionData.option_2,
+            newQuestionData.option_3,
+            newQuestionData.option_4
+        ];
+        // Convert correct_option to a zero-based index
+        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
+        // Check if the index is valid and within the bounds of the options array
+        if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
+            // Map correct_option to its content
+            newQuestionData.correct_option = options[correctOptionIndex];
+        }
+        console.log(newQuestionData);
+
         const question = await Quiz.createQuestion(newQuestionData); // -------------------- Create a new question
         if (!question) {
             return res.status(500).json({ message: "Failed to create question" });  // ----- Return error if question creation fails
@@ -340,6 +356,21 @@ const updateQuestion = async (req, res) => {
             newQuestionData.option_3.toLowerCase(),
             newQuestionData.option_4.toLowerCase()
         ];
+
+        const optionValues = [
+            newQuestionData.option_1,
+            newQuestionData.option_2,
+            newQuestionData.option_3,
+            newQuestionData.option_4
+        ];
+        // ------------------------------------------------------------------------------------------------ Convert correct_option to a zero-based index
+        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
+        // ------------------------------------------------------------------------------------------------ Check if the index is valid and within the bounds of the options array
+        if (correctOptionIndex >= 0 && correctOptionIndex < optionValues.length) {
+            // --------------------------------------------------------------------------------------------- Map correct_option to its content
+            newQuestionData.correct_option = optionValues[correctOptionIndex];
+        }
+        console.log(newQuestionData);
 
         const correctOptionExists = options.includes(newQuestionData.correct_option.toLowerCase()); // ------ compare options in lower case
         if (!correctOptionExists) {

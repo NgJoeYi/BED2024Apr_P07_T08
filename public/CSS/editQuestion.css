@@ -138,3 +138,37 @@ main {
     margin-left: auto; /* Push next button to the right */
     display: none; /* Hide the next button */
 }
+
+
+.question-card select {
+    width: 100%;
+    padding: 15px; /* Increased padding for better usability */
+    margin-bottom: 15px; /* Increased margin for better spacing */
+    border: 1px solid #d9aa52; /* Updated border color for better contrast */
+    border-radius: 8px; /* Slightly more rounded corners */
+    background-color: #f9f9f9; /* Lighter background color for better contrast */
+    color: #1b2b40; /* Match color to background */
+    font-size: 16px;
+    box-sizing: border-box; /* Ensure padding and border are included in width */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for focus state */
+    appearance: none; /* Remove default arrow icon */
+    -webkit-appearance: none; /* Remove default arrow icon in Safari */
+    -moz-appearance: none; /* Remove default arrow icon in Firefox */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><polygon fill="%231b2b40" points="6 8 10 12 14 8"/></svg>'); /* Custom arrow icon */
+    background-repeat: no-repeat; /* Prevent the arrow icon from repeating */
+    background-position: right 15px center; /* Position the arrow icon */
+    background-size: 10px 10px; /* Size of the arrow icon */
+}
+
+.question-card select:focus {
+    border-color: #b28f3e; /* Darker border color on focus */
+    box-shadow: 0 0 8px rgba(185, 143, 62, 0.6); /* Subtle shadow on focus */
+    outline: none; /* Remove default outline */
+}
+
+.question-card label {
+    font-size: 16px;
+    margin-bottom: 5px;
+    display: block;
+    color: #d9aa52;
+}
