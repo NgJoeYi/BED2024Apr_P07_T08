@@ -401,7 +401,12 @@ function createQuestionForm() {
         </div>
         <div>
             <label for="correct_option">Correct Option:</label>
-            <input type="text" id="correct_option" name="correct_option" required>
+            <select id="correct_option" name="correct_option" required>
+                <option value="1">Option 1</option>
+                <option value="2">Option 2</option>
+                <option value="3">Option 3</option>
+                <option value="4">Option 4</option>
+            </select>
         </div>
         <div>
             <label for="qnsImg">Question Image:</label>
