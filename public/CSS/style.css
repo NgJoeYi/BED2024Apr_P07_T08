@@ -781,7 +781,7 @@
   color: gray;
 }
 
-.pin-button-top-right {
+.pin-button {
   background-color: transparent;
   border: solid 1px black;
   padding: 10px;
@@ -1333,4 +1333,61 @@
 
 .like-button:focus, .dislike-button:focus {
   outline: none;
+}
+
+
+
+
+/* for my gemini api DONT TOUCH  */
+
+/* Add these styles to your CSS file */
+.suggestion-button {
+  background-color: transparent;
+  border: solid 1px black;
+  padding: 10px;
+  color: #0366d6;
+  cursor: pointer;
+  position: absolute;
+  top: 16px;
+  right: 25px;
+}
+
+.suggestion-button:hover {
+  background-color: #e67e22;
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 10px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }

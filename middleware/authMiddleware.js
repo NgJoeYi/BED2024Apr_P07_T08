@@ -46,6 +46,7 @@ function verifyJWT(req, res, next) {
             'POST /unfollow':  ['student', 'lecturer'],
             'GET /followed-discussions':  ['student', 'lecturer'],
             'GET /follow-status':  ['student', 'lecturer'],
+            'GET /discussions/:id/suggestions':  ['student', 'lecturer'],
 
             
             'GET /comments': ['student', 'lecturer'],
