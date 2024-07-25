@@ -2,13 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const token = getToken(); // Retrieve the token from sessionStorage
     const currentUserId = getCurrentUserId(); // Retrieve the user ID from sessionStorage
 
-    // // Check if the user is logged in by verifying the token
-    // if (!token) {
-    //     console.error('User is not logged in. Token not found.');
-    //     // Optionally, redirect to the login page or show a login message
-    //     return;
-    // }
-
     // Set the Main Feed tab as the default active tab
     showTab('mainFeed');
 
@@ -59,21 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
-// function fetchWithAuth(url, options = {}) {
-//     const token = getToken(); // Retrieve token from sessionStorage
-//     console.log('Retrieved token:', token); // Debugging line
-//     if (!token) {
-//         console.error('No token found in sessionStorage');
-//         return Promise.reject('No token found in sessionStorage');
-//     }
-//     options.headers = {
-//         ...options.headers,
-//         'Authorization': `Bearer ${token}`,
-//         'Content-Type': 'application/json'
-//     };
-//     return fetch(url, options);
-// }
 
 function getToken() {
     const token = sessionStorage.getItem('token');
@@ -193,7 +171,13 @@ function capitalizeFirstLetter(string) {
 }
 
 function addDiscussionToFeed(discussion, feedType) {
+    console.log(`Adding discussion ID: ${discussion.id} to feed type: ${feedType}`);
     const feed = document.querySelector(`#${feedType} .activity-feed`);
+    if (!feed) {
+        console.error(`Feed element not found for feed type: ${feedType}`);
+        return;
+    }
+
     const post = document.createElement('div');
     post.classList.add('post');
     post.setAttribute('data-id', discussion.id);
@@ -223,7 +207,7 @@ function addDiscussionToFeed(discussion, feedType) {
             <div class="user-info">
                 <div class="username">${capitalizedUsername}</div>
                 <div class="role">(${discussion.role})</div>
-                <button class="follow-button" data-user-id="${discussion.userId}">Follow</button>
+                <button class="follow-button" data-user-id="${discussion.user_id}">Follow</button>
             </div>
             <button class="${pinButtonClass} pin-button-top-right" data-id="${discussion.id}">${pinButtonText}</button>
         </div>
@@ -251,6 +235,8 @@ function addDiscussionToFeed(discussion, feedType) {
         feed.appendChild(post);
     }
 
+    // Debugging: Ensure fetchCommentCountForDiscussion is called for each discussion
+    console.log(`Calling fetchCommentCountForDiscussion for discussion ID: ${discussion.id}`);
     fetchCommentCountForDiscussion(discussion.id);
 
     const likeButton = post.querySelector('.like-button');
@@ -298,9 +284,6 @@ function addDiscussionToFeed(discussion, feedType) {
         console.log('Followee ID:', followeeId); // Debugging: Log followeeId
         followUser(followeeId, this);
     });
-
-    // Check if the user is already following this discussion's user
-    checkFollowingStatus(discussion.user_id, followButton);
 }
 
 function incrementViews(discussionId) {
@@ -371,12 +354,25 @@ function incrementDislikes(discussionId, likeButton, dislikeButton) {
 }
 
 function fetchCommentCountForDiscussion(discussionId) {
+    console.log(`Fetching comment count for discussion ID: ${discussionId}`);
     fetch(`/comments/discussion/${discussionId}/count`)
-        .then(response => response.json())
+        .then(response => {
+            console.log(`Response received for discussion ID: ${discussionId}`);
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log(`Data received for discussion ID: ${discussionId}:`, data);
             if (data.count !== undefined) {
                 const commentCountElement = document.getElementById(`comment-count-${discussionId}`);
-                commentCountElement.textContent = `💬 ${data.count} Comments`;
+                if (commentCountElement) {
+                    commentCountElement.textContent = `💬 ${data.count} Comments`;
+                    console.log(`Updated comment count for discussion ID: ${discussionId}`);
+                } else {
+                    console.error(`Comment count element not found for discussion ID: ${discussionId}`);
+                }
             } else {
                 console.error('Error fetching comment count for discussion:', data);
                 alert('Error fetching comment count.');
@@ -477,23 +473,6 @@ function followUser(followeeId, button) {
     });
 }
 
-function checkFollowingStatus(followeeId, button) {
-    fetchWithAuth(`/following-status?followeeId=${followeeId}`, {
-        method: 'GET'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.isFollowing) {
-            button.textContent = 'Unfollow';
-            button.classList.remove('follow-button');
-            button.classList.add('unfollow-button');
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching following status:', error);
-    });
-}
-
 function showTab(tabName) {
     const tabButtons = document.querySelectorAll('.tab-btn');
     tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -511,3 +490,4 @@ function getActiveTab() {
     const activeTab = document.querySelector('.tab-btn.active');
     return activeTab ? activeTab.getAttribute('onclick').match(/showTab\('([^']+)'\)/)[1] : 'mainFeed';
 }
+
