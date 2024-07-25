@@ -1,5 +1,5 @@
 const sql = require('mssql'); // Importing the 'mssql' library for SQL Server operations
-const dbConfig = require('../dbConfig'); // Importing database configuration
+// const dbConfig = require('../dbConfig'); // Importing database configuration
 const reviewModel = require('../models/Review'); // Importing the Review model
 
 // Get reviews based on course ID, filter, and sort criteria
