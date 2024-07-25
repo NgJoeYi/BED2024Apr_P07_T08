@@ -25,67 +25,73 @@ async function fetchLastChapterName() {
 }
 
 // UPLOAD LECTURES
-async function addFiles() {
-    const previousChapterName = await fetchLastChapterName();
-    const chapterNameInput = document.getElementById('chapterName').value.trim();
+async function addLecture() {
     const title = document.getElementById('lectureName').value.trim();
     const duration = document.getElementById('duration-lecture').value.trim();
     const description = document.getElementById('description').value.trim();
     const videoFileInput = document.getElementById('videoFiles');
+    const chapterName = document.getElementById('chapterName').value.trim();
 
-    console.log("Chapter Name Input:", chapterNameInput);
-    console.log("Title:", title);
-    console.log("Duration:", duration);
-    console.log("Description:", description);
-
-    if (!title || !duration || !description || videoFileInput.files.length === 0 ) {
-        alert('Please fill in all fields and select at least one file.');
+    if (!title || !duration || !description || videoFileInput.files.length === 0) {
+        alert('Please fill in all fields and select a video file.');
         return;
     }
-    
-    let chapterName = chapterNameInput || previousChapterName;
-    console.log('Final Chapter Name to Use:', chapterName);
-    if (!chapterName) {
-        alert('Please enter a chapter name.');
+
+    // Check if the video filename contains spaces
+    const videoFile = videoFileInput.files[0];
+    if (videoFile && videoFile.name.includes(' ')) {
+        alert('The video filename should not contain spaces. Please rename your file and try again.');
+        videoFileInput.value = ''; // Clear the file input
         return;
     }
+    if(duration<=0){
+        alert('The duration cannot be lesser than or equal to 0.');
+        duration.value='';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('duration', duration);
+    formData.append('description', description);
+    formData.append('chapterName', chapterName); // Adding chapterName
+    formData.append('video', videoFileInput.files[0]);
 
     try {
         // Fetch the max course ID
-        const courseIDResponse = await fetch('/lectures/max-course-id');
+        const courseIDResponse = await fetchWithAuth('/lectures/max-course-id');
         if (!courseIDResponse.ok) {
             throw new Error('Failed to fetch max course ID');
         }
         const courseIDData = await courseIDResponse.json();
         const courseID = courseIDData.maxCourseID;
-        console.log("courseID from Server:", courseID); // Ensure this logs
+        console.log("courseID", courseID); // Ensure this logs
 
-        const formData = new FormData();
-        formData.append('CourseID', courseID);
-        formData.append('ChapterName', chapterName);
-        formData.append('Title', title);
-        formData.append('Duration', duration);
-        formData.append('Description', description);
-        Array.from(videoFileInput.files).forEach(file => formData.append('Video', file));
+        formData.append('courseID', courseID); // Append courseID to FormData
 
-        const response = await fetchWithAuth('/lectures', { // ------------------------------------------------- headers in jwtutility.js
+        // Log FormData entries
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
+
+        const response = await fetchWithAuth('/lectures', {
             method: 'POST',
             body: formData
         });
 
-        if (!response) return; // ********************** jwt
-
-        if (response.ok) {
-            const newLecture = await response.json();
-            displayNewLecture(newLecture, videoFileInput.files);
-            closeModal();
-            console.log("Lecture added successfully");
-        } else {
-            throw new Error('Failed to save the lecture');
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(`Failed to upload lecture: ${errorData.message}`);
+            return;
         }
+
+        const newLecture = await response.json();
+        alert('Lecture uploaded successfully');
+        displayNewLecture(newLecture, videoFileInput.files);
+        closeModal();
     } catch (error) {
-        console.error('Error saving the lecture:', error);
-        alert('Error saving the lecture.');
+        console.error('Error uploading lecture:', error);
+        alert('Error uploading lecture.');
     }
 }
 
@@ -100,10 +106,10 @@ function displayNewLecture(newLecture, videoFiles) {
     const lectureDetails = document.createElement('div');
     lectureDetails.className = 'lecture-details';
     lectureDetails.innerHTML = `
-        <p>Chapter Name : ${newLecture.ChapterName}</p>
-        <p>Lecture Name: ${newLecture.Title}</p>
-        <p>Duration: ${newLecture.Duration} minutes</p>
-        <p>Description: ${newLecture.Description}</p>
+        <p>Chapter Name : ${newLecture.chapterName}</p>
+        <p>Lecture Name: ${newLecture.title}</p>
+        <p>Duration: ${newLecture.duration} minutes</p>
+        <p>Description: ${newLecture.description}</p>
     `;
 
     const videoFileNames = Array.from(videoFiles).map(file => file.name).join(', ');
@@ -127,6 +133,7 @@ function resetForm() {
     console.log("Form reset completed");
 }
 
+// adding courses 
 async function addCourses() {
     const title = document.getElementById('course-name-text').textContent.trim();
     const description = document.getElementById('course-details').textContent.trim();
@@ -139,6 +146,21 @@ async function addCourses() {
         alert('Please complete entering course information and select an image.');
         return;
     }
+    // Check if the image filename contains spaces or parentheses or hyphens
+    const courseImage = courseImageInput.files[0];
+    if (courseImage) {
+        const filename = courseImage.name;
+        if (/[\s()-]/.test(filename)) {
+            alert('The course image filename should not contain spaces or parentheses. Please rename your file and try again.');
+            courseImageInput.value = ''; // Clear the file input
+            return;
+        }
+    }
+    if(duration<=0){
+        alert('The duration cannot be lesser than or equal to 0.');
+        duration.value='';
+        return;
+    }
 
     const formData = new FormData();
     formData.append('title', title);
@@ -146,24 +168,21 @@ async function addCourses() {
     formData.append('category', category);
     formData.append('level', level);
     formData.append('duration', duration);
-    formData.append('imageFile', courseImageInput.files[0]);
+    formData.append('courseImage', courseImageInput.files[0]);
 
     try {
-        const response = await fetchWithAuth('/courses', { // ------------------------------------------------- headers in jwtutility.js
+        const response = await fetchWithAuth('/courses', {
             method: 'POST',
             body: formData
         });
 
-        if (!response) return; // ********************** jwt
+        if (!response) return;
 
         if (response.ok) {
             const newCourse = await response.json();
             alert('Course saved successfully');
             makeFieldsUneditable();
             document.getElementById('course-arrangement').style.display = 'block';
-            // document.getElementById('submit-button').style.display = 'none';
-            // document.getElementById('cancel-button').style.display = 'none';
-           
         } else {
             const errorData = await response.json();
             alert(`Failed to save the course: ${errorData.message}`);
@@ -173,6 +192,8 @@ async function addCourses() {
         alert('Error saving the course.');
     }
 }
+
+
 
 async function cancelCourse() {
     if (confirm(`Are you sure you want to stop creating course?`)) {

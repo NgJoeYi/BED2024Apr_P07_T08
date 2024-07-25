@@ -1,6 +1,8 @@
 const Courses = require("../models/courses");
 const sql = require("mssql");
 const multer = require("multer");
+const path = require('path');
+const fs = require('fs');
 
 // Multer setup for file uploads
 const storage = multer.memoryStorage();
@@ -89,24 +91,61 @@ const getEarliestCourses = async(req,res)=>{
   }
 }
 
-// Creating course 
+// Create a new course
 const createCourse = async (req, res) => {
-  const newCourse = req.body;
-  const userID = req.user.id;
-  if (req.file) {
-    newCourse.courseImage = req.file.buffer; // Directly use the buffer from multer
-  } else {
-    console.log('Course Image not provided');
-    return res.status(400).send("courseImage file not provided");
+  const { title, description, category, level, duration } = req.body;
+  const UserID = req.user.id;
+  if (!UserID) {
+    console.error("UserID not provided");
+    return res.status(400).send("UserID not provided");
   }
 
+  if (!req.file) {
+    console.error("Course image not provided");
+    return res.status(400).send("Course image not provided");
+  }
+
+  const courseImageFilename = req.file.filename;
+
   try {
-    const createdCourse = await Courses.createCourse(newCourse,userID);
-    res.status(201).json(createdCourse);
+    const newCourseData = {
+      UserID,
+      title,
+      description,
+      category,
+      level,
+      duration,
+      CourseImage: courseImageFilename, // Only the filename is saved
+    };
+    const newCourseID = await Courses.createCourse(newCourseData);
+    res.status(201).json({ CourseID: newCourseID, ...newCourseData });
   } catch (error) {
     console.error('Error creating course:', error);
-    res.status(500).send("Error creating course");
+    res.status(500).send('Error creating course');
   }
+};
+
+// get course image
+const getCourseImage = (req, res) => {
+  const imageFilename = req.params.filename.trim();
+  const imagePath = path.resolve(__dirname, '..', 'public', 'courseImages', imageFilename);
+
+  console.log('Requested filename:', imageFilename);
+  console.log('Normalized path to file:', imagePath);
+
+  fs.access(imagePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      console.error('File does not exist:', imagePath);
+      return res.status(404).send('Image not found');
+    }
+
+    res.sendFile(imagePath, (err) => {
+      if (err) {
+        console.error('Error sending image file:', err);
+        res.status(404).send('Image not found');
+      }
+    });
+  });
 };
 
 // Update course if the user has permission 
@@ -120,18 +159,19 @@ const updateCourse = async (req, res) => {
 
   try {
     // If no new image is uploaded, retain the current image
-    if (!req.file) {
-      console.log('DIDNT CHANGE IMAGE');
+    if (!req.file && req.body.noImageChange === 'true') {
+      console.log('No new image provided');
       const existingCourse = await Courses.getCourseById(courseID);
       if (!existingCourse) {
         return res.status(404).send("Course not found");
       }
       newCourseData.courseImage = existingCourse.courseImage;
-      console.log('EXISTING COURSE: ', existingCourse);
-      console.log('OLD IMAGE:', newCourseData.courseImage);
-    } else {
-      console.log('IMAGE CHANGED');
-      newCourseData.courseImage = req.file.buffer;
+      console.log('Existing course:', existingCourse);
+      console.log('Old image:', newCourseData.courseImage);
+    } else if (req.file) {
+      console.log('New image provided');
+      // Save the new image
+      newCourseData.courseImage = req.file.filename; // Update filename or process as needed
     }
 
     const updatedCourse = await Courses.updateCourse(courseID, newCourseData);
@@ -144,6 +184,7 @@ const updateCourse = async (req, res) => {
     res.status(500).send("Error updating course");
   }
 };
+
 
 // Deleting course if the user has permission 
 const deleteCourse = async (req, res) => {
@@ -185,22 +226,6 @@ const deleteCourseWithNoLectures = async (req, res) => {
   } catch (error) {
     console.error('Error deleting course with no lectures:', error);
     res.status(500).json({ message: "Error deleting course with no lectures:(" });
-  }
-};
-
-// For the course.html
-const getCourseImage = async (req, res) => {
-  const courseID = parseInt(req.params.id);
-  try {
-    const imageBuffer = await Courses.getCourseImage(courseID);
-    if (!imageBuffer) {
-      return res.status(404).send('Image not found');
-    }
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.send(imageBuffer);
-  } catch (error) {
-    console.error('Error fetching course image:', error);
-    res.status(500).send('Server error');
   }
 };
 
