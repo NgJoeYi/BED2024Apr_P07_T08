@@ -81,6 +81,7 @@ app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 
 // Add Routes for quizzes
+app.get('/quizzes/trivia', jwtAuthorization.verifyJWT, quizController.fetchTriviaQuizzes); // Add the new route for fetching trivia quizzes
 app.get('/quizzes/statistics', quizController.getQuizPassFailStatistics); // users not logged in can see
 app.get('/quizzes', quizController.getAllQuizWithCreatorName); // users not logged in can see
 app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);

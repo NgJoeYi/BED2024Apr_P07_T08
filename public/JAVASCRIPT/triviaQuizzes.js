@@ -28,16 +28,16 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'triviaQuiz.html';
     });
 
-    fetchTriviaQuizzes(); // Fetch the list of trivia quizzes from the Open Trivia Database
+    fetchTriviaQuizzes(); // Fetch the list of trivia quizzes from the new route
 });
 
-// Fetch trivia quizzes from the Open Trivia Database API
+// Fetch trivia quizzes from the new API route
 function fetchTriviaQuizzes() {
-    fetch('https://opentdb.com/api.php?amount=10')
+    fetchWithAuth('/quizzes/trivia?amount=10') // Adjust the query parameters as needed
         .then(response => response.json())
         .then(data => {
             console.log("Fetched Trivia Quizzes Data:", data); // Log fetched data
-            const quizzes = data.results;
+            const quizzes = data;
             if (quizzes && quizzes.length > 0) {
                 displayTriviaQuizzes(quizzes);
             } else {
@@ -48,7 +48,7 @@ function fetchTriviaQuizzes() {
         .catch(error => console.error('Error fetching trivia quizzes:', error));
 }
 
-// Display trivia quizzes from Open Trivia Database
+// Display trivia quizzes from the API
 function displayTriviaQuizzes(quizzes) {
     console.log("Displaying Trivia Quizzes:", quizzes); // Log quizzes to be displayed
     const triviaQuizContainer = document.getElementById('trivia-quiz-container');
@@ -236,7 +236,7 @@ function createResultButtons(container) {
     const homeButton = document.createElement('button');
     homeButton.innerText = 'Back to Home';
     homeButton.onclick = () => {
-        window.location.href = 'Index.html';
+        window.location.href = 'index.html';
     };
 
     container.appendChild(retakeButton);
