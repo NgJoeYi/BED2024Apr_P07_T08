@@ -2347,7 +2347,7 @@
         }
       }
     },
-    "/courses/image/{id}": {
+    "/courses/image/{filename}": {
       "get": {
         "description": "",
         "tags": ["Courses"],
@@ -2377,34 +2377,28 @@
     },
     "/courses/noLectures": {
       "delete": {
-        "description": "",
+        "summary": "Delete courses with no lectures",
+        "description": "Deletes courses that have no lectures. If no such courses exist, a 404 status is returned.",
         "tags": ["Courses"],
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
         "responses": {
           "204": {
-            "description": "No Content"
+            "description": "Courses with no lectures deleted successfully."
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized - Authentication required."
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden - You do not have permission to delete courses."
           },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found - No courses with no lectures found."
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Internal Server Error - An error occurred while attempting to delete courses."
           }
         }
       }
-    },
+    },    
     "/lectures/checking": {
       "get": {
         "description": "",

@@ -99,7 +99,7 @@ async function run() {
             Level NVARCHAR(50),
             Duration INT, -- Duration in minutes
             CreatedAt DATETIME DEFAULT GETDATE(),
-            CourseImage VARBINARY(MAX),
+            CourseImage NVARCHAR(255),
             FOREIGN KEY (UserID) REFERENCES Users(id)
         );
 
@@ -109,7 +109,7 @@ async function run() {
             UserID INT NOT NULL,
             Title NVARCHAR(200) NOT NULL,
             Description NVARCHAR(2000),
-            Video VARBINARY(MAX),
+            Video NVARCHAR(255),
             Duration INT, -- Duration in minutes
             Position INT, -- Position in the course sequence
             CreatedAt DATETIME DEFAULT GETDATE(),
@@ -212,8 +212,7 @@ async function run() {
         // Path to courseImage file
         const courseImagePath = path.join(__dirname,'../BED2024Apr_P07_T08/public/courseImage/course1.jpeg');
 
-        // Read courseImage file 
-        const courseImageBuffer = fs.readFileSync(courseImagePath);
+        const courseImageFilename = 'course1.jpeg';
 
         // Insert data into Courses table
         const insertCourses = `
@@ -223,10 +222,12 @@ async function run() {
         (2, 'Digital Marketing', 'Explore the strategies and tools used in digital marketing to reach and engage audiences.', 'Marketing', 'Intermediate', 300, @image);
         `;
         await connection.request()
-        .input('image',courseImageBuffer)
+        .input('image', sql.NVarChar, courseImageFilename)
         .query(insertCourses);
         
         // Path to external files 
+        const video1Filename = 'video1.mp4';
+        const video2Filename = 'video2.mp4';
         const videoFilePath = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureVideos/video1.mp4');
         const video2path = path.join(__dirname,'../BED2024Apr_P07_T08/public/lectureVideos/video2.mp4');
         const lectureImage = path.join(__dirname, '../BED2024Apr_P07_T08/public/lectureImage/lecture1.jpeg');
@@ -240,27 +241,31 @@ async function run() {
         INSERT INTO Lectures (CourseID, UserID, Title, Description, Video, Duration, Position, ChapterName) VALUES
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
-        'Python Basics', 'Introduction to Python programming basics.', @video, 60, 1, 'Introduction'),
+        'Python Basics', 'Introduction to Python programming basics.', @video1, 60, 1, 'Introduction'),
 
         ((SELECT CourseID FROM Courses WHERE Title = 'Introduction to Python'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
         'Data Types in Python', 'Understanding different data types in Python.', @video2, 90, 2, 'Chapter Two'),
+
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
         (SELECT id FROM Users WHERE email = 'bob_brown@example.com'), 
-        'Algebraic Structures', 'Exploring advanced algebraic structures.', @video, 120, 1, 'Introduction'),
+        'Algebraic Structures', 'Exploring advanced algebraic structures.', @video1, 120, 1, 'Introduction'),
+
         ((SELECT CourseID FROM Courses WHERE Title = 'Advanced Algebra'), 
         (SELECT id FROM Users WHERE email = 'bob_brown@example.com'), 
-        'Polynomial Equations', 'Solving polynomial equations in algebra.',  @video2,  100, 2, 'Chapter Two'),
+        'Polynomial Equations', 'Solving polynomial equations in algebra.', @video2,  100, 2, 'Chapter Two'),
+
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
-        'SEO Basics', 'Introduction to Search Engine Optimization.',  @video,75, 1, 'Introduction'),
+        'SEO Basics', 'Introduction to Search Engine Optimization.', @video1, 75, 1, 'Introduction'),
+
         ((SELECT CourseID FROM Courses WHERE Title = 'Digital Marketing'), 
         (SELECT id FROM Users WHERE email = 'jane_smith@example.com'), 
         'Content Marketing', 'Strategies for effective content marketing.', @video2,  85, 2, 'Chapter Two');
         `;
         await connection.request()
-        .input('video', sql.VarBinary, videoBuffer)
-        .input('video2',video2Buffer)
+        .input('video1', sql.NVarChar, video1Filename)
+        .input('video2', sql.NVarChar, video2Filename)
         .query(insertLectures);
 
         // Insert data into user_reviews table

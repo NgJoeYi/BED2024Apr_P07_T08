@@ -74,7 +74,6 @@ function verifyJWT(req, res, next) {
             'PUT /courses/:id': ['student', 'lecturer'],
             'POST /courses': ['student', 'lecturer'],
             'DELETE /courses/:id': ['student', 'lecturer'],
-            'DELETE /courses/noLectures': ['student', 'lecturer'],
 
             'GET /lectures/last-chapter': ['lecturer'],
             'GET /lectures/checking': ['lecturer'],
