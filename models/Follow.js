@@ -81,22 +81,22 @@ class Follow {
     }
     
 
-    static async isFollowing(followerId, followeeId) {
-        try {
-            const pool = await sql.connect(dbConfig);
-            const result = await pool.request()
-                .input('followerId', sql.Int, followerId)
-                .input('followeeId', sql.Int, followeeId)
-                .query(`
-                    SELECT 1 
-                    FROM Follow 
-                    WHERE FollowerId = @followerId AND FolloweeId = @followeeId
-                `);
-            return result.recordset.length > 0;
-        } catch (err) {
-            throw new Error(`Error checking follow status: ${err.message}`);
-        }
-    }
+    // static async isFollowing(followerId, followeeId) {
+    //     try {
+    //         const pool = await sql.connect(dbConfig);
+    //         const result = await pool.request()
+    //             .input('followerId', sql.Int, followerId)
+    //             .input('followeeId', sql.Int, followeeId)
+    //             .query(`
+    //                 SELECT 1 
+    //                 FROM Follow 
+    //                 WHERE FollowerId = @followerId AND FolloweeId = @followeeId
+    //             `);
+    //         return result.recordset.length > 0;
+    //     } catch (err) {
+    //         throw new Error(`Error checking follow status: ${err.message}`);
+    //     }
+    // }
     
 }
 module.exports = Follow;
