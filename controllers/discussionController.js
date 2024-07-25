@@ -1,5 +1,29 @@
 const validateDiscussion = require('../middleware/discussionValidation');
 const discussionModel = require('../models/Discussion');
+// const { Configuration, OpenAIApi } = require('openai');
+
+// // Load environment variables
+// require('dotenv').config();
+
+// const configuration = new Configuration({
+//     apiKey: process.env.OPENAI_API_KEY,
+// });
+// const openai = new OpenAIApi(configuration);
+
+
+// async function getSuggestedAnswer(discussionDetails) {
+//     try {
+//         const response = await openai.createCompletion({
+//             model: 'text-davinci-003',
+//             prompt: `Here is a discussion topic: ${discussionDetails}\n\nPlease provide a detailed and insightful response to this discussion.`,
+//             max_tokens: 150,
+//         });
+//         return response.data.choices[0].text.trim();
+//     } catch (err) {
+//         console.error('Error fetching suggested answer from OpenAI:', err);
+//         throw new Error('Failed to get suggested answer');
+//     }
+// }
 
 // Controller functions
 const getDiscussions = async (req, res) => {
@@ -143,6 +167,19 @@ const unpinDiscussion = async (req, res) => {
     }
 };
 
+const getDiscussionsWithFollowStatus = async (req, res) => {
+    const userId = req.user.id;
+    const { category = 'all', sort = 'most-recent', search = '' } = req.query;
+    try {
+        const discussions = await discussionModel.getDiscussionsWithFollowStatus(userId, category, sort, search);
+        res.json({ success: true, discussions });
+    } catch (err) {
+        console.error('Error fetching discussions:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+
 module.exports = {
     getDiscussions,
     getDiscussionById,
@@ -155,5 +192,6 @@ module.exports = {
     validateDiscussion, // Importing the validateDiscussion function here
     incrementViews,
     pinDiscussion,
-    unpinDiscussion
+    unpinDiscussion,
+    getDiscussionsWithFollowStatus
 };
