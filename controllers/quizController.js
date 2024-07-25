@@ -1,4 +1,5 @@
 const Quiz = require('../models/quiz');
+const fetch = require('node-fetch'); // Import node-fetch to make API requests
 
 // Function to convert base64 image data to buffer
 function base64ToBuffer(base64String) {
@@ -626,6 +627,28 @@ const getQuizPassFailStatistics = async (req, res) => {
     }
 };
 
+
+// Fetch trivia quizzes from the Open Trivia Database API
+const fetchTriviaQuizzes = async (req, res) => {
+    const amount = req.query.amount || 10; // Get the amount of quizzes to fetch, default to 10
+    const difficulty = req.query.difficulty || ''; // Get the difficulty level if provided
+
+    const url = `https://opentdb.com/api.php?amount=${amount}&difficulty=${difficulty}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data || !data.results || data.results.length === 0) {
+            return res.status(404).json({ message: 'No trivia quizzes found' });
+        }
+
+        res.status(200).json(data.results); // Return the trivia quizzes
+    } catch (error) {
+        console.error('Error fetching trivia quizzes:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
 module.exports = {
     createQuiz,
     getQuizById,
@@ -642,5 +665,6 @@ module.exports = {
     submitQuiz,
     updateQuestion,
     deleteQuestion,
-    getQuizPassFailStatistics
+    getQuizPassFailStatistics,
+    fetchTriviaQuizzes
 };

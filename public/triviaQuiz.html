@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Quizzes</title>
+    <link rel="stylesheet" href="CSS/navbar.css">
+    <link rel="stylesheet" href="CSS/trivia.css"> <!-- Ensure this line is present to include your quiz styles -->
+    <!-- Linking to external stylesheets for icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
+</head>
+<body>
+<!-- navbar -->
+<header>
+    <nav class="navbar">
+        <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
+        <ul class="menu-links" id="menu-links">
+            <li><a href="Index.html">HOME</a></li>
+            <li><a href="ContactUs.html">CONTACT US</a></li>
+            <li><a href="quiz.html">QUIZ</a></li>
+            <li><a href="Courses.html" id="nav-courses" style="display: none;">COURSES</a></li>
+            <li><a href="activityfeed.html" id="nav-activityfeed" style="display: none;">ACTIVITYFEED</a></li>
+            <li><a href="account.html" id="nav-account" style="display: none;">ACCOUNT</a></li>
+        </ul>
+        <div class="auth-links" id="auth-links">
+            <a href="Login.html" id="navbar-login">LOG IN</a>
+            <a href="Register.html" id="navbar-signup">SIGN UP</a>
+        </div>
+        <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
+    </nav>
+</header>
+<main>
+    <div class="left-buttons-container">
+        <button id="quiz-button" class="left-button">Quiz</button>
+        <button id="statistics-button" class="left-button">Statistics</button>
+        <button id="trivia-quiz-button" class="left-button active">Trivia Quiz</button>
+    </div>
+    
+    <section id="quiz-list">
+        <div id="trivia-quiz-container">
+            <!-- Trivia quizzes will be dynamically inserted here -->
+        </div>
+    </section>
+
+    <section id="quiz-summary" class="hidden">
+        <div id="summary-container">
+            <!-- Quiz summary will be dynamically inserted here -->
+        </div>
+    </section>
+
+    <section id="quiz-questions" class="hidden">
+        <div id="timer" style="font-size: 24px; font-weight: bold;"></div>
+        <div id="questions-container"></div>
+        <div id="navigation-buttons">
+            <button id="prev-button" onclick="prevQuestion()">Previous</button>
+            <button id="next-button" onclick="nextQuestion()">Next</button>
+        </div>
+        <button id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
+    </section>
+
+    
+    <section id="quiz-results" class="hidden">
+        <div id="results-container"></div>
+    </section>
+</main>
+
+<!--Footer-->
+<footer>
+    <div class="footer">
+        <div class="row">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-youtube"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+        </div>
+        <div class="row">
+            <ul>
+                <li><a href="#">Contact us</a></li>
+                <li><a href="#">Our Services</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms & Conditions</a></li>
+                <li><a href="#">Career</a></li>
+            </ul>
+        </div>
+        <div class="row">
+            EduHelper Copyright © 2024 Saturday.- All rights reserved 
+        </div>
+    </div>
+</footer>
+<script src="JAVASCRIPT/JwtUtility.js"></script>
+<script src="JAVASCRIPT/triviaQuizzes.js"></script>
+</body>
+</html>
