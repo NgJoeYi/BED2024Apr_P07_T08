@@ -33,15 +33,8 @@ const validateCreateQuestion = (req, res, next) => {
       option_2: Joi.string().required(),
       option_3: Joi.string().required(),
       option_4: Joi.string().required(),
-      correct_option: Joi.string().valid(Joi.ref('option_1'), Joi.ref('option_2'), Joi.ref('option_3'), Joi.ref('option_4')).required(),
+      correct_option: Joi.number().integer().min(1).max(4).required(),
       qnsImg: Joi.string().base64().allow('', null).optional(), // Allow empty string, null, or base64 string
-    }).custom((value, helpers) => {
-      const options = [value.option_1, value.option_2, value.option_3, value.option_4];
-      const uniqueOptions = new Set(options);
-      if (uniqueOptions.size !== options.length) {
-          return helpers.message("All options must be unique.");
-      }
-      return value;
   });
 
   const validation = schema.validate(req.body, { abortEarly: false });

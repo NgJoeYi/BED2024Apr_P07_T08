@@ -71,6 +71,11 @@ function displayQuestionsForEdit(isEditMode) {
 
         const options = [question.option_1, question.option_2, question.option_3, question.option_4]; // Get options
         options.forEach((option, i) => {  // Iterate over options
+            const optionLabel = document.createElement('label'); // ********************
+            optionLabel.innerText = `Question ${i + 1}:`; // Label for the option // ********************
+            optionLabel.style.color = '#d9aa52'; // Highlight color for labels // ********************
+            questionCard.appendChild(optionLabel); // Add label to card // ********************
+
             const optionInput = document.createElement('input');
             optionInput.type = 'text';
             optionInput.value = option;  // Set option value
@@ -79,12 +84,27 @@ function displayQuestionsForEdit(isEditMode) {
             questionCard.appendChild(optionInput); // Add option input to card
         });
 
-        const correctOptionInput = document.createElement('input');
-        correctOptionInput.type = 'text';
-        correctOptionInput.value = question.correct_option; // Set correct option value
-        correctOptionInput.dataset.questionId = question.question_id; // Use correct ID field
-        correctOptionInput.dataset.correctOption = true; // Mark as correct option
-        questionCard.appendChild(correctOptionInput); // Add correct option input to card
+        const correctOptionLabel = document.createElement('label'); // ********************
+        correctOptionLabel.innerText = 'Correct option:'; // Label for correct option // ********************
+        correctOptionLabel.style.color = '#d9aa52'; // Highlight color for labels // ********************
+        questionCard.appendChild(correctOptionLabel); // Add label to card // ********************
+
+        const correctOptionSelect = document.createElement('select');
+        correctOptionSelect.dataset.questionId = question.question_id; // Use correct ID field
+        correctOptionSelect.dataset.correctOption = true; // Mark as correct option
+
+        ['1', '2', '3', '4'].forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.innerText = value;
+            if (value === question.correct_option) {
+                option.selected = true;
+            }
+            correctOptionSelect.appendChild(option);
+        });
+
+        questionCard.appendChild(correctOptionSelect); // Add correct option select to card
+
 
         // Add Delete button in edit mode
         const deleteButton = document.createElement('button');
@@ -179,15 +199,26 @@ function createNewQuestionForm() {
         optionInputs.push(optionInput); // Collecting option inputs
     }
 
-    const correctOptionInput = document.createElement('input');
-    correctOptionInput.type = 'text';
-    correctOptionInput.placeholder = 'Correct option'; // Set placeholder for correct option
-    questionCard.appendChild(correctOptionInput); // Add correct option input to card
+    const correctOptionLabel = document.createElement('label'); // ********************
+    correctOptionLabel.innerText = 'Correct option:'; // Label for correct option // ********************
+    correctOptionLabel.style.color = '#d9aa52'; // Highlight color for labels // ********************
+    questionCard.appendChild(correctOptionLabel); // Add label to card // ********************
+
+    const correctOptionSelect = document.createElement('select'); // ********************
+    correctOptionSelect.placeholder = 'Correct option'; // Set placeholder for correct option // ********************
+    ['1', '2', '3', '4'].forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.innerText = value;
+        correctOptionSelect.appendChild(option);
+    });
+
+    questionCard.appendChild(correctOptionSelect); // Add correct option select to card // ********************
 
     // Add save button to save the new question
     const saveNewQuestionButton = document.createElement('button');
     saveNewQuestionButton.innerText = 'Save Question';
-    saveNewQuestionButton.onclick = () => saveNewQuestion(questionCard, questionInput, imageInput, optionInputs, correctOptionInput);
+    saveNewQuestionButton.onclick = () => saveNewQuestion(questionCard, questionInput, imageInput, optionInputs, correctOptionSelect);
     questionCard.appendChild(saveNewQuestionButton); // Add save button to card
 
     questionsContainer.appendChild(questionCard);  // Add question card to container
@@ -325,8 +356,8 @@ async function saveChanges() {
         for (let i = 0; i < 4; i++) { // Iterate over options
             options.push(document.querySelector(`input[data-question-id="${questionId}"][data-option-index="${i}"]`).value); // Get updated option value
         }
-        const correctOption = document.querySelector(`input[data-question-id="${questionId}"][data-correct-option="true"]`).value; // Get updated correct option value
-
+        const correctOptionElement = document.querySelector(`select[data-question-id="${questionId}"][data-correct-option="true"]`); // **************
+        const correctOption = correctOptionElement ? correctOptionElement.value : ''; // Get updated correct option value // **************
         const imageInput = document.querySelector(`input[data-question-id="${questionId}"][type="file"]`);  // Get image input element
         const imgFile = imageInput ? imageInput.files[0] : null;  // Get selected image file, if any
         let qnsImg = null; // Variable to store base64 image data
