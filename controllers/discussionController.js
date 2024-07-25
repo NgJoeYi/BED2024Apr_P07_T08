@@ -1,29 +1,27 @@
 const validateDiscussion = require('../middleware/discussionValidation');
 const discussionModel = require('../models/Discussion');
-// const { Configuration, OpenAIApi } = require('openai');
+require('dotenv').config();
 
-// // Load environment variables
-// require('dotenv').config();
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// const configuration = new Configuration({
-//     apiKey: process.env.OPENAI_API_KEY,
-// });
-// const openai = new OpenAIApi(configuration);
+// Initialize the GoogleGenerativeAI instance
+const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
+// Get the specific model instance
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// async function getSuggestedAnswer(discussionDetails) {
-//     try {
-//         const response = await openai.createCompletion({
-//             model: 'text-davinci-003',
-//             prompt: `Here is a discussion topic: ${discussionDetails}\n\nPlease provide a detailed and insightful response to this discussion.`,
-//             max_tokens: 150,
-//         });
-//         return response.data.choices[0].text.trim();
-//     } catch (err) {
-//         console.error('Error fetching suggested answer from OpenAI:', err);
-//         throw new Error('Failed to get suggested answer');
-//     }
-// }
+const generateSuggestion = async (text) => {
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent(text);
+        const response = await result.response;
+        const suggestions = response.text();
+        return suggestions;
+    } catch (error) {
+        console.error('Error generating suggestions:', error);
+        throw new Error('Failed to generate suggestions');
+    }
+};
 
 // Controller functions
 const getDiscussions = async (req, res) => {
@@ -42,13 +40,14 @@ const getDiscussionById = async (req, res) => {
     try {
         const discussion = await discussionModel.getDiscussionById(discussionId);
         if (discussion) {
-            res.json(discussion);
+            const suggestions = await generateSuggestion(discussion.description); // Generate suggestions based on the discussion description
+            res.json({ success: true, discussion, suggestions });
         } else {
             res.status(404).json({ error: 'Discussion not found' });
         }
     } catch (err) {
         console.error('Error fetching discussion details:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 
@@ -59,8 +58,9 @@ const createDiscussion = async (req, res) => {
     }
     try {
         const { title, category, description } = req.body;
+        const suggestions = await generateSuggestion(description); // Generate suggestions based on the description
         const newDiscussion = await discussionModel.createDiscussion(title, category, description, userId);
-        res.json({ success: true, discussion: newDiscussion });
+        res.json({ success: true, discussion: newDiscussion, suggestions });
     } catch (err) {
         console.error('Error creating discussion:', err);
         res.status(500).json({ success: false, error: err.message });
@@ -179,7 +179,24 @@ const getDiscussionsWithFollowStatus = async (req, res) => {
     }
 };
 
+// GEMINI API....
+const getSuggestionsForDiscussion = async (req, res) => {
+    const discussionId = req.params.id;
+    try {
+        const discussion = await discussionModel.getDiscussionById(discussionId);
+        if (discussion) {
+            const suggestions = await generateSuggestion(discussion.description);
+            res.json({ success: true, suggestions });
+        } else {
+            res.status(404).json({ error: 'Discussion not found' });
+        }
+    } catch (err) {
+        console.error('Error fetching suggestions:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
 
+// Add this to your module exports
 module.exports = {
     getDiscussions,
     getDiscussionById,
@@ -189,9 +206,10 @@ module.exports = {
     getDiscussionsByUser,
     updateDiscussion,
     deleteDiscussion,
-    validateDiscussion, // Importing the validateDiscussion function here
+    validateDiscussion,
     incrementViews,
     pinDiscussion,
     unpinDiscussion,
-    getDiscussionsWithFollowStatus
+    getDiscussionsWithFollowStatus,
+    getSuggestionsForDiscussion
 };
