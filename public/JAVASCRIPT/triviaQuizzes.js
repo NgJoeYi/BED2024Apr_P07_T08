@@ -218,7 +218,7 @@ function submitQuiz() {
         resultsContainer.appendChild(resultItem);
     });
 
-    createResultButtons(resultsContainer); // Add buttons to the results container
+    createResultButtons(); // Add buttons to the new container
 
     document.querySelector('.left-buttons-container').classList.add('hidden-buttons');
     document.getElementById('quiz-questions').classList.add('hidden');
@@ -226,19 +226,24 @@ function submitQuiz() {
     alert('Quiz submitted!');
 }
 
-function createResultButtons(container) {
+function createResultButtons() {
+    const buttonContainerBelow = document.getElementById('button-container-below');
+    buttonContainerBelow.innerHTML = ''; // Clear previous buttons if any
+
     const retakeButton = document.createElement('button');
     retakeButton.innerText = 'Retake Quiz';
+    retakeButton.className = 'retake-button'; // Add a class for styling
     retakeButton.onclick = () => {
         window.location.href = 'triviaQuiz.html';
     };
 
     const homeButton = document.createElement('button');
     homeButton.innerText = 'Back to Home';
+    homeButton.className = 'home-button'; // Add a class for styling
     homeButton.onclick = () => {
         window.location.href = 'index.html';
     };
 
-    container.appendChild(retakeButton);
-    container.appendChild(homeButton);
+    buttonContainerBelow.appendChild(retakeButton);
+    buttonContainerBelow.appendChild(homeButton);
 }

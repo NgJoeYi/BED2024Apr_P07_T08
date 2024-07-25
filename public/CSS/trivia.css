@@ -285,6 +285,7 @@ main {
     background-color: #d9aa52;
     color: white;
     margin-top: 16px;
+    margin-left: -0.5px;
 }
 
 #submit-quiz:hover {
@@ -393,4 +394,28 @@ button:hover {
 .selected-answer {
     background-color: #d9aa52;
     color: #000000; /* Optional: to change the text color for better contrast */
+}
+
+/* Add styles for the buttons to ensure they look good below the white container */
+#button-container-below {
+    text-align: center;
+    margin-top: 20px; /* Adjust as needed */
+}
+
+#button-container-below button {
+    background-color: #d4af37; /* Gold color */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    margin: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#button-container-below button:hover {
+    background-color: #b3862f; /* Darker gold on hover */
 }
