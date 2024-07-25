@@ -23,7 +23,7 @@ main {
     margin-bottom: 20px;
     padding: 20px;
     color: #ffffff;
-    text-align: left; /* Align text to the left inside the card */
+    text-align: center; /* Center align the text inside the card */
 }
 
 .question-card h3 {
@@ -35,19 +35,20 @@ main {
     width: 100%;
     height: 300px; /* Fixed height */
     object-fit: contain; /* Maintain aspect ratio */
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .question-card label {
     display: block;
-    margin-bottom: 10px;
-    font-size: 16px; /* Increase font size */
-    color: #c0c0c0; /* Change label color */
-    padding: 10px;
-    border: 1px solid #c0c0c0; /* Add border to label */
-    border-radius: 10px; /* Rounded corners */
+    margin-bottom: -1px; /* Reduce margin to bring labels closer */
+    font-size: 18px; /* Increase font size */
+    padding: 15px 0; /* Increase padding for larger size */
+    border: 1px solid #ffffff; /* Add border to label */
+    border-radius: 5px; /* Reduce border-radius for a more square shape */
     cursor: pointer; /* Change cursor to pointer */
     transition: background-color 0.3s, color 0.3s; /* Add transition for background and color */
+    background-color: #ffffff; /* Background color of labels */
+    color: #1b2b40; /* Text color of labels */
 }
 
 .question-card label:hover {
@@ -64,21 +65,24 @@ main {
     color: #1b2b40; /* Change text color when selected */
 }
 
-#submit-quiz, #prev-button, #next-button {
+#submit-quiz {
     background-color: #d9aa52;
-    color: #1b2b40;
+    color: #ffffff; /* Change text color to white */
     border: none;
-    border-radius: 30px;
-    padding: 12px 20px;
-    font-size: 16px;
+    border-radius: 5px; /* Slightly rounded corners */
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
     align-self: center;
-    display: inline-block; /* Inline block for better alignment */
-    margin: 10px; /* Margin to separate buttons */
+    display: block; /* Block display for full-width */
+    margin: 20px auto; /* Center align and add margin */
+    width: 100%; /* Stretch to the full width of the parent container */
+    max-width: 1200px; /* Ensure it doesn't exceed the main container width */
 }
 
-#submit-quiz:hover, #prev-button:hover, #next-button:hover {
+#submit-quiz:hover {
     background-color: #b28f3e;
     transform: translateY(-3px);
 }
@@ -87,6 +91,30 @@ main {
     display: flex;
     justify-content: space-between; /* Distribute buttons evenly */
     margin-top: 20px; /* Margin to move it down */
+}
+
+#prev-button, #next-button {
+    background-color: #d9aa52;
+    color: #1b2b40;
+    border: none;
+    border-radius: 30px;
+    padding: 15px 25px; /* Increase padding for bigger buttons */
+    font-size: 18px; /* Increase font size */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    display: inline-block; /* Inline block for better alignment */
+    margin: 10px; /* Margin to separate buttons */
+}
+
+#prev-button:hover, #next-button:hover {
+    background-color: #b28f3e;
+    transform: translateY(-3px);
+}
+
+
+#prev-button:hover, #next-button:hover {
+    background-color: #b28f3e;
+    transform: translateY(-3px);
 }
 
 #prev-button {
