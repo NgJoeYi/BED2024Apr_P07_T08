@@ -2,7 +2,7 @@ const { user } = require("../dbConfig");
 const Lectures = require("../models/Lectures");
 const multer = require("multer");
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs'); 
 
 // Multer setup for file uploads
 const storage = multer.memoryStorage();
@@ -108,22 +108,39 @@ const deletingChapterName = async (req, res) => {
 
 // Update a lecture's information, ensuring the user has permission
 const updateLecture = async (req, res) => {
-    const userID = req.user.id; // user id that logged on now 
-    // lecture id 
+    const userID = req.user.id;
     const id = req.params.id;
     const { title, description, chapterName, duration } = req.body;
-    let video = req.file ? req.file.buffer : null;
+    
+    let videoFilename = null;
+
+    // Handle new video file if uploaded
+    if (req.file) {
+        // Check if req.file is correctly populated
+        console.log('Uploaded file:', req.file);
+
+        if (!req.file.buffer) {
+            console.error('No video data found in req.file.buffer');
+            return res.status(400).send('Invalid video file');
+        }
+
+        // Generate a unique filename for the video
+        videoFilename = `${uuid.v4()}_${req.file.originalname}`;
+        const videoPath = path.resolve(__dirname, '..', 'public', 'lectureVideos', videoFilename);
+
+        try {
+            // Write the file to the filesystem
+            await fs.promises.writeFile(videoPath, req.file.buffer);
+        } catch (err) {
+            console.error('Error saving video file:', err);
+            return res.status(500).send('Error saving video file');
+        }
+    }
+
     const existingLecture = await Lectures.getLectureByID(id);
 
-    if (!video) {
-        try {
-            if (existingLecture && existingLecture.video) {
-                video = existingLecture.video;
-            }
-        } catch (error) {
-            console.error('Error fetching existing lecture video:', error);
-            return res.status(500).send('Error fetching existing lecture video');
-        }
+    if (!videoFilename) {
+        videoFilename = existingLecture ? existingLecture.video : null;
     }
 
     const newLectureData = {
@@ -131,22 +148,28 @@ const updateLecture = async (req, res) => {
         Description: description,
         ChapterName: chapterName,
         Duration: duration,
-        Video: video
+        Video: videoFilename
     };
+
     try {
-        if (userID != existingLecture.userID) {
+        if (userID !== existingLecture.userID) {
             return res.status(403).send('You do not have permission to edit the lecture');
         }
+
         const updateResult = await Lectures.updateLecture(id, newLectureData);
         if (!updateResult) {
             return res.status(404).send('Lecture not found!');
         }
+
         res.json({ message: 'Lecture updated successfully', data: updateResult, userID: userID });
     } catch (error) {
         console.error('Error updating lecture:', error);
         res.status(500).send('Error updating lecture');
     }
 };
+
+
+
 
 // Retrieve the name of the last chapter for the current user, so user can add multiple lecture under chapter
 const getLastChapterName = async (req, res) => {
@@ -256,6 +279,7 @@ const getLectureVideoByID = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 };
+
 
 
 // When user press into course the lectures under it will show

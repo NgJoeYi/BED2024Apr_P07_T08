@@ -44,6 +44,11 @@ async function addLecture() {
         videoFileInput.value = ''; // Clear the file input
         return;
     }
+    if(duration<=0){
+        alert('The duration cannot be lesser than or equal to 0.');
+        duration.value='';
+        return;
+    }
 
     const formData = new FormData();
     formData.append('title', title);
@@ -141,16 +146,21 @@ async function addCourses() {
         alert('Please complete entering course information and select an image.');
         return;
     }
-    // Check if the image filename contains spaces or parentheses
+    // Check if the image filename contains spaces or parentheses or hyphens
     const courseImage = courseImageInput.files[0];
     if (courseImage) {
         const filename = courseImage.name;
-        if (/[\s()]/.test(filename)) {
+        if (/[\s()-]/.test(filename)) {
             alert('The course image filename should not contain spaces or parentheses. Please rename your file and try again.');
             courseImageInput.value = ''; // Clear the file input
             return;
         }
-     }
+    }
+    if(duration<=0){
+        alert('The duration cannot be lesser than or equal to 0.');
+        duration.value='';
+        return;
+    }
 
     const formData = new FormData();
     formData.append('title', title);

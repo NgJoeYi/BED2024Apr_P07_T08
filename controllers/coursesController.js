@@ -148,7 +148,6 @@ const getCourseImage = (req, res) => {
   });
 };
 
-
 // Update course if the user has permission 
 const updateCourse = async (req, res) => {
   const userID = req.user.id; // user id that logged on now
@@ -160,18 +159,19 @@ const updateCourse = async (req, res) => {
 
   try {
     // If no new image is uploaded, retain the current image
-    if (!req.file) {
-      console.log('DIDNT CHANGE IMAGE');
+    if (!req.file && req.body.noImageChange === 'true') {
+      console.log('No new image provided');
       const existingCourse = await Courses.getCourseById(courseID);
       if (!existingCourse) {
         return res.status(404).send("Course not found");
       }
       newCourseData.courseImage = existingCourse.courseImage;
-      console.log('EXISTING COURSE: ', existingCourse);
-      console.log('OLD IMAGE:', newCourseData.courseImage);
-    } else {
-      console.log('IMAGE CHANGED');
-      newCourseData.courseImage = req.file.buffer;
+      console.log('Existing course:', existingCourse);
+      console.log('Old image:', newCourseData.courseImage);
+    } else if (req.file) {
+      console.log('New image provided');
+      // Save the new image
+      newCourseData.courseImage = req.file.filename; // Update filename or process as needed
     }
 
     const updatedCourse = await Courses.updateCourse(courseID, newCourseData);
@@ -184,6 +184,7 @@ const updateCourse = async (req, res) => {
     res.status(500).send("Error updating course");
   }
 };
+
 
 // Deleting course if the user has permission 
 const deleteCourse = async (req, res) => {

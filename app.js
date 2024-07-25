@@ -172,7 +172,7 @@ app.get('/courses/:id', courseController.getCoursesById);
 app.get('/courses/image/:filename', courseController.getCourseImage);
 app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.updateCourse);
 app.post('/courses', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.createCourse); // Ensure field name matches
-app.delete('/courses/noLectures', jwtAuthorization.verifyJWT, courseController.deleteCourseWithNoLectures);
+app.delete('/courses/noLectures', courseController.deleteCourseWithNoLectures);
 app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
 
 

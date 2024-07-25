@@ -39,25 +39,22 @@ async function fetchCourses(category = 'All', sortBy = 'most-recent') {
 // DELETING COURSES WITH NO LECTURES 
 async function deleteCourseWithNoLectures() {
   try {
-      const token = sessionStorage.getItem('token');
-      const response = await fetch('/courses/noLectures', {
-          method: 'DELETE',
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      });
-      if (response.status === 404) {
-          return;
-      } else if (!response.ok) {
-          const errorMessage = await response.text();
-          console.error('Network response was not ok:', errorMessage);
-          throw new Error(`Network response was not ok: ${errorMessage}`);
-      }
+    const response = await fetch('/courses/noLectures', {
+      method: 'DELETE'
+    });
+    if (response.status === 404) {
+      console.log('No courses found to delete');
+      return;
+    } else if (!response.ok) {
+      const errorMessage = await response.text();
+      console.error('Network response was not ok:', errorMessage);
+      throw new Error(`Network response was not ok: ${errorMessage}`);
+    }
 
-      console.log('Deleted courses with no lectures'); // Log success
-      fetchCourses(); // Refresh the courses list
+    console.log('Deleted courses with no lectures'); // Log success
+    fetchCourses(); // Refresh the courses list
   } catch (error) {
-      console.error('Error deleting courses with no lectures:', error);
+    console.error('Error deleting courses with no lectures:', error);
   }
 }
 

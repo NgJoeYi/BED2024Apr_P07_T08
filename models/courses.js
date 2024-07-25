@@ -148,8 +148,20 @@ class Courses {
             request.input('category', sql.NVarChar, newCourseData.category);
             request.input('level', sql.NVarChar, newCourseData.level);
             request.input('duration', sql.Int, newCourseData.duration);
-            request.input('courseImage', sql.VarBinary, newCourseData.courseImage);
     
+            // Check if the courseImage field exists and is a filename
+            if (newCourseData.courseImage) {
+                request.input('courseImage', sql.NVarChar, newCourseData.courseImage);
+            } else {
+                // If no new image is provided, use the existing image filename
+                const existingCourse = await this.getCourseById(id);
+                if (existingCourse) {
+                    request.input('courseImage', sql.NVarChar, existingCourse.courseImage);
+                } else {
+                    request.input('courseImage', sql.Null, null);
+                }
+            }
+        
             await request.query(sqlQuery);
             return await this.getCourseById(id);
         } catch (error) {
@@ -159,6 +171,7 @@ class Courses {
             await connection.close();
         }
     }
+    
 
     // deleting courses with no lectures logic so all courses will have lectures inside it 
     static async deleteCourseWithNoLectures() {

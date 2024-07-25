@@ -1,4 +1,3 @@
-// Event listener to execute code once the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', async function() {
     // Extract lectureID and courseID from the URL parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -9,13 +8,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (lectureID && courseID) {
         try {
             // Fetch lecture details using authenticated request
-            const response = await fetchWithAuth(`/lectures/${lectureID}`); // ------------------------------------------------- headers in jwtutility.js
+            const response = await fetchWithAuth(`/lectures/${lectureID}`); // headers in jwtutility.js
             if (!response.ok) throw new Error('Network response was not ok');
             const lecture = await response.json();
             // Populate the form with the fetched lecture details
             populateLectureDetails(lecture);
         } catch (error) {
             console.error('Error fetching lecture details:', error);
+            alert('Error fetching lecture details. Please try again later.');
         }
     }
 
@@ -35,20 +35,35 @@ document.addEventListener('DOMContentLoaded', async function() {
 
             // Handle new lecture video file if selected
             if (lectureVideoInput.files.length > 0) {
-                console.log('New lecture video selected:', lectureVideoInput.files[0]);
-                // Remove existing 'lectureVideo' field if present
-                formData.delete('lectureVideo');
-                formData.append('lectureVideo', lectureVideoInput.files[0]);
+                // Check if the video filename contains spaces
+                const videoFile = lectureVideoInput.files[0];
+                if (videoFile) {
+                    if (videoFile.name.includes(' ')) {
+                        alert('The video filename should not contain spaces. Please rename your file and try again.');
+                        lectureVideoInput.value = ''; // Clear the file input
+                        return;
+                    }
+                    console.log('New lecture video selected:', videoFile);
+                    // Remove existing 'lectureVideo' field if present
+                    formData.delete('lectureVideo');
+                    formData.append('lectureVideo', videoFile);
+                } else {
+                    alert('No video file selected. Please choose a video file.');
+                    return;
+                }
             } else if (presentVideoElement.src) {
                 console.log('Using existing lecture video:', presentVideoElement.src);
             }
 
             try {
                 // Log final FormData before sending
-                console.log('Final FormData:', Array.from(formData.entries())); 
+                for (const [key, value] of formData.entries()) {
+                    console.log(`${key}:`, value);
+                }
+
 
                 // Send the updated lecture data to the server using authenticated request
-                const response = await fetchWithAuth(`/lectures/${lectureID}`, { // ------------------------------------------------- headers in jwtutility.js
+                const response = await fetchWithAuth(`/lectures/${lectureID}`, { // headers in jwtutility.js
                     method: 'PUT',
                     body: formData
                 });
@@ -66,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 window.location.href = `lecture.html?courseID=${courseID}`;
             } catch (error) {
                 console.error('Error updating lecture:', error);
-                alert('Error updating lecture.');
+                alert('Error updating lecture. Please try again later.');
             }
         });
     }
@@ -87,7 +102,7 @@ function populateLectureDetails(lecture) {
     const lectureVideoInputElement = document.getElementById('lectureVideoInput');
 
     if (lectureVideoElement && lecture.video) {
-        const videoUrl = `/video/${lecture.lectureID}`;
+        const videoUrl = `/video/${lecture.video}`; // Make sure this URL is correct
         lectureVideoElement.src = videoUrl;
         lectureVideoElement.controls = true; // Show video controls
         lectureVideoElement.style.display = 'block'; // Make video visible

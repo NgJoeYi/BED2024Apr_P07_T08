@@ -104,7 +104,7 @@ class Lectures {
                 UPDATE Lectures SET 
                 Title = @title,
                 Description = @description,
-                Video = @video,
+                Video = @video,  -- Update video filename in the database
                 Duration = @duration,
                 ChapterName = @chapterName
                 WHERE LectureID = @id
@@ -113,10 +113,10 @@ class Lectures {
             request.input('id', sql.Int, id);
             request.input('title', sql.NVarChar, newLectureData.Title);
             request.input('description', sql.NVarChar, newLectureData.Description);
-            request.input('video', sql.VarBinary, newLectureData.Video);
+            request.input('video', sql.NVarChar, newLectureData.Video); // Save the filename in the database
             request.input('duration', sql.Int, newLectureData.Duration);
             request.input('chapterName', sql.NVarChar, newLectureData.ChapterName);
-
+    
             const result = await request.query(sqlQuery);
             return result.rowsAffected > 0;
         } catch (error) {
@@ -126,6 +126,7 @@ class Lectures {
             await connection.close();
         }
     }
+    
     
 
     // TO SET THE NEW COURSE ID 
