@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizButton = document.getElementById('quiz-button');
     const statisticsButton = document.getElementById('statistics-button');
     const triviaButton = document.getElementById('trivia-quiz-button');
+    const buttonContainer = document.querySelector('.left-buttons-container');
 
     // Mark the trivia button as active and others as inactive
     quizButton.classList.remove('active');
@@ -100,6 +101,7 @@ function startTriviaQuiz(quiz) {
 }
 
 function startQuiz() {
+    document.querySelector('.left-buttons-container').classList.add('hidden-buttons');
     document.getElementById('quiz-list').classList.add('hidden');
     document.getElementById('quiz-questions').classList.remove('hidden');
     initializeQuiz(JSON.parse(sessionStorage.getItem('currentTriviaQuiz')));
@@ -107,40 +109,65 @@ function startQuiz() {
 
 let currentQuestionIndex = 0;
 let quizData = null;
+let userAnswers = []; // Array to store user answers
 
 function initializeQuiz(quiz) {
-    quizData = quiz;
+    quizData = [quiz]; // Wrap the single question in an array to handle uniformly
     console.log("Initializing Quiz with Data:", quizData); // Log initialized quiz data
+    console.log("Total Questions in the Quiz:", quizData.length);
     displayQuestion();
 }
 
 function displayQuestion() {
+    console.log("Displaying Question Index:", currentQuestionIndex); // Log current question index
     console.log("Displaying Question:", quizData[currentQuestionIndex]); // Log question to be displayed
     const questionContainer = document.getElementById('questions-container');
     questionContainer.innerHTML = '';
 
     const questionTitle = document.createElement('h2');
-    questionTitle.innerText = quizData.question;
+    questionTitle.innerText = quizData[currentQuestionIndex].question;
     questionContainer.appendChild(questionTitle);
 
-    const answerOptions = [quizData.correct_answer, ...quizData.incorrect_answers];
+    const answerOptions = [quizData[currentQuestionIndex].correct_answer, ...quizData[currentQuestionIndex].incorrect_answers];
     answerOptions.sort(() => Math.random() - 0.5); // Shuffle the answers
 
     answerOptions.forEach(answer => {
         const answerButton = document.createElement('button');
         answerButton.innerText = answer;
-        answerButton.onclick = () => checkAnswer(answer, quizData.correct_answer);
+        answerButton.onclick = () => selectAnswer(answer, answerButton);
         questionContainer.appendChild(answerButton);
     });
+
+    updateNavigationButtons();
 }
 
-function checkAnswer(selectedAnswer, correctAnswer) {
-    console.log("Selected Answer:", selectedAnswer, "Correct Answer:", correctAnswer); // Log selected and correct answer
-    if (selectedAnswer === correctAnswer) {
-        alert('Correct!');
+function updateNavigationButtons() {
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+
+    if (currentQuestionIndex === 0) {
+        prevButton.style.display = 'none';
     } else {
-        alert('Incorrect. The correct answer is: ' + correctAnswer);
+        prevButton.style.display = 'inline-block';
     }
+
+    if (currentQuestionIndex === quizData.length - 1) {
+        nextButton.style.display = 'none';
+    } else {
+        nextButton.style.display = 'inline-block';
+    }
+}
+
+function selectAnswer(answer, answerButton) {
+    userAnswers[currentQuestionIndex] = answer; // Store the selected answer
+    console.log("User Selected Answer:", answer); // Log the selected answer
+
+    // Remove the 'selected-answer' class from all buttons
+    const answerButtons = document.querySelectorAll('#questions-container button');
+    answerButtons.forEach(btn => btn.classList.remove('selected-answer'));
+
+    // Add the 'selected-answer' class to the clicked button
+    answerButton.classList.add('selected-answer');
 }
 
 function nextQuestion() {
@@ -148,6 +175,7 @@ function nextQuestion() {
         currentQuestionIndex++;
         displayQuestion();
     } else {
+        console.log("No more questions. Total Questions:", quizData.length);
         alert('You have completed the quiz!');
         // Optionally, you could redirect back to the quizzes page or show the results here
     }
@@ -161,6 +189,56 @@ function prevQuestion() {
 }
 
 function submitQuiz() {
+    console.log("User Answers:", userAnswers); // Log user answers
+    const resultsContainer = document.getElementById('results-container');
+    resultsContainer.innerHTML = '';
+
+    quizData.forEach((question, index) => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+
+        const questionTitle = document.createElement('h3');
+        questionTitle.innerText = `Question ${index + 1}: ${question.question}`;
+        resultItem.appendChild(questionTitle);
+
+        const userAnswer = document.createElement('p');
+        userAnswer.innerHTML = `Your answer: ${userAnswers[index] || 'No answer selected'}`;
+        resultItem.appendChild(userAnswer);
+
+        const correctAnswer = document.createElement('p');
+        correctAnswer.innerHTML = `Correct answer: ${question.correct_answer}`;
+        resultItem.appendChild(correctAnswer);
+
+        if (userAnswers[index] === question.correct_answer) {
+            userAnswer.className = 'correct';
+        } else {
+            userAnswer.className = 'incorrect';
+        }
+
+        resultsContainer.appendChild(resultItem);
+    });
+
+    createResultButtons(resultsContainer); // Add buttons to the results container
+
+    document.querySelector('.left-buttons-container').classList.add('hidden-buttons');
+    document.getElementById('quiz-questions').classList.add('hidden');
+    document.getElementById('quiz-results').classList.remove('hidden');
     alert('Quiz submitted!');
-    // Optionally, you could implement more logic here to handle the quiz submission
+}
+
+function createResultButtons(container) {
+    const retakeButton = document.createElement('button');
+    retakeButton.innerText = 'Retake Quiz';
+    retakeButton.onclick = () => {
+        window.location.href = 'triviaQuiz.html';
+    };
+
+    const homeButton = document.createElement('button');
+    homeButton.innerText = 'Back to Home';
+    homeButton.onclick = () => {
+        window.location.href = 'Index.html';
+    };
+
+    container.appendChild(retakeButton);
+    container.appendChild(homeButton);
 }
