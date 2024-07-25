@@ -59,6 +59,24 @@ const createQuestionAfterQuizCreation = async (req, res) => {
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
 
+
+        // Define options from newQuestionData
+        const options = [
+            newQuestionData.option_1,
+            newQuestionData.option_2,
+            newQuestionData.option_3,
+            newQuestionData.option_4
+        ];
+        // Convert correct_option to a zero-based index
+        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
+        // Check if the index is valid and within the bounds of the options array
+        if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
+            // Map correct_option to its content
+            newQuestionData.correct_option = options[correctOptionIndex];
+        }
+        console.log(newQuestionData);
+
+
         const question = await Quiz.createQuestion(newQuestionData); // --------------------- Create a new question
         if (!question) {
             return res.status(500).json({ message: "Failed to create question" }); // ------- Return error if question creation fails
@@ -83,6 +101,22 @@ const createQuestionOnUpdate = async (req, res) => { // utilise this in editQues
             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
         }
         
+        // Define options from newQuestionData
+        const options = [
+            newQuestionData.option_1,
+            newQuestionData.option_2,
+            newQuestionData.option_3,
+            newQuestionData.option_4
+        ];
+        // Convert correct_option to a zero-based index
+        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
+        // Check if the index is valid and within the bounds of the options array
+        if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
+            // Map correct_option to its content
+            newQuestionData.correct_option = options[correctOptionIndex];
+        }
+        console.log(newQuestionData);
+
         const question = await Quiz.createQuestion(newQuestionData); // -------------------- Create a new question
         if (!question) {
             return res.status(500).json({ message: "Failed to create question" });  // ----- Return error if question creation fails
@@ -183,11 +217,17 @@ const updateQuiz = async (req, res) => {
     try {
 
         const getAllTitles = await Quiz.getAllQuizWithCreatorName(); // ------------------------------------- Retrieve all quiz titles with creator names
+
+        // Debug logging
+        console.log('getAllTitles:', getAllTitles);
+        console.log('newQuizData:', newQuizData);
+        console.log('quizId:', quizId);
+
         // -------------------------------------------------------------------------------------------------- Check for duplicate titles, excluding the current quiz being updated
         const newTitle = newQuizData.title.trim().toLowerCase(); // ----------------------------------------- Trim and convert new title to lower case
         for (const quiz of getAllTitles) {
             const existingTitle = quiz.title.trim().toLowerCase(); // --------------------------------------- Trim and convert existing title to lower case
-            if (newTitle === existingTitle && quiz.id !== quizId) { // -------------------------------------- Exclude the current quiz from duplicate check
+            if (newTitle === existingTitle && parseInt(quiz.quiz_id) !== quizId) { // -------------------------------------- Exclude the current quiz from duplicate check
                 return res.status(400).json({ message: 'Title already exists' }); // ------------------------ Return error if title already exists
             }
         }
@@ -206,6 +246,16 @@ const updateQuiz = async (req, res) => {
         } else { // ---------------------------------------------------------------------------------------- If no new image is provided, retain the existing image buffer
             newQuizData.quizImg = checkQuiz.quizImg;
         }
+
+        // Check if any changes were made
+        const changesMade = Object.keys(newQuizData).some(
+            key => newQuizData[key] !== checkQuiz[key]
+        );
+
+        if (!changesMade) {
+            return res.status(400).json({ message: 'No changes were made.' });
+        }
+
         const quiz = await Quiz.updateQuiz(quizId, newQuizData); // ---------------------------------------- Update the quiz
         res.status(200).json({ message: 'successfully updated', quiz}); // --------------------------------- Return success message and updated quiz
     } catch (error) {
@@ -312,6 +362,21 @@ const updateQuestion = async (req, res) => {
             newQuestionData.option_3.toLowerCase(),
             newQuestionData.option_4.toLowerCase()
         ];
+
+        const optionValues = [
+            newQuestionData.option_1,
+            newQuestionData.option_2,
+            newQuestionData.option_3,
+            newQuestionData.option_4
+        ];
+        // ------------------------------------------------------------------------------------------------ Convert correct_option to a zero-based index
+        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
+        // ------------------------------------------------------------------------------------------------ Check if the index is valid and within the bounds of the options array
+        if (correctOptionIndex >= 0 && correctOptionIndex < optionValues.length) {
+            // --------------------------------------------------------------------------------------------- Map correct_option to its content
+            newQuestionData.correct_option = optionValues[correctOptionIndex];
+        }
+        console.log(newQuestionData);
 
         const correctOptionExists = options.includes(newQuestionData.correct_option.toLowerCase()); // ------ compare options in lower case
         if (!correctOptionExists) {
