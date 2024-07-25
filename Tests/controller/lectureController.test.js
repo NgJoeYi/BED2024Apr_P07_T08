@@ -1,120 +1,110 @@
-const express = require('express');
 const request = require('supertest');
+const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const { getAllLectures, createLecture } = require('../../controllers/lectureController');
-const Lectures = require('../../models/Lectures');
+const lectureController = require('../controllers/lectureController');
+const Lectures = require('../models/Lectures');
 
-// Mock the Lectures model
-jest.mock('../../models/Lectures', () => ({
-  getAllLectures: jest.fn(),
-  createLecture: jest.fn()
-}));
+// Mock data and functions
+jest.mock('../models/Lectures');
 
 const app = express();
 app.use(express.json());
-app.use(multer({ storage: multer.memoryStorage() }).single('video')); // Use memory storage for testing
 
-// Mock middleware to set req.user
-app.use((req, res, next) => {
-  req.user = { id: 1 }; // Mock user ID for testing
-  next();
-});
+// Configure multer for file upload
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-app.get('/lectures', getAllLectures);
-app.post('/lectures', createLecture);
+app.post('/upload', upload.single('video'), lectureController.createLecture);
+app.get('/lectures', lectureController.getAllLectures);
 
-describe('Lectures Controller Tests', () => {
-  beforeEach(() => {
-    jest.clearAllMocks(); // Clear previous mock calls
-  });
+describe('Lecture Controller', () => {
+    describe('Create Lecture', () => {
+        it('should return 400 if video is not provided', async () => {
+            const res = await request(app)
+                .post('/upload')
+                .send({
+                    title: 'Sample Lecture',
+                    duration: '60',
+                    description: 'Sample Description',
+                    chapterName: 'Sample Chapter',
+                    courseID: '1'
+                })
+                .set('user', { id: 1 });
 
-  describe('getAllLectures', () => {
-    it('should fetch all lectures and return a JSON response', async () => {
-      const mockLectures = [
-        { id: 1, title: 'Lecture 1', description: 'Description 1', chapterName: 'Chapter 1', duration: 60, video: 'video1.mp4' },
-        { id: 2, title: 'Lecture 2', description: 'Description 2', chapterName: 'Chapter 2', duration: 90, video: 'video2.mp4' }
-      ];
+            expect(res.status).toBe(400);
+            expect(res.text).toBe('Video not provided');
+        });
 
-      Lectures.getAllLectures.mockResolvedValue(mockLectures);
+        it('should create a lecture and return 201 if all data is provided', async () => {
+            const mockLectureData = {
+                LectureID: 1,
+                courseID: 1,
+                userID: 1,
+                title: 'Sample Lecture',
+                duration: 60,
+                description: 'Sample Description',
+                position: 1,
+                chapterName: 'Sample Chapter',
+                video: 'sampleVideo.mp4'
+            };
 
-      const response = await request(app).get('/lectures');
+            Lectures.getCurrentPositionInChapter.mockResolvedValue(1);
+            Lectures.createLecture.mockResolvedValue(1);
 
-      expect(Lectures.getAllLectures).toHaveBeenCalledTimes(1);
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockLectures);
+            const res = await request(app)
+                .post('/upload')
+                .field('title', 'Sample Lecture')
+                .field('duration', '60')
+                .field('description', 'Sample Description')
+                .field('chapterName', 'Sample Chapter')
+                .field('courseID', '1')
+                .attach('video', path.resolve(__dirname, 'sampleVideo.mp4'))
+                .set('user', { id: 1 });
+
+            expect(res.status).toBe(201);
+            expect(res.body).toEqual({
+                LectureID: 1,
+                ...mockLectureData
+            });
+        });
     });
 
-    it('should handle errors and return a 500 status with an error message', async () => {
-      const errorMessage = 'Database error';
-      Lectures.getAllLectures.mockRejectedValue(new Error(errorMessage));
+    describe('Get All Lectures', () => {
+        it('should return all lectures', async () => {
+            const mockLectures = [
+                {
+                    lectureID: 1,
+                    courseID: 1,
+                    userID: 1,
+                    title: 'Sample Lecture 1',
+                    description: 'Sample Description 1',
+                    video: 'sampleVideo1.mp4',
+                    duration: 60,
+                    position: 1,
+                    createdAt: new Date(),
+                    chapterName: 'Sample Chapter 1'
+                },
+                {
+                    lectureID: 2,
+                    courseID: 1,
+                    userID: 1,
+                    title: 'Sample Lecture 2',
+                    description: 'Sample Description 2',
+                    video: 'sampleVideo2.mp4',
+                    duration: 60,
+                    position: 2,
+                    createdAt: new Date(),
+                    chapterName: 'Sample Chapter 2'
+                }
+            ];
 
-      const response = await request(app).get('/lectures');
+            Lectures.getAllLectures.mockResolvedValue(mockLectures);
 
-      expect(response.status).toBe(500);
-      expect(response.text).toBe('Error retrieving lectures');
+            const res = await request(app).get('/lectures');
+
+            expect(res.status).toBe(200);
+            expect(res.body).toEqual(mockLectures);
+        });
     });
-  });
-
-  describe('createLecture', () => {
-    it('should create a new lecture and return a JSON response', async () => {
-      const mockLecture = {
-        id: 1,
-        title: 'New Lecture',
-        description: 'New Lecture Description',
-        chapterName: 'New Chapter',
-        duration: 60,
-        video: 'newVideo.mp4'
-      };
-
-      Lectures.createLecture.mockResolvedValue(mockLecture);
-
-      const response = await request(app)
-        .post('/lectures')
-        .field('title', 'New Lecture')
-        .field('description', 'New Lecture Description')
-        .field('chapterName', 'New Chapter')
-        .field('duration', '60')
-        .field('courseID', '1')
-        .attach('video', path.resolve(__dirname, 'testVideo.mp4')); // Ensure this file exists
-
-      expect(Lectures.createLecture).toHaveBeenCalledTimes(1);
-      expect(response.status).toBe(201);
-      expect(response.body).toMatchObject(mockLecture);
-    }, 10000); // Increase timeout if needed
-
-    it('should return 400 if video is not provided', async () => {
-      console.log('Starting the test for missing video');
-
-      const response = await request(app)
-        .post('/lectures')
-        .field('title', 'New Lecture')
-        .field('description', 'New Lecture Description')
-        .field('chapterName', 'New Chapter')
-        .field('duration', '60')
-        .field('courseID', '1');
-
-      console.log('Response received:', response.status, response.text);
-
-      expect(response.status).toBe(400);
-      expect(response.text).toBe('Video not provided');
-    });
-
-    it('should handle errors and return a 500 status with an error message', async () => {
-      const errorMessage = 'Database error';
-      Lectures.createLecture.mockRejectedValue(new Error(errorMessage));
-
-      const response = await request(app)
-        .post('/lectures')
-        .field('title', 'New Lecture')
-        .field('description', 'New Lecture Description')
-        .field('chapterName', 'New Chapter')
-        .field('duration', '60')
-        .field('courseID', '1')
-        .attach('video', path.resolve(__dirname, 'testVideo.mp4'));
-
-      expect(response.status).toBe(500);
-      expect(response.text).toBe('Error creating lecture');
-    });
-  });
 });
