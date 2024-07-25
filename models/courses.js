@@ -14,7 +14,6 @@ class Courses {
         this.createdAt = createdAt;
         this.courseImage = courseImage;
     }
-
     // getting all courses in the table 
     static async getAllCourses() {
         let pool;
@@ -212,35 +211,35 @@ class Courses {
     }
 
     // create course logic 
-    static async createCourse(newCourseData,id) {
-        const connection = await sql.connect(dbConfig);
+    static async createCourse(newCourseData) {
+        let pool;
         try {
+            pool = await sql.connect(dbConfig);
             const sqlQuery = `
-                INSERT INTO Courses (UserID, Title, Description, Category, Level, Duration, CreatedAt, CourseImage)
-                VALUES (@UserID, @Title, @Description, @Category, @Level, @Duration, @CreatedAt, @CourseImage);
+                INSERT INTO Courses (UserID, Title, Description, Category, Level, Duration, CourseImage)
+                VALUES (@UserID, @Title, @Description, @Category, @Level, @Duration, @CourseImage);
                 SELECT SCOPE_IDENTITY() AS CourseID;
             `;
-            const request = connection.request();
-            request.input("UserID", sql.Int, id);
-            request.input("Title", sql.NVarChar, newCourseData.title);
-            request.input("Description", sql.NVarChar, newCourseData.description);
-            request.input("Category", sql.NVarChar, newCourseData.category);
-            request.input("Level", sql.NVarChar, newCourseData.level);
-            request.input("Duration", sql.Int, newCourseData.duration);
-            request.input("CreatedAt", sql.DateTime, new Date());
-            request.input("CourseImage", sql.VarBinary, newCourseData.courseImage);
+            const request = pool.request();
+            request.input('UserID', sql.Int, newCourseData.UserID);
+            request.input('Title', sql.NVarChar, newCourseData.title);
+            request.input('Description', sql.NVarChar, newCourseData.description);
+            request.input('Category', sql.NVarChar, newCourseData.category);
+            request.input('Level', sql.NVarChar, newCourseData.level);
+            request.input('Duration', sql.Int, newCourseData.duration);
+            request.input('CourseImage', sql.NVarChar, newCourseData.CourseImage);
 
             const result = await request.query(sqlQuery);
             const newCourseID = result.recordset[0].CourseID;
-
             return newCourseID;
         } catch (error) {
             console.error('Error creating course:', error);
             throw error;
         } finally {
-            await connection.close();
+            if (pool) pool.close();
         }
-    }  
+    }
+
     
     // get course image for course.html course container 
     static async getCourseImage(id){

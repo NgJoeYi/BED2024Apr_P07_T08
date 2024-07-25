@@ -11,9 +11,9 @@ async function fetchCourses(category = 'All', sortBy = 'most-recent') {
     let response;
 
     if (category === 'All' && sortBy === 'most-recent') {
-      response = await fetch('/courses/mostRecent');
-    } else if (category === 'All' && sortBy === 'oldest') {
       response = await fetch('/courses/earliest');
+    } else if (category === 'All' && sortBy === 'oldest') {
+      response = await fetch('/courses/mostRecent');
     } else if (sortBy === 'most-recent') {
       response = await fetch(`/courses/filter?category=${category}&sort=most-recent`);
     } else {
@@ -84,7 +84,7 @@ function displayCourses(filteredCourses = null) {
     courseElement.dataset.courseId = course.CourseID; // Add courseID to data attribute
 
     // Fetch the image from the new endpoint
-    const imageUrl = `/courses/image/${course.CourseID}`;
+    const imageUrl = `/courses/image/${course.CourseImage}`;
 
     courseElement.innerHTML = `
       <a href="lecture.html?courseID=${course.CourseID}">

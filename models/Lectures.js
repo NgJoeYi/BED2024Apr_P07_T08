@@ -144,9 +144,10 @@ class Lectures {
         }
     }
 
-    // create lecture logic 
-    static async createLecture(id,newLectureData) {
+    // creating lecture
+    static async createLecture(newLectureData) {
         let pool;
+        console.log('LECTURE MODEL:', newLectureData);
         try {
             pool = await sql.connect(dbConfig);
             const sqlQuery = `
@@ -155,15 +156,15 @@ class Lectures {
                 SELECT SCOPE_IDENTITY() AS LectureID;
             `;
             const request = pool.request();
-            request.input('CourseID', sql.Int, newLectureData.CourseID);
-            request.input('UserID', sql.Int, id);
-            request.input('Title', sql.NVarChar, newLectureData.Title);
-            request.input('Description', sql.NVarChar, newLectureData.Description);
-            request.input('Video', sql.VarBinary, newLectureData.Video);
-            request.input('Duration', sql.Int, newLectureData.Duration);
-            request.input('Position', sql.Int, newLectureData.Position);
-            request.input('ChapterName', sql.NVarChar, newLectureData.ChapterName);
-            
+            request.input('CourseID', sql.Int, newLectureData.courseID);
+            request.input('UserID', sql.Int, newLectureData.userID);
+            request.input('Title', sql.NVarChar, newLectureData.title);
+            request.input('Description', sql.NVarChar, newLectureData.description);
+            request.input('Video', sql.NVarChar, newLectureData.video); // Storing the filename
+            request.input('Duration', sql.Int, newLectureData.duration);
+            request.input('Position', sql.Int, newLectureData.position);
+            request.input('ChapterName', sql.NVarChar, newLectureData.chapterName);
+
             const result = await request.query(sqlQuery);
             const newLectureID = result.recordset[0].LectureID;
             return newLectureID;
@@ -218,8 +219,8 @@ class Lectures {
         }
     }
 
-     // for editing lecture
-    static async getLectureVideoByID(lectureID) {
+     // for playing lecture video
+     static async getLectureVideoByID(lectureID) {
         let connection;
         try {
             connection = await sql.connect(dbConfig);
@@ -233,7 +234,7 @@ class Lectures {
                 return null;
             }
     
-            return result.recordset[0].Video;
+            return result.recordset[0].Video; // Return the filename, not the video data
         } catch (error) {
             console.error('Error retrieving lecture video:', error);
             throw error;
@@ -241,6 +242,7 @@ class Lectures {
             if (connection) await connection.close();
         }
     }
+    
 
     // displaying lectures under the specific course 
     static async getLecturesByCourseID(courseID) {

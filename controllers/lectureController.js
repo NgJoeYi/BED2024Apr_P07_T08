@@ -1,6 +1,8 @@
 const { user } = require("../dbConfig");
 const Lectures = require("../models/Lectures");
 const multer = require("multer");
+const path = require('path');
+const fs = require('fs');
 
 // Multer setup for file uploads
 const storage = multer.memoryStorage();
@@ -174,34 +176,42 @@ const getMaxCourseID = async (req, res) => {
 
 // Create a new lecture
 const createLecture = async (req, res) => {
-    const { Title, Duration, Description, ChapterName, CourseID } = req.body;
-    const UserID = req.user.id;
+    const { title, duration, description, chapterName, courseID } = req.body;
+    const userID = req.user.id;
 
-    if (!UserID) {
+    if (!userID) {
         console.error("UserID not provided");
         return res.status(400).send("UserID not provided");
     }
-    if (!CourseID) {
+    if (!courseID) {
         console.error("CourseID not provided");
         return res.status(400).send("CourseID not provided");
     }
 
-    const video = req.files.Video[0].buffer;
+    if (!req.file) {
+        console.error("Video not provided");
+        return res.status(400).send("Video not provided");
+    }
+
+    const videoFilename = req.file.filename;
 
     try {
-        const Position = await Lectures.getCurrentPositionInChapter(ChapterName);
+        const position = await Lectures.getCurrentPositionInChapter(chapterName);
 
         const newLectureData = {
-            CourseID,
-            UserID,
-            Title,
-            Duration,
-            Description,
-            Position,
-            ChapterName,
-            Video: video,
-        }
-        const newLectureID = await Lectures.createLecture(UserID, newLectureData);
+            courseID: parseInt(courseID), // Ensure courseID is an integer
+            userID,
+            title,
+            duration: parseInt(duration), // Ensure duration is an integer
+            description,
+            position,
+            chapterName,
+            video: videoFilename, // Only the filename is saved
+        };
+
+        console.log('NEW LECTURE DATA:', newLectureData);
+
+        const newLectureID = await Lectures.createLecture(newLectureData);
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
         console.error('Error creating lecture:', error);
@@ -219,13 +229,25 @@ const getLectureVideoByID = async (req, res) => {
     }
 
     try {
-        const videoData = await Lectures.getLectureVideoByID(lectureID);
-        if (videoData) {
-            res.writeHead(200, {
-                'Content-Type': 'video/mp4', // Adjust MIME type as needed
-                'Content-Length': videoData.length
+        const videoFilename = await Lectures.getLectureVideoByID(lectureID);
+        if (videoFilename) {
+            // Construct the full path to the video file
+            const videoPath = path.resolve(__dirname, '..', 'public', 'lectureVideos', videoFilename);
+
+            fs.access(videoPath, fs.constants.F_OK, (err) => {
+                if (err) {
+                    console.error('File does not exist:', videoPath);
+                    alert('file not found');
+                    return res.status(404).send('Video not found');
+                }
+
+                res.sendFile(videoPath, (err) => {
+                    if (err) {
+                        console.error('Error sending video file:', err);
+                        res.status(500).send('Error serving video');
+                    }
+                });
             });
-            res.end(videoData);
         } else {
             res.status(404).send('Video not found');
         }
@@ -234,6 +256,7 @@ const getLectureVideoByID = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 };
+
 
 // When user press into course the lectures under it will show
 const getLecturesByCourseID = async (req, res) => {
