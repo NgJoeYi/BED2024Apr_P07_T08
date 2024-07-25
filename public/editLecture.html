@@ -60,10 +60,10 @@
                     <label for="lectureVideoInput">Lecture Video:</label>
                     <input type="file" id="lectureVideoInput" name="lectureVideo" accept="video/*">
                     <!--plays current video-->
-                    <video id="lectureVideo" name = "lectureVideo" style="display: block; margin-top: 10px; max-width: 400px;" controls>
-                        <source src="" type="video/mp4">
+                    <video id="lectureVideo" name="lectureVideo" style="display: none; margin-top: 10px; max-width: 400px;" controls>
+                        <source  style="display: none;" id="videoSource" src="" type="video/mp4">
                         Your browser does not support the video tag.
-                    </video>
+                    </video>                    
                 </div>
                 <button type="submit">Save Changes</button>
             </form>                                                            

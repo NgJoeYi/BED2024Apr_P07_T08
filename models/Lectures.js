@@ -64,8 +64,9 @@ class Lectures {
 
     // get specfic lecture by id logic 
     static async getLectureByID(id) {
-        let connection = await sql.connect(dbConfig);
+        let connection;
         try {
+            connection = await sql.connect(dbConfig);
             const sqlQuery = `SELECT * FROM Lectures WHERE LectureID = @lectureID`;
             const request = connection.request();
             request.input('lectureID', sql.Int, id);
@@ -89,12 +90,13 @@ class Lectures {
                 lecture.ChapterName
             );
         } catch (error) {
-            console.error('Error retrieving lecture: ', error);
+            console.error('Error retrieving lecture:', error);
             throw error;
         } finally {
-            await connection.close();
+            if (connection) await connection.close();
         }
     }
+    
     
     // update lecture logic 
     static async updateLecture(id, newLectureData) {

@@ -34,19 +34,25 @@ const getLectureDetails = async (req, res) => {
 };
 
 // Retrieve a specific lecture by ID
-const getLectureByID = async (req, res) => {
-    const id = req.params.id;
+async function getLectureByID(req, res) {
+    const lectureID = parseInt(req.params.id, 10);
+
+    if (isNaN(lectureID) || lectureID < 1) {
+        console.error('Invalid lectureID:', req.params.id);
+        return res.status(400).send('Invalid lecture ID');
+    }
+
     try {
-        const lecture = await Lectures.getLectureByID(id);
+        const lecture = await Lectures.getLectureByID(lectureID);
         if (!lecture) {
-            return res.status(404).send('Lecture not found!');
+            return res.status(404).json({ error: 'Lecture not found' });
         }
         res.json(lecture);
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Error retrieving lecture");
+        console.error('Error retrieving lecture:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-};
+}
 
 // Delete a specific lecture by ID, ensuring the user has permission
 const deleteLecture = async (req, res) => {
@@ -108,10 +114,11 @@ const deletingChapterName = async (req, res) => {
 
 // Update a lecture's information, ensuring the user has permission
 const updateLecture = async (req, res) => {
+    console.log('COMES BACK END.');
     const userID = req.user.id;
     const id = req.params.id;
     const { title, description, chapterName, duration } = req.body;
-    
+    console.log(id);
     let videoFilename = null;
 
     // Handle new video file if uploaded
@@ -119,22 +126,26 @@ const updateLecture = async (req, res) => {
         // Check if req.file is correctly populated
         console.log('Uploaded file:', req.file);
 
-        if (!req.file.buffer) {
-            console.error('No video data found in req.file.buffer');
+        // Use req.file.path for disk storage
+        if (!req.file.path) {
+            console.error('No video data found in req.file.path');
             return res.status(400).send('Invalid video file');
         }
 
         // Generate a unique filename for the video
-        videoFilename = `${uuid.v4()}_${req.file.originalname}`;
+        videoFilename = `${Date.now()}-${req.file.originalname}`;
         const videoPath = path.resolve(__dirname, '..', 'public', 'lectureVideos', videoFilename);
 
         try {
-            // Write the file to the filesystem
-            await fs.promises.writeFile(videoPath, req.file.buffer);
+            // Move the file to the new location (if necessary)
+            await fs.promises.rename(req.file.path, videoPath);
         } catch (err) {
             console.error('Error saving video file:', err);
             return res.status(500).send('Error saving video file');
         }
+
+        // Update videoFilename to the new filename
+        videoFilename = path.basename(videoPath); // Ensure we only have the filename
     }
 
     const existingLecture = await Lectures.getLectureByID(id);
@@ -167,8 +178,6 @@ const updateLecture = async (req, res) => {
         res.status(500).send('Error updating lecture');
     }
 };
-
-
 
 
 // Retrieve the name of the last chapter for the current user, so user can add multiple lecture under chapter
@@ -245,9 +254,10 @@ const createLecture = async (req, res) => {
 // So the right lecture video will play according to the lecture
 const getLectureVideoByID = async (req, res) => {
     const lectureID = parseInt(req.params.lectureID, 10);
+    console.log('Parsed lectureID:', lectureID);
 
-    if (isNaN(lectureID)) {
-        console.error('Invalid lectureID:', req.params.lectureID);
+    if (isNaN(lectureID) || lectureID < 1) {
+        console.error('Invalid lectureID:', req.params.id);
         return res.status(400).send('Invalid lecture ID');
     }
 
@@ -260,7 +270,6 @@ const getLectureVideoByID = async (req, res) => {
             fs.access(videoPath, fs.constants.F_OK, (err) => {
                 if (err) {
                     console.error('File does not exist:', videoPath);
-                    alert('file not found');
                     return res.status(404).send('Video not found');
                 }
 
@@ -279,7 +288,6 @@ const getLectureVideoByID = async (req, res) => {
         res.status(500).send('Internal server error');
     }
 };
-
 
 
 // When user press into course the lectures under it will show
