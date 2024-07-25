@@ -27,14 +27,19 @@ class Comment { // Initializing the Comment object with various properties
         let connection;
         try {
             connection = await sql.connect(dbConfig);  // Establishing a connection to the database
-            const result = await connection.query(query); // Executing the SQL query
+            const request = new sql.Request(connection);
+            const result = await request.query(query); // Executing the SQL query
+
+            if (!result || !result.recordset || result.recordset.length === 0) { // Handle cases when recordset is null, undefined, or empty
+                return []; // Return an empty array if no comments are found
+            }
             
             return result.recordset.map(row => new Comment( // Mapping result rows to instances of Comment class so more organized, easier to work with also
                 row.id, row.content, row.created_at, row.discussion_id, row.user_id, row.username, row.profilePic, row.role, row.likes, row.dislikes
             ));
 
             } catch (err) { // Handling any errors that occur during the process
-            throw new Error('Error fetching comments: ' + err.message);
+                throw new Error('Error fetching comments: ' + err.message);
 
         } finally {
             if (connection) {
@@ -91,6 +96,10 @@ class Comment { // Initializing the Comment object with various properties
             const request = new sql.Request(connection);
             request.input('discussionId', sql.Int, discussionId); // Setting the input parameter for the query
             const result = await request.query(query); // Executing the SQL query
+
+            if (!result || !result.recordset || result.recordset.length === 0) { // Handle cases when recordset is null, undefined, or empty
+                return []; // Return an empty array if no comments are found
+            }
 
             // Mapping the result rows to instances of the Comment class
             return result.recordset.map(row => new Comment(
@@ -155,7 +164,11 @@ class Comment { // Initializing the Comment object with various properties
             request.input('id', sql.Int, id);
             request.input('content', sql.NVarChar, content);
 
-            await request.query(query); // Executing the SQL query to update the comment
+            const result = await request.query(query); // Executing the SQL query to update the comment
+
+            if (!result || !result.rowsAffected || result.rowsAffected[0] === 0) {
+                throw new Error('Update failed, comment not found.');
+            }
 
             return await this.getCommentById(id); // Fetching and returning the updated comment
             
@@ -182,6 +195,10 @@ class Comment { // Initializing the Comment object with various properties
             const request = new sql.Request(connection);
             request.input('id', sql.Int, id); // Setting the input parameter for the query
             const result = await request.query(query); // Executing the SQL query to delete the comment
+
+            if (!result || !result.rowsAffected || result.rowsAffected[0] === 0) {
+                throw new Error('Delete failed, comment not found.');
+            }
 
             return result.rowsAffected > 0; // Return true if a row was deleted
 

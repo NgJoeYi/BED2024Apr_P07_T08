@@ -1,5 +1,5 @@
 const sql = require('mssql'); // Importing the 'mssql' library for SQL Server operations
-const dbConfig = require('../dbConfig'); // Importing database configuration
+// const dbConfig = require('../dbConfig'); // Importing database configuration
 const commentModel = require('../models/Comment'); // Importing the Comment model
 
 

@@ -2,12 +2,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set active state based on the current page
     const quizButton = document.getElementById('quiz-button');
     const statisticsButton = document.getElementById('statistics-button');
+    const triviaButton = document.getElementById('trivia-quiz-button');
 
     // Mark the quiz button as active and statistics button as inactive
     quizButton.classList.add('active');
     quizButton.classList.remove('inactive');
     statisticsButton.classList.remove('active');
     statisticsButton.classList.add('inactive');
+    triviaButton.classList.remove('active');
+    triviaButton.classList.add('inactive');
 
     // Navigate to quiz.html when the quiz button is clicked
     quizButton.addEventListener('click', () => {
@@ -17,6 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Navigate to statistics.html when the statistics button is clicked
     statisticsButton.addEventListener('click', () => {
         window.location.href = 'statistics.html';
+    });
+
+    // Navigate to triviaQuiz.html when the trivia button is clicked
+    triviaButton.addEventListener('click', () => {
+        window.location.href = 'triviaQuiz.html';
     });
 
     fetchQuizzes(); // Fetch the list of quizzes
