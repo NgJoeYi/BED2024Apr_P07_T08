@@ -51,23 +51,23 @@ const getFollowedDiscussions = async (req, res) => {
     }
 };
 
-const checkFollowingStatus = async (req, res) => {
-    const followerId = req.user.id;
-    const { followeeId } = req.body;
+// const checkFollowingStatus = async (req, res) => {
+//     const followerId = req.user.id;
+//     const { followeeId } = req.body;
     
-    try {
-        const isFollowing = await Follow.isFollowing(followerId, followeeId);
-        res.json({ success: true, following: isFollowing });
-    } catch (err) {
-        console.error('Error checking follow status:', err);
-        res.status(500).json({ success: false, error: err.message });
-    }
-};
+//     try {
+//         const isFollowing = await Follow.isFollowing(followerId, followeeId);
+//         res.json({ success: true, following: isFollowing });
+//     } catch (err) {
+//         console.error('Error checking follow status:', err);
+//         res.status(500).json({ success: false, error: err.message });
+//     }
+// };
 
 
 module.exports = {
     followUser,
     unfollowUser,
     getFollowedDiscussions,
-    checkFollowingStatus
+    // checkFollowingStatus
 };
