@@ -43,9 +43,9 @@ function verifyJWT(req, res, next) {
             'POST /discussions/:id/pin': ['student', 'lecturer'],  // Add this line for pin
             'POST /discussions/:id/unpin': ['student', 'lecturer'],  // Add this line for unpin
             'POST /follow':  ['student', 'lecturer'],
-            'DELETE /unfollow':  ['student', 'lecturer'],
+            'POST /unfollow':  ['student', 'lecturer'],
             'GET /followed-discussions':  ['student', 'lecturer'],
-            // 'GET /following-status':  ['student', 'lecturer'],
+            'GET /follow-status':  ['student', 'lecturer'],
 
             
             'GET /comments': ['student', 'lecturer'],
@@ -55,16 +55,18 @@ function verifyJWT(req, res, next) {
 
             'GET /quizzes': ['student', 'lecturer'],
             'GET /quizzes/:id': ['student', 'lecturer'],
-            'POST /quizzes': ['lecturer'], // Only lecturers can create quizzes
-            'PUT /quizzes/:id': ['lecturer'], // Only lecturers can update quizzes
-            'DELETE /quizzes/:id': ['lecturer'], // Only lecturers can delete quizzes
+            'GET /quizzes/trivia': ['student', 'lecturer'],
             'GET /quizzes/:id/questions': ['student', 'lecturer'],
-            'POST /submitQuiz': ['student', 'lecturer'],
             'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
+            'POST /quizzes': ['lecturer'], // Only lecturers can create quizzes
+            'POST /submitQuiz': ['student', 'lecturer'],
             'POST /quizzes/:id/questions': ['lecturer'], // Only lecturers can add questions to a quiz
             'POST /quizzes/:id/questions/update': ['lecturer'], // Only lecturers can add questions to a quiz
             'PUT /quizzes/:quizId/questions/:questionId': ['lecturer'],
+            'PUT /quizzes/:id': ['lecturer'], // Only lecturers can update quizzes
             'DELETE /quizzes/:quizId/questions/:questionId': ['lecturer'],
+            'DELETE /quizzes/:id': ['lecturer'], // Only lecturers can delete quizzes
+
             
             // 'GET /courses': ['student', 'lecturer'],
             // 'GET /courses/:id': ['student', 'lecturer'],

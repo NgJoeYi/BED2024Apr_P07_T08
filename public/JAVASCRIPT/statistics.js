@@ -1,19 +1,32 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Get references to the quiz and statistics buttons
+    // Get references to the quiz, statistics, and trivia buttons
     const quizButton = document.getElementById('quiz-button');
     const statisticsButton = document.getElementById('statistics-button');
+    const triviaButton = document.getElementById('trivia-quiz-button');
 
     // Set active state based on the current page
     if (window.location.pathname.includes('statistics.html')) {
-        // If on statistics page, set statistics button as active and quiz button as inactive
+        // If on statistics page, set statistics button as active and others as inactive
         statisticsButton.classList.add('active');
         statisticsButton.classList.remove('inactive');
         quizButton.classList.remove('active');
         quizButton.classList.add('inactive');
+        triviaButton.classList.remove('active');
+        triviaButton.classList.add('inactive');
     } else if (window.location.pathname.includes('quiz.html')) {
-        // If on quiz page, set quiz button as active and statistics button as inactive
+        // If on quiz page, set quiz button as active and others as inactive
         quizButton.classList.add('active');
         quizButton.classList.remove('inactive');
+        statisticsButton.classList.remove('active');
+        statisticsButton.classList.add('inactive');
+        triviaButton.classList.remove('active');
+        triviaButton.classList.add('inactive');
+    } else if (window.location.pathname.includes('triviaQuiz.html')) {
+        // If on trivia quiz page, set trivia button as active and others as inactive
+        triviaButton.classList.add('active');
+        triviaButton.classList.remove('inactive');
+        quizButton.classList.remove('active');
+        quizButton.classList.add('inactive');
         statisticsButton.classList.remove('active');
         statisticsButton.classList.add('inactive');
     }
@@ -26,6 +39,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add click event listener to statistics button to navigate to statistics.html
     statisticsButton.addEventListener('click', () => {
         window.location.href = 'statistics.html'; // Navigate to statistics.html
+    });
+
+    // Add click event listener to trivia button to navigate to triviaQuiz.html
+    triviaButton.addEventListener('click', () => {
+        window.location.href = 'triviaQuiz.html'; // Navigate to triviaQuiz.html
     });
 
     // Fetch and render statistics

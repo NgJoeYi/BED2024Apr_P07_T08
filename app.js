@@ -98,6 +98,7 @@ app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
 
 // Add Routes for quizzes
+app.get('/quizzes/trivia', jwtAuthorization.verifyJWT, quizController.fetchTriviaQuizzes); // Add the new route for fetching trivia quizzes
 app.get('/quizzes/statistics', quizController.getQuizPassFailStatistics); // users not logged in can see
 app.get('/quizzes', quizController.getAllQuizWithCreatorName); // users not logged in can see
 app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);
@@ -114,9 +115,10 @@ app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT,
 
 // for follow
 app.post('/follow',  jwtAuthorization.verifyJWT,  followController.followUser);
-app.delete('/unfollow',  jwtAuthorization.verifyJWT,  followController.unfollowUser);
+app.post('/unfollow',  jwtAuthorization.verifyJWT,  followController.unfollowUser);
 app.get('/followed-discussions',  jwtAuthorization.verifyJWT,  followController.getFollowedDiscussions);
-// app.get('/following-status', jwtAuthorization.verifyJWT, followController.checkFollowingStatus);
+app.get('/follow-status',  jwtAuthorization.verifyJWT,followController.checkFollowStatus);
+
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);

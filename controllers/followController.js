@@ -40,6 +40,7 @@ const unfollowUser = async (req, res) => {
     }
 };
 
+
 const getFollowedDiscussions = async (req, res) => {
     const userId = req.user.id;
     try {
@@ -51,23 +52,29 @@ const getFollowedDiscussions = async (req, res) => {
     }
 };
 
-// const checkFollowingStatus = async (req, res) => {
-//     const followerId = req.user.id;
-//     const { followeeId } = req.body;
-    
-//     try {
-//         const isFollowing = await Follow.isFollowing(followerId, followeeId);
-//         res.json({ success: true, following: isFollowing });
-//     } catch (err) {
-//         console.error('Error checking follow status:', err);
-//         res.status(500).json({ success: false, error: err.message });
-//     }
-// };
+const checkFollowStatus = async (req, res) => {
+    const followerId = req.user.id;
+    const { followeeId } = req.body;
+
+    if (isNaN(followeeId)) {
+        return res.status(400).json({ success: false, message: 'Invalid followee ID' });
+    }
+
+    try {
+        const isFollowing = await Follow.isFollowing(followerId, followeeId);
+        res.json({ success: true, following: isFollowing });
+    } catch (err) {
+        console.error('Error checking follow status:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
 
 
 module.exports = {
     followUser,
     unfollowUser,
     getFollowedDiscussions,
-    // checkFollowingStatus
+    checkFollowStatus
+    
 };

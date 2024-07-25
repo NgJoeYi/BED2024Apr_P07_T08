@@ -1,5 +1,6 @@
 const sql = require('mssql');
 const dbConfig = require('../dbConfig');
+const Follow = require('./Follow');
 
 class Discussion {
     constructor(id, title, description, category, posted_date, likes, dislikes, views, username, profilePic, role, pinned) {
@@ -244,6 +245,33 @@ class Discussion {
             return true;
         } catch (err) {
             throw new Error(`Error updating discussion pin: ${err.message}`);
+        }
+    }
+
+    static async getDiscussionsWithFollowStatus(userId, category = 'all', sort = 'most-recent', search = '') {
+        try {
+            let query = `
+                SELECT d.*, u.name AS username, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role,
+                CASE WHEN f.FollowerId IS NULL THEN 0 ELSE 1 END AS isFollowing
+                FROM Discussions d
+                LEFT JOIN Users u ON d.user_id = u.id
+                LEFT JOIN ProfilePic p ON u.id = p.user_id
+                LEFT JOIN Follow f ON d.user_id = f.FolloweeId AND f.FollowerId = @userId
+                WHERE (@category = 'all' OR d.category = @category)
+                AND (d.title LIKE '%' + @search + '%' OR d.description LIKE '%' + @search + '%')
+                ORDER BY d.pinned DESC, d.posted_date DESC
+            `;
+
+            const pool = await sql.connect(dbConfig);
+            const result = await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('category', sql.NVarChar, category)
+                .input('search', sql.NVarChar, search)
+                .query(query);
+
+            return result.recordset;
+        } catch (err) {
+            throw new Error(`Error getting discussions: ${err.message}`);
         }
     }
 }
