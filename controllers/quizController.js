@@ -217,11 +217,17 @@ const updateQuiz = async (req, res) => {
     try {
 
         const getAllTitles = await Quiz.getAllQuizWithCreatorName(); // ------------------------------------- Retrieve all quiz titles with creator names
+
+        // Debug logging
+        console.log('getAllTitles:', getAllTitles);
+        console.log('newQuizData:', newQuizData);
+        console.log('quizId:', quizId);
+
         // -------------------------------------------------------------------------------------------------- Check for duplicate titles, excluding the current quiz being updated
         const newTitle = newQuizData.title.trim().toLowerCase(); // ----------------------------------------- Trim and convert new title to lower case
         for (const quiz of getAllTitles) {
             const existingTitle = quiz.title.trim().toLowerCase(); // --------------------------------------- Trim and convert existing title to lower case
-            if (newTitle === existingTitle && quiz.id !== quizId) { // -------------------------------------- Exclude the current quiz from duplicate check
+            if (newTitle === existingTitle && parseInt(quiz.quiz_id) !== quizId) { // -------------------------------------- Exclude the current quiz from duplicate check
                 return res.status(400).json({ message: 'Title already exists' }); // ------------------------ Return error if title already exists
             }
         }
