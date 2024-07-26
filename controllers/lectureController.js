@@ -71,14 +71,15 @@ const deleteLecture = async (req, res) => {
 
         const success = await Lectures.deleteLecture(lectureID);
         if (!success) {
-            return res.status(404).send("Lecture not found");
+            return res.status(404).json({ message: "Lecture not found" });
         }
-        res.status(204).send("Lecture successfully deleted");
+        res.status(204).send();
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error deleting lecture");
+        res.status(500).json({ message: "Error deleting lecture" });
     }
 };
+
 
 // Delete a chapter by its name, ensuring the user has permission
 const deletingChapterName = async (req, res) => {
