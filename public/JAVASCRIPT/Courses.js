@@ -42,9 +42,9 @@ async function deleteCourseWithNoLectures() {
     const response = await fetch('/courses/noLectures', {
       method: 'DELETE'
     });
-    if (response.status === 404) {
-      console.log('No courses found to delete');
-      return;
+    if (response.status === 204) {
+      console.log('No courses found to delete'); // Log if no courses found
+      return; // Exit if no courses were found
     } else if (!response.ok) {
       const errorMessage = await response.text();
       console.error('Network response was not ok:', errorMessage);
@@ -57,6 +57,7 @@ async function deleteCourseWithNoLectures() {
     console.error('Error deleting courses with no lectures:', error);
   }
 }
+
 
 // DISPLAYING COURSES   
 function displayCourses(filteredCourses = null) {
