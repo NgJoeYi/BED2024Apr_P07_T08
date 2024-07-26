@@ -55,7 +55,6 @@ function verifyJWT(req, res, next) {
             'POST /comments': ['student', 'lecturer'],
             'DELETE /comments/:id': ['student', 'lecturer'],
 
-            'GET /quizzes/trivia': ['student', 'lecturer'], // Both student and lecturer logged in can see trivia questions
             'GET /quizzes/:id/questions': ['student', 'lecturer'],  // Only student and lecturer logged in can see quiz id's questions
             'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
             'POST /quizzes': ['lecturer'], // Only lecturers can create quizzes
