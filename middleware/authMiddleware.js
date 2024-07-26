@@ -67,16 +67,16 @@ function verifyJWT(req, res, next) {
             'DELETE /quizzes/:quizId/questions/:questionId': ['lecturer'],  // Only lecturer logged in can delete quiz id's questions
             'DELETE /quizzes/:id': ['lecturer'], // Only lecturers can delete quizzes
 
-            'PUT /courses/:id': ['student', 'lecturer'],
-            'POST /courses': ['student', 'lecturer'],
-            'DELETE /courses/:id': ['student', 'lecturer'],
+            'PUT /courses/:id': [ 'lecturer'], // Only lecturers can update courses
+            'POST /courses': [ 'lecturer'], // Only lecturers can post courses
+            'DELETE /courses/:id': [ 'lecturer'], // Both students and lecturers can delete courses, because of delete courses with no lectures
 
-            'GET /lectures/last-chapter': ['lecturer'],
-            'GET /lectures/checking': ['lecturer'],
-            'POST /lectures': ['lecturer'],
-            'PUT /lectures/:id': ['lecturer'],
-            'DELETE /lectures/:id': ['lecturer'],
-            'DELETE /lectures/course/:courseID/chapter/:chapterName': ['lecturer'],
+            'GET /lectures/last-chapter': ['lecturer'], // Only lecturers can get last chapter of lectures because they are the one creating it
+            'GET /lectures/checking': ['lecturer'],// Only lecturers can get the current userID  
+            'POST /lectures': ['lecturer'], // Only lecturers can create lecture
+            'PUT /lectures/:id': ['lecturer'], // Only lecturers can update lecture
+            'DELETE /lectures/:id': ['lecturer'], // Only lecturers can delete lectures
+            'DELETE /lectures/course/:courseID/chapter/:chapterName': ['lecturer'], // Only lecturers can delete the whole chapter of the lecture
 
             'PUT /reviews/:id': ['student', 'lecturer'],
             'POST /reviews': ['student', 'lecturer'],

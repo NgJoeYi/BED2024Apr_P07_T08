@@ -212,13 +212,14 @@ const deleteCourse = async (req, res) => {
 };
 
 // If user creates course but exists the page the course will not be created successfully
+// dont have status 404 because we cant find a course with no lecture to delete everytime
 const deleteCourseWithNoLectures = async (req, res) => {
   try {
     const success = await Courses.deleteCourseWithNoLectures();
     console.log('success of deleting courses with no lectures:', success);
     if (!success) {
       console.log('No courses were deleted.'); // Log if no courses were deleted
-      return res.status(404).json({ message: 'No courses with no lectures found.' });
+      return res.status(204).send('No courses with no lectures found.'); // Use 204 No Content
     }
     console.log('Courses with no lectures deleted successfully.'); // Log success
     res.status(204).send('Course deleted successfully!!');
@@ -227,6 +228,7 @@ const deleteCourseWithNoLectures = async (req, res) => {
     res.status(500).json({ message: "Error deleting course with no lectures:(" });
   }
 };
+
 
 // For users to search for courses in the search container 
 const searchCourses = async (req, res) => {
