@@ -47,6 +47,8 @@ function verifyJWT(req, res, next) {
             'GET /followed-discussions':  ['student', 'lecturer'],
             'GET /follow-status':  ['student', 'lecturer'],
             'GET /discussions/:id/suggestions':  ['student', 'lecturer'],
+            'GET /following-count':  ['student', 'lecturer'],
+
 
             
             'GET /comments': ['student', 'lecturer'],

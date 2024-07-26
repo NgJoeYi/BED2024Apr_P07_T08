@@ -380,6 +380,7 @@ function resetStars() {
 // Fetch user discussions on DOM load
 document.addEventListener('DOMContentLoaded', () => {
   fetchUserDiscussions();
+  fetchFollowingCount(); // Fetch following count on page load
 });
 
 async function fetchUserDiscussions() {
@@ -580,8 +581,42 @@ async function deleteDiscussion(discussionId) {
   }
 }
 
+async function fetchFollowingCount() {
+  try {
+    const response = await fetchWithAuth(`/following-count`); // Use your actual endpoint
+    if (!response.ok) {
+      throw new Error('Failed to fetch following count');
+    }
+
+    const data = await response.json();
+    console.log('Fetched following count:', data);
+
+    const followingCountElement = document.querySelector('.stat .info h3'); // Ensure this matches your HTML structure
+    followingCountElement.textContent = data.count; // Update the count in the HTML
+  } catch (error) {
+    console.error('Error fetching following count:', error);
+    alert('Error fetching following count: ' + error.message);
+  }
+}
+
+
+
+
+
+
+
+
 
 function showSection(sectionId, event) {
+  console.log('showSection called'); // Log function call
+  if (!event) {
+    event = window.event;
+    if (!event) {
+      console.error('Event is undefined');
+      return;
+    }
+  }
+
   console.log(`Showing section: ${sectionId}`); // Debug log
 
   // Hide all tab contents
@@ -612,7 +647,11 @@ function showSection(sectionId, event) {
 document.addEventListener('DOMContentLoaded', function() {
   const firstTab = document.querySelector('.tab');
   if (firstTab) {
+    console.log('First tab found:', firstTab); // Log first tab found
     firstTab.click();
     console.log(`Clicked first tab: ${firstTab.textContent}`); // Debug log
+  } else {
+    console.error('First tab not found'); // Log if first tab not found
   }
 });
+
