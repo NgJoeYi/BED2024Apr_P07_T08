@@ -58,6 +58,7 @@ main {
     background-color: #ffffff; /* Background color of labels */
     color: #1b2b40; /* Text color of labels */
     width: 100%; /* Full width for better alignment */
+    font-weight: bold;
 }
 
 .question-card label:hover {
