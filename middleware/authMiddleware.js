@@ -43,9 +43,10 @@ function verifyJWT(req, res, next) {
             'POST /discussions/:id/pin': ['student', 'lecturer'],  // Add this line for pin
             'POST /discussions/:id/unpin': ['student', 'lecturer'],  // Add this line for unpin
             'POST /follow':  ['student', 'lecturer'],
-            'DELETE /unfollow':  ['student', 'lecturer'],
+            'POST /unfollow':  ['student', 'lecturer'],
             'GET /followed-discussions':  ['student', 'lecturer'],
-            // 'GET /following-status':  ['student', 'lecturer'],
+            'GET /follow-status':  ['student', 'lecturer'],
+            'GET /discussions/:id/suggestions':  ['student', 'lecturer'],
 
             
             'GET /comments': ['student', 'lecturer'],
@@ -74,7 +75,6 @@ function verifyJWT(req, res, next) {
             'PUT /courses/:id': ['student', 'lecturer'],
             'POST /courses': ['student', 'lecturer'],
             'DELETE /courses/:id': ['student', 'lecturer'],
-            'DELETE /courses/noLectures': ['student', 'lecturer'],
 
             'GET /lectures/last-chapter': ['lecturer'],
             'GET /lectures/checking': ['lecturer'],

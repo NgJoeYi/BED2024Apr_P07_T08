@@ -1,5 +1,27 @@
 const validateDiscussion = require('../middleware/discussionValidation');
 const discussionModel = require('../models/Discussion');
+require('dotenv').config();
+
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+// Initialize the GoogleGenerativeAI instance
+const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+
+// Get the specific model instance
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+const generateSuggestion = async (text) => {
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent(text);
+        const response = await result.response;
+        const suggestions = response.text();
+        return suggestions;
+    } catch (error) {
+        console.error('Error generating suggestions:', error);
+        throw new Error('Failed to generate suggestions');
+    }
+};
 
 // Controller functions
 const getDiscussions = async (req, res) => {
@@ -18,13 +40,14 @@ const getDiscussionById = async (req, res) => {
     try {
         const discussion = await discussionModel.getDiscussionById(discussionId);
         if (discussion) {
-            res.json(discussion);
+            const suggestions = await generateSuggestion(discussion.description); // Generate suggestions based on the discussion description
+            res.json({ success: true, discussion, suggestions });
         } else {
             res.status(404).json({ error: 'Discussion not found' });
         }
     } catch (err) {
         console.error('Error fetching discussion details:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 };
 
@@ -35,8 +58,9 @@ const createDiscussion = async (req, res) => {
     }
     try {
         const { title, category, description } = req.body;
+        const suggestions = await generateSuggestion(description); // Generate suggestions based on the description
         const newDiscussion = await discussionModel.createDiscussion(title, category, description, userId);
-        res.json({ success: true, discussion: newDiscussion });
+        res.json({ success: true, discussion: newDiscussion, suggestions });
     } catch (err) {
         console.error('Error creating discussion:', err);
         res.status(500).json({ success: false, error: err.message });
@@ -143,6 +167,36 @@ const unpinDiscussion = async (req, res) => {
     }
 };
 
+const getDiscussionsWithFollowStatus = async (req, res) => {
+    const userId = req.user.id;
+    const { category = 'all', sort = 'most-recent', search = '' } = req.query;
+    try {
+        const discussions = await discussionModel.getDiscussionsWithFollowStatus(userId, category, sort, search);
+        res.json({ success: true, discussions });
+    } catch (err) {
+        console.error('Error fetching discussions:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+// GEMINI API....
+const getSuggestionsForDiscussion = async (req, res) => {
+    const discussionId = req.params.id;
+    try {
+        const discussion = await discussionModel.getDiscussionById(discussionId);
+        if (discussion) {
+            const suggestions = await generateSuggestion(discussion.description);
+            res.json({ success: true, suggestions });
+        } else {
+            res.status(404).json({ error: 'Discussion not found' });
+        }
+    } catch (err) {
+        console.error('Error fetching suggestions:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
+
+// Add this to your module exports
 module.exports = {
     getDiscussions,
     getDiscussionById,
@@ -152,8 +206,10 @@ module.exports = {
     getDiscussionsByUser,
     updateDiscussion,
     deleteDiscussion,
-    validateDiscussion, // Importing the validateDiscussion function here
+    validateDiscussion,
     incrementViews,
     pinDiscussion,
-    unpinDiscussion
+    unpinDiscussion,
+    getDiscussionsWithFollowStatus,
+    getSuggestionsForDiscussion
 };

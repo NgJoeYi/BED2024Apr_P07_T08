@@ -48,16 +48,33 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set up multer for file uploads
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        let uploadPath;
+        if (file.mimetype.startsWith('image/')) {
+            uploadPath = path.join(__dirname, 'public/courseImages');
+        } else if (file.mimetype.startsWith('video/')) {
+            uploadPath = path.join(__dirname, 'public/lectureVideos');
+        } else {
+            return cb(new Error('Invalid file type'), false);
+        }
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
 const upload = multer({ storage: storage });
 
 const multiUpload = upload.fields([
     { name: 'lectureVideo', maxCount: 1 },
-    { name: 'LectureImage', maxCount: 1 },
     { name: 'courseImage', maxCount: 1 },
-    { name: 'videoFiles' , maxCount : 1 },
-    { name: 'Video', maxCount: 1 },
+    { name: 'videoFiles', maxCount: 1 },
+    { name: 'video', maxCount: 1 },
 ]);
+
+const uploadSingleVideo = upload.single('video');
 
 // Middleware to ignore favicon requests
 app.get('/favicon.ico', (req, res) => res.status(204));
@@ -98,9 +115,10 @@ app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT,
 
 // for follow
 app.post('/follow',  jwtAuthorization.verifyJWT,  followController.followUser);
-app.delete('/unfollow',  jwtAuthorization.verifyJWT,  followController.unfollowUser);
+app.post('/unfollow',  jwtAuthorization.verifyJWT,  followController.unfollowUser);
 app.get('/followed-discussions',  jwtAuthorization.verifyJWT,  followController.getFollowedDiscussions);
-// app.get('/following-status', jwtAuthorization.verifyJWT, followController.checkFollowingStatus);
+app.get('/follow-status',  jwtAuthorization.verifyJWT,followController.checkFollowStatus);
+
 
 // Add Routes for discussions
 app.get('/discussions', discussionController.getDiscussions);
@@ -116,6 +134,9 @@ app.post('/discussions/:discussionId/dislike', jwtAuthorization.verifyJWT, discu
 app.post('/discussions/:discussionId/view', jwtAuthorization.verifyJWT, discussionController.incrementViews);
 app.post('/discussions/:id/pin', jwtAuthorization.verifyJWT, discussionController.pinDiscussion);
 app.post('/discussions/:id/unpin', jwtAuthorization.verifyJWT, discussionController.unpinDiscussion);
+
+//RAEANN GEMINI API
+app.get('/discussions/:id/suggestions',jwtAuthorization.verifyJWT, discussionController.getSuggestionsForDiscussion);
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
@@ -151,10 +172,10 @@ app.get('/courses/filter', courseController.filterByCategory);
 app.get('/courses/mostRecent',courseController.getMostRecentCourses); // for filtering by most recent made courses
 app.get('/courses/earliest',courseController.getEarliestCourses); // for filtering by earliest made courses
 app.get('/courses/:id', courseController.getCoursesById);
-app.get('/courses/image/:id', courseController.getCourseImage);
+app.get('/courses/image/:filename', courseController.getCourseImage);
 app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.updateCourse);
-app.post('/courses', jwtAuthorization.verifyJWT, upload.single('imageFile'), courseController.createCourse); // Ensure field name matches
-app.delete('/courses/noLectures', jwtAuthorization.verifyJWT, courseController.deleteCourseWithNoLectures);
+app.post('/courses', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.createCourse); // Ensure field name matches
+app.delete('/courses/noLectures', courseController.deleteCourseWithNoLectures);
 app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
 
 
@@ -168,7 +189,7 @@ app.get('/lectures/:id', lectureController.getLectureByID);
 app.get('/lectures/lecture-details/:id',lectureController.getLectureDetails);
 app.put('/lectures/:id', jwtAuthorization.verifyJWT, upload.single('lectureVideo'), lectureController.updateLecture);
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // for updating lecture
-app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
+app.post('/lectures', jwtAuthorization.verifyJWT, upload.single('lectureVideo'), lectureController.createLecture);
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 
 app.delete('/lectures/course/:courseID/chapter/:chapterName', jwtAuthorization.verifyJWT, lectureController.deletingChapterName); 
 

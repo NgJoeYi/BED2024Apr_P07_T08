@@ -171,7 +171,6 @@ function capitalizeFirstLetter(string) {
 }
 
 function addDiscussionToFeed(discussion, feedType) {
-    console.log(`Adding discussion ID: ${discussion.id} to feed type: ${feedType}`);
     const feed = document.querySelector(`#${feedType} .activity-feed`);
     if (!feed) {
         console.error(`Feed element not found for feed type: ${feedType}`);
@@ -181,10 +180,7 @@ function addDiscussionToFeed(discussion, feedType) {
     const post = document.createElement('div');
     post.classList.add('post');
     post.setAttribute('data-id', discussion.id);
-    post.setAttribute('data-user-id', discussion.user_id); // Correct the attribute name
-
-    // Debugging: Log the discussion object to check user_id
-    console.log('Discussion object:', discussion);
+    post.setAttribute('data-user-id', discussion.user_id);
 
     const likedByUser = discussion.userLiked ? 'true' : 'false';
     const dislikedByUser = discussion.userDisliked ? 'true' : 'false';
@@ -196,9 +192,6 @@ function addDiscussionToFeed(discussion, feedType) {
     const capitalizedUsername = capitalizeFirstLetter(discussion.username);
     const profilePicUrl = discussion.profilePic || 'images/profilePic.jpeg';
 
-    const pinButtonText = discussion.pinned ? 'Unpin' : 'Pin';
-    const pinButtonClass = discussion.pinned ? 'unpin-button' : 'pin-button';
-
     post.innerHTML = `
         <div class="post-header">
             <div class="profile-pic">
@@ -207,9 +200,9 @@ function addDiscussionToFeed(discussion, feedType) {
             <div class="user-info">
                 <div class="username">${capitalizedUsername}</div>
                 <div class="role">(${discussion.role})</div>
-                <button class="follow-button" data-user-id="${discussion.user_id}">Follow</button>
+                <button class="follow-button" data-user-id="${discussion.user_id}">Checking...</button>
+                <button class="suggestion-button" data-id="${discussion.id}">💡</button> <!-- Circular button for suggestions -->
             </div>
-            <button class="${pinButtonClass} pin-button-top-right" data-id="${discussion.id}">${pinButtonText}</button>
         </div>
         <div class="post-meta">
             <span class="posted-date-activity-dis">${new Date(discussion.posted_date).toLocaleDateString()}</span>
@@ -226,6 +219,7 @@ function addDiscussionToFeed(discussion, feedType) {
                 <span class="views-count">${viewsText}</span>
             </div>
             <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
+            <button class="pin-button" data-id="${discussion.id}">${discussion.pinned ? 'Unpin' : 'Pin'}</button> <!-- Button for pin/unpin -->
         </div>
     `;
 
@@ -235,15 +229,25 @@ function addDiscussionToFeed(discussion, feedType) {
         feed.appendChild(post);
     }
 
-    // Debugging: Ensure fetchCommentCountForDiscussion is called for each discussion
-    console.log(`Calling fetchCommentCountForDiscussion for discussion ID: ${discussion.id}`);
     fetchCommentCountForDiscussion(discussion.id);
 
     const likeButton = post.querySelector('.like-button');
     const dislikeButton = post.querySelector('.dislike-button');
     const commentButton = post.querySelector('.comment-button');
-    const pinButton = post.querySelector(`.${pinButtonClass}`);
     const followButton = post.querySelector('.follow-button');
+    const suggestionButton = post.querySelector('.suggestion-button'); // Get the suggestion button
+    const pinButton = post.querySelector('.pin-button'); // Get the pin/unpin button
+
+    checkFollowStatus(discussion.user_id)
+        .then(isFollowing => {
+            followButton.textContent = isFollowing ? 'Unfollow' : 'Follow';
+            followButton.classList.toggle('unfollow-button', isFollowing);
+            followButton.classList.toggle('follow-button', !isFollowing);
+        })
+        .catch(error => {
+            console.error('Error updating follow button:', error);
+            followButton.textContent = 'Follow'; // Default to 'Follow' in case of an error
+        });
 
     if (discussion.user_id === getCurrentUserId()) {
         followButton.style.display = 'none'; // Hide follow button for discussions posted by the logged-in user
@@ -273,16 +277,26 @@ function addDiscussionToFeed(discussion, feedType) {
         window.location.href = `comment.html?discussionId=${discussionId}`;
     });
 
-    pinButton.addEventListener('click', function () {
-        const discussionId = this.getAttribute('data-id');
-        const action = discussion.pinned ? 'unpin' : 'pin';
-        togglePinDiscussion(discussionId, action, this);
-    });
-
     followButton.addEventListener('click', function () {
         const followeeId = post.getAttribute('data-user-id');
-        console.log('Followee ID:', followeeId); // Debugging: Log followeeId
-        followUser(followeeId, this);
+        if (this.textContent === 'Follow') {
+            followUser(followeeId, this);
+        } else {
+            unfollowUser(followeeId, this);
+        }
+    });
+
+    // Add event listener to suggestion button
+    suggestionButton.addEventListener('click', function () {
+        const discussionId = this.getAttribute('data-id');
+        showSuggestionsPopup(discussionId);
+    });
+
+    // Add event listener to pin/unpin button
+    pinButton.addEventListener('click', function () {
+        const discussionId = this.getAttribute('data-id');
+        const action = this.textContent.toLowerCase() === 'pin' ? 'pin' : 'unpin';
+        togglePinDiscussion(discussionId, action, this);
     });
 }
 
@@ -441,6 +455,8 @@ function followUser(followeeId, button) {
         return;
     }
 
+    console.log('Attempting to follow user ID:', followeeIdNum); // Debugging log
+
     fetchWithAuth('/follow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -448,28 +464,72 @@ function followUser(followeeId, button) {
     })
     .then(response => {
         if (!response.ok) {
+            console.error('Failed to follow user, status:', response.status);
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
+        console.log('Follow response data:', data); // Debugging log
         if (data.success) {
-            if (button.textContent === 'Follow') {
-                button.textContent = 'Unfollow';
-                button.classList.remove('follow-button');
-                button.classList.add('unfollow-button');
-            } else {
-                button.textContent = 'Follow';
-                button.classList.remove('unfollow-button');
-                button.classList.add('follow-button');
-            }
+            button.textContent = 'Unfollow';
+            button.classList.remove('follow-button');
+            button.classList.add('unfollow-button');
+            alert('Successfully followed the user.'); // Alert for success
+            console.log(`Updated follow status for user ID: ${followeeIdNum} to 'Unfollow'`);
         } else {
             alert('Error following user.');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while trying to follow/unfollow the user.');
+        alert('An error occurred while trying to follow the user.');
+    });
+}
+
+function unfollowUser(followeeId, button) {
+    const followeeIdNum = parseInt(followeeId, 10);
+    if (isNaN(followeeIdNum)) {
+        console.error('Invalid followeeId:', followeeId);
+        alert('Invalid followee ID.');
+        return;
+    }
+
+    console.log('Attempting to unfollow user ID:', followeeIdNum); // Debugging log
+
+    fetchWithAuth('/unfollow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ followeeId: followeeIdNum })
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error('Failed to unfollow user, status:', response.status);
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Unfollow response data:', data); // Debugging log
+        if (data.success) {
+            button.textContent = 'Follow';
+            button.classList.remove('unfollow-button');
+            button.classList.add('follow-button');
+            alert('Successfully unfollowed the user.'); // Alert for success
+            console.log(`Updated follow status for user ID: ${followeeIdNum} to 'Follow'`);
+            if (getActiveTab() === 'following') {
+                const postElement = button.closest('.post');
+                if (postElement) {
+                    postElement.remove();
+                }
+            }
+        } else {
+            alert('Error unfollowing user.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while trying to unfollow the user.');
     });
 }
 
@@ -491,3 +551,88 @@ function getActiveTab() {
     return activeTab ? activeTab.getAttribute('onclick').match(/showTab\('([^']+)'\)/)[1] : 'mainFeed';
 }
 
+function checkFollowStatus(followeeId) {
+    return fetchWithAuth(`/follow-status?followeeId=${followeeId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            return data.following;
+        } else {
+            throw new Error('Error checking follow status');
+        }
+    })
+    .catch(error => {
+        console.error('Error checking follow status:', error);
+        throw error; // Removed the misplaced period and added a semicolon
+    });
+}
+
+
+// for GEMINI API
+// Add this JavaScript to your script file
+async function showSuggestionsPopup(discussionId) {
+    try {
+        const token = getToken();
+        if (!token) {
+            throw new Error('No token provided');
+        }
+
+        // Fetch suggestions from the server
+        const response = await fetch(`/discussions/${discussionId}/suggestions`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            let suggestions = data.suggestions;
+
+            // Ensure suggestions is an array or convert it to an array
+            if (!Array.isArray(suggestions)) {
+                suggestions = [suggestions];
+            }
+
+            const suggestionsContainer = document.getElementById('suggestionsContainer');
+            suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(suggestion => {
+                    const suggestionElement = document.createElement('div');
+                    suggestionElement.classList.add('suggestion');
+                    suggestionElement.innerText = suggestion;
+                    suggestionsContainer.appendChild(suggestionElement);
+                });
+            } else {
+                const noSuggestionElement = document.createElement('div');
+                noSuggestionElement.classList.add('no-suggestion');
+                noSuggestionElement.innerText = 'No suggestions available.';
+                suggestionsContainer.appendChild(noSuggestionElement);
+            }
+
+            // Show the popup
+            document.getElementById('suggestionPopup').style.display = 'block';
+        } else {
+            console.error('Error fetching suggestions:', data.error);
+        }
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+    }
+}
+
+
+
+function closeSuggestionPopup() {
+    document.getElementById('suggestionPopup').style.display = 'none';
+}

@@ -14,7 +14,6 @@ class Courses {
         this.createdAt = createdAt;
         this.courseImage = courseImage;
     }
-
     // getting all courses in the table 
     static async getAllCourses() {
         let pool;
@@ -149,8 +148,20 @@ class Courses {
             request.input('category', sql.NVarChar, newCourseData.category);
             request.input('level', sql.NVarChar, newCourseData.level);
             request.input('duration', sql.Int, newCourseData.duration);
-            request.input('courseImage', sql.VarBinary, newCourseData.courseImage);
     
+            // Check if the courseImage field exists and is a filename
+            if (newCourseData.courseImage) {
+                request.input('courseImage', sql.NVarChar, newCourseData.courseImage);
+            } else {
+                // If no new image is provided, use the existing image filename
+                const existingCourse = await this.getCourseById(id);
+                if (existingCourse) {
+                    request.input('courseImage', sql.NVarChar, existingCourse.courseImage);
+                } else {
+                    request.input('courseImage', sql.Null, null);
+                }
+            }
+        
             await request.query(sqlQuery);
             return await this.getCourseById(id);
         } catch (error) {
@@ -160,6 +171,7 @@ class Courses {
             await connection.close();
         }
     }
+    
 
     // deleting courses with no lectures logic so all courses will have lectures inside it 
     static async deleteCourseWithNoLectures() {
@@ -212,35 +224,35 @@ class Courses {
     }
 
     // create course logic 
-    static async createCourse(newCourseData,id) {
-        const connection = await sql.connect(dbConfig);
+    static async createCourse(newCourseData) {
+        let pool;
         try {
+            pool = await sql.connect(dbConfig);
             const sqlQuery = `
-                INSERT INTO Courses (UserID, Title, Description, Category, Level, Duration, CreatedAt, CourseImage)
-                VALUES (@UserID, @Title, @Description, @Category, @Level, @Duration, @CreatedAt, @CourseImage);
+                INSERT INTO Courses (UserID, Title, Description, Category, Level, Duration, CourseImage)
+                VALUES (@UserID, @Title, @Description, @Category, @Level, @Duration, @CourseImage);
                 SELECT SCOPE_IDENTITY() AS CourseID;
             `;
-            const request = connection.request();
-            request.input("UserID", sql.Int, id);
-            request.input("Title", sql.NVarChar, newCourseData.title);
-            request.input("Description", sql.NVarChar, newCourseData.description);
-            request.input("Category", sql.NVarChar, newCourseData.category);
-            request.input("Level", sql.NVarChar, newCourseData.level);
-            request.input("Duration", sql.Int, newCourseData.duration);
-            request.input("CreatedAt", sql.DateTime, new Date());
-            request.input("CourseImage", sql.VarBinary, newCourseData.courseImage);
+            const request = pool.request();
+            request.input('UserID', sql.Int, newCourseData.UserID);
+            request.input('Title', sql.NVarChar, newCourseData.title);
+            request.input('Description', sql.NVarChar, newCourseData.description);
+            request.input('Category', sql.NVarChar, newCourseData.category);
+            request.input('Level', sql.NVarChar, newCourseData.level);
+            request.input('Duration', sql.Int, newCourseData.duration);
+            request.input('CourseImage', sql.NVarChar, newCourseData.CourseImage);
 
             const result = await request.query(sqlQuery);
             const newCourseID = result.recordset[0].CourseID;
-
             return newCourseID;
         } catch (error) {
             console.error('Error creating course:', error);
             throw error;
         } finally {
-            await connection.close();
+            if (pool) pool.close();
         }
-    }  
+    }
+
     
     // get course image for course.html course container 
     static async getCourseImage(id){
