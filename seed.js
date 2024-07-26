@@ -160,7 +160,7 @@ async function run() {
             user_id INT NOT NULL,
             quiz_id INT NOT NULL,
             attempt_date DATETIME DEFAULT GETDATE(),
-            score INT,
+            score DECIMAL(10,1),
             time_taken INT, -- Time taken in seconds
             passed BIT,
             FOREIGN KEY (user_id) REFERENCES Users(id),
