@@ -108,6 +108,7 @@ function startTriviaQuiz(quiz) {
     console.log("Selected Quiz:", quiz); // Log selected quiz
     sessionStorage.setItem('currentTriviaQuiz', JSON.stringify(quiz));
     startTime = new Date(); // Start the timer
+    startTimer(); // Start the timer
     // Directly start the quiz
     startQuiz();
 }
@@ -118,6 +119,26 @@ function startQuiz() {
     document.getElementById('quiz-questions').classList.remove('hidden');
     initializeQuiz(JSON.parse(sessionStorage.getItem('currentTriviaQuiz')));
 }
+
+function startTimer() {
+    const timerElement = document.getElementById('timer');
+    timerInterval = setInterval(() => {
+        const currentTime = new Date();
+        const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+        
+        const minutes = Math.floor(elapsedTime / 60);
+        const seconds = elapsedTime % 60;
+        const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        timerElement.innerText = `Time: ${formattedTime}`;
+    }, 1000);
+}
+
+
+function stopTimer() {
+    clearInterval(timerInterval);
+}
+
 
 let currentQuestionIndex = 0;
 let quizData = null;
@@ -203,6 +224,7 @@ function prevQuestion() {
 async function submitQuiz() {
     const endTime = Date.now(); // End the timer
     const timeTaken = Math.floor((endTime - startTime) / 1000); // Calculate time taken in seconds
+    stopTimer(); // Stop the timer
     console.log("User Answers:", userAnswers); // Log user answers
 
     // Fetch user information
