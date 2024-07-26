@@ -59,3 +59,16 @@ This is the final submission. All functions and pages proposed during Checkpoint
 - visualAcuityQns3.jpg: [Source](https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQUnVy4svQ0XYzx7RfBgLvjT-h8eFs9Bkw11pvNL_YdzXAU11gy)
 - visualAcuityQns4.jpg: [Source](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRncOMoIQIEy1WAclvLD5ySXeWL3xpiGVEKCApNR3XPjYzPtBa_)
 - visualAcuityQns5.jpg: [Source](https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRiWWAhE29OPpyWXlM5i25qt0VvfIfyOhEqEbvpU24-mtF4LQ4t)
+
+- course1.jpeg [Source](https://www.in3labs.com/regular-classes-intake/in3labs2-2/)
+
+### Videos
+- video1.mp4  [Source](https://sample-videos.com/)
+- video2.mp4  [Source](https://sample-videos.com/)
+
+### 3rd Part API 
+**Wei Ying:** Vimeo Videos and search functionality are powered by the [Vimeo API](https://developer.vimeo.com/api).
+
+
+
+
