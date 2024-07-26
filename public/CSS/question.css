@@ -24,12 +24,12 @@ main {
     margin-bottom: 15px; /* Reduce margin */
     padding: 15px; /* Reduce padding */
     color: #ffffff;
-    text-align: center; /* Center align the text inside the card */
 }
 
 .question-card h3 {
     font-size: 20px; /* Further reduced font size */
     margin: 0 0 8px;
+    text-align: left; /* Align the question text to the left */
 }
 
 .question-card img {
@@ -37,6 +37,13 @@ main {
     height: 200px; /* Reduced fixed height */
     object-fit: contain; /* Maintain aspect ratio */
     margin-bottom: 10px; /* Reduced margin for better spacing */
+}
+
+.question-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align the options */
+    text-align: center; /* Center align the text inside the options */
 }
 
 .question-card label {
@@ -50,13 +57,14 @@ main {
     transition: background-color 0.3s, color 0.3s; /* Add transition for background and color */
     background-color: #ffffff; /* Background color of labels */
     color: #1b2b40; /* Text color of labels */
+    width: 100%; /* Full width for better alignment */
 }
 
 .question-card label:hover {
     background-color: #34495E; /* Change background color on hover */
     color: #ffffff; /* Change text color on hover */
     border-color: #d9aa52;
-    border-width: 2px; /* Set border width to 2px or any other desired thickness */    
+    border-width: 2px; /* Set border width to 2px or any other desired thickness */
 }
 
 .question-card input[type="radio"] {
@@ -94,6 +102,9 @@ main {
     display: flex;
     justify-content: space-between; /* Distribute buttons evenly */
     margin-top: 15px; /* Reduced margin to move it down */
+    gap: 10px; /* Add gap between the buttons */
+    width: 90%; /* Match the width of the question container */
+    margin: 0 auto; /* Center the container */
 }
 
 #prev-button, #next-button {
@@ -106,7 +117,7 @@ main {
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
     display: inline-block; /* Inline block for better alignment */
-    margin: 10px; /* Margin to separate buttons */
+    width: 150px; /* Fixed width to ensure same size */
 }
 
 #prev-button:hover, #next-button:hover {
@@ -116,8 +127,4 @@ main {
 
 #prev-button {
     visibility: hidden; /* Hide but reserve space */
-}
-
-#next-button {
-    margin-left: auto; /* Push next button to the right */
 }
