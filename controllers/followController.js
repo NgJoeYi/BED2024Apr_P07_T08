@@ -3,7 +3,6 @@ const discussionModel = require('../models/Discussion');
 
 // Controller functions
 
-
 const followUser = async (req, res) => {
     const followerId = req.user.id;
     const { followeeId } = req.body;

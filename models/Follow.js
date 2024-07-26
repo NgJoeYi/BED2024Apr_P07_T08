@@ -69,11 +69,13 @@ class Follow {
             const result = await pool.request()
                 .input('userId', sql.Int, userId)
                 .query(`
-                    SELECT d.*, u.name AS username, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role, d.user_id
+                    SELECT d.*, u.name AS username, ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role, d.user_id,
+                           CASE WHEN f2.FollowerId IS NOT NULL THEN 1 ELSE 0 END AS isFollowing
                     FROM Discussions d
                     JOIN Follow f ON f.FolloweeId = d.user_id
                     LEFT JOIN Users u ON d.user_id = u.id
                     LEFT JOIN ProfilePic p ON u.id = p.user_id
+                    LEFT JOIN Follow f2 ON f2.FolloweeId = d.user_id AND f2.FollowerId = @userId
                     WHERE f.FollowerId = @userId
                     ORDER BY d.posted_date DESC
                 `);
@@ -90,12 +92,13 @@ class Follow {
                 profilePic: row.profilePic,
                 role: row.role,
                 pinned: row.pinned,
-                user_id: row.user_id // Ensure this is included
+                user_id: row.user_id,
+                isFollowing: row.isFollowing // Include follow status
             }));
         } catch (err) {
             throw new Error(`Error getting followed discussions: ${err.message}`);
         }
     }
-}
+}    
 
 module.exports = Follow;
