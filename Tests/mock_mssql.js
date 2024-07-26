@@ -11,11 +11,16 @@ const mockConnect = jest.fn().mockResolvedValue({
 });
 
 const mockMssql = {
-  connect: mockConnect,
-  close: jest.fn(),
-  request: jest.fn(() => mockRequest),
-  Int: 'Int',
-  NVarChar: 'NVarChar',
+  connect: jest.fn().mockResolvedValue({
+      request: jest.fn().mockReturnThis(),
+      close: jest.fn(),
+      query: jest.fn(),
+      Int: 'Int',
+      NVarChar: 'NVarChar',
+  }),
 };
+
+jest.mock('mssql', () => mockMssql);
+
 
 module.exports = mockMssql;
