@@ -384,10 +384,10 @@ const updateQuestion = async (req, res) => {
         // ------------------------------------------------------------------------------------------------ Validate that the correct option is one of the provided options
         // Validate that the correct option is one of the provided options
         const options = [
-            newQuestionData.option_1.toLowerCase(),
-            newQuestionData.option_2.toLowerCase(),
-            newQuestionData.option_3.toLowerCase(),
-            newQuestionData.option_4.toLowerCase()
+            newQuestionData.option_1,
+            newQuestionData.option_2,
+            newQuestionData.option_3,
+            newQuestionData.option_4
         ];
 
         // Convert correct_option to a zero-based index
