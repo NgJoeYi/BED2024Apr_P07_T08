@@ -84,7 +84,7 @@ function displayTriviaQuizzes(quizzes) {
         const startButton = document.createElement('button');
         startButton.innerText = 'Start Quiz';
         startButton.onclick = () => {
-            const token = localStorage.getItem('token'); // fetch token from localStorage
+            const token = sessionStorage.getItem('token'); // fetch token from localStorage
             if (token) {
                 startTriviaQuiz(quiz);
             } else {
