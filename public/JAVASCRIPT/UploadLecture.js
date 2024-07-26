@@ -44,12 +44,17 @@ async function fetchLastChapterName() {
 
 // UPLOAD LECTURES
 async function addLecture() {
+    // Fetch the last chapter name from the server
+    const previousChapterName = await fetchLastChapterName();
     const title = document.getElementById('lectureName').value.trim();
     const duration = document.getElementById('duration-lecture').value.trim();
     const description = document.getElementById('description').value.trim();
     const localFileOption = document.getElementById("localFileOption").checked;
     const videoFileInput = document.getElementById('videoFiles');
-    const chapterName = document.getElementById('chapterName').value.trim();
+    const chapterNameInput = document.getElementById('chapterName').value.trim();
+    
+    // Determine the chapter name to use
+    let chapterName = chapterNameInput || previousChapterName;
 
     // Check if all required fields are filled
     if (!title || !duration || !description || (localFileOption && videoFileInput.files.length === 0)) {
@@ -73,6 +78,12 @@ async function addLecture() {
         return;
     }
 
+    // Check if chapter name is empty and if it's the first upload
+    if (!chapterName && !previousChapterName) {
+        alert('Please enter a chapter name.');
+        return;
+    }
+
     // Create a FormData object to hold the form data
     const formData = new FormData();
     formData.append('title', title);
@@ -85,7 +96,6 @@ async function addLecture() {
         formData.append('lectureVideo', videoFileInput.files[0]);
     } else {
         const selectedVideo = document.querySelector('.vimeo-video');
-        console.log('SELECTED :', selectedVideo);
         if (!selectedVideo) {
             alert('Please select a Vimeo video.');
             return;
@@ -140,6 +150,7 @@ async function addLecture() {
 // Search Vimeo videos
 async function fetchVimeoVideos() {
     const searchQuery = document.getElementById('vimeoSearch').value;
+    console.log('Searching for Vimeo videos with query:', searchQuery); // Log the search query
     try {
         const response = await fetch(`/lectures/search/vimeo-videos?search=${encodeURIComponent(searchQuery)}`);
         if (!response.ok) {
@@ -148,19 +159,29 @@ async function fetchVimeoVideos() {
             throw new Error('Failed to fetch Vimeo videos');
         }
         const data = await response.json();
-        alert(data.message);
-        displayVimeoVideos(data);
+        console.log('Vimeo search result:', data); // Log the API response
+        if (data.videos && data.videos.data.length > 0) {
+            alert(data.message);
+            displayVimeoVideos(data);
+        } else {
+            alert('No videos found for the search query.');
+            displayVimeoVideos({ videos: { data: [] } }); // Clear previous results
+        }
     } catch (error) {
         console.error('Error fetching Vimeo videos:', error);
+        alert('Error fetching Vimeo videos.');
     }
 }
+
 
 // Display Vimeo videos
 function displayVimeoVideos(data) {
     const container = document.getElementById('vimeoVideoResults');
+    
     container.innerHTML = ''; // Clear previous results
 
     if (data.videos && data.videos.data.length > 0) {
+        document.getElementById('vimeoVideoResults').style.display = 'flex'; // Ensure it's visible
         data.videos.data.forEach((video, index) => {
             const videoElement = document.createElement('div');
             videoElement.classList.add('vimeo-video');
@@ -201,12 +222,13 @@ function selectVimeoVideo(video, selectedId) {
 
     // Show only the selected video container
     const selectedContainer = document.getElementById(selectedId);
-    console.log(selectedContainer);
+    console.log('Selected video container:', selectedContainer); // Log selected video container
     selectedContainer.style.display = 'block';
 
     // Handle the selected video, e.g., set the video URL to a hidden input field
     console.log('Selected video:', video);
 }
+
 
 // Generates HTML code to display the lecture
 function displayNewLecture(newLecture, videoFiles) {
