@@ -210,7 +210,7 @@ const getMaxCourseID = async (req, res) => {
 // Create a new lecture
 const createLecture = async (req, res) => {
     const { title, duration, description, chapterName, courseID } = req.body;
-    const userID = req.user.id;
+    const userID = req.user.id; // extract userID from jwt 
 
     if (!userID) {
         console.error("UserID not provided");
@@ -221,12 +221,28 @@ const createLecture = async (req, res) => {
         return res.status(400).json({ message: "CourseID not provided" });
     }
 
-    if (!req.files || !req.files.lectureVideo) {
+    console.log('videovimeourl',req.body.vimeoVideoUrl );
+    console.log(req.body.vimeoVideoUrl == null);
+    if ( !req.files && !req.files.lectureVideo && req.body.vimeoVideoUrl == null ) {
         console.error("Video not provided");
         return res.status(400).json({ message: "Video not provided" });
     }
 
-    const videoFilename = req.files.lectureVideo[0].filename;
+    // Check if either a local video file or Vimeo URL is provided
+    let videoFilename = null;
+    let vimeoVideoUrl = req.body.vimeoVideoUrl || null;
+    console.log('vimeovideourl:',vimeoVideoUrl);
+
+    // If there are files in the request and a local video is uploaded
+    if (req.files && req.files.lectureVideo) {
+        videoFilename = req.files.lectureVideo[0].filename;
+    }
+
+    // If neither local video nor Vimeo URL is provided, return an error
+    if (!videoFilename && !vimeoVideoUrl) {
+        console.error("Video not provided");
+        return res.status(400).json({ message: "Video not provided" });
+    }
 
     try {
         const position = await Lectures.getCurrentPositionInChapter(chapterName);
@@ -239,7 +255,7 @@ const createLecture = async (req, res) => {
             description,
             position,
             chapterName,
-            video: videoFilename, // Only the filename is saved
+            video: videoFilename || vimeoVideoUrl, // Only the filename / vimeo URL is saved
         };
 
         console.log('NEW LECTURE DATA:', newLectureData);
@@ -321,7 +337,6 @@ const checkingUserID = async (req, res) => {
 // VIMEO API 
 const accessToken = process.env.VIMEO_ACCESS_TOKEN;
 async function getVimeoVideos(req, res) {
-    console.log('getvimeovideo');
     try {
         const searchQuery = req.query.search || ''; // Get the search query from the request
         const response = await fetch(`https://api.vimeo.com/videos?query=${searchQuery}`, {
@@ -333,9 +348,13 @@ async function getVimeoVideos(req, res) {
         if (!response.ok) {
             throw new Error('Failed to fetch videos from Vimeo');
         }
-
+        console.log('searching for vimeo video...');
         const data = await response.json();
-        res.json(data);
+        res.json({
+            message: "Searching for Vimeo video...",
+            videos: data
+        });
+        
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
