@@ -113,11 +113,14 @@ app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, qu
 app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 
+
+//--------------------------------------------------------RAEANN---------------------------------------------------------------------------------------------
 // for follow
 app.post('/follow',  jwtAuthorization.verifyJWT,  followController.followUser);
 app.post('/unfollow',  jwtAuthorization.verifyJWT,  followController.unfollowUser);
 app.get('/followed-discussions',  jwtAuthorization.verifyJWT,  followController.getFollowedDiscussions);
 app.get('/follow-status',  jwtAuthorization.verifyJWT,followController.checkFollowStatus);
+app.get('/following-count', jwtAuthorization.verifyJWT, followController.getFollowingCount);
 
 
 // Add Routes for discussions
@@ -137,6 +140,8 @@ app.post('/discussions/:id/unpin', jwtAuthorization.verifyJWT, discussionControl
 
 //RAEANN GEMINI API
 app.get('/discussions/:id/suggestions',jwtAuthorization.verifyJWT, discussionController.getSuggestionsForDiscussion);
+
+//--------------------------------------------------------RAEANN---------------------------------------------------------------------------------------------
 
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
