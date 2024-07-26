@@ -1,53 +1,61 @@
-# BED2024Apr_P07_T8
-
-### Version Control
-- The team leader should create a remote GitHub repository named `BED2024Apr_P<x>_T<y>`, where `<x>` is your tutorial group number and `<y>` is your assignment team number or name.
-- Give everyone in your group and your tutor collaborator rights.
-
-### Collaboration with Git
-- All members should clone the remote repository from Visual Studio Code.
-- During development, regularly pull the latest changes from the repository to see updates from others.
-- Whenever you're done working on a part of your features, push your completed code to the repository for everyone to access.
-- This way, everyone stays on the same page and can build upon each other's work.
-- Try experimenting with Git branches and GitHub Pull Requests!
-
-### Database Creation
-- Work together to finalize the SQL script to create all the tables needed for your assignment and populate them with appropriate data.
-- Each member should run the script on their local SQL Server to create the database you'll use for coding.
-
-### Communication
-- Use the GitHub repository and MS Teams to share information and files related to the assignment.
-
-### Back Up Your Work
-- Always back up your code and keep different versions on an external or cloud storage.
-- Remember, while version control helps, it's good practice to have a personal backup in case of unexpected issues.
-
-## Checkpoint 2 (10%, Due in Week 11)
-At this stage, you should have partially completed the proposed functions.
-
-### Deliverables
-- **Assignment Cover Page**: Indicate the Student ID and name of each student in the team, with the individual functions completed at this stage, as well as the link to the GitHub repository which contains the source code.
-  - Note: You should have done at least one GET function and one POST/PUT/DELETE function at this stage.
-- **Individual Video**: Not exceeding 5 minutes from each student demonstrating functions completed or errors encountered (if the function done failed) at this stage.
-- **Back-End Application Source Code**: Media files from all team members placed in appropriate sub-folders.
-- **Database Script and Environment Files**: For creation of a database that supports the back-end application, sample data should be provided in those files.
-  - Note: Compress the above files as one zipped file and submit this zipped file to POLITEMall.
+# BED2024Apr_P07_T08
 
 ## Checkpoint 3 (80%, Due in Week 15)
-This is the final submission; you should have completed all functions and pages proposed during Checkpoint 1 submission.
+
+This is the final submission. All functions and pages proposed during Checkpoint 1 should be completed.
 
 ### Deliverables
-- **Assignment Cover Page**: Indicate the Student ID and name of each student in the team, with the individual functions in charge by each student, as well as the link to the GitHub repository which contains the source code.
-- **Group Video**: Not exceeding 40 minutes, including the following contents:
-  - Introduce the overall application structure.
-  - Demonstrate the functions that have been done as a team.
-  - Demonstrate the functions implemented individually, mentioning the student’s name in the video when presenting each function.
-- **Front-End and Back-End Application**: Source code and media files from all team members placed in appropriate sub-folders.
-- **Updated Database Script and Environment Files**: For creation of a database that supports the back-end application, sample data should be provided in those files.
-- **API Documentation**: If the advanced feature is implemented.
-  - Note: Compress the above files as one zipped file and submit this zipped file to POLITEMall.
 
-## CREDITS
-- [bcrypt to compare hashed stored password in database](https://stackoverflow.com/questions/40076638/compare-passwords-bcryptjs)
-- <a href="https://www.freepik.com/free-vector/hand-drawn-glossary-illustration_41099328.htm#fromView=search&page=1&position=4&uuid=6caa4ec3-e237-437b-b17f-5bdb2c55dbef">Image by pikisuperstar on Freepik</a>
-- https://www.canva.com/
+1. **Assignment Cover Page**
+    - Indicate the Student ID and name of each student in the team.
+    - Include the individual functions each student is in charge of.
+    - Provide the link to the GitHub repository containing the source code.
+
+2. **Group Video** (Not exceeding 40 minutes)
+    - Introduce the overall application structure.
+    - Demonstrate the functions completed as a team.
+    - Demonstrate the functions implemented individually, mentioning the student’s name in the video when presenting each function.
+
+3. **Front-End and Back-End Application**
+    - Source code and media files from all team members placed in appropriate sub-folders.
+
+4. **Updated Database Script and Environment Files**
+    - Include scripts for creating a database that supports the back-end application.
+    - Provide sample data in those files.
+
+5. **API Documentation** (if the advanced feature is implemented).
+
+### Submission Instructions
+- Compress all the above files into one zipped file.
+- Submit this zipped file to POLITEMall.
+
+## Credits
+
+- [Image by pikisuperstar on Freepik](https://www.freepik.com/free-vector/hand-drawn-glossary-illustration_41099328.htm#fromView=search&page=1&position=4&uuid=6caa4ec3-e237-437b-b17f-5bdb2c55dbef)
+- [Canva](https://www.canva.com/)
+
+### Images
+- astigmatismQns1.jpg: [Source](https://www.nvisioncenters.com/wp-content/uploads//astigmatism-test-2.png)
+- astigmatismQns2.jpg: [Source](https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQGiSl8ukq5HC8cHpCCBi14Swjd8MvbRkkQodlzsSByqYIACPkY)
+- astigmatismQns3.jpg: [Source](https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQPoT8IUa6fmvQo2TKeoz_u5xHVaqggA_7P0dBLE-Ja0WOsiC0V)
+- astigmatismQns4.jpg: [Source](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXwsxBdTyfufz1EjCclbqbwVWL5_0NLHQniM4vvTrsfHxlj1Tr)
+- astigmatismQns5.jpg: [Source](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYh5g2JJQCWHqySg5ZGjTCMChnVlg6uA0uRyf60IDL9LSRf5t_)
+- colourBlindPlaceHolder.jpg: [Source](https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcR_rVn6qCpdkrYTgcHKVGvhwC0wiKY87d9ZivePP_rzhAAqMIiS)
+- colourBlindQns1.jpg: [Source](https://images.fineartamerica.com/images-medium-large-5/9-colour-blindness-test-science-photo-library.jpg)
+- colourBlindQns2.jpg: [Source](https://m.psecn.photoshelter.com/img-get/I0000m.cZNMo.HjY/s/860/860/Fphoto-27019212A-2DS.jpg)
+- colourBlindQns3.jpg: [Source](https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRA5tS-Qk429tZ5pF3E0V_xgFkrKjlDiAR1pNG3qAiS-VKFeycH)
+- colourBlindQns4.jpg: [Source](https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRdup0PVJs0w90h0XnMA8qK98kRDptpZWnJYpkvlFJVZEOGtHCE)
+- colourBlindQns5.jpg: [Source](https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQbQ4PtvjFDPYqWi2rU_F4RVmvrOzQdNm77YLcjszRhEdTwAFaZ)
+- depressionPlaceHolder.jpg: [Source](https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQKfY1iQSc3o9pXL3UK1KD1ALuJg1xki_oUBJnx7daDbE8K5osz)
+- dysgraphiaPlaceHolder.jpg: [Source](https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQiCuq7XL97LTTdB3NxIviisUhR6cRxyFq7mOjTUJiG72akrWSB)
+- dyslexiaPlaceHolder.jpg: [Source](https://www.canva.com/)
+- macularDegenerationQns1.jpg: [Source](https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSDIMiFOS8ff8bt668Uyp4BRE0CEahsXfjvg1qcCiBraj66sJBz)
+- macularDegenerationQns2.jpg: [Source](https://www.retinagozhastanesi.com/en/assets/images/httimg/amsler-grid-5.jpg)
+- macularDegenerationQns3.jpg: [Source](https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSwS456HdqXz6Lak15n5M-5Q3Px4TLpEW7c63cQmkc3-pELspti)
+- macularDegenerationQns4.jpg: [Source](https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRIWF5rthNaSKhfx23CKzrbDWYxAsDBbSeZDq2ZTar-IPo0bAPj)
+- macularDegenerationQns5.jpg: [Source](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkyMHdIcirriol7rKAH9ncH32tkoMC117exeX2mTil8DgaOsfv)
+- visualAcuityQns1.jpg: [Source](https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTeZPYZMxf8J_G7DUASYw2rmZzLI1zpD__IT4jZ7RbpZz0cAM83)
+- visualAcuityQns2.jpg: [Source](https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSyJYlKYJtrNyFSmri8FVpB451_FohqFgwbSaLkQHo-NnZeiF3v)
+- visualAcuityQns3.jpg: [Source](https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQUnVy4svQ0XYzx7RfBgLvjT-h8eFs9Bkw11pvNL_YdzXAU11gy)
+- visualAcuityQns4.jpg: [Source](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRncOMoIQIEy1WAclvLD5ySXeWL3xpiGVEKCApNR3XPjYzPtBa_)
+- visualAcuityQns5.jpg: [Source](https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRiWWAhE29OPpyWXlM5i25qt0VvfIfyOhEqEbvpU24-mtF4LQ4t)
