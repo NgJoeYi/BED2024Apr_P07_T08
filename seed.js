@@ -6,7 +6,7 @@ const path = require('path');
 
 async function run() {
     try {
-        // Connect to the database
+        // Connect to the databasef
         const connection = await sql.connect(dbConfig);
 
         // Remove foreign keys

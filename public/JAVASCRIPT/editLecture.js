@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Create FormData object from the form
             const formData = new FormData(form);
             const lectureVideoInput = document.getElementById('lectureVideoInput');
-            const presentVideoElement = document.getElementById('lectureVideo');
 
             console.log('FormData before appending:', Array.from(formData.entries()));
 
@@ -51,10 +50,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     alert('No video file selected. Please choose a video file.');
                     return;
                 }
-            } else if (presentVideoElement.src) {
-                console.log('Using existing lecture video:', presentVideoElement.src);
-            }
-
+            } 
             try {
                 // Log final FormData before sending
                 for (const [key, value] of formData.entries()) {
