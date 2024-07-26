@@ -140,9 +140,10 @@ async function addLecture() {
 async function fetchVimeoVideos() {
     const searchQuery = document.getElementById('vimeoSearch').value;
     try {
-        const response = await fetch(`/lectures/vimeo-videos?search=${encodeURIComponent(searchQuery)}`);
+        const response = await fetch(`/lectures/search/vimeo-videos?search=${encodeURIComponent(searchQuery)}`);
         if (!response.ok) {
-            alert('Something went wrong while fetching Vimeo videos.');
+            const errorData = await response.json(); // Extract error message
+            alert(`Error: ${errorData.error || 'Failed to fetch Vimeo videos'}`);
             throw new Error('Failed to fetch Vimeo videos');
         }
         const data = await response.json();

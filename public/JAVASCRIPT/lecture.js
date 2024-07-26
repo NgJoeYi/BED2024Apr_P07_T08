@@ -284,16 +284,42 @@ async function setVideo(lectureID) {
 
     try {
         const response = await fetch(`/video/${lectureID}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const videoBlob = await response.blob();
-        const videoUrl = URL.createObjectURL(videoBlob);
-        videoIframe.src = videoUrl;
-        videoIframe.dataset.lectureId = lectureID; // Set the data attribute
+        if (response.ok) {
+            const videoBlob = await response.blob();
+            const videoUrl = URL.createObjectURL(videoBlob);
+            videoIframe.src = videoUrl;
+            videoIframe.dataset.lectureId = lectureID;
+        } else if (response.status === 404) {
+            const vimeoEmbedUrl = await fetchVimeoVideoDetails(lectureID);
+            if (vimeoEmbedUrl) {
+                videoIframe.src = vimeoEmbedUrl;
+                videoIframe.dataset.lectureId = lectureID;
+            } else {
+                console.error('No video URL returned from Vimeo');
+            }
+        }
     } catch (error) {
         console.error('Error setting video:', error);
-        // Logs any errors encountered while setting the video.
     }
 }
+
+
+
+async function fetchVimeoVideoDetails(lectureID) {
+    try {
+        const response = await fetch(`/lectures/vimeo-video/${lectureID}`);
+        if (!response.ok) throw new Error('Failed to fetch Vimeo video details');
+        const data = await response.json();
+        console.log('Vimeo video details:', data);
+        // Construct the Vimeo embed URL
+        return `https://player.vimeo.com/video/${data.video.uri.split('/').pop()}`;
+    } catch (error) {
+        console.error('Error fetching Vimeo video details:', error);
+    }
+}
+
+
+
 
 // Brings user to the edit lecture page if they have permission
 async function editLecture(button) {

@@ -180,7 +180,8 @@ app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCo
 
 
 // route for vimeo API 
-app.get('/lectures/vimeo-videos',lectureController.getVimeoVideos);
+app.get('/lectures/search/vimeo-videos',lectureController.searchVimeoVideo);
+app.get('/lectures/vimeo-video/:id', lectureController.getVimeoVideo);
 
 // Add Routes for lectures
 app.get('/lectures/checking', jwtAuthorization.verifyJWT, lectureController.checkingUserID); // get current user ID 
