@@ -88,29 +88,28 @@ app.post('/register', userValidation, userController.createUser);
 app.post('/login', userController.loginUser);
 
 // Add Routes for account management
-app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById);
-app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId);
+app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById); // need token to see account details
+app.get('/account/profile', jwtAuthorization.verifyJWT, userController.getProfilePicByUserId); // need token to see profile picture
 app.get('/account/getAllAttemptCount', jwtAuthorization.verifyJWT, quizController.getAllAttemptCount);  // quiz related
 app.get('/account/getAttemptCountByQuizId', jwtAuthorization.verifyJWT, quizController.getAttemptCountByQuizId);  // quiz related
 app.get('/account/quizResult', jwtAuthorization.verifyJWT, quizController.getAllQuizResultsForUser); // question related
-app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController.updateProfilePic);
-app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser);
-app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser);
+app.post('/account/uploadProfilePic', jwtAuthorization.verifyJWT, userController.updateProfilePic); // need token to update profile pic
+app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController.updateUser); // need to token to update account details
+app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser); // need token to delete account
 
 // Add Routes for quizzes
-app.get('/quizzes/trivia', jwtAuthorization.verifyJWT, quizController.fetchTriviaQuizzes); // Add the new route for fetching trivia quizzes
+app.get('/quizzes/trivia', jwtAuthorization.verifyJWT, quizController.fetchTriviaQuizzes); // route for fetching trivia quizzes
 app.get('/quizzes/statistics', quizController.getQuizPassFailStatistics); // users not logged in can see
 app.get('/quizzes', quizController.getAllQuizWithCreatorName); // users not logged in can see
-app.get('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.getQuizById);
 app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
 app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
-app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuiz);
+app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuiz); // route to create quiz
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionAfterQuizCreation); // question form AFTER quiz creation // quiz.js
 app.post('/quizzes/:id/questions/update', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionOnUpdate); // question form DURING edit question // editQuestion.js
 app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuiz, quizController.updateQuiz); // edit quiz
 app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
-app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz);
+app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz); // delete quiz by quiz id
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 
 
