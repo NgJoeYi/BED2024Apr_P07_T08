@@ -83,7 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Next question button event listener
     const nextButton = document.getElementById('next-question');
     if (nextButton) {
-        nextButton.addEventListener('click', showNextQuestion);
+        nextButton.addEventListener('click', () => {
+            if (checkUniqueOptions()) {
+                showNextQuestion();
+            } else {
+                alert('Options must have unique content');
+            }
+        });
     }
 
     // Previous question button event listener
@@ -471,6 +477,17 @@ function showPreviousQuestion() {
         document.getElementById('question-modal').style.display = 'none';
         document.getElementById('quiz-modal').style.display = 'block';
     }
+}
+
+function checkUniqueOptions() {
+    const option1 = document.getElementById('option_1').value.trim();
+    const option2 = document.getElementById('option_2').value.trim();
+    const option3 = document.getElementById('option_3').value.trim();
+    const option4 = document.getElementById('option_4').value.trim();
+
+    const optionsSet = new Set([option1, option2, option3, option4]);
+
+    return optionsSet.size === 4;
 }
 
 // Update quiz modal handling functions
