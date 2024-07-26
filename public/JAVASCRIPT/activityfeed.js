@@ -201,6 +201,7 @@ function addDiscussionToFeed(discussion, feedType) {
                 <div class="username">${capitalizedUsername}</div>
                 <div class="role">(${discussion.role})</div>
                 <button class="follow-button" data-user-id="${discussion.user_id}">Checking...</button>
+                <button class="suggestion-button" data-id="${discussion.id}">💡</button> <!-- Circular button for suggestions -->
             </div>
         </div>
         <div class="post-meta">
@@ -218,6 +219,7 @@ function addDiscussionToFeed(discussion, feedType) {
                 <span class="views-count">${viewsText}</span>
             </div>
             <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
+            <button class="pin-button" data-id="${discussion.id}">${discussion.pinned ? 'Unpin' : 'Pin'}</button> <!-- Button for pin/unpin -->
         </div>
     `;
 
@@ -233,6 +235,8 @@ function addDiscussionToFeed(discussion, feedType) {
     const dislikeButton = post.querySelector('.dislike-button');
     const commentButton = post.querySelector('.comment-button');
     const followButton = post.querySelector('.follow-button');
+    const suggestionButton = post.querySelector('.suggestion-button'); // Get the suggestion button
+    const pinButton = post.querySelector('.pin-button'); // Get the pin/unpin button
 
     checkFollowStatus(discussion.user_id)
         .then(isFollowing => {
@@ -281,8 +285,20 @@ function addDiscussionToFeed(discussion, feedType) {
             unfollowUser(followeeId, this);
         }
     });
-}
 
+    // Add event listener to suggestion button
+    suggestionButton.addEventListener('click', function () {
+        const discussionId = this.getAttribute('data-id');
+        showSuggestionsPopup(discussionId);
+    });
+
+    // Add event listener to pin/unpin button
+    pinButton.addEventListener('click', function () {
+        const discussionId = this.getAttribute('data-id');
+        const action = this.textContent.toLowerCase() === 'pin' ? 'pin' : 'unpin';
+        togglePinDiscussion(discussionId, action, this);
+    });
+}
 
 function incrementViews(discussionId) {
     fetchWithAuth(`/discussions/${discussionId}/view`, {
@@ -555,8 +571,68 @@ function checkFollowStatus(followeeId) {
     })
     .catch(error => {
         console.error('Error checking follow status:', error);
-        throw error;
+        throw error; // Removed the misplaced period and added a semicolon
     });
 }
 
 
+// for GEMINI API
+// Add this JavaScript to your script file
+async function showSuggestionsPopup(discussionId) {
+    try {
+        const token = getToken();
+        if (!token) {
+            throw new Error('No token provided');
+        }
+
+        // Fetch suggestions from the server
+        const response = await fetch(`/discussions/${discussionId}/suggestions`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            let suggestions = data.suggestions;
+
+            // Ensure suggestions is an array or convert it to an array
+            if (!Array.isArray(suggestions)) {
+                suggestions = [suggestions];
+            }
+
+            const suggestionsContainer = document.getElementById('suggestionsContainer');
+            suggestionsContainer.innerHTML = ''; // Clear previous suggestions
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(suggestion => {
+                    const suggestionElement = document.createElement('div');
+                    suggestionElement.classList.add('suggestion');
+                    suggestionElement.innerText = suggestion;
+                    suggestionsContainer.appendChild(suggestionElement);
+                });
+            } else {
+                const noSuggestionElement = document.createElement('div');
+                noSuggestionElement.classList.add('no-suggestion');
+                noSuggestionElement.innerText = 'No suggestions available.';
+                suggestionsContainer.appendChild(noSuggestionElement);
+            }
+
+            // Show the popup
+            document.getElementById('suggestionPopup').style.display = 'block';
+        } else {
+            console.error('Error fetching suggestions:', data.error);
+        }
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+    }
+}
+
+
+
+function closeSuggestionPopup() {
+    document.getElementById('suggestionPopup').style.display = 'none';
+}

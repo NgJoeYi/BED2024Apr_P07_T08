@@ -135,6 +135,9 @@ app.post('/discussions/:discussionId/view', jwtAuthorization.verifyJWT, discussi
 app.post('/discussions/:id/pin', jwtAuthorization.verifyJWT, discussionController.pinDiscussion);
 app.post('/discussions/:id/unpin', jwtAuthorization.verifyJWT, discussionController.unpinDiscussion);
 
+//RAEANN GEMINI API
+app.get('/discussions/:id/suggestions',jwtAuthorization.verifyJWT, discussionController.getSuggestionsForDiscussion);
+
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
 app.get('/comments/count', commentController.getCommentCount); 
