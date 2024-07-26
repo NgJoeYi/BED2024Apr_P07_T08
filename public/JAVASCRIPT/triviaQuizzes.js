@@ -42,7 +42,7 @@ function fetchTriviaQuizzes() {
                 displayTriviaQuizzes(quizzes);
             } else {
                 console.error('No trivia quizzes found');
-                document.getElementById('trivia-quiz-container').innerText = 'No trivia quizzes available.';
+                document.getElementById('trivia-quiz-container').innerHTML = '<div id="no-quizzes-message">No trivia quizzes available.</div>';
             }
         })
         .catch(error => console.error('Error fetching trivia quizzes:', error));
@@ -84,7 +84,7 @@ function displayTriviaQuizzes(quizzes) {
         const startButton = document.createElement('button');
         startButton.innerText = 'Start Quiz';
         startButton.onclick = () => {
-            const token = localStorage.getItem('token'); // fetch token from localStorage
+            const token = sessionStorage.getItem('token'); // fetch token from localStorage
             if (token) {
                 startTriviaQuiz(quiz);
             } else {

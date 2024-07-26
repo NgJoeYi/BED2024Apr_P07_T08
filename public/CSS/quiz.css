@@ -16,6 +16,8 @@ main {
     padding: 10px 20px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-weight: bold; /* Bold text */
+    margin: 5px; /* Add margin if needed */
 }
 
 .left-button:hover {
@@ -136,6 +138,7 @@ main {
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
     align-self: center;
+    font-weight: bold; /* Bold text */
 }
 
 .quiz-card button:hover {
