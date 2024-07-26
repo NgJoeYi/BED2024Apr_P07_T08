@@ -64,9 +64,12 @@ async function run() {
             likes INT DEFAULT 0,
             dislikes INT DEFAULT 0,
             views INT DEFAULT 0,
-            pinned BIT DEFAULT 0,  
+            pinned BIT DEFAULT 0,
+            liked_by NVARCHAR(MAX), -- New column to store user IDs who liked the discussion
+            disliked_by NVARCHAR(MAX), -- New column to store user IDs who disliked the discussion
             FOREIGN KEY (user_id) REFERENCES Users(id)
         );
+
 
         CREATE TABLE Follow (
             Id INT IDENTITY(1,1) PRIMARY KEY,
