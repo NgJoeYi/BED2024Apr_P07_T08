@@ -434,3 +434,23 @@ input[readonly] {
     cursor: not-allowed;
     background-color: #f5f5f5;
 }
+
+/* Update Quiz Image Preview Container */
+#update-quiz-img-preview-container {
+    width: 150px; /* Adjust width as needed */
+    height: 150px; /* Adjust height as needed */
+    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Update Quiz Image Preview */
+#update_quiz_img_preview {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover; /* Ensure the image covers the container while maintaining its aspect ratio */
+    margin-bottom: 15px;
+}
