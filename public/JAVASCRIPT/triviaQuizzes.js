@@ -40,9 +40,8 @@ function fetchTriviaQuizzes() {
         .then(response => response.json())
         .then(data => {
             console.log("Fetched Trivia Quizzes Data:", data); // Log fetched data
-            const quizzes = data;
-            if (quizzes && quizzes.length > 0) {
-                displayTriviaQuizzes(quizzes);
+            if (data && Object.keys(data).length > 0) {
+                displayTriviaQuizzes(data);
             } else {
                 console.error('No trivia quizzes found');
                 document.getElementById('trivia-quiz-container').innerHTML = '<div id="no-quizzes-message">No trivia quizzes available.</div>';
@@ -51,13 +50,17 @@ function fetchTriviaQuizzes() {
         .catch(error => console.error('Error fetching trivia quizzes:', error));
 }
 
+
 // Display trivia quizzes from the API
-function displayTriviaQuizzes(quizzes) {
-    console.log("Displaying Trivia Quizzes:", quizzes); // Log quizzes to be displayed
+function displayTriviaQuizzes(groupedQuizzes) {
+    console.log("Displaying Trivia Quizzes:", groupedQuizzes); // Log quizzes to be displayed
     const triviaQuizContainer = document.getElementById('trivia-quiz-container');
     triviaQuizContainer.innerHTML = '';
 
-    quizzes.forEach((quiz, index) => {
+    Object.keys(groupedQuizzes).forEach(category => {
+        const categoryContainer = document.createElement('div');
+        categoryContainer.className = 'category-container';
+
         const quizCard = document.createElement('div');
         quizCard.className = 'quiz-card';
 
@@ -66,18 +69,14 @@ function displayTriviaQuizzes(quizzes) {
         quizCardContent.className = 'quiz-card-content';
 
         const quizTitle = document.createElement('h3');
-        quizTitle.innerText = `Quiz ${index + 1}: ${quiz.category}`;
+        quizTitle.innerText = category;
         quizCardContent.appendChild(quizTitle);
-
-        const quizDescription = document.createElement('p');
-        quizDescription.innerText = quiz.question;
-        quizCardContent.appendChild(quizDescription);
 
         const quizDetails = document.createElement('p');
         quizDetails.className = 'quiz-details';
         quizDetails.innerHTML = `
-            <strong>Type:</strong> ${quiz.type} | 
-            <strong>Difficulty:</strong> ${quiz.difficulty}`;
+            <strong>Questions:</strong> ${groupedQuizzes[category].length} | 
+            <strong>Difficulty:</strong> ${groupedQuizzes[category][0].difficulty}`;
         quizCardContent.appendChild(quizDetails);
 
         const buttonContainer = document.createElement('div');
@@ -89,7 +88,7 @@ function displayTriviaQuizzes(quizzes) {
         startButton.onclick = () => {
             const token = sessionStorage.getItem('token'); // fetch token from localStorage
             if (token) {
-                startTriviaQuiz(quiz);
+                startTriviaQuiz(groupedQuizzes[category], 0); // Start with the first question
             } else {
                 alert('No token found. Please log in.'); // Alert the user to log in
                 window.location.href = 'login.html'; // Redirect to login page
@@ -99,14 +98,18 @@ function displayTriviaQuizzes(quizzes) {
 
         quizCardContent.appendChild(buttonContainer);
         quizCard.appendChild(quizCardContent);
-        triviaQuizContainer.appendChild(quizCard);
+        categoryContainer.appendChild(quizCard);
+
+        triviaQuizContainer.appendChild(categoryContainer);
     });
 }
 
-function startTriviaQuiz(quiz) {
+
+function startTriviaQuiz(quizList, questionIndex) {
     // Save the selected quiz question to session storage
-    console.log("Selected Quiz:", quiz); // Log selected quiz
-    sessionStorage.setItem('currentTriviaQuiz', JSON.stringify(quiz));
+    console.log("Starting Quiz:", quizList); // Log selected quiz list
+    sessionStorage.setItem('currentTriviaQuiz', JSON.stringify(quizList));
+    sessionStorage.setItem('currentQuestionIndex', questionIndex);
     startTime = new Date(); // Start the timer
     startTimer(); // Start the timer
     // Directly start the quiz
@@ -117,8 +120,11 @@ function startQuiz() {
     document.querySelector('.left-buttons-container').classList.add('hidden-buttons');
     document.getElementById('quiz-list').classList.add('hidden');
     document.getElementById('quiz-questions').classList.remove('hidden');
-    initializeQuiz(JSON.parse(sessionStorage.getItem('currentTriviaQuiz')));
+    const quizList = JSON.parse(sessionStorage.getItem('currentTriviaQuiz'));
+    const questionIndex = parseInt(sessionStorage.getItem('currentQuestionIndex'));
+    initializeQuiz(quizList, questionIndex);
 }
+
 
 function startTimer() {
     const timerElement = document.getElementById('timer');
@@ -144,8 +150,10 @@ let currentQuestionIndex = 0;
 let quizData = null;
 let userAnswers = []; // Array to store user answers
 
-function initializeQuiz(quiz) {
-    quizData = [quiz]; // Wrap the single question in an array to handle uniformly
+function initializeQuiz(quizList, questionIndex) {
+    // If quizList is nested in another array, extract it
+    quizData = Array.isArray(quizList[0]) ? quizList[0] : quizList;
+    currentQuestionIndex = questionIndex; // Store the current question index
     console.log("Initializing Quiz with Data:", quizData); // Log initialized quiz data
     console.log("Total Questions in the Quiz:", quizData.length);
     displayQuestion();
@@ -157,22 +165,33 @@ function displayQuestion() {
     const questionContainer = document.getElementById('questions-container');
     questionContainer.innerHTML = '';
 
-    const questionTitle = document.createElement('h2');
-    questionTitle.innerText = quizData[currentQuestionIndex].question;
-    questionContainer.appendChild(questionTitle);
+    const currentQuestion = quizData[currentQuestionIndex];
 
-    const answerOptions = [quizData[currentQuestionIndex].correct_answer, ...quizData[currentQuestionIndex].incorrect_answers];
-    answerOptions.sort(() => Math.random() - 0.5); // Shuffle the answers
+    // Check if currentQuestion and its properties exist
+    if (currentQuestion && currentQuestion.question && currentQuestion.correct_answer && Array.isArray(currentQuestion.incorrect_answers)) {
+        const questionTitle = document.createElement('h2');
+        questionTitle.innerText = currentQuestion.question; // Access the question text properly
+        questionContainer.appendChild(questionTitle);
 
-    answerOptions.forEach(answer => {
-        const answerButton = document.createElement('button');
-        answerButton.innerText = answer;
-        answerButton.onclick = () => selectAnswer(answer, answerButton);
-        questionContainer.appendChild(answerButton);
-    });
+        const answerOptions = [currentQuestion.correct_answer, ...currentQuestion.incorrect_answers];
+        answerOptions.sort(() => Math.random() - 0.5); // Shuffle the answers
 
-    updateNavigationButtons();
+        answerOptions.forEach(answer => {
+            const answerButton = document.createElement('button');
+            answerButton.innerText = answer;
+            answerButton.onclick = () => selectAnswer(answer, answerButton);
+            questionContainer.appendChild(answerButton);
+        });
+
+        updateNavigationButtons();
+    } else {
+        console.error('Invalid question data:', currentQuestion);
+        questionContainer.innerHTML = '<p>Unable to load question. Please try again later.</p>';
+    }
 }
+
+
+
 
 function updateNavigationButtons() {
     const prevButton = document.getElementById('prev-button');

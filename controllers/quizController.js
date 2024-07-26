@@ -677,7 +677,17 @@ const fetchTriviaQuizzes = async (req, res) => {
             return res.status(404).json({ message: 'No trivia quizzes found' });
         }
 
-        res.status(200).json(data.results); // Return the trivia quizzes
+        // Group quizzes by category
+        const groupedQuizzes = data.results.reduce((acc, quiz) => {
+            if (!acc[quiz.category]) {
+                acc[quiz.category] = [];
+            }
+            acc[quiz.category].push(quiz);
+            return acc;
+        }, {});
+
+        console.log('Grouped Quizzes:', groupedQuizzes); // Debugging: Log the grouped quizzes
+        res.status(200).json(groupedQuizzes); // Return the grouped quizzes
     } catch (error) {
         console.error('Error fetching trivia quizzes:', error);
         res.status(500).json({ message: 'Server error. Please try again later.' });
