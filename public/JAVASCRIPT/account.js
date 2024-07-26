@@ -381,6 +381,7 @@ function resetStars() {
 document.addEventListener('DOMContentLoaded', () => {
   fetchUserDiscussions();
   fetchFollowingCount(); // Fetch following count on page load
+  fetchFollowerCount(); // Fetch follower count on page load
 });
 
 async function fetchUserDiscussions() {
@@ -598,6 +599,31 @@ async function fetchFollowingCount() {
     alert('Error fetching following count: ' + error.message);
   }
 }
+
+async function fetchFollowerCount() {
+  try {
+    const response = await fetchWithAuth(`/following-count`); // Use your actual endpoint
+    if (!response.ok) {
+      throw new Error('Failed to fetch following count');
+    }
+
+    const data = await response.json();
+    console.log('Fetched following count:', data);
+
+    const followingCountElement = document.querySelector('.stat .info h3'); // Ensure this matches your HTML structure
+
+    console.log('followingCountElement:', followingCountElement); // Log the element
+    if (followingCountElement) {
+      followingCountElement.textContent = data.count; // Update the count in the HTML
+    } else {
+      console.error('followingCountElement not found in the DOM');
+    }
+  } catch (error) {
+    console.error('Error fetching follower count:', error);
+    alert('Error fetching follower count: ' + error.message);
+  }
+}
+
 
 
 

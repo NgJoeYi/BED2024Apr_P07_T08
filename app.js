@@ -121,6 +121,7 @@ app.post('/unfollow',  jwtAuthorization.verifyJWT,  followController.unfollowUse
 app.get('/followed-discussions',  jwtAuthorization.verifyJWT,  followController.getFollowedDiscussions);
 app.get('/follow-status',  jwtAuthorization.verifyJWT,followController.checkFollowStatus);
 app.get('/following-count', jwtAuthorization.verifyJWT, followController.getFollowingCount);
+app.get('/follower-count', jwtAuthorization.verifyJWT, followController.getFollowerCount); // Add this line
 
 
 // Add Routes for discussions

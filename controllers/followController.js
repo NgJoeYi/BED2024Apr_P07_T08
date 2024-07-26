@@ -75,10 +75,23 @@ const getFollowingCount = async (req, res) => {
     }
 };
 
+const getFollowerCount = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const count = await Follow.getFollowerCount(userId);
+        res.json({ success: true, count });
+    } catch (err) {
+        console.error('Error fetching follower count:', err);
+        res.status(500).json({ success: false, error: 'Error fetching follower count' });
+    }
+};
+
+
 module.exports = {
     followUser,
     unfollowUser,
     getFollowedDiscussions,
     checkFollowStatus,
-    getFollowingCount // Export the new function
+    getFollowingCount,// Export the new function
+    getFollowerCount
 };
