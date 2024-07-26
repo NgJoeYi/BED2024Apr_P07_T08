@@ -76,7 +76,7 @@ function fetchDiscussions(feedType = 'mainFeed') {
         return;
     }
 
-    fetchWithAuth(url, {
+    fetch(url, {
         method: 'GET'
     })
     .then(response => {
@@ -140,7 +140,7 @@ function fetchFollowedDiscussions() {
         if (data.success) {
             if (data.discussions.length === 0) {
                 const noDiscussionMessage = document.createElement('div');
-                noDiscussionMessage.classList.add('no-discussion-message');
+                noDiscussionMessage.classList.add('no-suggestion');
                 noDiscussionMessage.textContent = "No discussions found";
                 feed.appendChild(noDiscussionMessage);
             } else {
@@ -200,8 +200,13 @@ function addDiscussionToFeed(discussion, feedType) {
             <div class="user-info">
                 <div class="username">${capitalizedUsername}</div>
                 <div class="role">(${discussion.role})</div>
-                <button class="follow-button" data-user-id="${discussion.user_id}">Checking...</button>
-                <button class="suggestion-button" data-id="${discussion.id}">💡</button> <!-- Circular button for suggestions -->
+                <button class="follow-button ${discussion.isFollowing ? 'unfollow-button' : 'follow-button'}" data-user-id="${discussion.user_id}">
+                    ${discussion.isFollowing ? 'Unfollow' : 'Follow'}
+                </button>
+            </div>
+             <div class="button-container">
+                    <button class="suggestion-button" data-id="${discussion.id}">💡</button>
+                    <button class="pin-button" data-id="${discussion.id}">${discussion.pinned ? 'Unpin' : 'Pin'}</button> <!-- Button for pin/unpin -->
             </div>
         </div>
         <div class="post-meta">
@@ -219,7 +224,7 @@ function addDiscussionToFeed(discussion, feedType) {
                 <span class="views-count">${viewsText}</span>
             </div>
             <button class="comment-button" data-id="${discussion.id}">Go to Comment</button>
-            <button class="pin-button" data-id="${discussion.id}">${discussion.pinned ? 'Unpin' : 'Pin'}</button> <!-- Button for pin/unpin -->
+           
         </div>
     `;
 
@@ -237,17 +242,6 @@ function addDiscussionToFeed(discussion, feedType) {
     const followButton = post.querySelector('.follow-button');
     const suggestionButton = post.querySelector('.suggestion-button'); // Get the suggestion button
     const pinButton = post.querySelector('.pin-button'); // Get the pin/unpin button
-
-    checkFollowStatus(discussion.user_id)
-        .then(isFollowing => {
-            followButton.textContent = isFollowing ? 'Unfollow' : 'Follow';
-            followButton.classList.toggle('unfollow-button', isFollowing);
-            followButton.classList.toggle('follow-button', !isFollowing);
-        })
-        .catch(error => {
-            console.error('Error updating follow button:', error);
-            followButton.textContent = 'Follow'; // Default to 'Follow' in case of an error
-        });
 
     if (discussion.user_id === getCurrentUserId()) {
         followButton.style.display = 'none'; // Hide follow button for discussions posted by the logged-in user
@@ -280,8 +274,10 @@ function addDiscussionToFeed(discussion, feedType) {
     followButton.addEventListener('click', function () {
         const followeeId = post.getAttribute('data-user-id');
         if (this.textContent === 'Follow') {
+            console.log('Following user:', followeeId); // Debugging line
             followUser(followeeId, this);
         } else {
+            console.log('Unfollowing user:', followeeId); // Debugging line
             unfollowUser(followeeId, this);
         }
     });
@@ -299,6 +295,7 @@ function addDiscussionToFeed(discussion, feedType) {
         togglePinDiscussion(discussionId, action, this);
     });
 }
+
 
 function incrementViews(discussionId) {
     fetchWithAuth(`/discussions/${discussionId}/view`, {
@@ -571,10 +568,9 @@ function checkFollowStatus(followeeId) {
     })
     .catch(error => {
         console.error('Error checking follow status:', error);
-        throw error; // Removed the misplaced period and added a semicolon
+        throw error;
     });
 }
-
 
 // for GEMINI API
 // Add this JavaScript to your script file
@@ -630,8 +626,6 @@ async function showSuggestionsPopup(discussionId) {
         console.error('Error fetching suggestions:', error);
     }
 }
-
-
 
 function closeSuggestionPopup() {
     document.getElementById('suggestionPopup').style.display = 'none';

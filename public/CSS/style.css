@@ -176,19 +176,27 @@
 
 
 
+
+/* Info section styling */
+
+.title_for_offer h2 {
+  padding: 20px;
+  text-align: center;
+}
+
 /* Info section styling */
 .info-section {
-  display: flex;
-  justify-content: space-around;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns of equal width */
+  gap: 20px; /* Gap between boxes */
   padding: 100px 20px;
-  background-color: #1b2b40; /* Info section background color */
+  background-color: white; /* Info section background color */
 }
 
 .info-box {
-  background-color: white;
+  background-color: #f1f1f1;
   padding: 20px;
   border-radius: 5px;
-  width: 22%;
   text-align: center;
 }
 
@@ -200,6 +208,22 @@
   font-size: 1em;
 }
 
+/* Ensure the first 4 items take a full row each */
+.info-box:nth-child(1),
+.info-box:nth-child(2),
+.info-box:nth-child(3),
+.info-box:nth-child(4) {
+  grid-column: span 1;
+}
+
+/* Center the next 2 items in a new row */
+.info-box:nth-child(5) {
+  grid-column: 2 / 3;
+}
+
+.info-box:nth-child(6) {
+  grid-column: 3 / 4;
+}
 
 
 
@@ -674,6 +698,7 @@
   display: flex;
   align-items: center;
   padding: 30px;
+  margin: 20px;
 }
 
 .search-container {
@@ -683,53 +708,63 @@
   position: relative;
 }
 
-.search-icon {
-  position: absolute;
-  left: 10px;
-  margin-bottom: 10px;
-  color: black;
-}
-
-.question-input {
+.question-input-activity {
   width: 100%;
   padding: 0.5rem 1rem 0.5rem 2.5rem; /* Adjust padding to fit the icon */
   border: 1px solid #ccc;
   border-radius: 4px;
   height: 40px; /* Ensure the height matches the buttons */
-  padding-left: 40px; /* Increase padding to move placeholder text more to the right */
+  
+}
+
+.clear-search-button {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
 }
 
 .refresh-button {
-  width: 80px; /* Set a fixed width */
-  height: 38px; /* Set a fixed height */
+  width: 50px; /* Adjust width to fit the icon and text */
+  height: 40px; /* Set height */
   margin-bottom: 10px;
   border: none;
   background-color: #d9aa52;
-  color: white;
+  color: black;
   cursor: pointer;
   border-radius: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1rem;
-  margin-left: 20px;
-  margin-right: 50%; /* Space between buttons */
+  margin-left: 10px; /* Adjust margin for spacing */
+  padding: 0; /* Remove padding for the button */
+}
+
+.refresh-button .fa-search {
+  font-size: 1.2em;
 }
 
 .add-button-activity {
-  width: 250px; /* Set a fixed width */
-  height: 38px; /* Set a fixed height */
+  width: 150px; /* Set a fixed width */
+  height: 40px; /* Set a fixed height */
   margin-bottom: 10px;
   border: none;
   background-color: #d9aa52;
-  color: white;
+  color: black;
   cursor: pointer;
   border-radius: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1rem;
+  margin-left: 10px; /* Adjust margin for spacing */
 }
+
+
+
 
 
 
@@ -781,7 +816,7 @@
   color: gray;
 }
 
-.pin-button {
+/* .pin-button {
   background-color: transparent;
   border: solid 1px black;
   padding: 10px;
@@ -789,8 +824,8 @@
   cursor: pointer;
   position: absolute;
   top: 16px;
-  right: 16px; /* Add this line */
-}
+  right: 16px;
+} */
 
 
 
@@ -810,9 +845,7 @@
   color: gray;
 }
 
-.follow-button {
-  margin-left: 30px;
-}
+
 
 
 /* Post content styling */
@@ -837,7 +870,7 @@
   align-items: center;
 }
 
-.like-button, .dislike-button, .follow-button, .pin-btn {
+.like-button, .unfollow-button, .follow-button, .pin-btn {
   background: none;
   border: none;
   font-size: 1em;
@@ -847,17 +880,24 @@
   align-items: center;
 }
 
-.like-button:focus, .dislike-button:focus, .follow-button:focus, .pin-btn:focus {
+.like-button:focus, .unfollow-button:focus, .follow-button:focus, .pin-btn:focus {
   outline: none;
 }
 
 .follow-button {
-  color: #0366d6;
+  margin-left: 30px;
+  color: #0366d6; /* Blue color */
+}
+
+.unfollow-button {
+  margin-left: 30px;
+  color: #0366d6; /* Blue color */
+  
 }
 
 .comment-button {
   background-color: #d9aa52;
-  color: white;
+  color: black;
   border: none;
   padding: 8px 16px;
   cursor: pointer;
@@ -996,14 +1036,6 @@
   
 }
 
-.comment-button {
-  padding: 0.5rem 1rem;
-  border: none;
-  background-color: #CD8D7A;
-  color: #fff;
-  cursor: pointer;
-  border-radius: 4px;
-}
 
 .post-meta {
   margin-bottom: 5px; /* Adjust margin as needed */
@@ -1341,7 +1373,7 @@
 /* for my gemini api DONT TOUCH  */
 
 /* Add these styles to your CSS file */
-.suggestion-button {
+/* .suggestion-button {
   background-color: transparent;
   border: solid 1px black;
   padding: 10px;
@@ -1354,7 +1386,7 @@
 
 .suggestion-button:hover {
   background-color: #e67e22;
-}
+} */
 
 .popup {
   display: none;
@@ -1364,18 +1396,24 @@
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: auto;
+  overflow: hidden;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
 .popup-content {
   background-color: #fefefe;
-  margin: 15% auto;
+  margin: auto;
   padding: 20px;
   border: 1px solid #888;
   width: 80%;
   max-width: 500px;
   border-radius: 10px;
+  max-height: 70vh; /* Set a fixed height */
+  overflow-y: auto; /* Enable vertical scrollbar */
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-60%, -50%);
 }
 
 .close {
@@ -1390,4 +1428,27 @@
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+
+.button-container {
+  display: flex;
+  align-items: right;
+  margin-left: auto; /* Ensure the button container is pushed to the right */
+}
+
+.pin-button,
+.suggestion-button {
+  background-color: transparent;
+  border: solid 1px black;
+  padding: 10px;
+  color: #1b2b40;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 10px; /* Add some space between the buttons */
+}
+
+.pin-button:hover,
+.suggestion-button:hover {
+  background-color: #e67e22;
 }
