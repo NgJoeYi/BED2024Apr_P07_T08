@@ -22,14 +22,14 @@ function verifyJWT(req, res, next) {
 
         // ************************************** ADD ROUTES HERE **************************************
         const authorizedRoles = {
-            'GET /account': ['student', 'lecturer'],
-            'GET /account/profile': ['student', 'lecturer'],
-            'POST /account/uploadProfilePic': ['student', 'lecturer'],
-            'PUT /account': ['student', 'lecturer'], // -- will need to come back to this
-            'DELETE /account': ['student', 'lecturer'], //hi i added this here - Raeann( delete it when u see HAHHAH)
-            'GET /account/quizResult': ['student', 'lecturer'], 
-            'GET /account/getAttemptCountByQuizId': ['student', 'lecturer'], 
-            'GET /account/getAllAttemptCount': ['student', 'lecturer'], 
+            'GET /account': ['student', 'lecturer'], // only student and lecturer logged in can see account details
+            'GET /account/profile': ['student', 'lecturer'], // only student and lecturer logged in can see profile picture
+            'POST /account/uploadProfilePic': ['student', 'lecturer'], // only student and lecturer logged in can update profile picture
+            'PUT /account': ['student', 'lecturer'], // only student and lecturer logged in can update account details
+            'DELETE /account': ['student', 'lecturer'], // only student and lecturer logged in can delete account details
+            'GET /account/quizResult': ['student', 'lecturer'], // only student and lecturer logged in can see quiz history
+            'GET /account/getAttemptCountByQuizId': ['student', 'lecturer'], // only student and lecturer logged in can see quiz attempt count by quiz id
+            'GET /account/getAllAttemptCount': ['student', 'lecturer'], // only student and lecturer logged in total number of quiz taken
             
             'GET /discussions/user': ['student', 'lecturer'],
             'GET /discussions': ['student', 'lecturer'],
@@ -48,32 +48,24 @@ function verifyJWT(req, res, next) {
             'GET /follow-status':  ['student', 'lecturer'],
             'GET /discussions/:id/suggestions':  ['student', 'lecturer'],
             'GET /following-count':  ['student', 'lecturer'],
-
-
             
             'GET /comments': ['student', 'lecturer'],
             'PUT /comments/:id': ['student', 'lecturer'],
             'POST /comments': ['student', 'lecturer'],
             'DELETE /comments/:id': ['student', 'lecturer'],
 
-            'GET /quizzes': ['student', 'lecturer'],
-            'GET /quizzes/:id': ['student', 'lecturer'],
-            'GET /quizzes/trivia': ['student', 'lecturer'],
-            'GET /quizzes/:id/questions': ['student', 'lecturer'],
+            'GET /quizzes/trivia': ['student', 'lecturer'], // Both student and lecturer logged in can see trivia questions
+            'GET /quizzes/:id/questions': ['student', 'lecturer'],  // Only student and lecturer logged in can see quiz id's questions
             'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
             'POST /quizzes': ['lecturer'], // Only lecturers can create quizzes
-            'POST /submitQuiz': ['student', 'lecturer'],
+            'POST /submitQuiz': ['student', 'lecturer'],  // Both student and lecturer logged in can see attempt the quiz
             'POST /quizzes/:id/questions': ['lecturer'], // Only lecturers can add questions to a quiz
             'POST /quizzes/:id/questions/update': ['lecturer'], // Only lecturers can add questions to a quiz
-            'PUT /quizzes/:quizId/questions/:questionId': ['lecturer'],
+            'PUT /quizzes/:quizId/questions/:questionId': ['lecturer'],  // Only student and lecturer logged in can update quiz id's questions
             'PUT /quizzes/:id': ['lecturer'], // Only lecturers can update quizzes
-            'DELETE /quizzes/:quizId/questions/:questionId': ['lecturer'],
+            'DELETE /quizzes/:quizId/questions/:questionId': ['lecturer'],  // Only lecturer logged in can delete quiz id's questions
             'DELETE /quizzes/:id': ['lecturer'], // Only lecturers can delete quizzes
 
-            
-            // 'GET /courses': ['student', 'lecturer'],
-            // 'GET /courses/:id': ['student', 'lecturer'],
-            // 'GET /courses/images/:id': ['student', 'lecturer'],
             'PUT /courses/:id': ['student', 'lecturer'],
             'POST /courses': ['student', 'lecturer'],
             'DELETE /courses/:id': ['student', 'lecturer'],
