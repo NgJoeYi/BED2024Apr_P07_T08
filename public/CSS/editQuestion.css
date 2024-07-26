@@ -1,56 +1,56 @@
 main {
-    padding: 60px 20px;
-    padding-top: 220px; /* Ensure content is below the navbar */
-    max-width: 1200px;
+    padding: 40px 10px;
+    padding-top: 180px; /* Ensure content is below the navbar */
+    max-width: 1000px;
     margin: 0 auto;
     text-align: center; /* Center align the text inside the main content */
 }
 
 #questions-container {
-    margin-top: 20px; /* Add some margin to move it down from the navbar */
-    width: 100%;
+    margin-top: 10px; /* Add some margin to move it down from the navbar */
+    width: 90%;
 }
 
 .question-card {
     background-color: #1b2b40;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     width: 100%; /* Make width 100% */
-    margin-bottom: 20px;
-    padding: 20px;
+    margin-bottom: 15px;
+    padding: 15px;
     color: #ffffff;
     text-align: left; /* Align text to the left inside the card */
 }
 
 .question-card h3 {
-    font-size: 22px; /* Slightly increased font size */
-    margin: 0 0 10px;
+    font-size: 20px; /* Slightly increased font size */
+    margin: 0 0 8px;
     color: #d9aa52; /* Highlight the question title */
 }
 
 .question-card img {
     width: 100%;
     height: auto; /* Maintain aspect ratio */
-    max-height: 300px; /* Fixed max height */
+    max-height: 250px; /* Fixed max height */
     object-fit: contain; /* Maintain aspect ratio */
-    margin-bottom: 20px; /* Increased margin for better spacing */
+    margin-bottom: 15px; /* Increased margin for better spacing */
 }
 
 .question-card textarea,
 .question-card input[type="text"],
 .question-card input[type="file"] {
     width: 100%;
-    padding: 15px; /* Increased padding for better usability */
-    margin-bottom: 15px; /* Increased margin for better spacing */
+    padding: 10px; /* Increased padding for better usability */
+    margin-bottom: 10px; /* Increased margin for better spacing */
     border: 1px solid #d9aa52; /* Updated border color for better contrast */
-    border-radius: 8px; /* Slightly more rounded corners */
+    border-radius: 5px; /* Slightly more rounded corners */
     background-color: #f9f9f9; /* Lighter background color for better contrast */
     color: #1b2b40; /* Match color to background */
-    font-size: 16px;
+    font-size: 14px;
     box-sizing: border-box; /* Ensure padding and border are included in width */
     transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for focus state */
 }
@@ -59,75 +59,74 @@ main {
 .question-card input[type="text"]:focus,
 .question-card input[type="file"]:focus {
     border-color: #b28f3e; /* Darker border color on focus */
-    box-shadow: 0 0 8px rgba(185, 143, 62, 0.6); /* Subtle shadow on focus */
+    box-shadow: 0 0 6px rgba(185, 143, 62, 0.6); /* Subtle shadow on focus */
     outline: none; /* Remove default outline */
 }
 
 .question-card input[type="text"] {
-    height: 40px; /* Fixed height for text inputs */
+    height: 35px; /* Fixed height for text inputs */
 }
 
 .question-card button {
     background-color: #d9aa52;
     color: #1b2b40;
     border: none;
-    border-radius: 30px;
-    padding: 12px 20px;
-    font-size: 16px;
+    border-radius: 25px;
+    padding: 10px 15px;
+    font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
-    margin: 10px 0; /* Margin to separate buttons */
+    margin: 8px 0; /* Margin to separate buttons */
 }
 
 .question-card button:hover {
     background-color: #b28f3e;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add a shadow on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Add a shadow on hover */
 }
 
 #save-changes {
     background-color: #d9aa52;
     color: #1b2b40;
     border: none;
-    border-radius: 30px;
-    padding: 15px 30px; /* Increased padding for better usability */
-    font-size: 18px; /* Slightly larger font size */
+    border-radius: 25px;
+    padding: 12px 20px; /* Increased padding for better usability */
+    font-size: 16px; /* Slightly larger font size */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover state */
-    margin: 20px auto; /* Center the button and add margin */
+    margin: 15px auto; /* Center the button and add margin */
     display: block; /* Make the button a block element */
 }
 
 #save-changes:hover {
     background-color: #b28f3e;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add a shadow on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Add a shadow on hover */
 }
-
 
 #create-question {
     background-color: #d9aa52;
     color: #1b2b40;
     border: none;
-    border-radius: 30px;
-    padding: 15px 30px; /* Increased padding for better usability */
-    font-size: 18px; /* Slightly larger font size */
+    border-radius: 25px;
+    padding: 12px 20px; /* Increased padding for better usability */
+    font-size: 16px; /* Slightly larger font size */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover state */
-    margin: 20px auto; /* Center the button and add margin */
+    margin: 15px auto; /* Center the button and add margin */
     display: block; /* Make the button a block element */
 }
 
 #create-question:hover {
     background-color: #b28f3e;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add a shadow on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Add a shadow on hover */
 }
 
 #navigation-buttons {
     display: flex;
     justify-content: space-between; /* Distribute buttons evenly */
-    margin-top: 20px; /* Margin to move it down */
+    margin-top: 15px; /* Margin to move it down */
 }
 
 #prev-button {
@@ -139,16 +138,15 @@ main {
     display: none; /* Hide the next button */
 }
 
-
 .question-card select {
     width: 100%;
-    padding: 15px; /* Increased padding for better usability */
-    margin-bottom: 15px; /* Increased margin for better spacing */
+    padding: 10px; /* Increased padding for better usability */
+    margin-bottom: 10px; /* Increased margin for better spacing */
     border: 1px solid #d9aa52; /* Updated border color for better contrast */
-    border-radius: 8px; /* Slightly more rounded corners */
+    border-radius: 5px; /* Slightly more rounded corners */
     background-color: #f9f9f9; /* Lighter background color for better contrast */
     color: #1b2b40; /* Match color to background */
-    font-size: 16px;
+    font-size: 14px;
     box-sizing: border-box; /* Ensure padding and border are included in width */
     transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for focus state */
     appearance: none; /* Remove default arrow icon */
@@ -156,18 +154,18 @@ main {
     -moz-appearance: none; /* Remove default arrow icon in Firefox */
     background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><polygon fill="%231b2b40" points="6 8 10 12 14 8"/></svg>'); /* Custom arrow icon */
     background-repeat: no-repeat; /* Prevent the arrow icon from repeating */
-    background-position: right 15px center; /* Position the arrow icon */
-    background-size: 10px 10px; /* Size of the arrow icon */
+    background-position: right 10px center; /* Position the arrow icon */
+    background-size: 8px 8px; /* Size of the arrow icon */
 }
 
 .question-card select:focus {
     border-color: #b28f3e; /* Darker border color on focus */
-    box-shadow: 0 0 8px rgba(185, 143, 62, 0.6); /* Subtle shadow on focus */
+    box-shadow: 0 0 6px rgba(185, 143, 62, 0.6); /* Subtle shadow on focus */
     outline: none; /* Remove default outline */
 }
 
 .question-card label {
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 5px;
     display: block;
     color: #d9aa52;
