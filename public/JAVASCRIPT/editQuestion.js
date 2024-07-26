@@ -91,6 +91,7 @@ function displayQuestionsForEdit(isEditMode) {
 
         const correctOptionSelect = document.createElement('select');
         correctOptionSelect.dataset.questionId = question.question_id; // Use correct ID field
+        correctOptionSelect.dataset.correctOption = "true"; // Mark this as the correct option select element
         
         // Create options for select
         ['1', '2', '3', '4'].forEach(value => {

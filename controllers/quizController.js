@@ -29,6 +29,8 @@ const createQuiz = async (req, res) => {
         /* VALIDATED TO MAKE SURE:
         1. all required fields are filled 
         */
+        newQuizData.title = newQuizData.title.charAt(0).toUpperCase() + newQuizData.title.slice(1); // make all quiz title start with upper case
+        newQuizData.description = newQuizData.title.charAt(0).toUpperCase() + newQuizData.title.slice(1); // make all quiz title start with upper case
 
         newQuizData.created_by = userId;  // ------------------------------------------------ Assign the user ID to the new quiz data
 
@@ -382,32 +384,32 @@ const updateQuestion = async (req, res) => {
         }
 
         // ------------------------------------------------------------------------------------------------ Validate that the correct option is one of the provided options
+        // Validate that the correct option is one of the provided options
         const options = [
-            newQuestionData.option_1.toLowerCase(),
-            newQuestionData.option_2.toLowerCase(),
-            newQuestionData.option_3.toLowerCase(),
-            newQuestionData.option_4.toLowerCase()
-        ];
-
-        const optionValues = [
             newQuestionData.option_1,
             newQuestionData.option_2,
             newQuestionData.option_3,
             newQuestionData.option_4
         ];
-        // ------------------------------------------------------------------------------------------------ Convert correct_option to a zero-based index
-        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
-        // ------------------------------------------------------------------------------------------------ Check if the index is valid and within the bounds of the options array
-        if (correctOptionIndex >= 0 && correctOptionIndex < optionValues.length) {
-            // --------------------------------------------------------------------------------------------- Map correct_option to its content
-            newQuestionData.correct_option = optionValues[correctOptionIndex];
-        }
-        console.log(newQuestionData);
 
-        const correctOptionExists = options.includes(newQuestionData.correct_option.toLowerCase()); // ------ compare options in lower case
-        if (!correctOptionExists) {
-            return res.status(400).json({ message: 'Correct option must be one of the given options' }); // - Return error if correct option is not valid
+        // Convert correct_option to a zero-based index
+        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
+
+        // Check if the index is valid and within the bounds of the options array
+        if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
+            // Map correct_option to its content
+            newQuestionData.correct_option = options[correctOptionIndex];
+        } else {
+            return res.status(400).json({ message: 'Correct option must be between 1 and 4' });
         }
+
+        // Debugging log
+        console.log('New question data:', newQuestionData);
+
+        // const correctOptionExists = options.includes(newQuestionData.correct_option.toLowerCase()); // ------ compare options in lower case
+        // if (!correctOptionExists) {
+        //     return res.status(400).json({ message: 'Correct option must be one of the given options' }); // - Return error if correct option is not valid
+        // } now using spinner no longer need this
 
         if (newQuestionData.question_text) { // ------------------------------------------------------------- Make sure sentences starts with caps 
             newQuestionData.question_text = newQuestionData.question_text.charAt(0).toUpperCase() + newQuestionData.question_text.slice(1);
