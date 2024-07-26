@@ -1,296 +1,208 @@
-/*lectures arrangement modal */
-.modal {
-    display: none; 
+/** 
+ * General Styles 
+ */
+ body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+}
+
+/** 
+ * Container Styles 
+ */
+.container, .course-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 10%;
+}
+
+/** 
+ * Course Title Styles 
+ */
+.upload-course-title {
+    margin-bottom: 20px;
+    color: #1b2b40;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.upload-course-title + p {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+/** 
+ * Form Group Styles 
+ */
+.form-group, .content {
+    margin-bottom: 15px;
+}
+
+.form-group label, .content label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input[type="text"], .form-group input[type="number"], .form-group textarea,
+.content input[type="text"], .content input[type="number"],
+.course-name p, .course-details p {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+/** 
+ * File Input Styles 
+ */
+input[type="file"] {
+    margin-top: 10px;
+}
+
+/** 
+ * Button Styles 
+ */
+button {
+    background-color: #d9aa52;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+button:hover {
+    background-color: #c49545;
+}
+
+/** 
+ * Modal Styles 
+ */
+ .modal {
+    display: none; /* Hide modal initially */
     position: fixed; 
     z-index: 1; 
-    padding-top: 100px; 
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
     overflow: auto; 
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4); 
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    align-items: flex-start; /* Align items to the top */
+    justify-content: center; /* Horizontally center */
+    padding-top: 200px; /* Space to push below the navbar */
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-/* upload course page*/
-.course-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
-    padding-top: 150px;
-}
-
-.course-name, .course-arrangement, .course-details, .course-skills-covered {
-    background-color: #FCE4D8;
-    padding: 20px;
-    border-radius: 8px;
-    position: relative;
-}
-
-.upload-course-title {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 30px;
-}
-/* lecture arrangement*/
-.lecture-details p {
-    margin: 5px 0;
-    font-size: 18px;
-}
-
-.course-arrangement .chapter {
-    margin-top: 20px;
-}
-
-.course-arrangement {
-    float: right;
-    cursor: pointer;
-}
-  
-.course-arrangement .chapter .files {
-    margin-top: 10px;
-    padding-left: 20px;
-}
-
-.files p, .chapter p, .course-name p,
-.course-details p, .course-skills-covered p {
-    color: #000;
-    font-size: 20px;
-}
-
-.course-name p {
-    margin-top: 20px;
-}
-
-.course-details p, .course-skills-covered p {
-    margin-top: 20px;
-    margin-bottom: 100px;
-}
-
-.new-btn-container {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.new-btn {
-    display: flex;
-    justify-content: flex-end;
-    align-content: flex-end;
-    margin-top: 20px;
-}
-
-.new-btn:hover {
-    color: #000;
-    background-color: white;
-}
-
-.files .file-item {
-    position: relative;
-}
-
-.files .file-item  {
-    display: none;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
-
-.files .file-item p:hover  {
-    display: inline-block;
-}
-
-.file-item {
-    position: relative;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-input[type="file" i]{
-    display:flex;
-    flex-direction: column;
-    margin-top: 10px;
-}
-
-
-.file-item:hover {
-    display: inline-block;
-}
-  
-#add-more-button{
-    margin-top: 10px;
-}
-/* course submit and cancel buttons*/
-.button-container{
-    display: flex;
-    justify-content: space-around;
-}
-.button-container button{
-    min-width: 100px;
-    min-height: 40px;
+    background-color: #fff;
     border-radius: 5px;
-}
-
-/* buttons in general */
-button{
-    padding:10px;
-    cursor: pointer;
-}
-
-.chapter-name {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%; 
+    max-width: 60%; /* Maximum width */
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
+    flex-direction: column;
+    margin: auto; /* Center the modal content */
 }
 
-.chapter-name {
-    display: none;
-    cursor: pointer;
-    margin-left: 10px;
-}
 
-.chapter-name:hover{
-    display: inline-block;
-}
-
-.file-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
+.modal-content input, .modal-content textarea {
     padding: 10px;
-    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
 }
 
-.file-item  {
-    display: none;
-    cursor: pointer;
-    margin-left: 10px;
+.modal-content h2, .modal-content h3 {
+    font-family: Arial, sans-serif;
+    font-weight: bold;
 }
 
-.file-item:hover {
-    display: inline-block;
-}
-/* course meta data styles*/
-.content {
+/** 
+ * Adjust Radio Buttons Container Style 
+ */
+.radioContainer {
     display: flex;
-    align-items: center;
-    gap: 10px; /* Space between label and input */
-    margin:10px;
+    flex-direction: row; /* Ensure the radio buttons and labels are side by side */
+    align-items: center; /* Align items vertically centered */
+    margin-bottom: 10px; /* Space between radio buttons and input fields */
 }
 
-.content label {
-    font-size: 20px;
-    white-space: nowrap;
+.radioContainer input[type="radio"] {
+    margin-right: 5px; /* Reduce space between radio button and label */
 }
 
-.content input {
-    flex: 1; /* Take the remaining space */
-    padding: 5px;
-    font-size: 18px;
-}
-#course-arrangement {
-    display: none;
+.radioContainer label {
+    margin-right: 15px; /* Reduce space between each label */
 }
 
-/* footer */
-
-/* New footer trying out */
-.footer {
-    background: #1b2b40;
-    padding: 30px 0px;
-    font-family: 'Play', sans-serif;
-    text-align: center;
+/** 
+ * Adjust the Input Container Style 
+ */
+.videoInputContainer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px; /* Adjust as necessary to make it closer to the radio buttons */
+    gap: 10px; /* Space between local file input and Vimeo search */
 }
 
-.footer .row {
-    width: 100%;
-    margin: 1% 0%;
-    padding: 0.6% 0%;
-    color: #d9aa52;
-    font-size: 0.8em;
+/** 
+ * Adjust the Input Container Style 
+ */
+.videoInputContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between local file input and Vimeo search */
 }
 
-.footer .row a {
-    text-decoration: none;
-    color: #d9aa52;
-    transition: 0.5s;
+/** 
+ * Button Container Style 
+ */
+.buttonContainer {
+    display: flex;
+    flex-direction: row;
 }
 
-.footer .row a:hover {
-    color: #fff;
-}
+/** 
+ * Vimeo Video Styles 
+ */
 
-.footer .row ul {
-    width: 100%;
-}
-
-.footer .row ul li {
-    display: inline-block;
-    margin: 0px 30px;
-}
-
-.footer .row a i {
-    font-size: 2em;
-    margin: 0% 1%;
-}
-
-@media (max-width: 600px) {
-    .footer {
-        text-align: left;
-        padding: 5%;
-    }
-
-    .footer .row ul li {
-        display: block;
-        margin: 10px 0px;
-        text-align: left;
-    }
-
-    .footer .row a i {
-        margin: 0% 3%;
-    }
-}
-
-
-/* for vimeo */
 #vimeoVideoResults {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
+}
+#vimeoVideoResults  h4{
+    font-family: Arial, sans-serif;
+    font-weight: normal;
 }
 
 .vimeo-video {
-    border: 1px solid #ddd;
+    background-color: #fff;
     padding: 10px;
-    width: calc(33% - 20px);
-    box-sizing: border-box;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(50% - 10px); /* Two videos in a row with space in between */
 }
 
 .vimeo-video img {
@@ -298,21 +210,5 @@ button{
     height: auto;
 }
 
-.vimeo-video h4 {
-    margin: 0 0 10px;
-    font-size: 16px;
-}
 
-.vimeo-video button {
-    display: block;
-    width: 100%;
-    padding: 5px;
-    background: #0073e6;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
 
-.vimeo-video button:hover {
-    background: #005bb5;
-}

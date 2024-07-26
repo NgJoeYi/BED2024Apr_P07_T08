@@ -3,31 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduHelper | Home</title>
+  <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
   <link rel="stylesheet" href="CSS/uploadCourses.css">
   <link rel="stylesheet" href="CSS/navbar.css">
-  <!-- Linking to external stylesheets for icons -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href='https://fonts.googleapis.com/css?family=Afacad' rel='stylesheet'>
-  <title>EduHelper | Home</title>
-  <link rel="icon" type="image/x-icon" href="Images/MemoryLogo.png">
 </head>
 <body>
 
 <!-- Top Navigation Bar --> 
 <header>
-  <nav class="navbar" style="background-color: white;">
-    <a class="logo" href="Index.html" style="color: black;"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
+  <nav class="navbar">
+    <a class="logo" href="Index.html"><i class="fa fa-slideshare"></i>&nbsp;EduHelper<span>.</span></a>
     <ul class="menu-links" id="account-menu-links">
       <span id="close-menu-btn" class="material-symbols-outlined">close</span>
-      <li><a href="Index.html" style="color: black;">HOME</a></li>
-      <li><a href="Courses.html" style="color: black;">COURSES</a></li>
-      <li><a href="account.html" style="color: black;">ACCOUNT</a></li>
-      <li><a href="activityfeed.html" style="color: black;">ACTIVITYFEED</a></li>
-      <li><a href="ContactUs.html" style="color: black;">CONTACT US</a></li>
-      <li><a href="Login.html" style="color: black;" id="navbar-login">LOG IN</a></li>
-      <li><a href="Register.html" style="color: black;" id="navbar-signup">SIGN UP</a></li>
+      <li><a href="Index.html">HOME</a></li>
+      <li><a href="Courses.html">COURSES</a></li>
+      <li><a href="activityfeed.html">ACTIVITYFEED</a></li>
+      <li><a href="ContactUs.html">CONTACT US</a></li>
+      <li><a href="account.html">ACCOUNT</a></li>
+      <li><a href="Login.html" id="navbar-login">LOG IN</a></li>
+      <li><a href="Register.html" id="navbar-signup">SIGN UP</a></li>
     </ul>
     <span id="hamburger-btn" class="material-symbols-outlined">menu</span>
   </nav>
@@ -36,50 +35,53 @@
 <div class="course-container">
   <div class="course-name">
     <span class="upload-course-title">Course Title:</span>
-    <p id="course-name-text" contenteditable="true" class="editable-placeholder">Enter course name...</p>
-</div>
+    <p id="course-name-text" contenteditable="true" class="editable-placeholder"></p>
+  </div>
 
-<div class="course-details">
-    <span class="upload-course-title" contenteditable="false">Course Description :</span>
-    <p contenteditable="true" class="editable-placeholder" id="course-details">Enter course description...</p>
-</div>
+  <div class="course-details">
+    <span class="upload-course-title">Course Description :</span>
+    <p id="course-details" contenteditable="true" class="editable-placeholder"></p>
+  </div>
 
-<div class="course-skills-covered" id="course-skills-covered">
-    <span class="upload-course-title" contenteditable="false">Course Meta Data :</span>
+  <div class="course-skills-covered" id="course-skills-covered">
+    <span class="upload-course-title">Course Meta Data :</span>
     <div class="content">
-        <label for="meta-data">Level:</label>
-        <input type="text" id="level">
+      <label for="level">Level:</label>
+      <input type="text" id="level" name="courseLevel" required>
     </div>
     <div class="content">
-        <label for="meta-data">Total Duration: </label>
-        <input type="number" id="duration" value="">
+      <label for="duration">Total Duration: </label>
+      <input type="number" id="duration" name="courseDuration" required>
     </div>
     <div class="content">
-        <label for="meta-data">Category: </label>
-        <input type="text" id="category" value="">
+      <label for="category">Category: </label>
+      <input type="text" id="category" name="courseCategory" required>
     </div>
     <div id="fileInputContainer">
-        <label for="imageFile">Upload Course Image:</label>
-        <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
+      <label for="imageFile">Upload Course Image:</label>
+      <input type="file" id="imageFile" name="imageFile" accept="image/*" required>
     </div>
-</div>
-<div class="button-container">
-  <button type="button" id="submit-button" onclick="addCourses()">Submit</button>
-  <button type="button" id="cancel-button" onclick="cancelCourse()">Cancel</button>
-</div>
+  </div>
 
-<div class="course-arrangement" id="course-arrangement" style="display: none;">
-  <span class="upload-course-title" contenteditable="false">Lectures Arrangement :</span>
-  <!-- Empty initially, users will add new chapters -->
+  <div class="button-container">
+    <button type="button" id="submit-button" onclick="addCourses()">Submit</button>
+    <button type="button" id="cancel-button" onclick="cancelCourse()">Cancel</button>
+  </div>
 
-  <div class="new-btn-container">
-    <button class="new-btn" onclick="triggerFileUpload()">New</button>
+  <div class="course-arrangement" id="course-arrangement" style="display: none;">
+    <span class="upload-course-title">Lectures Arrangement :</span>
+    <!-- Empty initially, users will add new chapters -->
+    <div class="new-btn-container">
+      <button class="new-btn" onclick="triggerFileUpload()">New</button>
+    </div>
   </div>
 </div>
 
-</div>
 
-<div id="newFileModal" class="modal">
+<!-- Modal for Adding New Lecture -->
+
+<!-- style="display: none;" -->
+<div id="newFileModal" class="modal" >
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
     <h2>Add New Lecture</h2>
@@ -116,11 +118,12 @@
       </div>
     </div>
     <br><br>
-    <button onclick="addLecture()">Add</button>
-    <button onclick="closeModal()">Cancel</button>
+    <div class="buttonContainer">
+      <button onclick="addLecture()">Add</button>
+      <button onclick="closeModal()">Cancel</button>
+    </div>
   </div>
 </div>
-
 
 
 <!-- Footer -->
@@ -147,7 +150,6 @@
   </div>
 </footer>
 
-<!-- Linking JS to HTML -->
 <script src="JAVASCRIPT/JwtUtility.js"></script>
 <script src="JAVASCRIPT/UploadLecture.js"></script>
 </body>

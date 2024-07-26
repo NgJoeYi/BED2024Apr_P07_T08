@@ -16,6 +16,7 @@ function toggleUploadOptions() {
 toggleUploadOptions();
 
 function triggerFileUpload() {
+    console.log('FSNJSF');
     document.getElementById('newFileModal').style.display = 'block';
 }
 

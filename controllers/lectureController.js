@@ -361,49 +361,6 @@ async function searchVimeoVideo(req, res) {
         res.status(500).json({ error: error.message });
     }
 }
-// Function to extract video ID from Vimeo URL
-// function extractVideoId(url) {
-//     const match = url.match(/vimeo\.com\/(\d+)/);
-//     return match ? match[1] : null;
-// }
-
-// Get Vimeo video details by URL
-// async function getVimeoVideo(req, res) {
-//     const lectureID = parseInt(req.params.id);
-//     try {
-//         const lecture = await Lectures.getLectureByID(lectureID);
-//         console.log('LECTURE VIDEO URL FSDJK', lecture.video);
-//         const videoUrl = req.query.url || ''; // Get the Vimeo URL from the request
-//         const videoId = extractVideoId(videoUrl); // Extract the video ID from the URL
-
-//         if (!videoId) {
-//             return res.status(400).json({ error: 'Invalid Vimeo URL' });
-//         }
-
-//         // Fetch video details from Vimeo API
-//         const response = await fetch(`https://api.vimeo.com/videos/${videoId}`, {
-//             headers: {
-//                 'Authorization': `Bearer ${accessToken}`
-//             }
-//         });
-
-//         if (!response.ok) {
-//             const errorData = await response.json(); // Extract error message
-//             console.error('Error from Vimeo API:', errorData);
-//             return res.status(response.status).json({ error: errorData.error || 'Error fetching Vimeo video details' });
-//         }
-
-//         const data = await response.json();
-//         res.json({
-//             message: 'Fetched Vimeo video details successfully',
-//             video: data
-//         });
-
-//     } catch (error) {
-//         console.error('Error fetching Vimeo video details:', error);
-//         res.status(500).json({ error: error.message });
-//     }
-// }
 
 // function that extracts vimeo video ID
 function extractVideoId(url) {
@@ -412,6 +369,7 @@ function extractVideoId(url) {
     return match ? match[1] : null;
 }
 
+// getting vimeo video from vimeo API 
 async function getVimeoVideo(req, res) {
     const lectureID = parseInt(req.params.id);
     try {
