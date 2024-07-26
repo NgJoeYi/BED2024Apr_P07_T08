@@ -130,7 +130,6 @@ const getCourseImage = (req, res) => {
   const imageFilename = req.params.filename.trim();
   const imagePath = path.resolve(__dirname, '..', 'public', 'courseImages', imageFilename);
 
-  console.log('Requested filename:', imageFilename);
   console.log('Normalized path to file:', imagePath);
 
   fs.access(imagePath, fs.constants.F_OK, (err) => {

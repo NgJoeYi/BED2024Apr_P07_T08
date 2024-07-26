@@ -1,99 +1,132 @@
-const sql = require('mssql');
-const Lecture = require('../../models/Lectures');
-const dbConfig = require('../../dbConfig');
+const request = require('supertest');
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const lectureController = require('../../controllers/lectureController');
+const Lectures = require('../../models/Lectures');
 
-jest.mock('mssql');
+// Mock lecture model
+jest.mock('../../models/Lectures');
+
+const app = express();
+app.use(express.json());
+
+// Middleware to set user
+app.use((req, res, next) => {
+    req.user = { id: 1 }; // Mock user
+    next();
+});
+
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
+// Mock multer middleware for video provided test
+const mockUploadWithVideo = (req, res, next) => {
+    req.file = {
+        filename: 'mockVideo.mp4',
+        path: path.join(__dirname, 'mockVideo.mp4'),
+        originalname: 'mockVideo.mp4',
+    };
+    req.body.courseID = '1'; // Mock courseID
+    next();
+};
+
+// Mock multer middleware for video not provided test
+const mockUploadWithoutVideo = (req, res, next) => {
+    req.file = null; // Simulate no video file provided
+    req.body.courseID = '1'; // Mock courseID
+    next();
+};
+
+app.post('/lectures', upload.single('video'), (req, res, next) => {
+    // Middleware to handle file uploads
+    if (req.file) {
+        mockUploadWithVideo(req, res, next);
+    } else {
+        mockUploadWithoutVideo(req, res, next);
+    }
+}, lectureController.createLecture);
+
+app.get('/lectures', lectureController.getAllLectures);
 
 describe('Lecture Controller', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
-
-    describe('createLecture', () => {
-        it('should create a new lecture and return the lecture data', async () => {
-            const mockLecture = {
-                courseID: 101,
+    describe('Create Lecture', () => {
+        beforeEach(() => {
+            jest.clearAllMocks(); // Clear mock calls before each test
+        });
+    
+        it('should return 400 if video is not provided', async () => {
+            const res = await request(app)
+                .post('/lectures')
+                .field('title', 'Sample Lecture')
+                .field('duration', '60')
+                .field('description', 'Sample Description')
+                .field('chapterName', 'Sample Chapter')
+                .field('courseID', '1')
+                .set('user', { id: 1 });
+    
+            expect(res.status).toBe(400);
+            expect(res.text).toBe('Video not provided');
+        });
+    
+        it('should create a lecture and return 201 if all data is provided', async () => {
+            const videoPath = path.join(__dirname, 'mockVideo.mp4');
+            fs.writeFileSync(videoPath, 'mock video content');
+            const mockLectureData = {
+                LectureID: 1,
+                courseID: 1,
                 userID: 1,
                 title: 'Sample Lecture',
                 duration: 60,
-                description: 'A sample lecture',
+                description: 'Sample Description',
                 position: 1,
-                chapterName: 'Chapter 1',
-                video: 'video.mp4'
+                chapterName: 'Sample Chapter',
+                video: 'mockVideo.mp4'
             };
+    
+            Lectures.getCurrentPositionInChapter.mockResolvedValue(1);
+            Lectures.createLecture.mockResolvedValue(mockLectureData);
+    
+            const res = await request(app)
+                .post('/lectures')
+                .field('title', 'Sample Lecture')
+                .field('duration', '60')
+                .field('description', 'Sample Description')
+                .field('chapterName', 'Sample Chapter')
+                .field('courseID', '1')
+                .attach('video', videoPath)
+                .set('user', { id: 1 });
+    
+            expect(res.status).toBe(201);
+            expect(res.body).toEqual(mockLectureData);
+    
+            // Clean up the mock file
+            fs.unlinkSync(videoPath);
+        }, 10000); // Increase timeout if needed
+    });
+    
 
-            const mockRequest = {
-                body: mockLecture,
-                file: { originalname: 'video.mp4' }
-            };
-
-            const mockResponse = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn()
-            };
-
-            const mockPool = {
-                request: jest.fn().mockReturnThis(),
-                input: jest.fn().mockReturnThis(),
-                query: jest.fn().mockResolvedValue({ recordset: [mockLecture] }),
-                close: jest.fn().mockResolvedValue(undefined)
-            };
-
-            sql.connect.mockResolvedValue(mockPool);
-
-            await Lecture.createLecture(mockRequest, mockResponse);
-
-            expect(sql.connect).toHaveBeenCalledWith(dbConfig);
-            expect(mockPool.request).toHaveBeenCalledTimes(1);
-            expect(mockPool.input).toHaveBeenCalledWith('courseID', sql.Int, mockLecture.courseID);
-            expect(mockPool.input).toHaveBeenCalledWith('userID', sql.Int, mockLecture.userID);
-            expect(mockPool.input).toHaveBeenCalledWith('title', sql.NVarChar, mockLecture.title);
-            expect(mockPool.input).toHaveBeenCalledWith('duration', sql.Int, mockLecture.duration);
-            expect(mockPool.input).toHaveBeenCalledWith('description', sql.NVarChar, mockLecture.description);
-            expect(mockPool.input).toHaveBeenCalledWith('position', sql.Int, mockLecture.position);
-            expect(mockPool.input).toHaveBeenCalledWith('chapterName', sql.NVarChar, mockLecture.chapterName);
-            expect(mockPool.input).toHaveBeenCalledWith('video', sql.NVarChar, mockLecture.video);
-            expect(mockPool.query).toHaveBeenCalledWith(expect.any(String));
-            expect(mockResponse.status).toHaveBeenCalledWith(201);
-            expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining(mockLecture));
+    describe('Get All Lectures', () => {
+        beforeEach(() => {
+            jest.clearAllMocks(); // Clear mock calls before each test
         });
 
-        it('should handle errors when creating a lecture', async () => {
-            const errorMessage = 'Database Error';
-            const mockRequest = {
-                body: {
-                    courseID: 101,
-                    userID: 1,
-                    title: 'Sample Lecture',
-                    duration: 60,
-                    description: 'A sample lecture',
-                    position: 1,
-                    chapterName: 'Chapter 1',
-                    video: 'video.mp4'
-                },
-                file: { originalname: 'video.mp4' }
-            };
-            const mockResponse = {
-                status: jest.fn().mockReturnThis(),
-                send: jest.fn()
-            };
+        it('should return a list of lectures', async () => {
+            const mockLectures = [
+                { id: 1, title: 'Lecture 1', duration: 60, description: 'First Lecture' },
+                { id: 2, title: 'Lecture 2', duration: 45, description: 'Second Lecture' }
+            ];
 
-            const mockPool = {
-                request: jest.fn().mockReturnThis(),
-                input: jest.fn().mockReturnThis(),
-                query: jest.fn().mockRejectedValue(new Error(errorMessage)),
-                close: jest.fn().mockResolvedValue(undefined)
-            };
+            // Mock Lectures.getAllLectures to return mock data
+            Lectures.getAllLectures.mockResolvedValue(mockLectures);
 
-            sql.connect.mockResolvedValue(mockPool);
+            const res = await request(app)
+                .get('/lectures')
+                .set('user', { id: 1 }); // Mock user ID
 
-            await Lecture.createLecture(mockRequest, mockResponse);
-
-            expect(sql.connect).toHaveBeenCalledWith(dbConfig);
-            expect(mockPool.request).toHaveBeenCalledTimes(1);
-            expect(mockPool.query).toHaveBeenCalledWith(expect.any(String));
-            expect(mockResponse.status).toHaveBeenCalledWith(500);
-            expect(mockResponse.send).toHaveBeenCalledWith(`Error creating lecture: ${errorMessage}`);
+            expect(res.status).toBe(200);
+            expect(res.body).toEqual(mockLectures);
         });
     });
 });
+
