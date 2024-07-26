@@ -91,19 +91,23 @@ function displayQuestionsForEdit(isEditMode) {
 
         const correctOptionSelect = document.createElement('select');
         correctOptionSelect.dataset.questionId = question.question_id; // Use correct ID field
-        correctOptionSelect.dataset.correctOption = true; // Mark as correct option
-
+        
+        // Create options for select
         ['1', '2', '3', '4'].forEach(value => {
             const option = document.createElement('option');
             option.value = value;
             option.innerText = value;
-            if (value === question.correct_option) {
+        
+            // Set the correct option as selected
+            if (value === question.correct_option.toString()) { // This line was updated
                 option.selected = true;
             }
+        
             correctOptionSelect.appendChild(option);
         });
-
+        
         questionCard.appendChild(correctOptionSelect); // Add correct option select to card
+        
 
 
         // Add Delete button in edit mode

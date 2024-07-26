@@ -68,6 +68,13 @@ const createQuestionAfterQuizCreation = async (req, res) => {
             newQuestionData.option_3,
             newQuestionData.option_4
         ];
+
+        // Validate that all options are unique
+        const uniqueOptions = new Set(options);
+        if (uniqueOptions.size !== options.length) {
+            return res.status(400).json({ message: "Options must have unique content" });
+        }
+        
         // Convert correct_option to a zero-based index
         const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
         // Check if the index is valid and within the bounds of the options array
@@ -109,6 +116,13 @@ const createQuestionOnUpdate = async (req, res) => { // utilise this in editQues
             newQuestionData.option_3,
             newQuestionData.option_4
         ];
+
+        // Validate that all options are unique
+        const uniqueOptions = new Set(options);
+        if (uniqueOptions.size !== options.length) {
+            return res.status(400).json({ message: "Options must have unique content" });
+        }
+        
         // Convert correct_option to a zero-based index
         const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
         // Check if the index is valid and within the bounds of the options array
@@ -332,6 +346,17 @@ const getQuizWithQuestions = async (req, res) => {
         if (!quiz) {
             return res.status(404).json({ message: 'Quiz does not exist' }); // ---------------------------- Return error if quiz does not exist
         }
+        // Iterate over each question in the quiz
+        quiz.questions.forEach(question => {
+            // Check which option matches the correct_option
+            for (let i = 1; i <= 4; i++) {
+                if (question[`option_${i}`] === question.correct_option) {
+                    question.correct_option = i; // Set correct_option to the corresponding option number
+                    console.log(question.correct_option);
+                    break; // Exit the loop once the correct_option is found
+                }
+            }
+        });
         res.status(200).json(quiz); // --------------------------------------------------------------------- Return retrieved quiz with questions
     } catch (error) {
         console.error('Get Quiz With Questions - Server Error:', error); // -------------------------------- Log error details
