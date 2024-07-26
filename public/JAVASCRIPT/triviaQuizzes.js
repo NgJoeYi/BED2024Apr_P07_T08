@@ -260,7 +260,7 @@ async function submitQuiz() {
 
     document.querySelector('.left-buttons-container').classList.add('hidden-buttons');
     document.getElementById('quiz-questions').classList.add('hidden');
-    document.getElementById('quiz-results').classList.remove('hidden');
+    document.getElementById('results-quiz').classList.remove('hidden');
     alert('Quiz submitted!');
 }
 
