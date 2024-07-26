@@ -92,6 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Submit questions button event listener
+    const submitButton = document.getElementById('submit-questions');
+    if (submitButton) {
+        submitButton.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent the default form submission
+    if (checkUniqueOptions()) {
+        handleQuestionFormSubmit(event);
+    } else {
+        alert('Options must have unique content');
+    }
+});
+}
     // Previous question button event listener
     const prevButton = document.getElementById('prev-question');
     if (prevButton) {
