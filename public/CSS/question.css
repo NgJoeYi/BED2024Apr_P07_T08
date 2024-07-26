@@ -1,48 +1,49 @@
 main {
-    padding: 60px 20px;
-    padding-top: 220px; /* Ensure content is below the navbar */
-    max-width: 1200px;
+    padding: 40px 15px;
+    padding-top: 160px; /* Ensure content is below the navbar */
+    max-width: 800px; /* Reduce the maximum width */
     margin: 0 auto;
     text-align: center; /* Center align the text inside the main content */
 }
 
 #questions-container {
-    margin-top: 20px; /* Add some margin to move it down from the navbar */
-    width: 100%;
+    margin-top: 15px; /* Add some margin to move it down from the navbar */
+    width: 90%; /* Reduce the width */
+    margin: 0 auto; /* Center the container */
 }
 
 .question-card {
     background-color: #1b2b40;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    width: 100%; /* Make width 100% */
-    margin-bottom: 20px;
-    padding: 20px;
+    width: 100%;
+    margin-bottom: 15px; /* Reduce margin */
+    padding: 15px; /* Reduce padding */
     color: #ffffff;
     text-align: center; /* Center align the text inside the card */
 }
 
 .question-card h3 {
-    font-size: 35px;
-    margin: 0 0 10px;
+    font-size: 20px; /* Further reduced font size */
+    margin: 0 0 8px;
 }
 
 .question-card img {
     width: 100%;
-    height: 300px; /* Fixed height */
+    height: 200px; /* Reduced fixed height */
     object-fit: contain; /* Maintain aspect ratio */
-    margin-bottom: 15px;
+    margin-bottom: 10px; /* Reduced margin for better spacing */
 }
 
 .question-card label {
     display: block;
-    margin-bottom: -1px; /* Reduce margin to bring labels closer */
-    font-size: 18px; /* Increase font size */
-    padding: 15px 0; /* Increase padding for larger size */
+    margin-bottom: 0; /* Reduce margin to bring labels closer */
+    font-size: 14px; /* Reduced font size */
+    padding: 10px 0; /* Reduced padding for smaller size */
     border: 1px solid #ffffff; /* Add border to label */
     border-radius: 5px; /* Reduce border-radius for a more square shape */
     cursor: pointer; /* Change cursor to pointer */
@@ -52,8 +53,10 @@ main {
 }
 
 .question-card label:hover {
-    background-color: #d9aa52; /* Change background color on hover */
-    color: #1b2b40; /* Change text color on hover */
+    background-color: #34495E; /* Change background color on hover */
+    color: #ffffff; /* Change text color on hover */
+    border-color: #d9aa52;
+    border-width: 2px; /* Set border width to 2px or any other desired thickness */    
 }
 
 .question-card input[type="radio"] {
@@ -70,16 +73,16 @@ main {
     color: #ffffff; /* Change text color to white */
     border: none;
     border-radius: 5px; /* Slightly rounded corners */
-    padding: 15px 30px;
-    font-size: 18px;
+    padding: 10px 20px; /* Reduced padding */
+    font-size: 16px; /* Reduced font size */
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
     align-self: center;
     display: block; /* Block display for full-width */
-    margin: 20px auto; /* Center align and add margin */
+    margin: 15px auto; /* Center align and add margin */
     width: 100%; /* Stretch to the full width of the parent container */
-    max-width: 1200px; /* Ensure it doesn't exceed the main container width */
+    max-width: 700px; /* Ensure it doesn't exceed the main container width */
 }
 
 #submit-quiz:hover {
@@ -90,27 +93,21 @@ main {
 #navigation-buttons {
     display: flex;
     justify-content: space-between; /* Distribute buttons evenly */
-    margin-top: 20px; /* Margin to move it down */
+    margin-top: 15px; /* Reduced margin to move it down */
 }
 
 #prev-button, #next-button {
     background-color: #d9aa52;
     color: #1b2b40;
     border: none;
-    border-radius: 30px;
-    padding: 15px 25px; /* Increase padding for bigger buttons */
-    font-size: 18px; /* Increase font size */
+    border-radius: 20px; /* Reduced border radius */
+    padding: 10px 15px; /* Reduced padding for smaller buttons */
+    font-size: 14px; /* Reduced font size */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
     display: inline-block; /* Inline block for better alignment */
     margin: 10px; /* Margin to separate buttons */
 }
-
-#prev-button:hover, #next-button:hover {
-    background-color: #b28f3e;
-    transform: translateY(-3px);
-}
-
 
 #prev-button:hover, #next-button:hover {
     background-color: #b28f3e;
