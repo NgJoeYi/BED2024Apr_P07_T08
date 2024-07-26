@@ -52,8 +52,10 @@ main {
 }
 
 .question-card label:hover {
-    background-color: #d9aa52; /* Change background color on hover */
-    color: #1b2b40; /* Change text color on hover */
+    background-color: #34495E; /* Change background color on hover */
+    color: #ffffff; /* Change text color on hover */
+    border-color: #d9aa52;
+    border-width: 2px; /* Set border width to 2px or any other desired thickness */    
 }
 
 .question-card input[type="radio"] {
