@@ -1,8 +1,6 @@
 const Follow = require('../models/Follow');
-const discussionModel = require('../models/Discussion');
 
 // Controller functions
-
 
 const followUser = async (req, res) => {
     const followerId = req.user.id;
@@ -21,8 +19,6 @@ const followUser = async (req, res) => {
     }
 };
 
-
-
 const unfollowUser = async (req, res) => {
     const followerId = req.user.id;
     const { followeeId } = req.body;
@@ -39,7 +35,6 @@ const unfollowUser = async (req, res) => {
         res.status(500).json({ success: false, error: err.message });
     }
 };
-
 
 const getFollowedDiscussions = async (req, res) => {
     const userId = req.user.id;
@@ -69,12 +64,21 @@ const checkFollowStatus = async (req, res) => {
     }
 };
 
-
+const getFollowingCount = async (req, res) => {
+    const userId = req.user.id;
+    try {
+        const count = await Follow.getFollowingCount(userId);
+        res.json({ success: true, count });
+    } catch (err) {
+        console.error('Error fetching following count:', err);
+        res.status(500).json({ success: false, error: 'Error fetching following count' });
+    }
+};
 
 module.exports = {
     followUser,
     unfollowUser,
     getFollowedDiscussions,
-    checkFollowStatus
-    
+    checkFollowStatus,
+    getFollowingCount // Export the new function
 };

@@ -150,7 +150,6 @@ class Lectures {
     // creating lecture
     static async createLecture(newLectureData) {
         let pool;
-        console.log('LECTURE MODEL:', newLectureData);
         try {
             pool = await sql.connect(dbConfig);
             const sqlQuery = `

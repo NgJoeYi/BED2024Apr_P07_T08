@@ -18,39 +18,29 @@ class Discussion {
         this.pinned = pinned; // Add pinned attribute
     }
 
-    static async getDiscussions(category, sort, search) {
+    static async getDiscussions(userId, category, sort, search) {
         try {
             let query = `
                 SELECT d.id, d.title, d.description, d.category, d.posted_date, d.likes, d.dislikes, d.views, u.name AS username, 
-                       ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role, d.pinned, d.user_id
+                       ISNULL(p.img, 'images/profilePic.jpeg') AS profilePic, u.role, d.pinned, d.user_id,
+                       CASE WHEN f.FollowerId IS NULL THEN 0 ELSE 1 END AS isFollowing
                 FROM Discussions d
                 LEFT JOIN Users u ON d.user_id = u.id
                 LEFT JOIN ProfilePic p ON u.id = p.user_id
-                WHERE 1=1
+                LEFT JOIN Follow f ON d.user_id = f.FolloweeId AND (@userId IS NULL OR f.FollowerId = @userId)
+                WHERE (@category = 'all' OR d.category = @category)
+                AND (d.title LIKE '%' + @search + '%' OR d.description LIKE '%' + @search + '%')
+                ORDER BY d.pinned DESC, d.posted_date DESC
             `;
-    
-            if (category && category !== 'all') {
-                query += ` AND d.category = @category`;
-            }
-    
-            if (search) {
-                query += ` AND (d.title LIKE @search OR d.description LIKE @search)`;
-            }
-    
-            query += ` ORDER BY d.pinned DESC, d.posted_date DESC`; // Sort pinned discussions to the top
     
             const pool = await sql.connect(dbConfig);
             const request = pool.request();
-    
-            if (category && category !== 'all') {
-                request.input('category', sql.NVarChar, category);
-            }
-    
-            if (search) {
-                request.input('search', sql.NVarChar, `%${search}%`);
-            }
-    
+            request.input('userId', sql.Int, userId);
+            request.input('category', sql.NVarChar, category);
+            request.input('search', sql.NVarChar, search);
+
             const result = await request.query(query);
+    
             return result.recordset.map(row => ({
                 id: row.id,
                 title: row.title,
@@ -64,12 +54,14 @@ class Discussion {
                 profilePic: row.profilePic,
                 role: row.role,
                 pinned: row.pinned,
-                user_id: row.user_id // Ensure this is included
+                user_id: row.user_id,
+                isFollowing: row.isFollowing // Include follow status
             }));
         } catch (err) {
             throw new Error(`Error getting discussions: ${err.message}`);
         }
     }
+
 
     static async getDiscussionById(discussionId) {
         try {
@@ -261,19 +253,20 @@ class Discussion {
                 AND (d.title LIKE '%' + @search + '%' OR d.description LIKE '%' + @search + '%')
                 ORDER BY d.pinned DESC, d.posted_date DESC
             `;
-
+    
             const pool = await sql.connect(dbConfig);
             const result = await pool.request()
                 .input('userId', sql.Int, userId)
                 .input('category', sql.NVarChar, category)
                 .input('search', sql.NVarChar, search)
                 .query(query);
-
+    
             return result.recordset;
         } catch (err) {
             throw new Error(`Error getting discussions: ${err.message}`);
         }
     }
+    
 }
 
 module.exports = Discussion;

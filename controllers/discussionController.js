@@ -27,7 +27,8 @@ const generateSuggestion = async (text) => {
 const getDiscussions = async (req, res) => {
     try {
         const { category = 'all', sort = 'most-recent', search = '' } = req.query;
-        const discussions = await discussionModel.getDiscussions(category, sort, search);
+        const userId = req.user ? req.user.id : null;  // Get userId if logged in, otherwise null
+        const discussions = await discussionModel.getDiscussions(userId, category, sort, search);
         res.json({ success: true, discussions });
     } catch (err) {
         console.error('Error getting discussions:', err);

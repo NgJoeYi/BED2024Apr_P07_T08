@@ -98,20 +98,7 @@ function populateLectureDetails(lecture) {
     document.getElementById('lectureDuration').value = lecture.duration || '';
 
     // Handle video element display
-    const lectureVideoElement = document.getElementById('lectureVideo');
     const videoSourceElement = document.getElementById('videoSource');
     const lectureVideoInputElement = document.getElementById('lectureVideoInput');
-    
-    if (lectureVideoElement && lecture.video) {
-        const videoUrl = `/video/${lecture.video}`; // Make sure this URL is correct
-        console.log('Setting video URL to:', videoUrl);
-        videoSourceElement.src = videoUrl; // Set src on source element
-        lectureVideoElement.load(); // Load new video source
-        lectureVideoElement.controls = true; // Show video controls
-        lectureVideoElement.style.display = 'block'; // Make video visible
-        lectureVideoInputElement.value = ''; // Clear the video input field
-    } else {
-        lectureVideoElement.style.display = 'none'; // Hide video element if no video
-    }
     
 }
