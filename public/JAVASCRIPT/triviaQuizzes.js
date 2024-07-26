@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Fetch trivia quizzes from the new API route
 function fetchTriviaQuizzes() {
-    fetchWithAuth('/quizzes/trivia?amount=10') // Adjust the query parameters as needed
+    fetch('/quizzes/trivia?amount=10')
         .then(response => response.json())
         .then(data => {
             console.log("Fetched Trivia Quizzes Data:", data); // Log fetched data
@@ -83,7 +83,15 @@ function displayTriviaQuizzes(quizzes) {
         // Create and append start quiz button
         const startButton = document.createElement('button');
         startButton.innerText = 'Start Quiz';
-        startButton.onclick = () => startTriviaQuiz(quiz);
+        startButton.onclick = () => {
+            const token = localStorage.getItem('token'); // fetch token from localStorage
+            if (token) {
+                startTriviaQuiz(quiz);
+            } else {
+                alert('No token found. Please log in.'); // Alert the user to log in
+                window.location.href = 'login.html'; // Redirect to login page
+            }
+        };
         buttonContainer.appendChild(startButton);
 
         quizCardContent.appendChild(buttonContainer);
