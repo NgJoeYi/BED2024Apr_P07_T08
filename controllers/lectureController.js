@@ -3,6 +3,7 @@ const Lectures = require("../models/Lectures");
 const multer = require("multer");
 const path = require('path');
 const fs = require('fs'); 
+const fetch = require('node-fetch'); // Import node-fetch to make API requests
 
 // Multer setup for file uploads
 const storage = multer.memoryStorage();
@@ -209,23 +210,39 @@ const getMaxCourseID = async (req, res) => {
 // Create a new lecture
 const createLecture = async (req, res) => {
     const { title, duration, description, chapterName, courseID } = req.body;
-    const userID = req.user.id;
+    const userID = req.user.id; // extract userID from jwt 
 
     if (!userID) {
         console.error("UserID not provided");
-        return res.status(400).send("UserID not provided");
+        return res.status(400).json({ message: "UserID not provided" });
     }
     if (!courseID) {
         console.error("CourseID not provided");
-        return res.status(400).send("CourseID not provided");
+        return res.status(400).json({ message: "CourseID not provided" });
     }
 
-    if (!req.file) {
+    console.log('videovimeourl',req.body.vimeoVideoUrl );
+    console.log(req.body.vimeoVideoUrl == null);
+    if ( !req.files && !req.files.lectureVideo && req.body.vimeoVideoUrl == null ) {
         console.error("Video not provided");
-        return res.status(400).send("Video not provided");
+        return res.status(400).json({ message: "Video not provided" });
     }
 
-    const videoFilename = req.file.filename;
+    // Check if either a local video file or Vimeo URL is provided
+    let videoFilename = null;
+    let vimeoVideoUrl = req.body.vimeoVideoUrl || null;
+    console.log('vimeovideourl:',vimeoVideoUrl);
+
+    // If there are files in the request and a local video is uploaded
+    if (req.files && req.files.lectureVideo) {
+        videoFilename = req.files.lectureVideo[0].filename;
+    }
+
+    // If neither local video nor Vimeo URL is provided, return an error
+    if (!videoFilename && !vimeoVideoUrl) {
+        console.error("Video not provided");
+        return res.status(400).json({ message: "Video not provided" });
+    }
 
     try {
         const position = await Lectures.getCurrentPositionInChapter(chapterName);
@@ -238,7 +255,7 @@ const createLecture = async (req, res) => {
             description,
             position,
             chapterName,
-            video: videoFilename, // Only the filename is saved
+            video: videoFilename || vimeoVideoUrl, // Only the filename / vimeo URL is saved
         };
 
         console.log('NEW LECTURE DATA:', newLectureData);
@@ -247,9 +264,10 @@ const createLecture = async (req, res) => {
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
         console.error('Error creating lecture:', error);
-        res.status(500).send('Error creating lecture');
+        res.status(500).json({ message: 'Error creating lecture', error: error.message });
     }
 };
+
 
 // So the right lecture video will play according to the lecture
 const getLectureVideoByID = async (req, res) => {
@@ -316,6 +334,85 @@ const checkingUserID = async (req, res) => {
     res.json({ userID });
 };
 
+// VIMEO API 
+const accessToken = process.env.VIMEO_ACCESS_TOKEN;
+async function searchVimeoVideo(req, res) {
+    try {
+        const searchQuery = req.query.search || ''; // Get the search query from the request
+        const response = await fetch(`https://api.vimeo.com/videos?query=${searchQuery}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json(); // Extract error message
+            res.status(response.status).json({ error: errorData.error || 'Error searching for Vimeo video...' });
+            return;
+        }
+        console.log('searching for vimeo video...');
+        const data = await response.json();
+        res.json({
+            message: "Searching for Vimeo video...",
+            videos: data
+        });
+        
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+// function that extracts vimeo video ID
+function extractVideoId(url) {
+    // Match video ID in URL
+    const match = url.match(/vimeo\.com\/(\d+)/);
+    return match ? match[1] : null;
+}
+
+// getting vimeo video from vimeo API 
+async function getVimeoVideo(req, res) {
+    const lectureID = parseInt(req.params.id);
+    try {
+        const lecture = await Lectures.getLectureByID(lectureID);
+        console.log(lecture);
+        const videoUrl = lecture.video;
+        console.log('videor url in getVimeoVideo: ',videoUrl);
+        if (!videoUrl) {
+            return res.status(400).json({ error: 'Invalid Vimeo URL' });
+        }
+        // extract video ID because that's what Vimeo API needs
+        const videoId = extractVideoId(videoUrl);
+        if(!videoId){
+            return res.status(400).json({error:"Invalid vimeo URL"});
+        }
+
+        // Fetch video details from Vimeo API
+        const response = await fetch(`https://api.vimeo.com/videos/${videoId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json(); // Extract error message
+            console.error('Error from Vimeo API:', errorData);
+            return res.status(response.status).json({ error: errorData.error || 'Error fetching Vimeo video details' });
+        }
+
+        const data = await response.json();
+        res.json({
+            message: 'Fetched Vimeo video details successfully',
+            video: data
+        });
+
+    } catch (error) {
+        console.error('Error fetching Vimeo video details:', error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
+
 module.exports = {
     getAllLectures,
     getLectureDetails,
@@ -328,5 +425,7 @@ module.exports = {
     getLecturesByCourseID,
     getMaxCourseID,
     getLectureByID,
-    checkingUserID
+    checkingUserID,
+    searchVimeoVideo,
+    getVimeoVideo
 };

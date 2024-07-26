@@ -109,7 +109,7 @@ async function run() {
             UserID INT NOT NULL,
             Title NVARCHAR(200) NOT NULL,
             Description NVARCHAR(2000),
-            Video NVARCHAR(255),
+             Video NVARCHAR(255), -- This will store either the local video filename or the Vimeo URL
             Duration INT, -- Duration in minutes
             Position INT, -- Position in the course sequence
             CreatedAt DATETIME DEFAULT GETDATE(),
