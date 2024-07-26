@@ -3,6 +3,7 @@ const Lectures = require("../models/Lectures");
 const multer = require("multer");
 const path = require('path');
 const fs = require('fs'); 
+const fetch = require('node-fetch'); // Import node-fetch to make API requests
 
 // Multer setup for file uploads
 const storage = multer.memoryStorage();
@@ -213,19 +214,19 @@ const createLecture = async (req, res) => {
 
     if (!userID) {
         console.error("UserID not provided");
-        return res.status(400).send("UserID not provided");
+        return res.status(400).json({ message: "UserID not provided" });
     }
     if (!courseID) {
         console.error("CourseID not provided");
-        return res.status(400).send("CourseID not provided");
+        return res.status(400).json({ message: "CourseID not provided" });
     }
 
-    if (!req.file) {
+    if (!req.files || !req.files.lectureVideo) {
         console.error("Video not provided");
-        return res.status(400).send("Video not provided");
+        return res.status(400).json({ message: "Video not provided" });
     }
 
-    const videoFilename = req.file.filename;
+    const videoFilename = req.files.lectureVideo[0].filename;
 
     try {
         const position = await Lectures.getCurrentPositionInChapter(chapterName);
@@ -247,9 +248,10 @@ const createLecture = async (req, res) => {
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
     } catch (error) {
         console.error('Error creating lecture:', error);
-        res.status(500).send('Error creating lecture');
+        res.status(500).json({ message: 'Error creating lecture', error: error.message });
     }
 };
+
 
 // So the right lecture video will play according to the lecture
 const getLectureVideoByID = async (req, res) => {
@@ -316,6 +318,28 @@ const checkingUserID = async (req, res) => {
     res.json({ userID });
 };
 
+// VIMEO API 
+const accessToken = process.env.VIMEO_ACCESS_TOKEN;
+async function getVimeoVideos(req, res) {
+    console.log('getvimeovideo');
+    try {
+        const searchQuery = req.query.search || ''; // Get the search query from the request
+        const response = await fetch(`https://api.vimeo.com/videos?query=${searchQuery}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch videos from Vimeo');
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
 module.exports = {
     getAllLectures,
     getLectureDetails,
@@ -328,5 +352,6 @@ module.exports = {
     getLecturesByCourseID,
     getMaxCourseID,
     getLectureByID,
-    checkingUserID
+    checkingUserID,
+    getVimeoVideos
 };

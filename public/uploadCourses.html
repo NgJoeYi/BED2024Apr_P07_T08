@@ -84,16 +84,12 @@
     <span class="close" onclick="closeModal()">&times;</span>
     <h2>Add New Lecture</h2>
     <h3>If you do not enter chapter name it will be saved under the previous chapter</h3>
+    <br>
     <label for="chapterName">Chapter Name:</label>
-    <input type="text" id="chapterName" placeholder="Enter chapter name" >
+    <input type="text" id="chapterName" placeholder="Enter chapter name">
     <br>
     <label for="lectureName">Lecture Name:</label>
     <input type="text" id="lectureName" placeholder="Enter lecture name" required>
-    <br>
-    <div id="fileInputContainer">
-      <label for="videoFiles">Upload Video Files:</label>
-      <input type="file" id="videoFiles" name="Video" accept="video/*" multiple required>
-    </div>
     <br>
     <label for="duration">Duration</label>
     <input type="number" id="duration-lecture" placeholder="Enter duration: " required>
@@ -101,10 +97,31 @@
     <label for="description">Description</label>
     <input type="text" id="description" placeholder="Enter description: " required>
     <br><br>
+    <div class="addVideoContainer">
+      <div>
+        <input type="radio" id="localFileOption" name="videoSource" value="local" onclick="toggleUploadOptions()" checked>
+        <label for="localFileOption">Upload Local File</label>
+        <input type="radio" id="vimeoOption" name="videoSource" value="vimeo" onclick="toggleUploadOptions()">
+        <label for="vimeoOption">Vimeo Video</label>
+      </div>
+      <div id="localFileInput">
+        <label for="videoFiles">Upload Video Files:</label>
+        <input type="file" id="videoFiles" name="lectureVideo" accept="video/*" multiple required>
+      </div>
+      <div id="vimeoVideosContainer" style="display: none;">
+        <label for="vimeoSearch">Search Vimeo Videos:</label>
+        <input type="text" id="vimeoSearch" placeholder="Enter search term">
+        <button onclick="searchVimeoVideos()">Search</button>
+        <div id="vimeoVideoResults"></div>
+      </div>
+    </div>
+    <br><br>
     <button onclick="addLecture()">Add</button>
     <button onclick="closeModal()">Cancel</button>
   </div>
 </div>
+
+
 
 <!-- Footer -->
 <footer>

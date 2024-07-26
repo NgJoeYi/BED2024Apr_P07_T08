@@ -1,33 +1,37 @@
-const mockQuery = jest.fn();
-const mockInput = jest.fn().mockReturnThis();
-const mockRequest = {
-  query: mockQuery,
-  input: mockInput,
-};
+const sql = require('mssql');
+const Lectures = require('../../models/Lectures'); // Import after mock setup
+const dbConfig = require('../../dbConfig');
 
-const mockConnect = jest.fn().mockResolvedValue({
-  request: jest.fn(() => mockRequest),
-  close: jest.fn(),
+// Mock the 'mssql' library
+jest.mock('mssql', () => {
+  const mockQuery = jest.fn();
+  const mockInput = jest.fn().mockReturnThis();
+  const mockRequest = {
+    query: mockQuery,
+    input: mockInput,
+  };
+
+  const mockConnect = jest.fn().mockResolvedValue({
+    request: jest.fn(() => mockRequest),
+    close: jest.fn(),
+  });
+
+  return {
+    connect: mockConnect,
+    Int: 'Int',
+    NVarChar: 'NVarChar',
+    // Add any other necessary mocks here
+  };
 });
 
-const mockMssql = {
-  connect: jest.fn().mockResolvedValue({
-      request: jest.fn(() => mockRequest),
-      close: jest.fn(),
-      query: jest.fn(),
-      Int: 'Int',
-      NVarChar: 'NVarChar',
-  }),
-};
-
-jest.mock('mssql', () => mockMssql);
-
-const Lectures = require('../../models/Lectures'); // Import after mock setup
-
 describe('Lecture Model Tests', () => {
+  let mockQuery;
+  let mockInput;
 
   beforeEach(() => {
     jest.clearAllMocks(); // Clear previous mock calls
+    mockQuery = sql.connect().request().query; // Reset mockQuery
+    mockInput = sql.connect().request().input; // Reset mockInput
   });
 
   it('should fetch all lectures from the database', async () => {
@@ -80,14 +84,14 @@ describe('Lecture Model Tests', () => {
       const result = await Lectures.createLecture(newLectureData);
       expect(result).toBe(mockNewLectureID);
 
-      expect(mockInput).toHaveBeenCalledWith('CourseID', mockMssql.Int, newLectureData.courseID);
-      expect(mockInput).toHaveBeenCalledWith('UserID', mockMssql.Int, newLectureData.userID);
-      expect(mockInput).toHaveBeenCalledWith('Title', mockMssql.NVarChar, newLectureData.title);
-      expect(mockInput).toHaveBeenCalledWith('Description', mockMssql.NVarChar, newLectureData.description);
-      expect(mockInput).toHaveBeenCalledWith('Video', mockMssql.NVarChar, newLectureData.video);
-      expect(mockInput).toHaveBeenCalledWith('Duration', mockMssql.Int, newLectureData.duration);
-      expect(mockInput).toHaveBeenCalledWith('Position', mockMssql.Int, newLectureData.position);
-      expect(mockInput).toHaveBeenCalledWith('ChapterName', mockMssql.NVarChar, newLectureData.chapterName);
+      expect(mockInput).toHaveBeenCalledWith('CourseID', sql.Int, newLectureData.courseID);
+      expect(mockInput).toHaveBeenCalledWith('UserID', sql.Int, newLectureData.userID);
+      expect(mockInput).toHaveBeenCalledWith('Title', sql.NVarChar, newLectureData.title);
+      expect(mockInput).toHaveBeenCalledWith('Description', sql.NVarChar, newLectureData.description);
+      expect(mockInput).toHaveBeenCalledWith('Video', sql.NVarChar, newLectureData.video);
+      expect(mockInput).toHaveBeenCalledWith('Duration', sql.Int, newLectureData.duration);
+      expect(mockInput).toHaveBeenCalledWith('Position', sql.Int, newLectureData.position);
+      expect(mockInput).toHaveBeenCalledWith('ChapterName', sql.NVarChar, newLectureData.chapterName);
       expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO Lectures'));
     });
 

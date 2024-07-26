@@ -179,6 +179,9 @@ app.delete('/courses/noLectures', courseController.deleteCourseWithNoLectures);
 app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
 
 
+// route for vimeo API 
+app.get('/lectures/vimeo-videos',lectureController.getVimeoVideos);
+
 // Add Routes for lectures
 app.get('/lectures/checking', jwtAuthorization.verifyJWT, lectureController.checkingUserID); // get current user ID 
 app.get('/lectures/last-chapter', jwtAuthorization.verifyJWT, lectureController.getLastChapterName); // Fetches the last chapter name for a specific user ID
@@ -189,10 +192,9 @@ app.get('/lectures/:id', lectureController.getLectureByID);
 app.get('/lectures/lecture-details/:id',lectureController.getLectureDetails);
 app.put('/lectures/:id', jwtAuthorization.verifyJWT, upload.single('lectureVideo'), lectureController.updateLecture);
 app.get('/video/:lectureID', lectureController.getLectureVideoByID); // for updating lecture
-app.post('/lectures', jwtAuthorization.verifyJWT, upload.single('lectureVideo'), lectureController.createLecture);
+app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 
 app.delete('/lectures/course/:courseID/chapter/:chapterName', jwtAuthorization.verifyJWT, lectureController.deletingChapterName); 
-
 
 
 app.listen(port, async () => {

@@ -130,6 +130,7 @@
     padding: 10px;
     margin: 10px 0;
 }
+
 input[type="file" i]{
     display:flex;
     flex-direction: column;
@@ -275,4 +276,43 @@ button{
     .footer .row a i {
         margin: 0% 3%;
     }
+}
+
+
+/* for vimeo */
+#vimeoVideoResults {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.vimeo-video {
+    border: 1px solid #ddd;
+    padding: 10px;
+    width: calc(33% - 20px);
+    box-sizing: border-box;
+}
+
+.vimeo-video img {
+    max-width: 100%;
+    height: auto;
+}
+
+.vimeo-video h4 {
+    margin: 0 0 10px;
+    font-size: 16px;
+}
+
+.vimeo-video button {
+    display: block;
+    width: 100%;
+    padding: 5px;
+    background: #0073e6;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.vimeo-video button:hover {
+    background: #005bb5;
 }

@@ -1,3 +1,20 @@
+// allows user to choose either to upload files from vimeo or personal file 
+function toggleUploadOptions() {
+    const localFileOption = document.getElementById("localFileOption").checked;
+    const fileInputContainer = document.getElementById("localFileInput");
+    const vimeoVideosContainer = document.getElementById("vimeoVideosContainer");
+
+    if (localFileOption) {
+        fileInputContainer.style.display = "block";
+        vimeoVideosContainer.style.display = "none";
+    } else {
+        fileInputContainer.style.display = "none";
+        vimeoVideosContainer.style.display = "block";
+    }
+}
+// Call this function once to initialize the state correctly
+toggleUploadOptions();
+
 function triggerFileUpload() {
     document.getElementById('newFileModal').style.display = 'block';
 }
@@ -29,24 +46,28 @@ async function addLecture() {
     const title = document.getElementById('lectureName').value.trim();
     const duration = document.getElementById('duration-lecture').value.trim();
     const description = document.getElementById('description').value.trim();
+    const localFileOption = document.getElementById("localFileOption").checked;
     const videoFileInput = document.getElementById('videoFiles');
     const chapterName = document.getElementById('chapterName').value.trim();
 
-    if (!title || !duration || !description || videoFileInput.files.length === 0) {
+    if (!title || !duration || !description || (localFileOption && videoFileInput.files.length === 0)) {
         alert('Please fill in all fields and select a video file.');
         return;
     }
 
-    // Check if the video filename contains spaces
-    const videoFile = videoFileInput.files[0];
-    if (videoFile && videoFile.name.includes(' ')) {
-        alert('The video filename should not contain spaces. Please rename your file and try again.');
-        videoFileInput.value = ''; // Clear the file input
-        return;
+    if (localFileOption) {
+        // Check if the video filename contains spaces
+        const videoFile = videoFileInput.files[0];
+        if (videoFile && videoFile.name.includes(' ')) {
+            alert('The video filename should not contain spaces. Please rename your file and try again.');
+            videoFileInput.value = ''; // Clear the file input
+            return;
+        }
     }
-    if(duration<=0){
+
+    if (duration <= 0) {
         alert('The duration cannot be lesser than or equal to 0.');
-        duration.value='';
+        duration.value = '';
         return;
     }
 
@@ -55,7 +76,21 @@ async function addLecture() {
     formData.append('duration', duration);
     formData.append('description', description);
     formData.append('chapterName', chapterName); // Adding chapterName
-    formData.append('video', videoFileInput.files[0]);
+
+    if (localFileOption) {
+        formData.append('lectureVideo', videoFileInput.files[0]);
+    } else {
+        const selectedVideo = document.querySelector('.vimeo-video.selected');
+        if (!selectedVideo) {
+            alert('Please select a Vimeo video.');
+            return;
+        }
+        formData.append('vimeoVideoUrl', selectedVideo.getAttribute('data-video-url'));
+    }
+      // Log FormData entries
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+    }
 
     try {
         // Fetch the max course ID
@@ -93,6 +128,80 @@ async function addLecture() {
         console.error('Error uploading lecture:', error);
         alert('Error uploading lecture.');
     }
+}
+
+
+// Getting videos from Vimeo
+async function getVideoFromVimeo() {
+    const response = await fetch('/lectures/vimeo-videos');
+    if (!response.ok) {
+        alert('something is wrong...');
+        throw new Error('Failed to fetch vimeo video');
+    }
+}
+
+// Search Vimeo videos
+async function searchVimeoVideos() {
+    const searchQuery = document.getElementById('vimeoSearch').value;
+    const response = await fetch(`/lectures/vimeo-videos?search=${encodeURIComponent(searchQuery)}`);
+    
+    if (!response.ok) {
+        alert('Something went wrong while fetching Vimeo videos.');
+        throw new Error('Failed to fetch Vimeo videos');
+    }
+    
+    const data = await response.json();
+    displayVimeoVideos(data);
+}
+
+// Display Vimeo videos
+function displayVimeoVideos(data) {
+    const container = document.getElementById('vimeoVideoResults');
+    container.innerHTML = ''; // Clear previous results
+
+    if (data.data && data.data.length > 0) {
+        data.data.forEach((video, index) => {
+            const videoElement = document.createElement('div');
+            videoElement.classList.add('vimeo-video');
+            videoElement.setAttribute('id', `vimeo-video-${index}`);
+
+            const videoTitle = document.createElement('h4');
+            videoTitle.textContent = video.name;
+
+            const videoThumbnail = document.createElement('img');
+            videoThumbnail.src = video.pictures.sizes[2].link; // Use appropriate size
+
+            const selectButton = document.createElement('button');
+            selectButton.textContent = 'Select';
+            selectButton.onclick = () => selectVimeoVideo(video, `vimeo-video-${index}`);
+
+            videoElement.appendChild(videoTitle);
+            videoElement.appendChild(videoThumbnail);
+            videoElement.appendChild(selectButton);
+
+            container.appendChild(videoElement);
+        });
+    } else {
+        container.innerHTML = '<p>No videos found</p>';
+    }
+}
+
+// Select Vimeo video
+function selectVimeoVideo(video, selectedId) {
+    // Hide all video containers
+    const allVideoContainers = document.querySelectorAll('.vimeo-video');
+    allVideoContainers.forEach(container => {
+        if (container.getAttribute('id') !== selectedId) {
+            container.style.display = 'none';
+        }
+    });
+
+    // Show only the selected video container
+    const selectedContainer = document.getElementById(selectedId);
+    selectedContainer.style.display = 'block';
+
+    // Handle the selected video, e.g., set the video URL to a hidden input field
+    console.log('Selected video:', video);
 }
 
 // generates html code to display the lecture 
@@ -192,8 +301,6 @@ async function addCourses() {
         alert('Error saving the course.');
     }
 }
-
-
 
 async function cancelCourse() {
     if (confirm(`Are you sure you want to stop creating course?`)) {
