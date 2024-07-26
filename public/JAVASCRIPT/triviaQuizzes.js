@@ -1,3 +1,6 @@
+let startTime; // Variable to hold the start time
+let endTime; // Variable to hold the end time
+
 document.addEventListener('DOMContentLoaded', () => {
     // Set active state based on the current page
     const quizButton = document.getElementById('quiz-button');
@@ -104,6 +107,8 @@ function startTriviaQuiz(quiz) {
     // Save the selected quiz question to session storage
     console.log("Selected Quiz:", quiz); // Log selected quiz
     sessionStorage.setItem('currentTriviaQuiz', JSON.stringify(quiz));
+    startTime = new Date(); // Start the timer
+    startTimer(); // Start the timer
     // Directly start the quiz
     startQuiz();
 }
@@ -114,6 +119,26 @@ function startQuiz() {
     document.getElementById('quiz-questions').classList.remove('hidden');
     initializeQuiz(JSON.parse(sessionStorage.getItem('currentTriviaQuiz')));
 }
+
+function startTimer() {
+    const timerElement = document.getElementById('timer');
+    timerInterval = setInterval(() => {
+        const currentTime = new Date();
+        const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+        
+        const minutes = Math.floor(elapsedTime / 60);
+        const seconds = elapsedTime % 60;
+        const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        
+        timerElement.innerText = `Time: ${formattedTime}`;
+    }, 1000);
+}
+
+
+function stopTimer() {
+    clearInterval(timerInterval);
+}
+
 
 let currentQuestionIndex = 0;
 let quizData = null;
@@ -196,42 +221,91 @@ function prevQuestion() {
     }
 }
 
-function submitQuiz() {
+async function submitQuiz() {
+    const endTime = Date.now(); // End the timer
+    const timeTaken = Math.floor((endTime - startTime) / 1000); // Calculate time taken in seconds
+    stopTimer(); // Stop the timer
     console.log("User Answers:", userAnswers); // Log user answers
-    const resultsContainer = document.getElementById('results-container');
-    resultsContainer.innerHTML = '';
 
+    // Fetch user information
+    const userResponse = await fetchWithAuth('/account', {});
+    const userData = await userResponse.json();
+    
+    // Calculate the score
+    let score = 0;
     quizData.forEach((question, index) => {
-        const resultItem = document.createElement('div');
-        resultItem.className = 'result-item';
-
-        const questionTitle = document.createElement('h3');
-        questionTitle.innerText = `Question ${index + 1}: ${question.question}`;
-        resultItem.appendChild(questionTitle);
-
-        const userAnswer = document.createElement('p');
-        userAnswer.innerHTML = `Your answer: ${userAnswers[index] || 'No answer selected'}`;
-        resultItem.appendChild(userAnswer);
-
-        const correctAnswer = document.createElement('p');
-        correctAnswer.innerHTML = `Correct answer: ${question.correct_answer}`;
-        resultItem.appendChild(correctAnswer);
-
         if (userAnswers[index] === question.correct_answer) {
-            userAnswer.className = 'correct';
-        } else {
-            userAnswer.className = 'incorrect';
+            score++;
         }
-
-        resultsContainer.appendChild(resultItem);
     });
 
-    createResultButtons(); // Add buttons to the new container
+    const result = {
+        QuizTitle: quizData[0].category,
+        QuizDescription: `Difficulty: ${quizData[0].difficulty} | Type: ${quizData[0].type}`,
+        UserName: userData.name,
+        AttemptDate: new Date().toLocaleString(),
+        Score: score,
+        TotalMarks: quizData.length,
+        TimeTaken: timeTaken,
+        TotalQuestions: quizData.length,
+        Passed: score >= quizData.length / 2,
+        UserResponses: quizData.map((question, index) => ({
+            question_text: question.question,
+            selected_option: userAnswers[index],
+            correct_option: question.correct_answer
+        }))
+    };
+
+    displayQuizResults(result);
 
     document.querySelector('.left-buttons-container').classList.add('hidden-buttons');
     document.getElementById('quiz-questions').classList.add('hidden');
     document.getElementById('quiz-results').classList.remove('hidden');
     alert('Quiz submitted!');
+}
+
+function displayQuizResults(result) {
+    const resultContainer = document.getElementById('results-container');
+    const formattedDate = result.AttemptDate; // You can format the date as needed
+
+    resultContainer.innerHTML = `
+        <div class="result-card">
+            <h2>Quiz Results</h2>
+            <div class="result-title">${result.QuizTitle}</div>
+            <div class="result-description">${result.QuizDescription}</div>
+            <div class="result-details">
+                <p><strong>User Name:</strong> ${result.UserName}</p>
+                <p><strong>Attempt Date:</strong> ${formattedDate}</p>
+                <p><strong>Score:</strong> ${result.Score}/${result.TotalMarks}</p>
+                <p><strong>Time Taken:</strong> ${result.TimeTaken ? result.TimeTaken + ' seconds' : 'N/A'}</p>
+                <p><strong>Total Questions:</strong> ${result.TotalQuestions}</p>
+                <p><strong>Passed:</strong> ${result.Passed ? 'Yes' : 'No'}</p>
+            </div>
+            <div class="incorrect-questions">
+                <h3>Incorrect Questions:</h3>
+                ${result.UserResponses.filter(response => response.selected_option !== response.correct_option).length === 0 ? 
+                    '<p>All your answers were correct!</p>' : 
+                    result.UserResponses.filter(response => response.selected_option !== response.correct_option)
+                    .map(response => `
+                        <div class="question-card">
+                            <p><strong>Question:</strong> ${response.question_text}</p>
+                            <p><strong>Your Answer:</strong> ${response.selected_option}</p>
+                            <p><strong>Correct Answer:</strong> ${response.correct_option}</p>
+                        </div>
+                    `).join('')}
+            </div>
+            <button id="retake-quiz" onclick="retakeQuiz()">Back to Quiz</button>
+            <button id="back-to-home" onclick="backToQuizzes()">Back to home</button>
+        </div>
+    `;
+}
+
+function retakeQuiz() {
+    window.location.href = 'triviaQuiz.html';
+}
+
+function backToQuizzes() {
+    window.location.href = 'index.html';
 }
 
 function createResultButtons() {
