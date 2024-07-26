@@ -30,6 +30,7 @@ const createQuiz = async (req, res) => {
         1. all required fields are filled 
         */
         newQuizData.title = newQuizData.title.charAt(0).toUpperCase() + newQuizData.title.slice(1); // make all quiz title start with upper case
+        newQuizData.description = newQuizData.title.charAt(0).toUpperCase() + newQuizData.title.slice(1); // make all quiz title start with upper case
 
         newQuizData.created_by = userId;  // ------------------------------------------------ Assign the user ID to the new quiz data
 
