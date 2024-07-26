@@ -273,6 +273,8 @@ const updateQuiz = async (req, res) => {
             return res.status(400).json({ message: 'No changes were made.' });
         }
 
+        newQuizData.title = newQuizData.title.charAt(0).toUpperCase() + newQuizData.title.slice(1); // start w upper case
+
         const quiz = await Quiz.updateQuiz(quizId, newQuizData); // ---------------------------------------- Update the quiz
         res.status(200).json({ message: 'successfully updated', quiz}); // --------------------------------- Return success message and updated quiz
     } catch (error) {
