@@ -394,6 +394,12 @@ const updateQuestion = async (req, res) => {
             newQuestionData.option_4
         ];
 
+        // Check for duplicate options
+        const uniqueOptions = new Set(options);
+        if (uniqueOptions.size !== options.length) {
+            return res.status(400).json({ message: 'Options must be unique' }); // Return error if options are not unique
+        }
+
         // Convert correct_option to a zero-based index
         const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
 
