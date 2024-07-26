@@ -393,18 +393,18 @@ async function saveChanges() {
     }
 
     try {
-        for (const updatedQuestion of updatedQuestions) { // Send updated question data to the server
+        for (const [index, updatedQuestion] of updatedQuestions.entries()) { // Send updated question data to the server
             const response = await fetchWithAuth(`/quizzes/${quizId}/questions/${updatedQuestion.question_id}`, { // ------------------------------------------------- headers in jwtutility.js
                 method: 'PUT',
                 body: JSON.stringify(updatedQuestion) // Convert question data to JSON
             });
             const data = await response.json(); // Parse server response
             if (!response.ok) {   // If response is not OK, log and alert the error
-                console.error(`Error updating question ${updatedQuestion.question_id}:`, data.message);
-                alert(`Error updating question ${updatedQuestion.question_id}: ${data.message}`);   
+                console.error(`Error updating question ${index + 1}:`, data.message);
+                alert(`Error updating question ${index + 1}: ${data.message}`);   
                 hasErrors = true;   
             } else { // If response is OK, log success message
-                console.log(`Question ${updatedQuestion.question_id} updated successfully`);
+                console.log(`Question ${index + 1} updated successfully`);
             }
         }
         if (!hasErrors) {    // If no errors occurred, alert success and redirect to quiz page
@@ -414,5 +414,5 @@ async function saveChanges() {
     } catch (error) { // Handle any errors that occur during the process
         console.error('Error saving changes:', error);
         alert(`Error saving changes: ${error.message}`);
-    }
+    }    
 }
