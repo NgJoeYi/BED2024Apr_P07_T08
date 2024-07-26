@@ -1,14 +1,15 @@
 main {
-    padding: 40px 10px;
-    padding-top: 180px; /* Ensure content is below the navbar */
-    max-width: 1000px;
+    padding: 20px 10px;
+    padding-top: 150px; /* Ensure content is below the navbar */
+    max-width: 600px; /* Reduce the maximum width */
     margin: 0 auto;
     text-align: center; /* Center align the text inside the main content */
 }
 
 #questions-container {
     margin-top: 10px; /* Add some margin to move it down from the navbar */
-    width: 90%;
+    width: 90%; /* Reduce the width */
+    margin: 0 auto; /* Center the container */
 }
 
 .question-card {
@@ -19,15 +20,15 @@ main {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    width: 100%; /* Make width 100% */
-    margin-bottom: 15px;
-    padding: 15px;
+    width: 100%;
+    margin-bottom: 10px; /* Reduce margin */
+    padding: 10px; /* Reduce padding */
     color: #ffffff;
     text-align: left; /* Align text to the left inside the card */
 }
 
 .question-card h3 {
-    font-size: 20px; /* Slightly increased font size */
+    font-size: 16px; /* Further reduced font size */
     margin: 0 0 8px;
     color: #d9aa52; /* Highlight the question title */
 }
@@ -35,22 +36,22 @@ main {
 .question-card img {
     width: 100%;
     height: auto; /* Maintain aspect ratio */
-    max-height: 250px; /* Fixed max height */
+    max-height: 150px; /* Further reduce max height */
     object-fit: contain; /* Maintain aspect ratio */
-    margin-bottom: 15px; /* Increased margin for better spacing */
+    margin-bottom: 8px; /* Reduced margin for better spacing */
 }
 
 .question-card textarea,
 .question-card input[type="text"],
 .question-card input[type="file"] {
     width: 100%;
-    padding: 10px; /* Increased padding for better usability */
-    margin-bottom: 10px; /* Increased margin for better spacing */
+    padding: 8px; /* Reduce padding */
+    margin-bottom: 8px; /* Reduce margin */
     border: 1px solid #d9aa52; /* Updated border color for better contrast */
     border-radius: 5px; /* Slightly more rounded corners */
     background-color: #f9f9f9; /* Lighter background color for better contrast */
     color: #1b2b40; /* Match color to background */
-    font-size: 14px;
+    font-size: 12px; /* Reduce font size */
     box-sizing: border-box; /* Ensure padding and border are included in width */
     transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for focus state */
 }
@@ -64,7 +65,7 @@ main {
 }
 
 .question-card input[type="text"] {
-    height: 35px; /* Fixed height for text inputs */
+    height: 25px; /* Reduced fixed height for text inputs */
 }
 
 .question-card button {
@@ -72,11 +73,11 @@ main {
     color: #1b2b40;
     border: none;
     border-radius: 25px;
-    padding: 10px 15px;
-    font-size: 14px;
+    padding: 8px 12px; /* Reduce padding */
+    font-size: 12px; /* Reduce font size */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
-    margin: 8px 0; /* Margin to separate buttons */
+    margin: 6px 0; /* Reduced margin to separate buttons */
 }
 
 .question-card button:hover {
@@ -90,11 +91,11 @@ main {
     color: #1b2b40;
     border: none;
     border-radius: 25px;
-    padding: 12px 20px; /* Increased padding for better usability */
-    font-size: 16px; /* Slightly larger font size */
+    padding: 10px 16px; /* Reduce padding */
+    font-size: 14px; /* Slightly reduced font size */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover state */
-    margin: 15px auto; /* Center the button and add margin */
+    margin: 10px auto; /* Center the button and add margin */
     display: block; /* Make the button a block element */
 }
 
@@ -109,11 +110,11 @@ main {
     color: #1b2b40;
     border: none;
     border-radius: 25px;
-    padding: 12px 20px; /* Increased padding for better usability */
-    font-size: 16px; /* Slightly larger font size */
+    padding: 10px 16px; /* Reduce padding */
+    font-size: 14px; /* Slightly reduced font size */
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover state */
-    margin: 15px auto; /* Center the button and add margin */
+    margin: 10px auto; /* Center the button and add margin */
     display: block; /* Make the button a block element */
 }
 
@@ -126,7 +127,7 @@ main {
 #navigation-buttons {
     display: flex;
     justify-content: space-between; /* Distribute buttons evenly */
-    margin-top: 15px; /* Margin to move it down */
+    margin-top: 10px; /* Reduced margin to move it down */
 }
 
 #prev-button {
@@ -140,13 +141,13 @@ main {
 
 .question-card select {
     width: 100%;
-    padding: 10px; /* Increased padding for better usability */
-    margin-bottom: 10px; /* Increased margin for better spacing */
+    padding: 8px; /* Reduce padding */
+    margin-bottom: 8px; /* Reduce margin */
     border: 1px solid #d9aa52; /* Updated border color for better contrast */
     border-radius: 5px; /* Slightly more rounded corners */
     background-color: #f9f9f9; /* Lighter background color for better contrast */
     color: #1b2b40; /* Match color to background */
-    font-size: 14px;
+    font-size: 12px; /* Reduce font size */
     box-sizing: border-box; /* Ensure padding and border are included in width */
     transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for focus state */
     appearance: none; /* Remove default arrow icon */
@@ -165,7 +166,7 @@ main {
 }
 
 .question-card label {
-    font-size: 14px;
+    font-size: 12px; /* Reduce font size */
     margin-bottom: 5px;
     display: block;
     color: #d9aa52;
