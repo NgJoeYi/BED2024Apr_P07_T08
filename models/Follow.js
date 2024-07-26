@@ -76,6 +76,19 @@ class Follow {
         }
     }
 
+    static async getFollowerCount(userId) {
+        try {
+            const pool = await sql.connect(dbConfig);
+            const result = await pool.request()
+                .input('userId', sql.Int, userId)
+                .query('SELECT COUNT(*) AS count FROM Follow WHERE FolloweeId = @userId');
+            
+            return result.recordset[0].count;
+        } catch (err) {
+            throw new Error(`Error getting follower count: ${err.message}`);
+        }
+    }
+
     static async getFollowedDiscussions(userId) {
         try {
             const pool = await sql.connect(dbConfig);
