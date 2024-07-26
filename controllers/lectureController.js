@@ -71,14 +71,15 @@ const deleteLecture = async (req, res) => {
 
         const success = await Lectures.deleteLecture(lectureID);
         if (!success) {
-            return res.status(404).send("Lecture not found");
+            return res.status(404).json({ message: "Lecture not found" });
         }
-        res.status(204).send("Lecture successfully deleted");
+        res.status(204).send();
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error deleting lecture");
+        res.status(500).json({ message: "Error deleting lecture" });
     }
 };
+
 
 // Delete a chapter by its name, ensuring the user has permission
 const deletingChapterName = async (req, res) => {
@@ -186,15 +187,17 @@ const getLastChapterName = async (req, res) => {
     const userID = req.user.id;
     try {
         const chapterName = await Lectures.getLastChapterName(userID);
+        console.log('Chapter Name:', chapterName); // Debugging log
         if (!chapterName) {
             return res.status(404).send('Chapter name not found');
         }
-        res.status(200).json({ chapterName: chapterName });
+        res.status(200).json({ chapterName });
     } catch (error) {
-        console.error(error);
+        console.error('Error getting chapter name:', error);
         res.status(500).send('Error getting chapter name');
     }
 };
+
 
 // Retrieve the maximum course ID from the database, so we can create new courseID 
 const getMaxCourseID = async (req, res) => {
@@ -258,7 +261,6 @@ const createLecture = async (req, res) => {
             video: videoFilename || vimeoVideoUrl, // Only the filename / vimeo URL is saved
         };
 
-        console.log('NEW LECTURE DATA:', newLectureData);
 
         const newLectureID = await Lectures.createLecture(newLectureData);
         res.status(201).json({ LectureID: newLectureID, ...newLectureData });
