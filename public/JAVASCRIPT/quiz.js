@@ -40,11 +40,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizModal = document.getElementById('quiz-modal');
     const questionModal = document.getElementById('question-modal');
     const closeQuizModalBtn = document.querySelector('.close-quiz-modal-btn');
-    const closeUpdateModalBtn = document.querySelector('.close-update-modal-btn'); // @@@@
-
+    const closeUpdateModalBtn = document.querySelector('.close-update-modal-btn');
 
     // Show the quiz creation modal
     createQuizBtn.addEventListener('click', () => {
+        // Clear session storage items
+        sessionStorage.removeItem('quizData');
+        sessionStorage.removeItem('questions');
+        sessionStorage.removeItem('questionImages');
+        sessionStorage.removeItem('questionImageNames');
+        
+        // Clear the image input
+        const qnsImgInput = document.getElementById('qnsImg');
+        if (qnsImgInput) {
+            qnsImgInput.value = ''; // Clear the file input
+        }
+        
         quizModal.style.display = 'block';
     });
 
@@ -59,10 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
         quizForm.addEventListener('submit', handleQuizFormSubmit);
     }
 
-    // Close the quiz update modal // @@@@
-    closeUpdateModalBtn.addEventListener('click', () => { // @@@@
-        closeUpdateModal(); // @@@@
-    }); // @@@@
+    // Close the quiz update modal
+    closeUpdateModalBtn.addEventListener('click', () => {
+        closeUpdateModal();
+    });
 
     const questionForm = document.getElementById('question-form');
     if (questionForm) {
@@ -75,17 +86,28 @@ document.addEventListener('DOMContentLoaded', () => {
         nextButton.addEventListener('click', showNextQuestion);
     }
 
-    // Delete quiz button event listener 
-    const deleteQuizBtn = document.getElementById('delete-quiz-btn'); 
-    if (deleteQuizBtn) { 
-        deleteQuizBtn.addEventListener('click', () => { 
-            const quizId = document.getElementById('update_quiz_id').value; 
-            handleDeleteQuiz(quizId); 
-        }); 
-    } 
+    // Previous question button event listener
+    const prevButton = document.getElementById('prev-question');
+    if (prevButton) {
+        prevButton.addEventListener('click', showPreviousQuestion);
+    }
+
+    // Delete quiz button event listener
+    const deleteQuizBtn = document.getElementById('delete-quiz-btn');
+    if (deleteQuizBtn) {
+        deleteQuizBtn.addEventListener('click', () => {
+            const quizId = document.getElementById('update_quiz_id').value;
+            handleDeleteQuiz(quizId);
+        });
+    }
 });
 
-// Fetch quizzes from the server
+let currentQuestionIndex = 0;
+let totalQuestions = 0;
+let questions = [];
+let questionImages = []; // To store base64 image data
+let questionImageNames = []; // To store image file names
+
 function fetchQuizzes() {
     fetch('/quizzes')
         .then(response => response.json())
@@ -100,7 +122,6 @@ function fetchQuizzes() {
         .catch(error => console.error('Error fetching quizzes:', error));
 }
 
-// Display quizzes on the page
 function displayQuizzes(quizzes) {
     const quizContainer = document.getElementById('quiz-container');
     quizContainer.innerHTML = '';
@@ -110,7 +131,6 @@ function displayQuizzes(quizzes) {
         const quizCard = document.createElement('div');
         quizCard.className = 'quiz-card';
 
-        // Create and append quiz image
         const quizImage = document.createElement('img');
         if (quiz.quizImg && quiz.quizImg.data) {
             const base64String = arrayBufferToBase64(quiz.quizImg.data);
@@ -118,7 +138,6 @@ function displayQuizzes(quizzes) {
         }
         quizCard.appendChild(quizImage);
 
-        // Create and append quiz card content
         const quizCardContent = document.createElement('div');
         quizCardContent.className = 'quiz-card-content';
 
@@ -138,16 +157,14 @@ function displayQuizzes(quizzes) {
             <strong>Created By:</strong> ${quiz.creator_name}`;
         quizCardContent.appendChild(quizDetails);
 
-        const buttonContainer = document.createElement('div');  
-        buttonContainer.className = 'button-container';  
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
 
-        // Create and append start quiz button
         const startButton = document.createElement('button');
         startButton.innerText = 'Start Quiz';
         startButton.onclick = () => window.location.href = `/question.html?quizId=${quiz.quiz_id}`;
-        buttonContainer.appendChild(startButton);  
+        buttonContainer.appendChild(startButton);
 
-        // Add dropdown menu only if the current user is the creator of the quiz
         if (userId === quiz.created_by) {
             const dropdown = document.createElement('div');
             dropdown.className = 'dropdown';
@@ -171,7 +188,7 @@ function displayQuizzes(quizzes) {
             const editDeleteQuestionLink = document.createElement('a');
             editDeleteQuestionLink.href = '#';
             editDeleteQuestionLink.className = 'edit-delete-question';
-            editDeleteQuestionLink.innerText = 'Edit / Delete Question';   
+            editDeleteQuestionLink.innerText = 'Edit / Delete Question';
 
             editDeleteQuestionLink.onclick = (event) => {
                 event.preventDefault();
@@ -188,7 +205,6 @@ function displayQuizzes(quizzes) {
         quizContainer.appendChild(quizCard);
     });
 
-    // Event delegation for dropdown toggles
     document.addEventListener('click', (event) => {
         const isDropdownToggle = event.target.matches('.dropdown-toggle');
         if (!isDropdownToggle && event.target.closest('.dropdown-menu') == null) {
@@ -201,7 +217,6 @@ function displayQuizzes(quizzes) {
     });
 }
 
-// Convert ArrayBuffer to base64 string
 function arrayBufferToBase64(buffer) {
     let binary = '';
     const bytes = new Uint8Array(buffer);
@@ -212,114 +227,110 @@ function arrayBufferToBase64(buffer) {
     return window.btoa(binary);
 }
 
-// ------------------------------- HANDLE FORMS -------------------------------
-// Handle quiz form submission
 function handleQuizFormSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const quizData = Object.fromEntries(formData.entries());
 
-    // Handle image upload for quiz creation
     const imgFile = document.getElementById('quizImg').files[0];
     if (imgFile) {
         const reader = new FileReader();
         reader.onloadend = () => {
-            quizData.quizImg = reader.result.split(',')[1]; // Convert image to base64 string
+            quizData.quizImg = reader.result.split(',')[1];
             console.log('Quiz Data with Image:', quizData);
             storeQuizData(quizData);
         };
         reader.readAsDataURL(imgFile);
     } else {
-        quizData.quizImg = null; // No image provided
+        quizData.quizImg = null;
         console.log('Quiz Data without Image:', quizData);
         storeQuizData(quizData);
     }
 }
 
-// Store quiz data temporarily and show the question modal
 function storeQuizData(quizData) {
     sessionStorage.setItem('quizData', JSON.stringify(quizData));
     document.getElementById('quiz-modal').style.display = 'none';
     document.getElementById('question-modal').style.display = 'block';
-    currentQuestionIndex = 0; // Initialize the current question index
-    totalQuestions = parseInt(quizData.total_questions); // Get the total questions
+    currentQuestionIndex = 0;
+    totalQuestions = parseInt(quizData.total_questions);
+    questions = JSON.parse(sessionStorage.getItem('questions')) || new Array(totalQuestions).fill({});
+    questionImages = JSON.parse(sessionStorage.getItem('questionImages')) || new Array(totalQuestions).fill(null);
+    questionImageNames = JSON.parse(sessionStorage.getItem('questionImageNames')) || new Array(totalQuestions).fill(null);
     createQuestionForm();
 }
 
-// Handle question form submission
 async function handleQuestionFormSubmit(event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
-    const questionData = Object.fromEntries(formData.entries());
-
-    // Handle image upload for question creation
-    const imgFile = document.getElementById('qnsImg').files[0];
-    if (imgFile) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            questionData.qnsImg = reader.result.split(',')[1]; // Convert image to base64 string
-            console.log('Question Data with Image:', questionData);
-            await storeQuestionData(questionData);
-        };
-        reader.readAsDataURL(imgFile);
-    } else {
-        questionData.qnsImg = null; // No image provided
-        console.log('Question Data without Image:', questionData);
-        await storeQuestionData(questionData);
+    saveCurrentQuestionData();
+    const questionData = questions[currentQuestionIndex];
+    if (questionImages[currentQuestionIndex]) {
+        questionData.qnsImg = questionImages[currentQuestionIndex];
     }
+    await storeQuestionData(questionData);
 }
 
-// Store question data and move to the next question or submit
-async function storeQuestionData(questionData) {
-    let questions = JSON.parse(sessionStorage.getItem('questions')) || [];
-    questions.push(questionData);
+function saveCurrentQuestionData() {
+    const questionData = {
+        question_text: document.getElementById('question_text').value,
+        option_1: document.getElementById('option_1').value,
+        option_2: document.getElementById('option_2').value,
+        option_3: document.getElementById('option_3').value,
+        option_4: document.getElementById('option_4').value,
+        correct_option: document.getElementById('correct_option').value,
+        qnsImg: questionImages[currentQuestionIndex] // Store the image data in base64 format
+    };
+    questions[currentQuestionIndex] = questionData;
     sessionStorage.setItem('questions', JSON.stringify(questions));
-    console.log('Stored Questions:', questions); // Add logging here
+    sessionStorage.setItem('questionImages', JSON.stringify(questionImages)); // Save the images in session storage
+    sessionStorage.setItem('questionImageNames', JSON.stringify(questionImageNames)); // Save image names in session storage
+    console.log('Current Question Data Saved:', questionData);
+}
+
+async function storeQuestionData(questionData) {
+    questions[currentQuestionIndex] = questionData;
+    sessionStorage.setItem('questions', JSON.stringify(questions));
+    console.log('Stored Questions:', questions);
 
     if (currentQuestionIndex < totalQuestions - 1) {
         currentQuestionIndex++;
-        createQuestionForm(); // Create form for the next question
+        createQuestionForm();
     } else {
         await submitQuizAndQuestions();
         alert('All questions have been created successfully.');
         document.getElementById('question-modal').style.display = 'none';
-        resetQuizForm(); // Reset quiz form fields
+        resetQuizForm();
         fetchQuizzes();
     }
 }
 
-// Reset quiz form fields
 function resetQuizForm() {
     const quizForm = document.getElementById('quiz-form');
     quizForm.reset();
 }
 
-// Submit quiz and questions to the server
 async function submitQuizAndQuestions() {
     const quizData = JSON.parse(sessionStorage.getItem('quizData'));
     const questions = JSON.parse(sessionStorage.getItem('questions'));
 
-    // Check that questions are stored as an array
     if (!Array.isArray(questions)) {
         console.error('Questions are not an array:', questions);
         return;
     }
 
-    // Send quiz data to the server and get the created quiz ID
     const createdQuiz = await createQuizRequest(quizData);
 
-    // Send each question to the server
     for (let question of questions) {
         question.quiz_id = createdQuiz.quiz_id;
         await createQuestionRequest(question);
     }
 
-    // Clear the temporary data
     sessionStorage.removeItem('quizData');
     sessionStorage.removeItem('questions');
+    sessionStorage.removeItem('questionImages'); // Clear images from session storage
+    sessionStorage.removeItem('questionImageNames'); // Clear image names from session storage
 }
 
-// Send request to create quiz
 async function createQuizRequest(data) {
     try {
         const response = await fetchWithAuth('/quizzes', {
@@ -347,7 +358,6 @@ async function createQuizRequest(data) {
     }
 }
 
-// Send request to create question
 async function createQuestionRequest(data) {
     try {
         const response = await fetchWithAuth(`/quizzes/${data.quiz_id}/questions`, {
@@ -375,33 +385,37 @@ async function createQuestionRequest(data) {
     }
 }
 
-// Create form for new question
 function createQuestionForm() {
     const questionsContainer = document.getElementById('questions-container');
     questionsContainer.innerHTML = `
         <div>
             <label for="question_text">Question:</label>
-            <input type="text" id="question_text" name="question_text" required>
+            <input type="text" id="question_text" name="question_text" value="${questions[currentQuestionIndex]?.question_text || ''}" required>
         </div>
         <div>
             <label for="option_1">Option 1:</label>
-            <input type="text" id="option_1" name="option_1" required>
+            <input type="text" id="option_1" name="option_1" value="${questions[currentQuestionIndex]?.option_1 || ''}" required>
         </div>
         <div>
             <label for="option_2">Option 2:</label>
-            <input type="text" id="option_2" name="option_2" required>
+            <input type="text" id="option_2" name="option_2" value="${questions[currentQuestionIndex]?.option_2 || ''}" required>
         </div>
         <div>
             <label for="option_3">Option 3:</label>
-            <input type="text" id="option_3" name="option_3" required>
+            <input type="text" id="option_3" name="option_3" value="${questions[currentQuestionIndex]?.option_3 || ''}" required>
         </div>
         <div>
             <label for="option_4">Option 4:</label>
-            <input type="text" id="option_4" name="option_4" required>
+            <input type="text" id="option_4" name="option_4" value="${questions[currentQuestionIndex]?.option_4 || ''}" required>
         </div>
         <div>
             <label for="correct_option">Correct Option:</label>
-            <input type="text" id="correct_option" name="correct_option" required>
+            <select id="correct_option" name="correct_option" required>
+                <option value="1" ${questions[currentQuestionIndex]?.correct_option == 1 ? 'selected' : ''}>Option 1</option>
+                <option value="2" ${questions[currentQuestionIndex]?.correct_option == 2 ? 'selected' : ''}>Option 2</option>
+                <option value="3" ${questions[currentQuestionIndex]?.correct_option == 3 ? 'selected' : ''}>Option 3</option>
+                <option value="4" ${questions[currentQuestionIndex]?.correct_option == 4 ? 'selected' : ''}>Option 4</option>
+            </select>
         </div>
         <div>
             <label for="qnsImg">Question Image:</label>
@@ -409,58 +423,76 @@ function createQuestionForm() {
         </div>
     `;
 
-    // Display the current question number
     const questionNumberElement = document.getElementById('question-number');
     questionNumberElement.innerText = `Question ${currentQuestionIndex + 1}/${totalQuestions}`;
     document.getElementById('next-question').style.display = currentQuestionIndex < totalQuestions - 1 ? 'inline-block' : 'none';
+    document.getElementById('prev-question').style.display = 'inline-block';
     document.getElementById('submit-questions').style.display = currentQuestionIndex === totalQuestions - 1 ? 'inline-block' : 'none';
+
+    const qnsImgInput = document.getElementById('qnsImg');
+    qnsImgInput.addEventListener('change', () => {
+        const file = qnsImgInput.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            questionImages[currentQuestionIndex] = reader.result.split(',')[1]; // Save image data in base64
+            questionImageNames[currentQuestionIndex] = file.name; // Save the filename
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            questionImages[currentQuestionIndex] = null;
+            questionImageNames[currentQuestionIndex] = null;
+        }
+    });
+
+    // Prefill image filename if there is an image for the current question
+    if (questionImageNames[currentQuestionIndex]) {
+        const dataTransfer = new DataTransfer();
+        const file = new File([""], questionImageNames[currentQuestionIndex]);
+        dataTransfer.items.add(file);
+        qnsImgInput.files = dataTransfer.files;
+    }
 }
 
-// Show the next question form
 function showNextQuestion() {
-    const questionForm = document.getElementById('question-form');
-    questionForm.dispatchEvent(new Event('submit'));
+    saveCurrentQuestionData();
+    if (currentQuestionIndex < totalQuestions - 1) {
+        currentQuestionIndex++;
+        createQuestionForm();
+    }
 }
 
+function showPreviousQuestion() {
+    saveCurrentQuestionData();
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        createQuestionForm();
+    } else {
+        document.getElementById('question-modal').style.display = 'none';
+        document.getElementById('quiz-modal').style.display = 'block';
+    }
+}
 
+// Update quiz modal handling functions
+function openUpdateModal(quiz) {
+    const updateQuizForm = document.getElementById('update-quiz-form');
+    updateQuizForm.reset();
+    document.getElementById('update_quiz_id').value = quiz.quiz_id;
+    document.getElementById('update_title').value = quiz.title;
+    document.getElementById('update_description').value = quiz.description;
+    document.getElementById('update_total_questions').value = quiz.total_questions;
+    document.getElementById('update_total_marks').value = quiz.total_marks;
 
+    const currentImage = quiz.quizImg ? `data:image/jpeg;base64,${arrayBufferToBase64(quiz.quizImg.data)}` : '';
+    document.getElementById('update_quiz_img_preview').src = currentImage;
+    document.getElementById('update_quiz_img_preview').style.display = currentImage ? 'block' : 'none';
 
+    document.getElementById('update-modal').style.display = 'block';
+}
 
-
-
-
-
-
-
-
-
-
-
-
-// %%%%%%%% Add missing functions for update and delete operations
-
-// Open the update quiz modal and prefill the fields
-function openUpdateModal(quiz) { 
-    const updateQuizForm = document.getElementById('update-quiz-form'); 
-    updateQuizForm.reset(); 
-    document.getElementById('update_quiz_id').value = quiz.quiz_id; 
-    document.getElementById('update_title').value = quiz.title; 
-    document.getElementById('update_description').value = quiz.description; 
-    document.getElementById('update_total_questions').value = quiz.total_questions; 
-    document.getElementById('update_total_marks').value = quiz.total_marks; 
-
-    const currentImage = quiz.quizImg ? `data:image/jpeg;base64,${arrayBufferToBase64(quiz.quizImg.data)}` : ''; 
-    document.getElementById('update_quiz_img_preview').src = currentImage; 
-    document.getElementById('update_quiz_img_preview').style.display = currentImage ? 'block' : 'none'; 
-
-    document.getElementById('update-modal').style.display = 'block'; 
-} 
-
-// Close the update quiz modal
-function closeUpdateModal() { 
-    document.getElementById('update-modal').style.display = 'none'; 
-} 
-
+function closeUpdateModal() {
+    document.getElementById('update-modal').style.display = 'none';
+}
 
 document.getElementById('update-quiz-form').addEventListener('submit', handleUpdateQuizFormSubmit);
 
@@ -478,46 +510,44 @@ async function handleUpdateQuizFormSubmit(event) {
         };
         reader.readAsDataURL(imgFile);
     } else {
-        quizData.quizImg = document.getElementById('current_quiz_img').value; // Use the stored current image
+        quizData.quizImg = document.getElementById('current_quiz_img').value;
         await updateQuizRequest(quizData);
     }
 }
 
-// Send request to update quiz
-async function updateQuizRequest(data) { 
-    try { 
-        const response = await fetchWithAuth(`/quizzes/${data.quiz_id}`, { 
-            method: 'PUT', 
-            body: JSON.stringify(data), 
-        }); 
-        const body = await response.json(); 
-        if (!response.ok) { 
-            throw new Error(body.message); 
-        } 
-        alert('Quiz updated successfully'); 
-        closeUpdateModal(); 
-        fetchQuizzes(); 
-        location.reload(); 
-    } catch (error) { 
-        console.error('Error updating quiz:', error); 
-        alert(`Error updating quiz: ${error.message}`); 
-    } 
-} 
+async function updateQuizRequest(data) {
+    try {
+        const response = await fetchWithAuth(`/quizzes/${data.quiz_id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+        const body = await response.json();
+        if (!response.ok) {
+            throw new Error(body.message);
+        }
+        alert('Quiz updated successfully');
+        closeUpdateModal();
+        fetchQuizzes();
+        location.reload();
+    } catch (error) {
+        console.error('Error updating quiz:', error);
+        alert(`Error updating quiz: ${error.message}`);
+    }
+}
 
-// Handle delete quiz
-async function handleDeleteQuiz(quizId) { 
-    try { 
-        const response = await fetchWithAuth(`/quizzes/${quizId}`, { 
-            method: 'DELETE' 
-        }); 
-        if (!response.ok) { 
-            throw new Error('Failed to delete quiz'); 
-        } 
-        alert('Quiz deleted successfully'); 
-        fetchQuizzes(); 
-        location.reload(); 
-    } catch (error) { 
-        console.error('Error deleting quiz:', error); 
-        alert(`Error deleting quiz: ${error.message}`); 
-    } 
-} 
+async function handleDeleteQuiz(quizId) {
+    try {
+        const response = await fetchWithAuth(`/quizzes/${quizId}`, {
+            method: 'DELETE'
+        });
+        if (!response.ok) {
+            throw new Error('Failed to delete quiz');
+        }
+        alert('Quiz deleted successfully');
+        fetchQuizzes();
+        location.reload();
+    } catch (error) {
+        console.error('Error deleting quiz:', error);
+        alert(`Error deleting quiz: ${error.message}`);
+    }
+}
