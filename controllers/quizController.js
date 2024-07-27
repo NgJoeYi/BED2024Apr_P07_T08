@@ -10,93 +10,134 @@ function base64ToBuffer(base64String) {
 }
 
 // Function to create a new quiz
-const createQuiz = async (req, res) => {
-    const newQuizData = req.body; // ----------------------------------------------------------- Extract new quiz data from the request body
-    const userId = req.user.id; // ------------------------------------------------------------- Extract user ID
+// why is create quiz and question in one same method?
+/*
+- because to create a question it needs to have a quiz id. meaning that a quiz needs to be created first. but what if there is an error in the question fields? 
+  the quiz would already have been created and it would state the total question is the number of total question as stated in the quiz creation form. 
+  but if the questions have an error, the questions would not be created
+  and if user refresh the page mid way through the question creation form, the same thing would happen, 
+  the quiz would be created which will state the number of total questions as stated in the quiz creation form, 
+  but no question would be created if there is an error or if the user reload midway through the quiz creation page
+*/
+const createQuizAndQuestion = async (req, res) => {
+    const newQuizData = req.body; // Extract new quiz data from the request body
+    const userId = req.user.id; // Extract user ID
     try {
+        // Retrieve all quiz titles with creator names
+        const getAllTitles = await Quiz.getAllQuizWithCreatorName(); 
 
-        const getAllTitles = await Quiz.getAllQuizWithCreatorName(); // ----------------------- Retrieve all quiz titles with creator names
-        // ------------------------------------------------------------------------------------ Check for duplicate titles
-        const newTitle = newQuizData.title.trim().toLowerCase(); // --------------------------- Trim and convert new title to lower case
-        for (const quiz of getAllTitles) {
-            const existingTitle = quiz.title.trim().toLowerCase(); // ------------------------- Trim and convert existing title to lower case
-            if (newTitle === existingTitle) { // ---------------------------------------------- Compare titles
-                return res.status(400).json({ message: 'Title already exists' }); // ---------- Return error if title already exists
+        // Check for duplicate titles
+        const newTitle = newQuizData.title.trim().toLowerCase(); // Normalize the new quiz title
+        for (const quiz of getAllTitles) { // Iterate through all existing quizzes
+            const existingTitle = quiz.title.trim().toLowerCase(); // Normalize the existing quiz title
+            if (newTitle === existingTitle) { // Check if the new title matches an existing title
+                return res.status(400).json({ message: 'Title already exists' }); // Return an error if duplicate title is found
             }
         }
 
-        // ----------------------------- DONE USING JOI INSTEAD -----------------------------
-        /* VALIDATED TO MAKE SURE:
-        1. all required fields are filled 
-        */
-        newQuizData.title = newQuizData.title.charAt(0).toUpperCase() + newQuizData.title.slice(1); // make all quiz title start with upper case
-        newQuizData.description = newQuizData.title.charAt(0).toUpperCase() + newQuizData.title.slice(1); // make all quiz title start with upper case
-
-        newQuizData.created_by = userId;  // ------------------------------------------------ Assign the user ID to the new quiz data
-
-        if (newQuizData.quizImg) { // ------------------------------------------------------- Convert img_url to buffer if it's a base64 string
-            newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg);
+        // Validate unique options for each question
+        for (const question of newQuizData.questions) { // Iterate through all questions in the new quiz
+            const options = [question.option_1, question.option_2, question.option_3, question.option_4]; // Get all options for the question
+            const uniqueOptions = new Set(options); // Create a set to check for uniqueness
+            if (uniqueOptions.size !== options.length) { // Check if the number of unique options matches the total number of options
+                return res.status(400).json({ message: 'Each question must have unique options' }); // Return an error if options are not unique
+            }
         }
-        const quiz = await Quiz.createQuiz(newQuizData); // --------------------------------- Create a new quiz
-        if (!quiz) {
-            return res.status(500).json({ message: 'Failed to create a new quiz' }); // ----- Return error if quiz creation fails
+
+        // Prepare quiz data
+        newQuizData.title = newQuizData.title.charAt(0).toUpperCase() + newQuizData.title.slice(1); // Capitalize the first letter of the title
+        newQuizData.description = newQuizData.description.charAt(0).toUpperCase() + newQuizData.description.slice(1); // Capitalize the first letter of the description
+        newQuizData.created_by = userId; // Set the creator ID for the quiz
+
+        if (newQuizData.quizImg) { // Check if a quiz image is provided
+            newQuizData.quizImg = base64ToBuffer(newQuizData.quizImg); // Convert the base64 image to a buffer
         }
-        res.status(201).json({ message: 'Quiz created successfully', quiz }); // ------------ Return success message and created quiz
-    } catch (error) {
-        console.error('Create Quiz - Server Error:', error); // ----------------------------- Log error details
-        res.status(500).json({ message: 'Server error. Please try again later.' }); // ------ Return server error
+
+        // Create the quiz
+        const quiz = await Quiz.createQuiz(newQuizData); // Save the new quiz to the database
+        if (!quiz) { // Check if the quiz creation failed
+            return res.status(500).json({ message: 'Failed to create a new quiz' }); // Return an error if quiz creation failed
+        }
+
+        // Create questions for the quiz
+        for (const question of newQuizData.questions) { // Iterate through all questions in the new quiz
+            question.quiz_id = quiz.quiz_id; // Assign the quiz ID to each question
+
+            if (question.qnsImg) { // Check if a question image is provided
+                question.qnsImg = base64ToBuffer(question.qnsImg); // Convert the base64 image to a buffer
+            }
+
+            // Convert correct_option to a zero-based index // Because user only chooses correct options in a spinner so only have 1,2,3,4 so need to map abck
+            const correctOptionIndex = parseInt(question.correct_option, 10) - 1;
+            // Check if the index is valid and within the bounds of the options array
+            if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
+                // Map correct_option to its content
+                question.correct_option = options[correctOptionIndex];
+            }
+
+            const createdQuestion = await Quiz.createQuestion(question); // Save the question to the database
+            if (!createdQuestion) { // Check if question creation failed
+                return res.status(500).json({ message: "Failed to create question" }); // Return an error if question creation failed
+            }
+        }
+
+        res.status(201).json({ message: 'Quiz and questions created successfully', quiz }); // Send a success response with the created quiz data
+    } catch (error) { // Catch any errors during the process
+        console.error('Create Quiz - Server Error:', error); // Log the error for debugging
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // Send a server error response
     }
 };
+
 
 // Function to create a question after quiz creation
-const createQuestionAfterQuizCreation = async (req, res) => {
-    const newQuestionData = req.body;  // --------------------------------------------------- Extract new question data from the request body
-    const quizId = parseInt(req.params.id); // ---------------------------------------------- Extract quiz ID from the request parameters
-    try {
-        const checkQuiz = await Quiz.getQuizById(quizId); // -------------------------------- Check if the quiz exists
-        if (!checkQuiz) {
-            return res.status(404).json({ message: 'Quiz does not exist' }); // ------------- Return error if quiz does not exist
-        }
+// const createQuestionAfterQuizCreation = async (req, res) => {
+//     const newQuestionData = req.body;  // --------------------------------------------------- Extract new question data from the request body
+//     const quizId = parseInt(req.params.id); // ---------------------------------------------- Extract quiz ID from the request parameters
+//     try {
+//         const checkQuiz = await Quiz.getQuizById(quizId); // -------------------------------- Check if the quiz exists
+//         if (!checkQuiz) {
+//             return res.status(404).json({ message: 'Quiz does not exist' }); // ------------- Return error if quiz does not exist
+//         }
 
-        if (newQuestionData.qnsImg) { // ---------------------------------------------------- Convert question image to buffer if it's a base64 string
-            newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
-        }
+//         if (newQuestionData.qnsImg) { // ---------------------------------------------------- Convert question image to buffer if it's a base64 string
+//             newQuestionData.qnsImg = base64ToBuffer(newQuestionData.qnsImg);
+//         }
 
 
-        // Define options from newQuestionData
-        const options = [
-            newQuestionData.option_1,
-            newQuestionData.option_2,
-            newQuestionData.option_3,
-            newQuestionData.option_4
-        ];
+//         // Define options from newQuestionData
+//         const options = [
+//             newQuestionData.option_1,
+//             newQuestionData.option_2,
+//             newQuestionData.option_3,
+//             newQuestionData.option_4
+//         ];
 
-        // Validate that all options are unique
-        const uniqueOptions = new Set(options);
-        if (uniqueOptions.size !== options.length) {
-            return res.status(400).json({ message: "Options must have unique content" });
-        }
+//         // Validate that all options are unique
+//         const uniqueOptions = new Set(options);
+//         if (uniqueOptions.size !== options.length) {
+//             return res.status(400).json({ message: "Options must have unique content" });
+//         }
         
-        // Convert correct_option to a zero-based index
-        const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
-        // Check if the index is valid and within the bounds of the options array
-        if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
-            // Map correct_option to its content
-            newQuestionData.correct_option = options[correctOptionIndex];
-        }
-        console.log(newQuestionData);
+//         // Convert correct_option to a zero-based index
+//         const correctOptionIndex = parseInt(newQuestionData.correct_option, 10) - 1;
+//         // Check if the index is valid and within the bounds of the options array
+//         if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
+//             // Map correct_option to its content
+//             newQuestionData.correct_option = options[correctOptionIndex];
+//         }
+//         console.log(newQuestionData);
 
 
-        const question = await Quiz.createQuestion(newQuestionData); // --------------------- Create a new question
-        if (!question) {
-            return res.status(500).json({ message: "Failed to create question" }); // ------- Return error if question creation fails
-        }
-        res.status(201).json({ message: 'Question created successfully', question }); // ---- Return success message and created question
-    } catch (error) {
-        console.error('Error creating question:', error); // -------------------------------- Log error details
-        return res.status(500).json({ message: "Internal Server Error" }); // --------------- Return server error
-    }
-};
+//         const question = await Quiz.createQuestion(newQuestionData); // --------------------- Create a new question
+//         if (!question) {
+//             return res.status(500).json({ message: "Failed to create question" }); // ------- Return error if question creation fails
+//         }
+//         res.status(201).json({ message: 'Question created successfully', question }); // ---- Return success message and created question
+//     } catch (error) {
+//         console.error('Error creating question:', error); // -------------------------------- Log error details
+//         return res.status(500).json({ message: "Internal Server Error" }); // --------------- Return server error
+//     }
+// };
 
 // Function to create a question when updating the quiz
 const createQuestionOnUpdate = async (req, res) => { // utilise this in editQuestion.js 
@@ -695,13 +736,13 @@ const fetchTriviaQuizzes = async (req, res) => {
 };
 
 module.exports = {
-    createQuiz,
+    // createQuiz,
     getQuizById,
     getAllQuizWithCreatorName,
     updateQuiz,
     deleteQuiz,
     getQuizWithQuestions,
-    createQuestionAfterQuizCreation,
+    createQuizAndQuestion,
     createQuestionOnUpdate,
     getAllQuizResultsForUser,
     getUserQuizResult,
