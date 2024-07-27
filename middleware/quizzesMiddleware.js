@@ -1,13 +1,13 @@
 
 const Joi = require("joi");
 
-const validateCreateQuiz = (req, res, next) => {
+const validateCreateQuizAndQns = (req, res, next) => {
   const schema = Joi.object({
       title: Joi.string().required(),
       description: Joi.string().allow(null, ''),
       total_questions: Joi.number().integer().required(),
       total_marks: Joi.number().integer().required(),
-      quizImg: Joi.string().base64().allow(null, ''), // Optional quizImg
+      quizImg: Joi.string().base64().required(), // Required quizImg
       questions: Joi.array().items(
           Joi.object({
               question_text: Joi.string().required(),
@@ -104,7 +104,7 @@ const validateUpdateQuestion = (req, res, next) => {
 
 module.exports = {
   validateCreateQuestion,
-  validateCreateQuiz,
+  validateCreateQuizAndQns,
   validateUpdateQuiz,
   validateUpdateQuestion
 };
