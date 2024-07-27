@@ -37,7 +37,6 @@ async function fetchWithAuth(url, options = {}) {
                     alertShown = true; // Set flag to prevent multiple alerts
                     window.location.href = 'login.html'; // Redirect to login page
                 }
-                return null;
             } else { // For other unauthorized access errors
                 if (!alertShown) {
                     alert(errorData.message || 'Unauthorized access'); // Alert the user
