@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 if (selectedVideo) {
                     formData.append('vimeoVideoUrl', selectedVideo.getAttribute('data-video-url'));
                 } else {
-                    alert('Please select a Vimeo video.');
                     return;
                 }
             }
@@ -103,7 +102,7 @@ function toggleUploadOptions() {
     const localFileInputContainer = document.getElementById('localFileInput');
     const vimeoVideosContainer = document.getElementById('vimeoVideosContainer');
     const localFileOption = document.getElementById('localFileOption').checked;
-    
+
     if (localFileOption) {
         localFileInputContainer.style.display = 'block';
         vimeoVideosContainer.style.display = 'none';
@@ -142,7 +141,7 @@ async function fetchVimeoVideos() {
 // Display Vimeo videos
 function displayVimeoVideos(data) {
     const container = document.getElementById('vimeoVideoResults');
-    
+
     container.innerHTML = ''; // Clear previous results
 
     if (data.videos && data.videos.data.length > 0) {
@@ -161,7 +160,8 @@ function displayVimeoVideos(data) {
 
             const selectButton = document.createElement('button');
             selectButton.textContent = 'Select';
-            selectButton.onclick = () => selectVimeoVideo(videoElement);
+            selectButton.type = 'button'; // Change type to 'button' to prevent form submission
+            selectButton.onclick = () => selectVimeoVideo(videoElement, videoElement.id);
 
             videoElement.appendChild(videoTitle);
             videoElement.appendChild(videoThumbnail);
@@ -175,16 +175,22 @@ function displayVimeoVideos(data) {
 }
 
 // Select Vimeo video
-function selectVimeoVideo(selectedElement) {
+function selectVimeoVideo(video, selectedId) {
     // Hide all video containers
     const allVideoContainers = document.querySelectorAll('.vimeo-video');
     allVideoContainers.forEach(container => {
-        container.classList.remove('selected');
+        if (container.getAttribute('id') !== selectedId) {
+            container.style.display = 'none';
+        }
     });
 
     // Show only the selected video container
-    selectedElement.classList.add('selected');
+    const selectedContainer = document.getElementById(selectedId);
+    selectedContainer.style.display = 'flex';
+
+    // Mark the selected video
+    selectedContainer.classList.add('selected');
 
     // Handle the selected video, e.g., set the video URL to a hidden input field
-    console.log('Selected video:', selectedElement);
+    console.log('Selected video:', video);
 }
