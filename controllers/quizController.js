@@ -38,6 +38,8 @@ const createQuizAndQuestion = async (req, res) => {
         // Validate unique options for each question
         for (const question of newQuizData.questions) { // Iterate through all questions in the new quiz
             const options = [question.option_1, question.option_2, question.option_3, question.option_4]; // Get all options for the question
+            
+            // Ensure options are unique
             const uniqueOptions = new Set(options); // Create a set to check for uniqueness
             if (uniqueOptions.size !== options.length) { // Check if the number of unique options matches the total number of options
                 return res.status(400).json({ message: 'Each question must have unique options' }); // Return an error if options are not unique
@@ -67,12 +69,15 @@ const createQuizAndQuestion = async (req, res) => {
                 question.qnsImg = base64ToBuffer(question.qnsImg); // Convert the base64 image to a buffer
             }
 
-            // Convert correct_option to a zero-based index // Because user only chooses correct options in a spinner so only have 1,2,3,4 so need to map abck
+            // Define options inside the loop where it's used
+            const options = [question.option_1, question.option_2, question.option_3, question.option_4];
             const correctOptionIndex = parseInt(question.correct_option, 10) - 1;
             // Check if the index is valid and within the bounds of the options array
             if (correctOptionIndex >= 0 && correctOptionIndex < options.length) {
                 // Map correct_option to its content
                 question.correct_option = options[correctOptionIndex];
+            } else {
+                return res.status(400).json({ message: 'Correct option must be between 1 and 4' });
             }
 
             const createdQuestion = await Quiz.createQuestion(question); // Save the question to the database
@@ -87,6 +92,8 @@ const createQuizAndQuestion = async (req, res) => {
         res.status(500).json({ message: 'Server error. Please try again later.' }); // Send a server error response
     }
 };
+
+
 
 
 // Function to create a question after quiz creation
