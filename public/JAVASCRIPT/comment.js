@@ -1,23 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    const popup = document.getElementById('popup'); 
-    const addCommentBtn = document.getElementById('addCommentBtn'); 
+    const popup = document.getElementById('popup'); // Get the popup element by its ID
+    const addCommentBtn = document.getElementById('addCommentBtn'); // Get the add comment button by its ID
 
-    let editMode = false; 
-    let currentComment = null;
-    let currentCommentId = null;
+    let editMode = false; // Track if are in edit mode
+    let currentComment = null; // Store the current comment being edited
+    let currentCommentId = null; // Store the ID of the current comment being edited
 
-    const token = getToken();
-    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10);  
+    const token = getToken(); // Retrieve the authentication token from session storage
+    const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage and convert it to an integer
     const currentUser = { 
-        profilePic: sessionStorage.getItem('profilePic') || 'images/profilePic.jpeg'
+        profilePic: sessionStorage.getItem('profilePic') || 'images/profilePic.jpeg' // Retrieve the current user's profile picture or use a default image if not available (Added this for Gignite)
     };
 
-    if (token) {
+    if (token) { // If the user is authenticated
         addCommentBtn.addEventListener('click', () => {
             showPopup('add'); 
         });
-    } else {
+    } else { // If the user is not authenticated
         addCommentBtn.style.display = 'none'; 
     }
 
@@ -28,56 +28,56 @@ document.addEventListener('DOMContentLoaded', () => {
         const cancelButton = popup.querySelector('.cancel-btn');
         const avatarImg = popup.querySelector('.avatar img');
 
-        if (type === 'add') {
+        if (type === 'add') { // If the popup is for adding a new comment
             popupTitle.textContent = 'Leave a Comment';
-            commentText.value = ''; 
-            avatarImg.src = currentUser.profilePic;  
-            editMode = false;
-            currentComment = null; 
-            currentCommentId = null; 
+            commentText.value = ''; // Clear the comment text input
+            avatarImg.src = currentUser.profilePic; // Set the avatar image to the current user's profile picture
+            editMode = false; // Set edit mode to false
+            currentComment = null;  // Clear the current comment
+            currentCommentId = null; // Clear the current comment ID
             saveButton.onclick = saveComment;
 
-        } else {
+        } else { // If the popup is for editing an existing comment
             popupTitle.textContent = 'Edit Comment';
-            commentText.value = currentComment.querySelector('.comment-content').textContent.trim(); 
-            avatarImg.src = currentComment.querySelector('.avatar img').src; 
-            editMode = true;
+            commentText.value = currentComment.querySelector('.comment-content').textContent.trim(); // Set the comment text input to the current comment's content
+            avatarImg.src = currentComment.querySelector('.avatar img').src;  // Set the avatar image to the current comment's avatar image (Gignite)
+            editMode = true; // Set edit mode to true
             saveButton.onclick = saveComment;  
         }
 
-        cancelButton.onclick = closePopup; 
-        popup.style.display = 'flex';
+        cancelButton.onclick = closePopup; // Set the cancel button's onclick event to close the popup
+        popup.style.display = 'flex'; // Display the popup
     }
 
     function closePopup() {
-        popup.style.display = 'none';
+        popup.style.display = 'none'; // Hide the popup
     }
 
     async function saveComment() {
-        const commentText = document.getElementById('comment-text').value;
-        const discussionId = new URLSearchParams(window.location.search).get('discussionId');
+        const commentText = document.getElementById('comment-text').value; // Get the comment text input value
+        const discussionId = new URLSearchParams(window.location.search).get('discussionId'); // Get the discussion ID from the URL
     
         try {
-            const response = editMode && currentComment
+            const response = editMode && currentComment // If in edit mode, send a PUT request to update the comment
                 ? await fetchWithAuth(`/comments/${currentCommentId}`, { 
                     method: 'PUT',
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 })
-                : await fetchWithAuth('/comments', { 
+                : await fetchWithAuth('/comments', { // If not in edit mode, send a POST request to create a new comment
                     method: 'POST',
                     body: JSON.stringify({ content: commentText, discussionId: parseInt(discussionId, 10) })
                 });
     
             if (response.ok) { 
                 const updatedComment = await response.json();
-                if (editMode && currentComment) {
+                if (editMode && currentComment) { // If in edit mode, update the current comment's content
                     currentComment.querySelector('.comment-content').textContent = commentText;
 
                     // Remove existing translation elements
                     currentComment.querySelector('.comment-translated-content')?.remove();
                     currentComment.querySelector('.comment-source-language')?.remove();
 
-                    // Create new translation HTML if necessary
+                    // Create new translation HTML if necessary (aka if updatedComment not in english)
                     const translationHTML = updatedComment.sourceLanguage && updatedComment.sourceLanguage !== 'en' 
                         ? `<div class="comment-translated-content">Translation: ${updatedComment.translatedContent || 'No translation available'}</div>
                         <div class="comment-source-language">Detected language: ${updatedComment.sourceLanguage}</div>`
@@ -88,20 +88,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (commentActions) {
                         commentActions.insertAdjacentHTML('beforebegin', translationHTML);
                     }         
-                               
+
                     alert('Comment updated successfully!');
 
                 } else {
                     alert('Comment posted successfully!');
-                    fetchComments(discussionId);
+                    fetchComments(discussionId); // To get the newly created comment without user manually refreshing
                 }
                 closePopup();
             } else {
                 const errorData = await response.json();
-                alert(errorData.error || response.statusText);
+                alert(errorData.error || response.statusText); // Alert the error message
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error:', error); // Logging down the error
         }
     }    
 
@@ -111,21 +111,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 body: JSON.stringify({ content: text, discussionId: parseInt(discussionId, 10) })
             });
-            if (response.ok) { 
-                alert('Comment posted successfully!');
-                fetchComments(discussionId); 
+            if (response.ok) { // Posting of comments succesful
+                alert('Comment posted successfully!'); // Success message
+                fetchComments(discussionId); // Refresh
             } else {
                 const errorData = await response.json(); 
-                alert(errorData.error || response.statusText); 
+                alert(errorData.error || response.statusText);  // Alert error
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error:', error); // Log error
         }
     }
         
     async function deleteComment(button) {
-        const comment = button.closest('.comment');
-        const commentId = comment.dataset.id;
+        const comment = button.closest('.comment'); // Get the closest comment element
+        const commentId = comment.dataset.id; // Get the comment ID from the data attribute
     
         try {
             const response = await fetchWithAuth(`/comments/${commentId}`, {
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok){
                 if (confirm("Are you sure you want to delete this comment?")) {
-                    comment.remove(); 
+                    comment.remove(); // Remove the comment element
                     alert('Comment deleted successfully!');
                 }
             }
@@ -151,13 +151,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function editComment(button) {
         const comment = button.closest('.comment');
-        const commentUserId = parseInt(comment.dataset.userId, 10);
-        const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); 
+        const commentUserId = parseInt(comment.dataset.userId, 10); // Get the comment user ID from the data attribute
+        const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); // Get the current user ID from session storage
         
         if (commentUserId === currentUserId) {
-            currentComment = comment; 
-            currentCommentId = comment.dataset.id;
-            showPopup('edit');
+            currentComment = comment; // Set the current comment
+            currentCommentId = comment.dataset.id; // Set the current comment ID
+            showPopup('edit'); // Show popup for editing
         } else {
             alert('You can only edit your own comments.');
         }
@@ -197,6 +197,7 @@ async function fetchDiscussionDetails(discussionId) {
     } catch (error) {
         // Log any errors encountered during the fetch operation
         console.error('Error fetching discussion details:', error);
+
     }
 }
 
@@ -206,7 +207,7 @@ function displayDiscussionDetails(discussion) {
         console.error('No discussion details to display');
         return;
     }
-
+  
     // Get the HTML element where the discussion will be displayed
     const mainPost = document.getElementById('main-post'); 
     if (!mainPost) {
@@ -263,6 +264,7 @@ async function fetchComments(discussionId) {
         // Check if the response is not ok (e.g., HTTP status code is not 200)
         if (!response.ok) {
             throw new Error(`Error fetching comments: ${response.statusText}`);
+
         }
         // Parse the response JSON
         const comments = await response.json(); 
@@ -279,12 +281,13 @@ async function fetchComments(discussionId) {
 
     async function incrementLikes(commentId, likeButton, dislikeButton) {
         try {
-            const userId = sessionStorage.getItem('userId'); // Assuming userId is stored in sessionStorage
-            if (!userId) {
+            const userId = sessionStorage.getItem('userId'); // Retrieve userId from sessionStorage
+            if (!userId) { // No userId
                 alert('User ID is required');
                 return;
             }
     
+            // POST request to like the comment, not PUT (liking , disliking comments has nothing to do with PUT since is not updating)
             const response = await fetchWithAuth(`/comments/${commentId}/like`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -293,7 +296,7 @@ async function fetchComments(discussionId) {
             
             const data = await response.json();
             if (data.success) {
-                likeButton.textContent = `👍 ${data.likes} Likes`;
+                likeButton.textContent = `👍 ${data.likes} Likes`; // Update the like button text and attributes based on the response
                 alert(data.message);
                 if (data.message.includes('removed')) {
                     likeButton.setAttribute('data-liked', 'false');
@@ -312,12 +315,13 @@ async function fetchComments(discussionId) {
     
     async function incrementDislikes(commentId, likeButton, dislikeButton) {
         try {
-            const userId = sessionStorage.getItem('userId'); // Assuming userId is stored in sessionStorage
+            const userId = sessionStorage.getItem('userId'); // Retrieve userId from sessionStorage
             if (!userId) {
                 alert('User ID is required');
                 return;
             }
     
+            // POST request to dislike the comment
             const response = await fetchWithAuth(`/comments/${commentId}/dislike`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -326,7 +330,7 @@ async function fetchComments(discussionId) {
     
             const data = await response.json();
             if (data.success) {
-                dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
+                dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`; // Update the dislike button text and attributes based on the response
                 alert(data.message);
                 if (data.message.includes('removed')) {
                     dislikeButton.setAttribute('data-disliked', 'false');
@@ -345,20 +349,21 @@ async function fetchComments(discussionId) {
              
     function displayComments(comments) {
         const commentsSection = document.querySelector('.comments-section'); 
-        commentsSection.innerHTML = ''; 
-        const token = getToken();
+        commentsSection.innerHTML = ''; // Clear previous comments
+        const token = getToken(); // Get authentication token
         const currentUserId = parseInt(sessionStorage.getItem('userId'), 10); 
 
+        // Initial organization of comments is by the date they were posted
         comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
         comments.forEach(comment => { 
             console.log(comment); 
     
             const formattedUsername = formatUsername(comment.username);
-            const commentElement = document.createElement('div'); 
+            const commentElement = document.createElement('div'); // Create a div element for the comment
             commentElement.classList.add('comment');
-            commentElement.dataset.id = comment.id;
-            commentElement.dataset.userId = comment.user_id;
+            commentElement.dataset.id = comment.id; // Set the comment ID as a data attribute
+            commentElement.dataset.userId = comment.user_id; // Set the user ID as a data attribute
 
             const likedByUser = comment.userLiked ? 'true' : 'false';
             const dislikedByUser = comment.userDisliked ? 'true' : 'false';
@@ -366,6 +371,7 @@ async function fetchComments(discussionId) {
             const likesText = `👍 ${comment.likes || 0} Likes`;
             const dislikesText = `👎 ${comment.dislikes || 0} Dislikes`;
 
+            // HTML for the comment translation if applicable
             let translationHTML = '';
             if (comment.sourceLanguage && comment.sourceLanguage !== 'en') {
                 translationHTML = `
@@ -396,23 +402,25 @@ async function fetchComments(discussionId) {
             const likeButton = commentElement.querySelector('.like-button');
             const dislikeButton = commentElement.querySelector('.dislike-button');
 
+             // Add event listener for the like button
             likeButton.addEventListener('click', function () {
                 if (dislikeButton.getAttribute('data-disliked') === 'true') {
                     alert('You can only like or dislike a comment.');
                     return;
                 }
-                incrementLikes(comment.id, this, dislikeButton); 
+                incrementLikes(comment.id, this, dislikeButton); // Call incrementLikes on click
             });
 
+            // Add event listener for the dislike button
             dislikeButton.addEventListener('click', function () {
                 if (likeButton.getAttribute('data-liked') === 'true') {
                     alert('You can only like or dislike a comment.');
                     return;
                 }
-                incrementDislikes(comment.id, likeButton, this); 
+                incrementDislikes(comment.id, likeButton, this);  // Call incrementDislikes on click
             });
             
-            commentsSection.appendChild(commentElement);
+            commentsSection.appendChild(commentElement); // Add the comment element to the comments section
         });
     }        
 
@@ -426,24 +434,25 @@ async function fetchComments(discussionId) {
             const responseText = await response.text();
             console.log('Response text:', responseText);
 
-            if (!response.ok) {
+            if (!response.ok) { // Log and throw an error if the response is not OK
                 console.error('Error response:', responseText);
                 throw new Error('Failed to fetch comment count by discussion ID');
             }
 
-            const data = JSON.parse(responseText);
+            const data = JSON.parse(responseText); // Parse the response text as JSON
             console.log('Parsed data:', data);
 
             const totalCommentsElement = document.getElementById('total-comments'); 
             if (totalCommentsElement) {
-                totalCommentsElement.textContent = data.count;
+                totalCommentsElement.textContent = data.count; // Update the total comments element along with the fetched count
             }
             
         } catch (error) {
-            console.error('Error fetching comment count by discussion ID:', error);
+            console.error('Error fetching comment count by discussion ID:', error); // Log any errors that occur during the fetch
         }
     }
         
+    // Format username by capitalizing the first letter of each word
     function formatUsername(username) {
         return username.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
@@ -453,11 +462,13 @@ async function fetchComments(discussionId) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
+    // To get the discussion ID from the URL parameters
     const discussionId = new URLSearchParams(window.location.search).get('discussionId'); 
-    fetchDiscussionDetails(discussionId);
-    fetchComments(discussionId); 
-    fetchCommentCountByDiscussionId(discussionId);
+    fetchDiscussionDetails(discussionId); // Get details for the discussion
+    fetchComments(discussionId); // Get comments for the discussion
+    fetchCommentCountByDiscussionId(discussionId); // Get the comment count for the discussion
 
+    // Assign these as global window object for external use
     window.editComment = editComment;
     window.deleteComment = deleteComment;
     window.saveComment = saveComment;
@@ -465,5 +476,5 @@ async function fetchComments(discussionId) {
 });
 
 function getToken() {
-    return sessionStorage.getItem('token'); 
+    return sessionStorage.getItem('token'); // To get the authentication token from sessionStorage
 }

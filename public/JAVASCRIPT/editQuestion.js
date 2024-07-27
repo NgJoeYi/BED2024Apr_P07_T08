@@ -274,7 +274,7 @@ async function saveNewQuestion(questionCard, questionInput, imageInput, optionIn
             window.location.reload(); // Refresh the page to reload the data
         } else {
             console.error('Failed to create question:', data.message);
-            alert(`Failed to create question: ${data.message}`);
+            displayValidationErrors(data); // Display validation errors
         }
     } catch (error) {
         console.error('Error creating question:', error);
@@ -401,7 +401,7 @@ async function saveChanges() {
             const data = await response.json(); // Parse server response
             if (!response.ok) {   // If response is not OK, log and alert the error
                 console.error(`Error updating question ${index + 1}:`, data.message);
-                alert(`Error updating question ${index + 1}: ${data.message}`);   
+                displayValidationErrors(data); // Display validation errors
                 hasErrors = true;   
             } else { // If response is OK, log success message
                 console.log(`Question ${index + 1} updated successfully`);
@@ -416,3 +416,11 @@ async function saveChanges() {
         alert(`Error saving changes: ${error.message}`);
     }    
 }
+
+function displayValidationErrors(error) {
+    if (error.errors) {
+      alert('Validation failed:\n' + error.errors.join('\n'));
+    } else {
+      alert(`Error: ${error.message}`);
+    }
+  }

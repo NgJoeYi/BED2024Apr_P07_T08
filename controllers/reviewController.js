@@ -171,37 +171,39 @@ const getReviewsByCourseIdAndSort = async (req, res) => {
     }
 }
 
+// To increase likes for reviews
 const incrementLikes = async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
-        const userId = req.body.userId || req.user?.id;
+        const reviewId = req.params.reviewId; // Extract review ID from request parameters
+        const userId = req.body.userId || req.user?.id; // Ensure userId is passed in the request body
 
         if (!userId) {
-            return res.status(400).json({ success: false, error: 'User ID is required' });
+            return res.status(400).json({ success: false, error: 'User ID is required' }); // Return 400 if user ID is missing
         }
 
         const result = await reviewModel.incrementLikes(reviewId, userId);
-        res.json({ success: true, message: result.message, likes: result.likes });
+        res.json({ success: true, message: result.message, likes: result.likes }); // Send success response with updated amount of likes
     } catch (err) {
         console.error('Error toggling like:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message }); // Send 500 status code if an error occurs
     }
 }
 
+// To increase dislikes for reviews
 const incrementDislikes = async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
-        const userId = req.body.userId || req.user?.id;
+        const reviewId = req.params.reviewId; // Extract review ID from request parameters
+        const userId = req.body.userId || req.user?.id; // Ensure userId is passed in the request body
 
         if (!userId) {
-            return res.status(400).json({ success: false, error: 'User ID is required' });
+            return res.status(400).json({ success: false, error: 'User ID is required' }); // Return 400 if user ID is missing
         }
 
         const result = await reviewModel.incrementDislikes(reviewId, userId);
-        res.json({ success: true, message: result.message, dislikes: result.dislikes });
+        res.json({ success: true, message: result.message, dislikes: result.dislikes }); // Send success response with updated amount of dislikes
     } catch (err) {
         console.error('Error toggling dislike:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message }); // Send 500 status code if an error occurs
     }
 }
 

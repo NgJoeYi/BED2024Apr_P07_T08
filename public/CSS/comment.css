@@ -390,6 +390,12 @@ h3 {
     font-size: 18px;
 }
 
+.comment-translated-content, .comment-source-language{
+  color: #d9aa52;
+  font-weight: 600;
+  font-size: 18px;
+}
+
 .role{
   color: #bbb9b9;
   margin-left: 10px;

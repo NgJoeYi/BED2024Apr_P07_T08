@@ -6,8 +6,17 @@ const fs = require('fs');
 const fetch = require('node-fetch'); // Import node-fetch to make API requests
 
 // Multer setup for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, path.resolve(__dirname, '..', 'public', 'lectureVideos'));
+    },
+    filename: function (req, file, cb) {
+      cb(null, `${Date.now()}-${file.originalname}`);
+    }
+  });
+  
+  const upload = multer({ storage: storage });
+  
 
 // Retrieve and display all lectures
 const getAllLectures = async (req, res) => {
@@ -116,44 +125,25 @@ const deletingChapterName = async (req, res) => {
 
 // Update a lecture's information, ensuring the user has permission
 const updateLecture = async (req, res) => {
-    console.log('COMES BACK END.');
+    console.log('REQUEST BODY:', req.body);
     const userID = req.user.id;
     const id = req.params.id;
-    const { title, description, chapterName, duration } = req.body;
-    console.log(id);
+    const { title, description, chapterName, duration, vimeoVideoUrl } = req.body;
     let videoFilename = null;
 
-    // Handle new video file if uploaded
-    if (req.file) {
-        // Check if req.file is correctly populated
+    if (vimeoVideoUrl) {
+        // Vimeo URL is provided, use it for the video field
+        videoFilename = vimeoVideoUrl;
+    } else if (req.file) {
+        // Handle new video file if uploaded
         console.log('Uploaded file:', req.file);
-
-        // Use req.file.path for disk storage
-        if (!req.file.path) {
-            console.error('No video data found in req.file.path');
-            return res.status(400).send('Invalid video file');
+        videoFilename = req.file.filename;
+    } else {
+        // If no new video is uploaded or no Vimeo URL is provided, keep the existing video filename
+        const existingLecture = await Lectures.getLectureByID(id);
+        if (existingLecture) {
+            videoFilename = existingLecture.video;
         }
-
-        // Generate a unique filename for the video
-        videoFilename = `${Date.now()}-${req.file.originalname}`;
-        const videoPath = path.resolve(__dirname, '..', 'public', 'lectureVideos', videoFilename);
-
-        try {
-            // Move the file to the new location (if necessary)
-            await fs.promises.rename(req.file.path, videoPath);
-        } catch (err) {
-            console.error('Error saving video file:', err);
-            return res.status(500).send('Error saving video file');
-        }
-
-        // Update videoFilename to the new filename
-        videoFilename = path.basename(videoPath); // Ensure we only have the filename
-    }
-
-    const existingLecture = await Lectures.getLectureByID(id);
-
-    if (!videoFilename) {
-        videoFilename = existingLecture ? existingLecture.video : null;
     }
 
     const newLectureData = {
@@ -165,21 +155,27 @@ const updateLecture = async (req, res) => {
     };
 
     try {
+        const existingLecture = await Lectures.getLectureByID(id);
+
+        if (!existingLecture) {
+            return res.status(404).send('Lecture not found!');
+        }
+
         if (userID !== existingLecture.userID) {
             return res.status(403).send('You do not have permission to edit the lecture');
         }
 
         const updateResult = await Lectures.updateLecture(id, newLectureData);
-        if (!updateResult) {
-            return res.status(404).send('Lecture not found!');
-        }
-
         res.json({ message: 'Lecture updated successfully', data: updateResult, userID: userID });
     } catch (error) {
         console.error('Error updating lecture:', error);
         res.status(500).send('Error updating lecture');
     }
 };
+
+
+
+
 
 
 // Retrieve the name of the last chapter for the current user, so user can add multiple lecture under chapter
