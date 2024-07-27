@@ -79,10 +79,34 @@ const validateUpdateQuiz = (req, res, next) => {
   next();
 };
 
+const validateUpdateQuestion = (req, res, next) => {
+  const schema = Joi.object({
+    question_text: Joi.string().required(),
+    option_1: Joi.string().required(),
+    option_2: Joi.string().required(),
+    option_3: Joi.string().required(),
+    option_4: Joi.string().required(),
+    correct_option: Joi.number().integer().min(1).max(4).required(),
+    qnsImg: Joi.string().base64().allow(null, ''), // Allow empty string or null for image
+  }).unknown(true); // Allow other fields (e.g., question_id)
+
+  const validation = schema.validate(req.body, { abortEarly: false });
+
+  if (validation.error) {
+    const errors = validation.error.details.map((error) => error.message);
+    console.log('Validation errors:', errors); // Log the validation errors to the console
+    res.status(400).json({ message: "Validation error", errors });
+    return;
+  }
+
+  next();
+};
+
 module.exports = {
   validateCreateQuestion,
   validateCreateQuiz,
-  validateUpdateQuiz
+  validateUpdateQuiz,
+  validateUpdateQuestion
 };
 // note: 
 // - joi.ref is used to create a reference to another key in the same schema. so in this case,
