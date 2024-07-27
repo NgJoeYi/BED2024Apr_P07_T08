@@ -596,7 +596,7 @@ async function fetchFollowingCount() {
     followingCountElement.textContent = data.count; // Update the count in the HTML
   } catch (error) {
     console.error('Error fetching following count:', error);
-    alert('Error fetching following count: ' + error.message);
+   
   }
 }
 
@@ -620,7 +620,7 @@ async function fetchFollowerCount() {
     }
   } catch (error) {
     console.error('Error fetching follower count:', error);
-    alert('Error fetching follower count: ' + error.message);
+   
   }
 }
 
