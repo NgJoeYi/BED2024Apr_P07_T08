@@ -668,29 +668,29 @@ const fetchTriviaQuizzes = async (req, res) => {
     const amount = req.query.amount || 10; // Get the amount of quizzes to fetch, default to 10
     const difficulty = req.query.difficulty || ''; // Get the difficulty level if provided
 
-    const url = `https://opentdb.com/api.php?amount=${amount}&difficulty=${difficulty}`;
+    const url = `https://opentdb.com/api.php?amount=${amount}&difficulty=${difficulty}`; // Construct the API URL with query parameters
     try {
-        const response = await fetch(url);
-        const data = await response.json();
+        const response = await fetch(url); // Fetch data from the API
+        const data = await response.json(); // Parse the response as JSON
 
-        if (!data || !data.results || data.results.length === 0) {
-            return res.status(404).json({ message: 'No trivia quizzes found' });
+        if (!data || !data.results || data.results.length === 0) {  // Check if data is invalid or empty
+            return res.status(404).json({ message: 'No trivia quizzes found' }); // Return 404 status if no quizzes found
         }
 
         // Group quizzes by category
         const groupedQuizzes = data.results.reduce((acc, quiz) => {
-            if (!acc[quiz.category]) {
-                acc[quiz.category] = [];
+            if (!acc[quiz.category]) { // If category is not already in accumulator
+                acc[quiz.category] = []; // Initialize category array
             }
-            acc[quiz.category].push(quiz);
-            return acc;
+            acc[quiz.category].push(quiz); // Push the quiz into the category array
+            return acc; // Return the accumulator for the next iteration
         }, {});
 
         console.log('Grouped Quizzes:', groupedQuizzes); // Debugging: Log the grouped quizzes
         res.status(200).json(groupedQuizzes); // Return the grouped quizzes
-    } catch (error) {
+    } catch (error) { // Catch any errors during fetch or data processing
         console.error('Error fetching trivia quizzes:', error);
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        res.status(500).json({ message: 'Server error. Please try again later.' }); // Return 500 status with error message
     }
 };
 
