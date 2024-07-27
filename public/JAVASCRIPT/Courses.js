@@ -285,7 +285,7 @@ async function searchCourses(event) {
     displayCourses(courses);
   } catch (error) {
     console.error('Error searching for courses: ', error);
-    alert('Error searching for courses. Please re-enter.');
+    alert('Course not found. Please re-enter.');
   }
 }
 
