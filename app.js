@@ -110,7 +110,7 @@ app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQu
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
 app.post('/quizzes/:id/questions/update', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionOnUpdate); // question form DURING edit question // editQuestion.js
 app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuiz, quizController.updateQuiz); // edit quiz
-app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
+app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuestion, quizController.updateQuestion); // edit question
 app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz); // delete quiz by quiz id
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
 //--------------------------------------------------------JOEYI---------------------------------------------------------------------------------------------
