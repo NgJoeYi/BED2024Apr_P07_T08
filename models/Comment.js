@@ -15,7 +15,7 @@ class Comment { // Initializing the Comment object with various properties
         this.dislikes = dislikes;
     }
 
-    // Function to fetch all comments
+    // To fetch all comments
     static async getAllComments() {
         const query = `
             SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, u.id AS user_id, u.name AS username,
@@ -48,7 +48,7 @@ class Comment { // Initializing the Comment object with various properties
         }
     }
     
-    // Function to fetch comments by user ID
+    // To fetch comments by user ID
     static async getCommentById(id) {
         const query = `
             SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, uc.user_id, u.name AS username,
@@ -80,7 +80,7 @@ class Comment { // Initializing the Comment object with various properties
         }
     }
     
-    // Function to fetch comments by discussion ID
+    // To fetch comments by discussion ID
     static async getCommentsByDiscussionId(discussionId) {
         const query = `
             SELECT uc.id, uc.content, uc.created_at, uc.discussion_id, uc.likes, uc.dislikes, u.id AS user_id, u.name AS username,
@@ -116,7 +116,7 @@ class Comment { // Initializing the Comment object with various properties
         }
     }
 
-    // Function to create a new comment
+    // To create a new comment
     static async createComment(content, userId, discussion_id) {
         const query = `
             INSERT INTO user_comments (content, user_id, discussion_id, created_at)
@@ -148,7 +148,7 @@ class Comment { // Initializing the Comment object with various properties
         }
     }
     
-    // Function to update comment
+    // To update comment
     static async updateComment(id, content) {
         const query = `
             UPDATE user_comments
@@ -183,7 +183,7 @@ class Comment { // Initializing the Comment object with various properties
     }
     
     
-    // Function to delete comment
+    // To delete comment
     static async deleteComment(id) {
         const query = `
             DELETE FROM user_comments
@@ -212,7 +212,7 @@ class Comment { // Initializing the Comment object with various properties
         }
     }
 
-    // Function to fetch total count of comments
+    // To fetch total count of comments
     static async getCommentCount() {
         const query = `SELECT COUNT(*) AS count FROM user_comments`;
         let connection;
@@ -232,7 +232,7 @@ class Comment { // Initializing the Comment object with various properties
         }
     }
 
-    // Function to fetch the count of comments by discussion ID
+    // To fetch the count of comments by discussion ID
     static async getCommentCountByDiscussionId(discussionId) {
         const query = `
             SELECT COUNT(*) AS count
@@ -257,6 +257,7 @@ class Comment { // Initializing the Comment object with various properties
         }
     }   
 
+    // To handle incrementing number of likes for comment
     static async incrementLikes(commentId, userId) {
         const query = `
             IF EXISTS (SELECT 1 FROM CommentLikes WHERE comment_id = @commentId AND user_id = @userId)
@@ -279,17 +280,20 @@ class Comment { // Initializing the Comment object with various properties
         `;
         let connection;
         try {
-            connection = await sql.connect(dbConfig);
+            connection = await sql.connect(dbConfig); // Establishing a connection to the database
             const request = new sql.Request(connection);
-            request.input('commentId', sql.Int, commentId);
+            // Setting the input parameter for the query
+            request.input('commentId', sql.Int, commentId); 
             request.input('userId', sql.Int, userId);
-            const result = await request.query(query);
-            return result.recordset[0];
-        } catch (err) {
+            const result = await request.query(query); // Executing the SQL query to increment likes for comment
+            return result.recordset[0]; // Return the result
+
+        } catch (err) { // Handling any errors that occur during the process
             throw new Error('Error toggling like: ' + err.message);
+
         } finally {
             if (connection) {
-                await connection.close();
+                await connection.close(); // Ensuring that the database connection is closed
             }
         }
     }
@@ -316,17 +320,20 @@ class Comment { // Initializing the Comment object with various properties
         `;
         let connection;
         try {
-            connection = await sql.connect(dbConfig);
+            connection = await sql.connect(dbConfig); // Establishing a connection to the database
             const request = new sql.Request(connection);
+            // Setting the input parameter for the query
             request.input('commentId', sql.Int, commentId);
             request.input('userId', sql.Int, userId);
-            const result = await request.query(query);
-            return result.recordset[0];
-        } catch (err) {
+            const result = await request.query(query); // Executing the SQL query to increment dislikes for comment
+            return result.recordset[0]; // Return the result
+
+        } catch (err) { // Handling any errors that occur during the process
             throw new Error('Error toggling dislike: ' + err.message);
+
         } finally {
             if (connection) {
-                await connection.close();
+                await connection.close(); // Ensuring that the database connection is closed
             }
         }
     }

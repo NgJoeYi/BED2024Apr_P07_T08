@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('courseID');
         if (courseId && !isNaN(courseId)) {
-            fetchReviews(courseId); 
+            fetchReviews(courseId);  // Fetch reviews with the updated filter
         } else {
             console.error('Invalid course ID');
         }
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const courseId = urlParams.get('courseID');
         if (courseId && !isNaN(courseId)) {
-            fetchReviews(courseId);
+            fetchReviews(courseId); // Fetch reviews with the updated sort option
         } else {
             console.error('Invalid course ID');
         }
@@ -159,7 +159,7 @@ function showPopup(type, review = null) {
 // Function to close the popup
 function closePopup() {
     const popup = document.getElementById('popup');
-    popup.style.display = 'none';
+    popup.style.display = 'none'; // Hide the popup
 }
 
 // Function to delete a review
@@ -175,14 +175,14 @@ async function deleteReview(button) {
         if (!response) return; 
         if (response.ok) {
             review.remove(); // Remove the review element
-            alert('Review deleted successfully!');
+            alert('Review deleted successfully!'); // Alert user successful deletion of review
         } else {
             const errorMessage = await response.text();
-            console.error('Failed to delete review:', errorMessage);
+            console.error('Failed to delete review:', errorMessage); // Logging the error
         }
     } catch (error) {
-        console.error('Error deleting review:', error);
-        alert('Error deleting review');
+        console.error('Error deleting review:', error); // Logging error
+        alert('Error deleting review'); // Alert user if unsucessful deletion of review
     }
 }
 
@@ -259,19 +259,19 @@ async function editReview(button) {
                 body: JSON.stringify({ review_text: updatedText, rating: updatedRating, courseId: courseId })
             });
             
-            if (!response) return;
+            if (!response) return; // Exit if no response
             if (!response.ok) {
-                const error = await response.json();
-                throw error;
+                const error = await response.json(); // Parse error response
+                throw error; // Throw error to be caught in catch block
             }
 
-            const data = await response.json();
+            const data = await response.json(); // Parse successful response
             alert(data.message); // Success message
             closePopup(); // Close the popup
             fetchReviews(courseId); // Refresh the reviews
         } catch (error) {
-            console.error('Error updating review:', error);
-            alert(`${error.error || 'Internal Server Error'}`);
+            console.error('Error updating review:', error); // Logging error
+            alert(`${error.error || 'Internal Server Error'}`); // Show error message
         }
     };
 
@@ -281,69 +281,71 @@ async function editReview(button) {
     };
 }
 
+// Function to increment likes for a review
 async function incrementLikes(reviewId, likeButton, dislikeButton) {
     try {
         const userId = sessionStorage.getItem('userId');
         if (!userId) {
-            alert('User ID is required');
+            alert('User ID is required'); // Alert if user ID not found
             return;
         }
 
         const response = await fetchWithAuth(`/reviews/${reviewId}/like`, {
-            method: 'POST',
+            method: 'POST', // Send a POST request to increment likes, not PUT
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId })
+            body: JSON.stringify({ userId }) // Include user ID in request body
         });
 
         const data = await response.json();
         if (data.success) {
-            likeButton.textContent = `👍 ${data.likes} Likes`;
-            alert(data.message);
+            likeButton.textContent = `👍 ${data.likes} Likes`; // Update like count
+            alert(data.message); // Show success message
             if (data.message.includes('removed')) {
-                likeButton.setAttribute('data-liked', 'false');
+                likeButton.setAttribute('data-liked', 'false'); // Update like status
             } else {
-                likeButton.setAttribute('data-liked', 'true');
-                dislikeButton.setAttribute('data-disliked', 'false');
+                likeButton.setAttribute('data-liked', 'true'); // Update like status
+                dislikeButton.setAttribute('data-disliked', 'false'); // Update dislike status
             }
         } else {
-            alert('Error toggling like.');
+            alert('Error toggling like.'); // Show error message if not successful in increasing/toggling likes
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error toggling like.');
+        console.error('Error:', error); // Log ging error
+        alert('Error toggling like.'); // Alert to show error
     }
 }
 
+// Function to increment dislikes for a review
 async function incrementDislikes(reviewId, likeButton, dislikeButton) {
     try {
         const userId = sessionStorage.getItem('userId');
         if (!userId) {
-            alert('User ID is required');
+            alert('User ID is required'); // Alert if user ID not found
             return;
         }
 
         const response = await fetchWithAuth(`/reviews/${reviewId}/dislike`, {
-            method: 'POST',
+            method: 'POST', // Send a POST request to increment dislikes, not PUT
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId })
+            body: JSON.stringify({ userId }) // Include user ID in request body
         });
 
         const data = await response.json();
         if (data.success) {
-            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
-            alert(data.message);
+            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`; // Update dislike count
+            alert(data.message); // Show success message
             if (data.message.includes('removed')) {
-                dislikeButton.setAttribute('data-disliked', 'false');
+                dislikeButton.setAttribute('data-disliked', 'false'); // Update dislike status
             } else {
-                dislikeButton.setAttribute('data-disliked', 'true');
-                likeButton.setAttribute('data-liked', 'false');
+                dislikeButton.setAttribute('data-disliked', 'true'); // Update dislike status
+                likeButton.setAttribute('data-liked', 'false'); // Update like status
             }
         } else {
-            alert('Error toggling dislike.');
+            alert('Error toggling dislike.'); // Show error message if not successful in increasing/toggling dislikes
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error toggling dislike.');
+        console.error('Error:', error); // Logging error
+        alert('Error toggling dislike.'); // Alert user about insuccessful toggling of dislikes
     }
 }
 
@@ -387,23 +389,26 @@ async function fetchReviews(courseId) {
         reviewsContainer.innerHTML = ''; // Clear existing reviews
 
         reviews.forEach(review => {
-            const reviewElement = document.createElement('div');
-            reviewElement.classList.add('review');
-            reviewElement.setAttribute('data-id', review.review_id);
-            reviewElement.setAttribute('data-user-id', review.user_id);
-            reviewElement.setAttribute('data-date', review.review_date);
+            const reviewElement = document.createElement('div'); // Create a new 'div' element to represent the review
+            reviewElement.classList.add('review'); // Add 'review' class for styling
+            reviewElement.setAttribute('data-id', review.review_id); // Set review ID as a data attribute
+            reviewElement.setAttribute('data-user-id', review.user_id); // Set user ID as a data attribute
+            reviewElement.setAttribute('data-date', review.review_date); // Set review date as a data attribute
 
-            const likedByUser = review.userLiked ? 'true' : 'false';
-            const dislikedByUser = review.userDisliked ? 'true' : 'false';
+             // Determine if the current user has liked or disliked this review
+            const likedByUser = review.userLiked ? 'true' : 'false'; // 'true' if the review is liked by the user, otherwise 'false'
+            const dislikedByUser = review.userDisliked ? 'true' : 'false'; // 'true' if the review is disliked by the user, otherwise 'false'
 
-            const likesText = `👍 ${review.likes || 0} Likes`;
-            const dislikesText = `👎 ${review.dislikes || 0} Dislikes`;
+            const likesText = `👍 ${review.likes || 0} Likes`; // Show the number of likes
+            const dislikesText = `👎 ${review.dislikes || 0} Dislikes`; // Show the number of dislikes
 
+            // Display action buttons if the user is logged in and is the author of the review
             const reviewActions = (token && review.user_id === currentUserId) ? `
                 <button onclick="editReview(this)">Edit</button>
                 <button class="deleteReview" onclick="deleteReview(this)">Delete</button>
             ` : '';
 
+            // Display like and dislike buttons if the user is logged in
             const likeDislikeButtons = token ? `
                 <button class="like-button" data-liked="${likedByUser}">${likesText}</button>
                 <button class="dislike-button" data-disliked="${dislikedByUser}">${dislikesText}</button>
@@ -441,7 +446,7 @@ async function fetchReviews(courseId) {
                         alert('You can only like or dislike a review.');
                         return;
                     }
-                    incrementLikes(review.review_id, this, dislikeButton);
+                    incrementLikes(review.review_id, this, dislikeButton); // Increment likes
                 });
 
                 dislikeButton.addEventListener('click', function () {
@@ -449,7 +454,7 @@ async function fetchReviews(courseId) {
                         alert('You can only like or dislike a review.');
                         return;
                     }
-                    incrementDislikes(review.review_id, likeButton, this);
+                    incrementDislikes(review.review_id, likeButton, this); // Increment dislikes
                 });
             }
             
@@ -468,17 +473,17 @@ async function fetchReviewCountByCourseId(courseId) {
             method: 'GET' // Send a GET request to fetch review count
         });
 
-        console.log('Response status:', response.status); // Debug
+        console.log('Response status:', response.status); // Debugging log
         const responseText = await response.text();
-        console.log('Response text:', responseText);
+        console.log('Response text:', responseText); // Debugging log
 
         if (!response.ok) {
-            console.error('Error response:', responseText);
+            console.error('Error response:', responseText); // Logging error if the request fails
             throw new Error('Failed to fetch review count by course ID');
         }
 
-        const data = JSON.parse(responseText);
-        console.log('Parsed data:', data); // Debug 
+        const data = JSON.parse(responseText); // Parse the response
+        console.log('Parsed data:', data); // Debugging log
 
     } catch (error) {
         console.error('Error fetching review count by course ID:', error);

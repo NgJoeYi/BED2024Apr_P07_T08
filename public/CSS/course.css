@@ -1,0 +1,333 @@
+/* filter css in course.html side  */
+
+
+/* Popup Styles */
+/* General Popup/Modal Styles */
+
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 9999; /* Sit on top */
+    left: 0;
+    top: 80px;
+    float: center;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    
+  }
+  
+  /* Popup/Modal Content */
+  .popup-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 5% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 600px;
+    box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.2);
+    border-radius: 10px;
+  }
+  
+  /* Close Button */
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Form Group */
+  .form-group-activity {
+    margin-bottom: 15px;
+  }
+  
+  /* Label */
+  .form-group-activity label {
+    font-weight: bold;
+    display: block;
+  }
+  
+  /* Text Input */
+  .form-group-activity input[type="text"],
+  .form-group-activity textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical; /* Allow the user to resize the textarea (vertically) */
+  }
+  
+  /* Dropdown Select */
+  .form-group-activity select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 10px;
+  }
+  
+  /* Submit Button */
+  .upload-button {
+    background-color: #1b2b40; /* Button color */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  .upload-button:hover {
+    background-color: #224574;
+    border: 2px solid #f0c674; /* Gold border for the active button */
+  }
+  
+  
+  
+  
+  
+  /* baghtml, Courses.html */
+  
+  .main-courses-unique {
+    padding: 20px;
+    text-align: center;
+    margin: 20px
+  }
+  
+  .course-header-unique {
+    margin-bottom: 40px; /* Increased margin for spacing */
+    padding: 50px;
+    border-radius: 20px;
+  }
+  
+  .search-filter-bar-unique {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .search-container{
+    display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+    
+  }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    color: black;
+  }
+
+  .question-section {
+    display: flex;
+    align-items: center;
+    padding: 30px;
+    margin: 20px;
+  }
+  
+  
+  .question-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.5rem; /* Adjust padding to fit the icon */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    height: 40px; /* Ensure the height matches the buttons */
+    
+  }
+  .question-input-activity {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2.5rem; /* Adjust padding to fit the icon */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    height: 40px; /* Ensure the height matches the buttons */
+  }  
+  
+  .add-button {
+    width: 90px; /* Set a fixed width */
+    height: 40px; /* Set a fixed height */
+    border: none;
+    background-color: #d9aa52;
+    color: black;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    margin-left: 10px; /* Adjust margin for spacing */
+    text-decoration: none;
+    padding-top: 9px;
+    text-align: center; /* Ensure text is centered if any additional text */
+}
+
+  
+  .filter-sort-unique {
+    display: flex;
+    margin: 20px;
+    right: 16px;
+    padding: 1rem;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+  }
+  
+  .filter-unique,
+  .sort-unique {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Spacing between label and select */
+  }
+  
+  .filter-unique select,
+  .sort-unique select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+  }
+  
+  .filter-unique {
+    margin-right: 20px; /* Add more spacing from the search bar */
+  }
+  
+  /* Courses grid layout */
+  .courses-grid-unique {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px; /* Increased gap between course cards */
+    margin-top: 40px;
+    margin: 30px;
+  }
+  
+  /* Individual course card styling */
+  .course-cd-unique {
+    border: 1px solid #ccc;
+    padding: 10px; /* Increased padding inside the card */
+    text-align: left;
+    background-color: #f0f0f0; /* Light grey background color */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  .course-cd-unique a{
+    text-decoration: none;
+    color:inherit;
+  }
+  .course-cd-unique:hover {
+    transform: scale(1.05);
+  }
+  
+  .course-cd-unique img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px 10px 0 0;
+    object-fit: cover;
+  }
+  /*delete course button*/
+  .delete-button-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center; /* This centers the content horizontally */
+  }
+  .delete-course {
+    margin-right:15px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 50px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px; /* Add some space from the content above */
+  }
+  
+  .delete-course:hover {
+    background-color: darkred;
+  }
+  
+  /* edit course button*/
+  .edit-course {
+    background-color: #D5CAD6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 50px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px; /* Add some space from the content above */
+  }
+  
+  .edit-course:hover {
+    background-color: #6B5E62;
+  }
+  
+  /* Course details styling */
+  .course-details-unique {
+    padding: 10px 0;
+  }
+  
+  .course-details-unique h6 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-decoration: none;
+  }
+  
+  .course-details-unique p {
+    margin: 4px 0;
+    color: #666;
+  }
+  
+  .course-meta {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .course-meta span {
+    margin-right: 10px;
+  }
+  
+  .posted-date {
+    font-size: 14px;
+    color: #888;
+    margin-top: 10px; /* Add space above the posted date */
+  }
+  
+  /* Pagination styling */
+  .pagination-unique {
+    margin: 40px 0; /* Increased margin for spacing */
+  }
+  
+  .pagination-unique span {
+    cursor: pointer;
+    padding: 10px 20px; /* Increased padding for better spacing */
+    border: 1px solid #ccc;
+    margin: 0 10px; /* Increased margin between pagination buttons */
+  }
+  
+  /* disable pagination buttons*/
+  .disabled{
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  

@@ -311,7 +311,7 @@ async function submitQuizAndQuestions() { // Function to submit quiz and questio
         });
         const body = await response.json(); // Parse the response as JSON
         if (!response.ok) { // Check if response is not ok
-            throw new Error(body.message); // Throw an error with the response message
+            throw body; // Throw an error with the response message
         }
         alert(body.message);  // Display the message from the server
         sessionStorage.removeItem('quizData'); // Remove quiz data from session storage
@@ -323,7 +323,7 @@ async function submitQuizAndQuestions() { // Function to submit quiz and questio
         fetchQuizzes(); // Fetch the quizzes
     } catch (error) { // Catch any errors
         console.error('Error creating quiz and questions:', error);
-        alert(`Error creating quiz and questions: ${error.message}`); // Alert the user of the error
+        displayValidationErrors(error); // Display the validation errors
         document.getElementById('question-modal').style.display = 'block'; // Keep the question modal open for editing
     }
 }
@@ -469,7 +469,7 @@ async function updateQuizRequest(data) { // Async function to send the update qu
         });
         const body = await response.json(); // Parse the response as JSON
         if (!response.ok) { // Check if the response is not ok
-            throw new Error(body.message); // Throw an error with the response message
+            throw body; // Throw an error with the response message
         }
         alert(body.message); // Display the message from the server
         closeUpdateModal(); // Close the update modal
@@ -477,7 +477,7 @@ async function updateQuizRequest(data) { // Async function to send the update qu
         location.reload(); // Reload the page
     } catch (error) {
         console.error('Error updating quiz:', error);
-        alert(`Error updating quiz: ${error.message}`); // Alert the user of the error
+        displayValidationErrors(error); // Display the validation errors
     }
 }
 
@@ -507,3 +507,11 @@ async function handleDeleteQuiz(quizId) { // Async function to handle the delete
         alert(`Error deleting quiz: ${error.message}`); // Alert the user of the error
     }
 }
+
+function displayValidationErrors(error) {
+    if (error.errors) {
+      alert('Validation failed:\n' + error.errors.join('\n'));
+    } else {
+      alert(`Error creating quiz and questions: ${error.message}`);
+    }
+  }
