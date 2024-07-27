@@ -140,14 +140,14 @@ const deleteUser = async (req, res) => {
             return res.status(400).json({ message: 'Password is incorrect' }); // note to self: check message appears (edit: done)
         }
 
-        const deleteFK = await User.deleteUtility(); // ------------------------------------------- Delete user-related records (foreign keys)
+        const deleteFK = await User.deleteUtility(userId); // ------------------------------------------- Delete user-related records (foreign keys)
         if (!deleteFK) { // ----------------------------------------------------------------------- If deletion of user-related records fails, send a 500 response
             return res.status(500).json({ message: 'Failed to delete user-related records' });
         }
-        const userDeleted = await User.deleteUser(userId); // ------------------------------------- Delete the user from the database
-        if (!userDeleted) { // -------------------------------------------------------------------- If user deletion fails, send a 500 response
-            return res.status(500).json({ message: 'Failed to delete user' });
-        }
+        // const userDeleted = await User.deleteUser(userId); // ------------------------------------- Delete the user from the database
+        // if (!userDeleted) { // -------------------------------------------------------------------- If user deletion fails, send a 500 response
+        //     return res.status(500).json({ message: 'Failed to delete user' });
+        // }
         res.status(204).json({ message: 'Account deleted successfully' }); // --------------------- Send a success response with no content
     } catch (error) {
         console.error('Server error:', error); // ------------------------------------------------- Log error details
