@@ -135,60 +135,153 @@ class User { // ----------------------------------------------------------------
     }
     
     
-    // Method to delete a user
-    static async deleteUser(userId) {
-        let connection; // ------------------------------------------------------------------------- Declare a variable for the database connection
-        try {
-            connection = await sql.connect(dbConfig); // ------------------------------------------- Establish a connection to the database
-            const sqlQuery = `
-                DELETE FROM Users WHERE id=@userId;
-            `; // ---------------------------------------------------------------------------------- SQL query to delete a user by their ID
-            const request = connection.request(); // ----------------------------------------------- Create a request object for the query
-            request.input('userId', userId); // ---------------------------------------------------- Add the userId as an input parameter for the query
-            const results = await request.query(sqlQuery); // -------------------------------------- Execute the query and store the result
-            if (results.rowsAffected[0] === 0) { // ------------------------------------------------ Check if no rows were affected (user was not deleted)
-                return null; // -------------------------------------------------------------------- Return null if no rows were affected
-            }
-            return results.rowsAffected[0] > 0; // ------------------------------------------------- Return true if the user was deleted
-        } catch (error) {
-            console.error('Error deleting user:', error); // --------------------------------------- Log any errors that occur during the process
-            throw error; // ------------------------------------------------------------------------ Throw the error to be handled by the calling function
-        } finally {
-            if (connection) { // ------------------------------------------------------------------- Close the database connection if it was established
-                await connection.close();
-            }
-        }
-    }
+    // // Method to delete a user
+    // static async deleteUser(userId) {
+    //     let connection; // ------------------------------------------------------------------------- Declare a variable for the database connection
+    //     try {
+    //         connection = await sql.connect(dbConfig); // ------------------------------------------- Establish a connection to the database
+    //         const sqlQuery = `
+    //             DELETE FROM Users WHERE id=@userId;
+    //         `; // ---------------------------------------------------------------------------------- SQL query to delete a user by their ID
+    //         const request = connection.request(); // ----------------------------------------------- Create a request object for the query
+    //         request.input('userId', userId); // ---------------------------------------------------- Add the userId as an input parameter for the query
+    //         const results = await request.query(sqlQuery); // -------------------------------------- Execute the query and store the result
+    //         if (results.rowsAffected[0] === 0) { // ------------------------------------------------ Check if no rows were affected (user was not deleted)
+    //             return null; // -------------------------------------------------------------------- Return null if no rows were affected
+    //         }
+    //         return results.rowsAffected[0] > 0; // ------------------------------------------------- Return true if the user was deleted
+    //     } catch (error) {
+    //         console.error('Error deleting user:', error); // --------------------------------------- Log any errors that occur during the process
+    //         throw error; // ------------------------------------------------------------------------ Throw the error to be handled by the calling function
+    //     } finally {
+    //         if (connection) { // ------------------------------------------------------------------- Close the database connection if it was established
+    //             await connection.close();
+    //         }
+    //     }
+    // }
 
-    // Method to delete user-related records (foreign keys)
-    static async deleteUtility() { 
-        let connection; // ------------------------------------------------------------------------- Declare a variable for the database connection
+    static async deleteUtility(userId) {
+        let connection;
         try {
-            connection = await sql.connect(dbConfig); // ------------------------------------------- Establish a connection to the database
-            const sqlQuery = `
-                DECLARE @sql NVARCHAR(MAX) = N'';
-                
-                SELECT @sql += ' ALTER TABLE ' + QUOTENAME(OBJECT_SCHEMA_NAME(f.parent_object_id)) + '.' + QUOTENAME(OBJECT_NAME(f.parent_object_id)) + 
-                                ' DROP CONSTRAINT ' + QUOTENAME(f.name) + ';'
-                FROM sys.foreign_keys AS f
-                INNER JOIN sys.foreign_key_columns AS fc
-                ON f.object_id = fc.constraint_object_id
-                WHERE fc.referenced_object_id = OBJECT_ID(N'Users');
-                
-                EXEC sp_executesql @sql;
-            `; // --------------------------------------------------------------------------------- SQL query to delete foreign keys related to the Users table
-            const request = connection.request(); // ---------------------------------------------- Create a request object for the query
-            const results = await request.query(sqlQuery); // ------------------------------------- Execute the query and store the result
-            return results.rowsAffected.length > 0; // -------------------------------------------- Return true if any rows were affected (constraints were dropped)
+            connection = await sql.connect(dbConfig);
+    
+            const request = connection.request();
+            request.input('userId', userId);
+    
+            console.log('Deleting from IncorrectAnswers (by attempt_id)...');
+            await request.query(`
+            DELETE FROM IncorrectAnswers WHERE attempt_id IN (SELECT attempt_id FROM UserQuizAttempts WHERE user_id = @userId);
+            `);
+    
+            console.log('Deleting from UserResponses (by attempt_id)...');
+            await request.query(`
+            DELETE FROM UserResponses WHERE attempt_id IN (SELECT attempt_id FROM UserQuizAttempts WHERE user_id = @userId);
+            `);
+    
+            console.log('Deleting from UserQuizAttempts...');
+            await request.query(`
+            DELETE FROM UserQuizAttempts WHERE user_id = @userId;
+            `);
+    
+            console.log('Deleting from IncorrectAnswers (by question_id)...');
+            await request.query(`
+            DELETE FROM IncorrectAnswers WHERE question_id IN (SELECT question_id FROM Questions WHERE quiz_id IN (SELECT quiz_id FROM Quizzes WHERE created_by = @userId));
+            `);
+    
+            console.log('Deleting from UserResponses (by question_id)...');
+            await request.query(`
+            DELETE FROM UserResponses WHERE question_id IN (SELECT question_id FROM Questions WHERE quiz_id IN (SELECT quiz_id FROM Quizzes WHERE created_by = @userId));
+            `);
+    
+            console.log('Deleting from Questions...');
+            await request.query(`
+            DELETE FROM Questions WHERE quiz_id IN (SELECT quiz_id FROM Quizzes WHERE created_by = @userId);
+            `);
+    
+            console.log('Deleting from CommentLikes (by comment_id)...');
+            await request.query(`
+            DELETE FROM CommentLikes WHERE comment_id IN (SELECT id FROM user_comments WHERE user_id = @userId);
+            `);
+    
+            console.log('Deleting from CommentDislikes (by comment_id)...');
+            await request.query(`
+            DELETE FROM CommentDislikes WHERE comment_id IN (SELECT id FROM user_comments WHERE user_id = @userId);
+            `);
+    
+            console.log('Deleting user-specific CommentLikes and CommentDislikes...');
+            await request.query(`
+            DELETE FROM CommentLikes WHERE user_id = @userId;
+            DELETE FROM CommentDislikes WHERE user_id = @userId;
+            `);
+    
+            console.log('Deleting from user_comments...');
+            await request.query(`
+            DELETE FROM user_comments WHERE user_id = @userId;
+            `);
+    
+            console.log('Deleting from Follow...');
+            await request.query(`
+            DELETE FROM Follow WHERE FollowerId = @userId OR FolloweeId = @userId;
+            `);
+    
+            console.log('Deleting from Discussions...');
+            await request.query(`
+            DELETE FROM Discussions WHERE user_id = @userId;
+            `);
+    
+            console.log('Deleting from Lectures (by CourseID)...');
+            await request.query(`
+            DELETE FROM Lectures WHERE CourseID IN (SELECT CourseID FROM Courses WHERE UserID = @userId);
+            `);
+    
+            console.log('Deleting from Lectures (by UserID)...');
+            await request.query(`
+            DELETE FROM Lectures WHERE UserID = @userId;
+            `);
+    
+            console.log('Deleting from Courses...');
+            await request.query(`
+            DELETE FROM Courses WHERE UserID = @userId;
+            `);
+    
+            console.log('Deleting from user_reviews...');
+            await request.query(`
+            DELETE FROM user_reviews WHERE user_id = @userId;
+            `);
+    
+            // Add deletion from UserQuizAttempts by quiz_id before deleting from Quizzes
+            console.log('Deleting from UserQuizAttempts (by quiz_id)...');
+            await request.query(`
+            DELETE FROM UserQuizAttempts WHERE quiz_id IN (SELECT quiz_id FROM Quizzes WHERE created_by = @userId);
+            `);
+    
+            console.log('Deleting from Quizzes...');
+            await request.query(`
+            DELETE FROM Quizzes WHERE created_by = @userId;
+            `);
+    
+            console.log('Deleting from ProfilePic...');
+            await request.query(`
+            DELETE FROM ProfilePic WHERE user_id = @userId;
+            `);
+    
+            console.log('Deleting from Users...');
+            await request.query(`
+            DELETE FROM Users WHERE id = @userId;
+            `);
+    
+            console.log(`User and related records for userId ${userId} deleted successfully.`);
+            return true; // Indicate that deletion was successful
         } catch (error) {
-            console.error('Error deleting user-related records:', error); // ---------------------- Log any errors that occur during the process
-            throw error; // ----------------------------------------------------------------------- Throw the error to be handled by the calling function
+            console.error('Error deleting user and related records:', error);
+            return false; // Indicate that there was an error during deletion
         } finally {
-            if (connection) { // ------------------------------------------------------------------ Close the database connection if it was established
+            if (connection) {
                 await connection.close();
             }
         }
     }
+    
 
 
     // Method to update a user's profile picture
