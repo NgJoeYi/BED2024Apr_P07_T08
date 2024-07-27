@@ -377,63 +377,91 @@ function resetStars() {
   stars.forEach(star => star.classList.remove('hover'));
 }
 
-// Fetch user discussions on DOM load
-document.addEventListener('DOMContentLoaded', () => {
-  fetchUserDiscussions();
-  fetchFollowingCount(); // Fetch following count on page load
-  fetchFollowerCount(); // Fetch follower count on page load
-});
 
-async function fetchUserDiscussions() {
-  try {
-    const response = await fetchWithAuth(`/discussions/user`); // ------------------------------------------------- headers in jwtutility.js
-    if (!response) return; // *************** changes for jwt
-    // if (!response.ok) {
-    //   throw new Error('Failed to fetch user discussions');
-    // }
-
-    const data = await response.json();
-    console.log('Fetched discussions data:', data);
-
-    const discussionsContainer = document.querySelector('.user-discussions');
-    const noDiscussionsMessage = document.querySelector('.no-discussions-message');
-    const totalDiscussionsElement = document.getElementById('total-discussions'); // Add this line
-    
-    discussionsContainer.innerHTML = '';
-
-    if (data.success) {
-      if (data.discussions.length === 0) {
-        noDiscussionsMessage.style.display = 'block';
-      } else {
-        noDiscussionsMessage.style.display = 'none';
-        data.discussions.forEach(discussion => {
-          addUserDiscussionToFeed(discussion);
-        });
-      }
-      // Update the total discussions count
-      totalDiscussionsElement.textContent = data.discussions.length; // Add this line
-    } else {
-      console.log(data.success);
-      alert('Error fetching user discussions.');
-    }
-  } catch (error) {
-    console.error('Error fetching user discussions:', error);
-    alert('Error fetching user discussions: ' + error.message);
-  }
-}
+//--------------------------------------------------------------------------------------------------------------------RAEANN - fetching of discussionn-----------------------------------------------------------------------
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function addUserDiscussionToFeed(discussion) {
-  const feed = document.querySelector('.user-discussions');
-  const post = document.createElement('div');
-  post.classList.add('post');
-  post.setAttribute('data-id', discussion.id);
+// Fetch user discussions on DOM load
+// Fetch user discussions and other related data when the DOM content is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  fetchUserDiscussions();        // Fetch user discussions from the server
+  fetchFollowingCount();         // Fetch the count of users being followed on page load
+  fetchFollowerCount();          // Fetch the count of followers on page load
+});
 
+// Function to fetch user discussions from the server
+async function fetchUserDiscussions() {
+  try {
+    // Await the result of the fetchWithAuth function which includes JWT authorization headers
+    const response = await fetchWithAuth(`/discussions/user`); // ------------------------------------------------- headers in jwtutility.js
+
+    // Check if the response object is falsy
+    if (!response) return; // *************** changes for jwt
+    // The commented-out code would throw an error if the response is not okay, but it's currently disabled
+    // if (!response.ok) {
+    //   throw new Error('Failed to fetch user discussions');
+    // }
+
+    // Parse the JSON data from the response
+    const data = await response.json();
+    console.log('Fetched discussions data:', data);
+
+    // Get the element that will display the user discussions
+    const discussionsContainer = document.querySelector('.user-discussions');
+    // Get the element that displays a message when there are no discussions
+    const noDiscussionsMessage = document.querySelector('.no-discussions-message');
+    // Get the element that will show the total number of discussions
+    const totalDiscussionsElement = document.getElementById('total-discussions'); // Add this line
+    
+    // Clear any existing content in the discussions container
+    discussionsContainer.innerHTML = '';
+
+    // Check if the data indicates success
+    if (data.success) {
+      // If no discussions are returned, show a no discussions message
+      if (data.discussions.length === 0) {
+        noDiscussionsMessage.style.display = 'block';
+      } else {
+        // Hide the no discussions message if there are discussions
+        noDiscussionsMessage.style.display = 'none';
+        // Iterate over the fetched discussions and add each to the feed
+        data.discussions.forEach(discussion => {
+          addUserDiscussionToFeed(discussion);
+        });
+      }
+      // Update the total discussions count displayed on the page
+      totalDiscussionsElement.textContent = data.discussions.length; // Add this line
+    } else {
+      // Log the success status and alert the user about the error
+      console.log(data.success);
+      alert('Error fetching user discussions.');
+    }
+  } catch (error) {
+    // Log any errors encountered during the fetch operation and alert the user
+    console.error('Error fetching user discussions:', error);
+    alert('Error fetching user discussions: ' + error.message);
+  }
+}
+
+// --------------------------------------------------------------------------------adding of the fetched discussion in the html..---------------------------------------------
+
+// Function to add a discussion to the user feed
+function addUserDiscussionToFeed(discussion) {
+  // Select the container where discussions will be added
+  const feed = document.querySelector('.user-discussions');
+  
+  // Create a new div element to represent a post
+  const post = document.createElement('div');
+  post.classList.add('post'); // Add 'post' class for styling
+  post.setAttribute('data-id', discussion.id); // Set a custom data attribute to store the discussion ID
+
+  // Capitalize the first letter of the username
   const capitalizedUsername = capitalizeFirstLetter(discussion.username);
 
+  // Set the inner HTML of the post with the discussion details
   post.innerHTML = `
     <div class="post-header">
       <div class="profile-pic">
@@ -455,181 +483,257 @@ function addUserDiscussionToFeed(discussion) {
     </div>
   `;
 
+  // Append the newly created post element to the feed container
   feed.appendChild(post);
 
+  // Add an event listener to the edit button to open an edit modal with the discussion details
   post.querySelector('.edit-btn').addEventListener('click', () => openEditModal(discussion.id, discussion.title, discussion.description, discussion.category));
+  
+  // Add an event listener to the delete button to open a delete confirmation modal
   post.querySelector('.delete-btn').addEventListener('click', () => openDeleteDiscussionModal(discussion.id));
 }
 
 
-// Edit Modal functions
+//-----------------------------------------------------------------------------------------Edit of discussion-----------------------------------------------------------------------
+
+// Function to open the edit modal and populate it with the current discussion details
 function openEditModal(discussionId, title, description, category) {
+  // Set the values of the input fields in the modal with the existing discussion data
   document.getElementById('editTitle').value = title;
   document.getElementById('editText').value = description;
   document.getElementById('editCategory').value = category;
+
+  // Display the edit modal
   document.getElementById('editModal').style.display = 'block';
 
+  // Attach an event listener to the save button that will trigger the saveEdit function
   document.getElementById('saveEdit').onclick = function () {
-    saveEdit(discussionId);
+    saveEdit(discussionId); // Call saveEdit function with the discussion ID
   };
 }
 
-
+// Function to close the edit modal
 function closeEditModal() {
+  // Hide the edit modal
   document.getElementById('editModal').style.display = 'none';
 }
 
+// Function to save the edited discussion details
 async function saveEdit(discussionId) {
+  // Retrieve the updated values from the input fields in the modal
   const title = document.getElementById('editTitle').value;
   const description = document.getElementById('editText').value;
   const category = document.getElementById('editCategory').value;
 
+  // Log the data to the console for debugging purposes
   console.log('Saving edit for discussion ID:', discussionId);
   console.log('Title:', title);
   console.log('Description:', description);
   console.log('Category:', category);
 
   try {
+    // Send a PUT request to the server to update the discussion details
     const response = await fetchWithAuth(`/discussions/${discussionId}`, { // ------------------------------------------------- headers in jwtutility.js
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ title, description, category })
+      body: JSON.stringify({ title, description, category }) // Send updated data in JSON format
     });
 
+    // Parse the JSON response from the server
     const responseData = await response.json();
 
+    // Check if the response was not ok and throw an error if necessary
     if (!response.ok) {
       console.error('Error response from server:', responseData);
       throw new Error('Failed to update discussion');
     }
 
+    // Notify the user that the update was successful
     alert('Discussion updated successfully');
+    
+    // Refresh the list of discussions to reflect the changes
     fetchUserDiscussions();
+    
+    // Close the edit modal
     closeEditModal();
   } catch (error) {
+    // Log any errors encountered during the update process and alert the user
     console.error('Error updating discussion:', error);
     alert('Error updating discussion: ' + error.message);
   }
 }
 
 
-// Delete Modal functions
+//--------------------------------------------------------------------------------------------Delete Discussion-------------------------------------------------
+
+// Function to open the delete discussion modal and set up event handlers
 function openDeleteDiscussionModal(discussionId) {
+  // Log the discussion ID for debugging purposes
   console.log('Opening delete modal for discussion ID:', discussionId);
+  
+  // Get the delete modal element by its ID
   const deleteModal = document.getElementById('deleteDiscussionModal');
   if (deleteModal) {
+    // Display the delete modal
     deleteModal.style.display = 'block';
   } else {
+    // Log an error if the delete modal is not found and exit the function
     console.error('Delete modal not found');
     return; // Exit function if modal is not found
   }
 
+  // Get the confirm button element by its ID
   const confirmButton = document.getElementById('confirmDelete');
   if (confirmButton) {
+    // Set up an event handler for the confirm button to delete the discussion
     confirmButton.onclick = function () {
       console.log('Confirm delete clicked for discussion ID:', discussionId);
-      deleteDiscussion(discussionId);
+      deleteDiscussion(discussionId); // Call the deleteDiscussion function
     };
   } else {
+    // Log an error if the confirm button is not found
     console.error('Confirm button not found');
   }
 
+  // Get the close button element by its ID
   const closeButton = document.getElementById('closeDeleteModal');
   if (closeButton) {
-    closeButton.onclick = closeDeleteModal;
+    // Set up an event handler for the close button to close the modal
+    closeButton.onclick = closeDeleteModalDis;
   } else {
+    // Log an error if the close button is not found
     console.error('Close button not found');
   }
 
+  // Get the cancel button element by its ID
   const cancelButton = document.getElementById('cancelDeleteModal');
   if (cancelButton) {
-    cancelButton.onclick = closeDeleteModal;
+    // Set up an event handler for the cancel button to close the modal
+    cancelButton.onclick = closeDeleteModalDis;
   } else {
+    // Log an error if the cancel button is not found
     console.error('Cancel button not found');
   }
 }
 
+// Function to close the delete discussion modal
 function closeDeleteModalDis() {
+  // Log the action for debugging purposes
   console.log('Closing delete modal');
+  
+  // Get the delete modal element by its ID
   const deleteModal = document.getElementById('deleteDiscussionModal');
-  if (deleteModal) {  // Check if deleteModal is not null
+  if (deleteModal) { // Check if deleteModal is not null
+    // Hide the delete modal
     deleteModal.style.display = 'none';
   } else {
+    // Log an error if the delete modal is not found
     console.error('Delete modal not found.');
   }
 }
 
+// Function to delete a discussion
 async function deleteDiscussion(discussionId) {
   try {
+    // Send a DELETE request to the server to delete the discussion
     const response = await fetchWithAuth(`/discussions/${discussionId}`, { // ------------------------------------------------- headers in jwtutility.js
       method: 'DELETE'
     });
 
+    // Check if the response is not okay and throw an error with the response text
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to delete discussion: ${errorText}`);
     }
 
+    // Notify the user that the discussion was deleted successfully
     alert('Discussion and associated comments deleted successfully');
+    // Close the delete modal and refresh the list of discussions
     closeDeleteModalDis(); // Close the modal after deleting
     fetchUserDiscussions();
     
   } catch (error) {
+    // Log any errors encountered during the delete operation and alert the user
     console.error('Error deleting discussion:', error);
     alert('Error deleting discussion: ' + error.message);
   }
 }
 
+
+//-----------------------------------------------------------------------------------Fetching of following count------------------------------------------
+
+// Function to fetch and display the count of users the current user is following
 async function fetchFollowingCount() {
   try {
+    // Make a request to the server to get the following count
     const response = await fetchWithAuth(`/following-count`); // Use your actual endpoint
+
+    // Check if the response is not ok (e.g., HTTP status code is not 200)
     if (!response.ok) {
+      // Throw an error if the response indicates a failure
       throw new Error('Failed to fetch following count');
     }
 
+    // Parse the JSON data from the response
     const data = await response.json();
-    console.log('Fetched following count:', data);
+    console.log('Fetched following count:', data); // Log the data for debugging
 
+    // Select the HTML element where the following count will be displayed
     const followingCountElement = document.querySelector('.stat .info h3'); // Ensure this matches your HTML structure
+    
+    // Update the text content of the selected element with the fetched count
     followingCountElement.textContent = data.count; // Update the count in the HTML
   } catch (error) {
+    // Log any errors encountered during the fetch operation
     console.error('Error fetching following count:', error);
-   
+    
+    // Optionally, you could show an error message to the user or handle the error in other ways
   }
 }
 
+
+
+// --------------------------------------------------------------------------------fetching the follower count-------------------------------------------------------
+
+// Function to fetch and display the count of followers for the current user
 async function fetchFollowerCount() {
   try {
-    const response = await fetchWithAuth(`/following-count`); // Use your actual endpoint
+    // Make a request to the server to get the follower count
+    const response = await fetchWithAuth(`/follower-count`); // Use your actual endpoint
+
+    // Check if the response is not ok (e.g., HTTP status code is not 200)
     if (!response.ok) {
-      throw new Error('Failed to fetch following count');
+      // Throw an error if the response indicates a failure
+      throw new Error('Failed to fetch follower count');
     }
 
+    // Parse the JSON data from the response
     const data = await response.json();
-    console.log('Fetched following count:', data);
+    console.log('Fetched follower count:', data); // Log the data for debugging
 
-    const followingCountElement = document.querySelector('.stat .info h3'); // Ensure this matches your HTML structure
+    // Select the HTML element where the follower count will be displayed
+    const followerCountElement = document.querySelector('.stat .info h3'); // Ensure this matches your HTML structure
 
-    console.log('followingCountElement:', followingCountElement); // Log the element
-    if (followingCountElement) {
-      followingCountElement.textContent = data.count; // Update the count in the HTML
+    console.log('followerCountElement:', followerCountElement); // Log the element
+    if (followerCountElement) {
+      // Update the text content of the selected element with the fetched count
+      followerCountElement.textContent = data.count;
     } else {
-      console.error('followingCountElement not found in the DOM');
+      // Log an error if the element is not found in the DOM
+      console.error('followerCountElement not found in the DOM');
     }
   } catch (error) {
+    // Log any errors encountered during the fetch operation
     console.error('Error fetching follower count:', error);
-   
+    
+    // Optionally, you could show an error message to the user or handle the error in other ways
   }
 }
 
 
-
-
-
-
-
+//----------------------------------------------------------------------------END OF RAEANN's DISCUSSION-------------------------------------------------------------------------------------------------------------------------------------------
 
 
 

@@ -8,15 +8,21 @@ class Follow {
         this.followeeId = followeeId; // Initialize the followee ID
     }
 
+    // usage of static - the method is within a class
+    // async function - indicating that it can perform asynchronous operations and can be used with await to wait for promises to resolve.
+
+
     // Create a new follow relationship
     static async create(followerId, followeeId) {
-        if (isNaN(followerId) || isNaN(followeeId)) {
-            throw new Error('Validation failed for parameter. Invalid number.');
+        //NaN - not a number
+        if (isNaN(followerId) || isNaN(followeeId)) {  // to check if the both id is valid numbers 
+            throw new Error('Validation failed for parameter. Invalid number.'); // if return as not a number it will return true and show this Error
+            // the execution of the method will stop, and the error will be propagated to where the method was called
         }
 
         try {
-            const pool = await sql.connect(dbConfig); // Connect to the database
-            const result = await pool.request()
+            const pool = await sql.connect(dbConfig); // Connect to the database, asynchronous function returns connection pools - used to make database request 
+            const result = await pool.request() //a new request using the connection pool.
                 .input('followerId', sql.Int, followerId) // Add follower ID parameter
                 .input('followeeId', sql.Int, followeeId) // Add followee ID parameter
                 .query(`
@@ -24,7 +30,10 @@ class Follow {
                     VALUES (@followerId, @followeeId);
                     SELECT SCOPE_IDENTITY() AS id;
                 `); // Insert follow relationship and return the new ID
-            return new Follow(result.recordset[0].id, followerId, followeeId); // Return the new follow instance
+                // scope identity - query retrieves the last inserted identity value in the current scope, which is the ID of the newly created follow relationship.
+            return new Follow(result.recordset[0].id, followerId, followeeId); // result of the query is stored in the result variable, 
+            //recordset property contains the rows returned by the query. In this case, it contains a single row with the new ID (id).
+            // return the follow class with the initialized IDs
         } catch (err) {
             throw new Error(`Error creating follow: ${err.message}`);
         }
@@ -32,12 +41,13 @@ class Follow {
 
     // Delete an existing follow relationship
     static async delete(followerId, followeeId) {
-        if (isNaN(followerId) || isNaN(followeeId)) {
-            throw new Error('Validation failed for parameter. Invalid number.');
+        if (isNaN(followerId) || isNaN(followeeId)) {  // to check if the both id is valid numbers 
+            throw new Error('Validation failed for parameter. Invalid number.'); // if return as not a number it will return true and show this Error
+            // the execution of the method will stop, and the error will be propagated to where the method was called
         }
 
         try {
-            const pool = await sql.connect(dbConfig); // Connect to the database
+            const pool = await sql.connect(dbConfig);  // Connect to the database, asynchronous function returns connection pools - used to make database request 
             await pool.request()
                 .input('followerId', sql.Int, followerId) // Add follower ID parameter
                 .input('followeeId', sql.Int, followeeId) // Add followee ID parameter

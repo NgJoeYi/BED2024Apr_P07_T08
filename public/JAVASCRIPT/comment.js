@@ -164,91 +164,118 @@ document.addEventListener('DOMContentLoaded', () => {
     }
         
    
+// -------------------------------------------------------------------------RAEANN - DiscussionDetails--------------------------------------------------------------
+    // Add an event listener that runs when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function () {
+    // Get query parameters from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    // Extract the discussionId from the query parameters
+    const discussionId = urlParams.get('discussionId');
+    // Fetch discussion details using the discussionId
+    fetchDiscussionDetails(discussionId);
+});
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const discussionId = urlParams.get('discussionId');
-        fetchDiscussionDetails(discussionId);
-    });
-    
-    async function fetchDiscussionDetails(discussionId) {
-        try {
-            const response = await fetchWithAuth(`/discussions/${discussionId}`);
-            if (!response.ok) {
-                throw new Error(`Error fetching discussion: ${response.statusText}`);
-            }
-            const data = await response.json();
-            if (data.success) {
-                console.log('Fetched discussion data:', data.discussion);
-                displayDiscussionDetails(data.discussion);
-            } else {
-                console.error('Error fetching discussion:', data.error);
-            }
-        } catch (error) {
-            console.error('Error fetching discussion details:', error);
+// Async function to fetch discussion details from the server
+async function fetchDiscussionDetails(discussionId) {
+    try {
+        // Make an authenticated request to get discussion details
+        const response = await fetchWithAuth(`/discussions/${discussionId}`);
+        // Check if the response is not ok (e.g., HTTP status code is not 200)
+        if (!response.ok) {
+            throw new Error(`Error fetching discussion: ${response.statusText}`);
         }
+        // Parse the response JSON
+        const data = await response.json();
+        // Check if the API call was successful
+        if (data.success) {
+            console.log('Fetched discussion data:', data.discussion);
+            // Display discussion details
+            displayDiscussionDetails(data.discussion);
+        } else {
+            console.error('Error fetching discussion:', data.error);
+        }
+    } catch (error) {
+        // Log any errors encountered during the fetch operation
+        console.error('Error fetching discussion details:', error);
     }
-    
-    function displayDiscussionDetails(discussion) {
-        if (!discussion) {
-            console.error('No discussion details to display');
-            return;
-        }
-    
-        const mainPost = document.getElementById('main-post'); 
-        if (!mainPost) {
-            console.error('main-post element not found');
-            return;
-        }
-    
-        const capitalizedUsername = capitalizeFirstLetter(discussion.username);
-        const likedByUser = discussion.userLiked; 
-        const dislikedByUser = discussion.userDisliked; 
-    
-        const likesText = `👍 ${discussion.likes} Likes`;
-        const dislikesText = `👎 ${discussion.dislikes} Dislikes`;
-    
-        mainPost.innerHTML = `
-            <div class="post-header">
-                <div class="profile-pic">
-                    <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
-                </div>
-                <div class="username">${capitalizedUsername}</div>
-            </div>
-            <div class="post-meta">
-                <span class="category-discussion">Category: ${discussion.category}</span>
-                <span class="posted-date-activity-dis">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
-            </div>
-            <div class="post-content-dis">
-                <p>${discussion.description}</p>
-            </div>
-            <div class="post-footer">
-                <div class="likes-dislikes">
-                    <button class="like-button" style="color: black;" data-liked="${likedByUser}">${likesText}</button>
-                    <button class="dislike-button" style="color: black;" data-disliked="${dislikedByUser}">${dislikesText}</button>
-                </div>
-            </div>
-        `;
-    }
-    
-    function capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Function to display the discussion details on the page
+function displayDiscussionDetails(discussion) {
+    if (!discussion) {
+        console.error('No discussion details to display');
+        return;
     }
 
-    async function fetchComments(discussionId) {
-        try {
-            const response = await fetchWithAuth(`/comments?discussionId=${discussionId}`, {
-                method: 'GET'
-            });
-            if (!response.ok) {
-                throw new Error(`Error fetching comments: ${response.statusText}`);
-            }
-            const comments = await response.json(); 
-            displayComments(comments); 
-        } catch (error) {
-            console.error('Error fetching comments:', error);
+    // Get the HTML element where the discussion will be displayed
+    const mainPost = document.getElementById('main-post'); 
+    if (!mainPost) {
+        console.error('main-post element not found');
+        return;
+    }
+
+    // Capitalize the first letter of the username
+    const capitalizedUsername = capitalizeFirstLetter(discussion.username);
+    // Check if the user liked or disliked the post
+    const likedByUser = discussion.userLiked; 
+    const dislikedByUser = discussion.userDisliked; 
+
+    // Prepare text for likes and dislikes
+    const likesText = `👍 ${discussion.likes} Likes`;
+    const dislikesText = `👎 ${discussion.dislikes} Dislikes`;
+
+    // Update the inner HTML of the mainPost element with the discussion details
+    mainPost.innerHTML = `
+        <div class="post-header">
+            <div class="profile-pic">
+                <img src="${discussion.profilePic || 'images/profilePic.jpeg'}" alt="Profile Picture">
+            </div>
+            <div class="username">${capitalizedUsername}</div>
+        </div>
+        <div class="post-meta">
+            <span class="category-discussion">Category: ${discussion.category}</span>
+            <span class="posted-date-activity-dis">Posted on: ${new Date(discussion.posted_date).toLocaleDateString()}</span>
+        </div>
+        <div class="post-content-dis">
+            <p>${discussion.description}</p>
+        </div>
+        <div class="post-footer">
+            <div class="likes-dislikes">
+                <button class="like-button" style="color: black;" data-liked="${likedByUser}">${likesText}</button>
+                <button class="dislike-button" style="color: black;" data-disliked="${dislikedByUser}">${dislikesText}</button>
+            </div>
+        </div>
+    `;
+}
+
+// Function to capitalize the first letter of a string
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Async function to fetch comments related to the discussion
+async function fetchComments(discussionId) {
+    try {
+        // Make an authenticated request to get comments for the discussion
+        const response = await fetchWithAuth(`/comments?discussionId=${discussionId}`, {
+            method: 'GET'
+        });
+        // Check if the response is not ok (e.g., HTTP status code is not 200)
+        if (!response.ok) {
+            throw new Error(`Error fetching comments: ${response.statusText}`);
         }
-    }    
+        // Parse the response JSON
+        const comments = await response.json(); 
+        // Display comments (assuming a function displayComments exists)
+        displayComments(comments); 
+    } catch (error) {
+        // Log any errors encountered during the fetch operation
+        console.error('Error fetching comments:', error);
+    }
+}
+
+
+    // --------------------------------------------------------------------------end of discussiondetials------------------------------------------------------------
 
     async function incrementLikes(commentId, likeButton, dislikeButton) {
         try {
