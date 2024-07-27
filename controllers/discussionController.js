@@ -1,4 +1,4 @@
-const validateDiscussion = require('../middleware/discussionValidation'); // Import middleware for validating discussion data
+const validateDiscussion = require('../middleware/discussionValidation'); // Import middleware for validating create and update discussion data
 const discussionModel = require('../models/Discussion'); // Import the discussion model
 require('dotenv').config(); // Load environment variables from a .env file
 
@@ -13,8 +13,8 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 // Function to generate suggestions based on text input
 const generateSuggestion = async (text) => {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Initialize the model
-        const result = await model.generateContent(text); // Generate content based on the input text
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Initialize the latest model 
+        const result = await model.generateContent(text); // Generate content based on the input text - which is the description
         const response = await result.response; // Wait for the response
         const suggestions = response.text(); // Extract suggestions from the response
         return suggestions; // Return the suggestions

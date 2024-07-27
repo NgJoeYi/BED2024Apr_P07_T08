@@ -1,4 +1,4 @@
-const Follow = require('../models/Follow'); // Import the Follow model
+const Follow = require('../models/Follow'); // Import the Follow model  - interacts with SQL
 
 // Controller functions
 
@@ -17,7 +17,7 @@ const followUser = async (req, res) => {
         res.json({ success: true, follow }); // Send the follow relationship as response
     } catch (err) {
         console.error('Error creating follow:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message });  // to return if there is a an unexpected condition was encountered and no more specific message is suitable.
     }
 };
 
@@ -28,7 +28,7 @@ const unfollowUser = async (req, res) => {
 
     // Check if followeeId is a number
     if (isNaN(followeeId)) {
-        return res.status(400).json({ success: false, message: 'Invalid followee ID' });
+        return res.status(400).json({ success: false, message: 'Invalid followee ID' }); // indicates that the server would not process the request due to something the server considered to be a client error
     }
 
     try {
@@ -36,7 +36,7 @@ const unfollowUser = async (req, res) => {
         res.json({ success }); // Send success status as response
     } catch (err) {
         console.error('Error deleting follow:', err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message });   // to return if there is a an unexpected condition was encountered and no more specific message is suitable.
     }
 };
 
