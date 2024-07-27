@@ -247,53 +247,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function incrementLikes(commentId, likeButton, dislikeButton) {
         try {
-            if (dislikeButton.getAttribute('data-disliked') === 'true') {
-                alert('You can only choose to like or dislike a comment.');
+            const userId = sessionStorage.getItem('userId'); // Assuming userId is stored in sessionStorage
+            if (!userId) {
+                alert('User ID is required');
                 return;
             }
-
+    
             const response = await fetchWithAuth(`/comments/${commentId}/like`, {
-                method: 'POST'
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }) // Include userId in the request body
             });
-            const data = await response.json(); 
+            
+            const data = await response.json();
             if (data.success) {
                 likeButton.textContent = `👍 ${data.likes} Likes`;
-                likeButton.setAttribute('data-liked', 'true');
-                dislikeButton.setAttribute('data-disliked', 'false');
+                alert(data.message);
+                if (data.message.includes('removed')) {
+                    likeButton.setAttribute('data-liked', 'false');
+                } else {
+                    likeButton.setAttribute('data-liked', 'true');
+                    dislikeButton.setAttribute('data-disliked', 'false');
+                }
             } else {
-                alert('Error adding like.');
+                alert('Error toggling like.');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error adding like.');
+            alert('Error toggling like.');
         }
     }
-
+    
     async function incrementDislikes(commentId, likeButton, dislikeButton) {
         try {
-            if (likeButton.getAttribute('data-liked') === 'true') {
-                alert('You can only choose to like or dislike a comment.');
+            const userId = sessionStorage.getItem('userId'); // Assuming userId is stored in sessionStorage
+            if (!userId) {
+                alert('User ID is required');
                 return;
             }
-
+    
             const response = await fetchWithAuth(`/comments/${commentId}/dislike`, {
-                method: 'POST'
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }) // Include userId in the request body
             });
-            const data = await response.json(); 
-
+    
+            const data = await response.json();
             if (data.success) {
                 dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
-                dislikeButton.setAttribute('data-disliked', 'true');
-                likeButton.setAttribute('data-liked', 'false');
+                alert(data.message);
+                if (data.message.includes('removed')) {
+                    dislikeButton.setAttribute('data-disliked', 'false');
+                } else {
+                    dislikeButton.setAttribute('data-disliked', 'true');
+                    likeButton.setAttribute('data-liked', 'false');
+                }
             } else {
-                alert('Error adding dislike.');
+                alert('Error toggling dislike.');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error adding dislike.');
+            alert('Error toggling dislike.');
         }
     }
-
+             
     function displayComments(comments) {
         const commentsSection = document.querySelector('.comments-section'); 
         commentsSection.innerHTML = ''; 
@@ -339,24 +356,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const dislikeButton = commentElement.querySelector('.dislike-button');
 
             likeButton.addEventListener('click', function () {
-                if (this.getAttribute('data-liked') === 'true') {
-                    alert('You have already liked this comment.');
-                    return;
-                }
                 if (dislikeButton.getAttribute('data-disliked') === 'true') {
-                    alert('You can only choose to like or dislike a comment.');
+                    alert('You can only like or dislike a comment.');
                     return;
                 }
                 incrementLikes(comment.id, this, dislikeButton); 
             });
 
             dislikeButton.addEventListener('click', function () {
-                if (this.getAttribute('data-disliked') === 'true') {
-                    alert('You have already disliked this comment.');
-                    return;
-                }
                 if (likeButton.getAttribute('data-liked') === 'true') {
-                    alert('You can only choose to like or dislike a review.');
+                    alert('You can only like or dislike a comment.');
                     return;
                 }
                 incrementDislikes(comment.id, likeButton, this); 

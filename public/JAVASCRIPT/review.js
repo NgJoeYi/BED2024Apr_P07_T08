@@ -281,59 +281,69 @@ async function editReview(button) {
     };
 }
 
-// Function to increment the likes of a review
-async function incrementReviewLikes(reviewId, likeButton, dislikeButton) {
+async function incrementLikes(reviewId, likeButton, dislikeButton) {
     try {
-
-        // Check if the user already disliked the review
-        if (dislikeButton.getAttribute('data-disliked') === 'true') {
-            alert('You can only choose to like or dislike a review.');
+        const userId = sessionStorage.getItem('userId');
+        if (!userId) {
+            alert('User ID is required');
             return;
         }
 
-        // Send POST request to increment like count for particular review
-        const response = await fetch(`/reviews/${reviewId}/like`, {
-            // *** Like & Dislike is POST, not PUT because they are not considered to be updating anything. Instead, they are a new action, not an update to an existing action.
-            method: 'POST' // Send a POST request to increment likes
+        const response = await fetchWithAuth(`/reviews/${reviewId}/like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
         });
+
         const data = await response.json();
         if (data.success) {
-            likeButton.textContent = `👍 ${data.likes} Likes`; // Update the like button text
-            likeButton.setAttribute('data-liked', 'true'); // Set the review as liked
-            dislikeButton.setAttribute('data-disliked', 'false'); // Set the review as not disliked
+            likeButton.textContent = `👍 ${data.likes} Likes`;
+            alert(data.message);
+            if (data.message.includes('removed')) {
+                likeButton.setAttribute('data-liked', 'false');
+            } else {
+                likeButton.setAttribute('data-liked', 'true');
+                dislikeButton.setAttribute('data-disliked', 'false');
+            }
         } else {
-            alert('Error adding like.');
+            alert('Error toggling like.');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error adding like.');
+        alert('Error toggling like.');
     }
 }
 
-// Function to increment the dislikes of a review
-async function incrementReviewDislikes(reviewId, likeButton, dislikeButton) {
+async function incrementDislikes(reviewId, likeButton, dislikeButton) {
     try {
-
-        // Check if the user already liked the review
-        if (likeButton.getAttribute('data-liked') === 'true') {
-            alert('You can only choose to like or dislike a review.');
+        const userId = sessionStorage.getItem('userId');
+        if (!userId) {
+            alert('User ID is required');
             return;
         }
 
-        const response = await fetch(`/reviews/${reviewId}/dislike`, {
-            method: 'POST' // Send a POST request to increment dislikes
+        const response = await fetchWithAuth(`/reviews/${reviewId}/dislike`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
         });
+
         const data = await response.json();
         if (data.success) {
-            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`; // Update the dislike button text
-            dislikeButton.setAttribute('data-disliked', 'true'); // Set the review as disliked
-            likeButton.setAttribute('data-liked', 'false'); // Set the review as not liked
+            dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
+            alert(data.message);
+            if (data.message.includes('removed')) {
+                dislikeButton.setAttribute('data-disliked', 'false');
+            } else {
+                dislikeButton.setAttribute('data-disliked', 'true');
+                likeButton.setAttribute('data-liked', 'false');
+            }
         } else {
-            alert('Error adding dislike.');
+            alert('Error toggling dislike.');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error adding dislike.');
+        alert('Error toggling dislike.');
     }
 }
 
@@ -425,35 +435,21 @@ async function fetchReviews(courseId) {
             const likeButton = reviewElement.querySelector('.like-button');
             const dislikeButton = reviewElement.querySelector('.dislike-button');
 
-            if (likeButton){
-                likeButton.addEventListener('click', function () {
-                    if (this.getAttribute('data-liked') === 'true') {
-                        alert('You have already liked this review.');
-                        return;
-                    }
+            likeButton.addEventListener('click', function () {
+                if (dislikeButton.getAttribute('data-disliked') === 'true') {
+                    alert('You can only like or dislike a review.');
+                    return;
+                }
+                incrementLikes(review.review_id, this, dislikeButton);
+            });
     
-                    if (dislikeButton.getAttribute('data-disliked') === 'true') {
-                        alert('You can only choose to like or dislike a review.');
-                        return;
-                    }
-                    incrementReviewLikes(review.review_id, this, dislikeButton); // Increment likes
-                });
-            }
-
-            if (dislikeButton){
-                dislikeButton.addEventListener('click', function () {
-                    if (this.getAttribute('data-disliked') === 'true') {
-                        alert('You have already disliked this review.');
-                        return;
-                    }
-    
-                    if (likeButton.getAttribute('data-liked') === 'true') {
-                        alert('You can only choose to like or dislike a review.');
-                        return;
-                    }
-                    incrementReviewDislikes(review.review_id, likeButton, this); // Increment dislikes
-                });
-            }
+            dislikeButton.addEventListener('click', function () {
+                if (likeButton.getAttribute('data-liked') === 'true') {
+                    alert('You can only like or dislike a review.');
+                    return;
+                }
+                incrementDislikes(review.review_id, likeButton, this);
+            });
             
             reviewsContainer.appendChild(reviewElement); // Append the review element to the container
         });
