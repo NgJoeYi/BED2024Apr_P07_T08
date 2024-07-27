@@ -87,10 +87,12 @@ main {
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
-    overflow: visible; /* Ensure content isn't clipped */
+    overflow: hidden; /* Ensure content isn't clipped */
     width: 100%; /* Make width 100% to fill grid column */
     max-width: 350px; /* Ensure the card doesn't exceed the max width */
+    height: 220px; /* Set a fixed height for consistency */
 }
+
 
 .quiz-card:hover {
     transform: translateY(-10px);
@@ -223,31 +225,52 @@ main {
 /* Styles for the questions container */
 #questions-container {
     padding: 20px;
-    background-color: #1b2b40; /* Set background to white */
+    background-color: #1b2b40; /* Background color */
     border-radius: 8px;
     max-width: 600px;
     width: 100%;
-    margin: 0 auto;
+    margin: 0 auto; /* Center the container horizontally */
+    display: flex; /* Add flex display */
+    flex-direction: column; /* Ensure column layout */
+    align-items: center; /* Center align items horizontally */
+    justify-content: center; /* Center align items vertically */
 }
 
+/* Header Styles */
 #questions-container h2 {
     color: #ffffff;
     margin-bottom: 20px;
-    text-align: left;
+    text-align: center; /* Center align the text */
 }
 
+/* Option Container */
+#questions-container .option-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align items horizontally */
+    gap: 10px; /* Add gap between the options */
+    width: 100%; /* Ensure it takes full width of parent */
+}
+
+/* Option Buttons */
 #questions-container button {
     display: block;
-    width: 100%;
-    padding: 10px;
-    margin: 10px auto; /* Center align and add vertical margin */
+    width: 100%; /* Set width to 100% */
+    max-width: 500px; /* Set a max-width for better centering */
+    padding: 10px 20px; /* Add horizontal padding for better button size */
     font-size: 16px;
     border: 2px solid #34495E;
     border-radius: 4px;
     cursor: pointer;
     background-color: #2C3E50;
     color: #ECF0F1;
+    text-align: center; /* Ensure text is centered */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+    margin: 5px 0; /* Add vertical margin for spacing */
 }
+
 
 #questions-container button.selected-answer {
     background-color: #d9aa52;
@@ -263,45 +286,6 @@ main {
 #questions-container button {
     background-color: #ffffff; /* Set background to white */
     color: #000000; /* Set text color to black */
-}
-
-/* Navigation buttons */
-#navigation-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
-}
-
-#navigation-buttons button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: #007bff;
-    color: white;
-}
-
-#navigation-buttons button:hover {
-    background-color: #0056b3;
-}
-
-#submit-quiz {
-    display: block;
-    width: 100%;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: #d9aa52;
-    color: white;
-    margin-top: 16px;
-    margin-left: -0.5px;
-}
-
-#submit-quiz:hover {
-    background-color: #b28f3e;
 }
 
 /* General styles */
@@ -338,4 +322,63 @@ main {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
     margin: 0 auto; /* Center the container */
+}
+
+/* Ensure the navigation buttons are within the questions container */
+#questions-container #navigation-buttons {
+    display: flex;
+    justify-content: space-between; /* Ensure Previous is on the left and Next is on the right */
+    width: 100%; /* Stretch to the full width of the parent */
+    padding: 0 0px; /* Add padding to control spacing at the ends */
+    margin: 30px 0; /* Adjust margin for spacing, if needed */
+}
+
+#navigation-buttons {
+    display: flex;
+    justify-content: space-between; /* Ensure Previous is on the left and Next is on the right */
+    width: 100%; /* Stretch to the full width of the parent */
+    padding: 0 0px; /* Add padding to control spacing at the ends */
+    margin: 30px 0; /* Adjust margin for spacing, if needed */
+}
+
+#navigation-buttons button {
+    flex: 1; /* Make buttons take equal space */
+    margin: 0 10px; /* Add some horizontal margin */
+    background-color: #d9aa52;
+    color: #1b2b40;
+    border: none;
+    border-radius: 20px; /* Reduced border radius */
+    padding: 10px 15px; /* Reduced padding for smaller buttons */
+    font-size: 14px; /* Reduced font size */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+#navigation-buttons button:hover {
+    background-color: #b28f3e;
+    transform: translateY(-3px);
+}
+
+#prev-button {
+    visibility: hidden; /* Hide but reserve space */
+}
+
+#submit-quiz {
+    display: block;
+    width: 100%;
+    max-width: 600px; /* to ensure it doesn't stretch too wide */
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #d9aa52;
+    color: white;
+    margin-top: 16px;
+    margin-left: 1px; /* Align to the left */
+}
+
+
+#submit-quiz:hover {
+    background-color: #b28f3e;
 }

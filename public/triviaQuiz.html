@@ -60,8 +60,11 @@
             <button id="prev-button" onclick="prevQuestion()">Previous</button>
             <button id="next-button" onclick="nextQuestion()">Next</button>
         </div>
-        <button id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
+        <div id="submit-quiz-container" class="hidden">
+            <button id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
+        </div>
     </section>
+    
 
     <!-- Wrap the results-container in a border-container -->
     <section id="results-quiz" class="hidden">

@@ -157,6 +157,7 @@ function initializeQuiz(quizList, questionIndex) {
     console.log("Initializing Quiz with Data:", quizData); // Log initialized quiz data
     console.log("Total Questions in the Quiz:", quizData.length);
     displayQuestion();
+    updateNavigationButtons();
 }
 
 function displayQuestion() {
@@ -191,22 +192,25 @@ function displayQuestion() {
 }
 
 
-
-
 function updateNavigationButtons() {
     const prevButton = document.getElementById('prev-button');
     const nextButton = document.getElementById('next-button');
+    const submitQuizContainer = document.getElementById('submit-quiz-container');
 
+    // Show the previous button only if not on the first question
     if (currentQuestionIndex === 0) {
-        prevButton.style.display = 'none';
+        prevButton.style.visibility = 'hidden';
     } else {
-        prevButton.style.display = 'inline-block';
+        prevButton.style.visibility = 'visible';
     }
 
+    // Show the next button only if not on the last question
     if (currentQuestionIndex === quizData.length - 1) {
-        nextButton.style.display = 'none';
+        nextButton.style.visibility = 'hidden';
+        submitQuizContainer.classList.remove('hidden');
     } else {
-        nextButton.style.display = 'inline-block';
+        nextButton.style.visibility = 'visible';
+        submitQuizContainer.classList.add('hidden');
     }
 }
 
