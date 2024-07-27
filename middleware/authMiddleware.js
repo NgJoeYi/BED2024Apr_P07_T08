@@ -31,31 +31,30 @@ function verifyJWT(req, res, next) {
             'GET /account/getAttemptCountByQuizId': ['student', 'lecturer'], // only student and lecturer logged in can see quiz attempt count by quiz id
             'GET /account/getAllAttemptCount': ['student', 'lecturer'], // only student and lecturer logged in total number of quiz taken
             
-            'GET /discussions/user': ['student', 'lecturer'],
-            'GET /discussions': ['student', 'lecturer'],
-            'GET /discussions/:id': ['student', 'lecturer'],
-            'POST /discussions': ['student', 'lecturer'],
-            'POST /discussions/:discussionId/like': ['student', 'lecturer'],
-            'POST /discussions/:discussionId/dislike': ['student', 'lecturer'],
-            'POST /discussions/:discussionId/view': ['student', 'lecturer'],  // Add this line for views
-            'PUT /discussions/:id': ['student', 'lecturer'],
-            'DELETE /discussions/:id': ['student', 'lecturer'],
-            'POST /discussions/:id/pin': ['student', 'lecturer'],  // Add this line for pin
-            'POST /discussions/:id/unpin': ['student', 'lecturer'],  // Add this line for unpin
-            'POST /follow':  ['student', 'lecturer'],
-            'POST /unfollow':  ['student', 'lecturer'],
-            'GET /followed-discussions':  ['student', 'lecturer'],
-            'GET /follow-status':  ['student', 'lecturer'],
-            'GET /discussions/:id/suggestions':  ['student', 'lecturer'],
-            'GET /following-count':  ['student', 'lecturer'],
-            'GET /follower-count':  ['student', 'lecturer'],
+            'GET /discussions/user': ['student', 'lecturer'], // only student and lecturer logged in can see their own discussions
+            'GET /discussions': ['student', 'lecturer'], // only student and lecturer logged in can see all discussions
+            'GET /discussions/:id': ['student', 'lecturer'], // only student and lecturer logged in can see a specific discussion
+            'POST /discussions': ['student', 'lecturer'], // only student and lecturer logged in can create a new discussion
+            'POST /discussions/:discussionId/like': ['student', 'lecturer'], // only student and lecturer logged in can like a discussion
+            'POST /discussions/:discussionId/dislike': ['student', 'lecturer'], // only student and lecturer logged in can dislike a discussion
+            'POST /discussions/:discussionId/view': ['student', 'lecturer'], // only student and lecturer logged in can increment view count of a discussion
+            'PUT /discussions/:id': ['student', 'lecturer'], // only student and lecturer logged in can update a specific discussion
+            'DELETE /discussions/:id': ['student', 'lecturer'], // only student and lecturer logged in can delete a specific discussion
+            'POST /discussions/:id/pin': ['student', 'lecturer'], // only student and lecturer logged in can pin a discussion
+            'POST /discussions/:id/unpin': ['student', 'lecturer'], // only student and lecturer logged in can unpin a discussion
+            'POST /follow': ['student', 'lecturer'], // only student and lecturer logged in can follow another user
+            'POST /unfollow': ['student', 'lecturer'], // only student and lecturer logged in can unfollow another user
+            'GET /followed-discussions': ['student', 'lecturer'], // only student and lecturer logged in can see discussions of followed users
+            'GET /follow-status': ['student', 'lecturer'], // only student and lecturer logged in can see follow status
+            'GET /discussions/:id/suggestions': ['student', 'lecturer'], // only student and lecturer logged in can see suggestions for a specific discussion
+            'GET /following-count': ['student', 'lecturer'], // only student and lecturer logged in can see the count of users they are following
+            'GET /follower-count': ['student', 'lecturer'], // only student and lecturer logged in can see the count of their followers
                       
-            'GET /comments': ['student', 'lecturer'],
-            'PUT /comments/:id': ['student', 'lecturer'],
-            'POST /comments': ['student', 'lecturer'],
-            'DELETE /comments/:id': ['student', 'lecturer'],
+            'GET /comments': ['student', 'lecturer'], // only student and lecturer logged in can see all comments
+            'PUT /comments/:id': ['student', 'lecturer'], // only student and lecturer logged in can update their own respective comments
+            'POST /comments': ['student', 'lecturer'], // only student and lecturer logged in can post comments 
+            'DELETE /comments/:id': ['student', 'lecturer'], // only student and lecturer logged in can delete their own respective comments
 
-            'GET /quizzes/trivia': ['student', 'lecturer'], // Both student and lecturer logged in can see trivia questions
             'GET /quizzes/:id/questions': ['student', 'lecturer'],  // Only student and lecturer logged in can see quiz id's questions
             'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
             'POST /quizzes': ['lecturer'], // Only lecturers can create quizzes
@@ -78,9 +77,9 @@ function verifyJWT(req, res, next) {
             'DELETE /lectures/:id': ['lecturer'], // Only lecturers can delete lectures
             'DELETE /lectures/course/:courseID/chapter/:chapterName': ['lecturer'], // Only lecturers can delete the whole chapter of the lecture
 
-            'PUT /reviews/:id': ['student', 'lecturer'],
-            'POST /reviews': ['student', 'lecturer'],
-            'DELETE /reviews/:id': ['student', 'lecturer'],
+            'PUT /reviews/:id': ['student', 'lecturer'], // only student and lecturer logged in can update their own respective comments
+            'POST /reviews': ['student', 'lecturer'], // only student and lecturer logged in can post comments
+            'DELETE /reviews/:id': ['student', 'lecturer'], // only student and lecturer logged in can delete their own respective comments
         };
         // ************************************** ADD ROUTES HERE **************************************
 

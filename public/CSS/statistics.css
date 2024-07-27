@@ -48,6 +48,8 @@
     padding: 10px 20px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-weight: bold; /* Bold text */
+    margin: 5px; /* Add margin if needed */
 }
 
 .left-button:hover {

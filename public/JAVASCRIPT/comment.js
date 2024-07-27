@@ -69,9 +69,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
     
             if (response.ok) { 
+                const updatedComment = await response.json();
                 if (editMode && currentComment) {
                     currentComment.querySelector('.comment-content').textContent = commentText;
+
+                    // Remove existing translation elements
+                    currentComment.querySelector('.comment-translated-content')?.remove();
+                    currentComment.querySelector('.comment-source-language')?.remove();
+
+                    // Create new translation HTML if necessary
+                    const translationHTML = updatedComment.sourceLanguage && updatedComment.sourceLanguage !== 'en' 
+                        ? `<div class="comment-translated-content">Translation: ${updatedComment.translatedContent || 'No translation available'}</div>
+                        <div class="comment-source-language">Detected language: ${updatedComment.sourceLanguage}</div>`
+                    : '';
+
+                    // Insert translation HTML before the comment-actions element
+                    const commentActions = currentComment.querySelector('.comment-actions');
+                    if (commentActions) {
+                        commentActions.insertAdjacentHTML('beforebegin', translationHTML);
+                    }         
+                               
                     alert('Comment updated successfully!');
+
                 } else {
                     alert('Comment posted successfully!');
                     fetchComments(discussionId);
@@ -84,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error:', error);
         }
-    }
+    }    
 
     async function postComment(text, discussionId) {
         try {
@@ -144,21 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
         
-    async function fetchDiscussionDetails(discussionId) {
-        try {
-            const response = await fetchWithAuth(`/discussions/${discussionId}`);
-            if (!response.ok) {
-                throw new Error(`Error fetching discussion: ${response.statusText}`);
-            }
-            const discussion = await response.json(); 
-            if (!discussion) {
-                throw new Error('Discussion not found');
-            }
-            displayDiscussionDetails(discussion); 
-        } catch (error) {
-            console.error('Error fetching discussion details:', error);
-        }
-    }
+   
 
     document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
@@ -247,53 +252,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function incrementLikes(commentId, likeButton, dislikeButton) {
         try {
-            if (dislikeButton.getAttribute('data-disliked') === 'true') {
-                alert('You can only choose to like or dislike a comment.');
+            const userId = sessionStorage.getItem('userId'); // Assuming userId is stored in sessionStorage
+            if (!userId) {
+                alert('User ID is required');
                 return;
             }
-
+    
             const response = await fetchWithAuth(`/comments/${commentId}/like`, {
-                method: 'POST'
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }) // Include userId in the request body
             });
-            const data = await response.json(); 
+            
+            const data = await response.json();
             if (data.success) {
                 likeButton.textContent = `👍 ${data.likes} Likes`;
-                likeButton.setAttribute('data-liked', 'true');
-                dislikeButton.setAttribute('data-disliked', 'false');
+                alert(data.message);
+                if (data.message.includes('removed')) {
+                    likeButton.setAttribute('data-liked', 'false');
+                } else {
+                    likeButton.setAttribute('data-liked', 'true');
+                    dislikeButton.setAttribute('data-disliked', 'false');
+                }
             } else {
-                alert('Error adding like.');
+                alert('Error toggling like.');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error adding like.');
+            alert('Error toggling like.');
         }
     }
-
+    
     async function incrementDislikes(commentId, likeButton, dislikeButton) {
         try {
-            if (likeButton.getAttribute('data-liked') === 'true') {
-                alert('You can only choose to like or dislike a comment.');
+            const userId = sessionStorage.getItem('userId'); // Assuming userId is stored in sessionStorage
+            if (!userId) {
+                alert('User ID is required');
                 return;
             }
-
+    
             const response = await fetchWithAuth(`/comments/${commentId}/dislike`, {
-                method: 'POST'
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }) // Include userId in the request body
             });
-            const data = await response.json(); 
-
+    
+            const data = await response.json();
             if (data.success) {
                 dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
-                dislikeButton.setAttribute('data-disliked', 'true');
-                likeButton.setAttribute('data-liked', 'false');
+                alert(data.message);
+                if (data.message.includes('removed')) {
+                    dislikeButton.setAttribute('data-disliked', 'false');
+                } else {
+                    dislikeButton.setAttribute('data-disliked', 'true');
+                    likeButton.setAttribute('data-liked', 'false');
+                }
             } else {
-                alert('Error adding dislike.');
+                alert('Error toggling dislike.');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error adding dislike.');
+            alert('Error toggling dislike.');
         }
     }
-
+             
     function displayComments(comments) {
         const commentsSection = document.querySelector('.comments-section'); 
         commentsSection.innerHTML = ''; 
@@ -316,6 +338,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const likesText = `👍 ${comment.likes || 0} Likes`;
             const dislikesText = `👎 ${comment.dislikes || 0} Dislikes`;
+
+            let translationHTML = '';
+            if (comment.sourceLanguage && comment.sourceLanguage !== 'en') {
+                translationHTML = `
+                    <div class="comment-translated-content">Translation:${comment.translatedContent || 'No translation available'}</div>
+                    <div class="comment-source-language">Detected language: ${comment.sourceLanguage}</div>
+                `;
+            }
     
             commentElement.innerHTML = `
                 <div class="user-info">
@@ -326,10 +356,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="role"> (${comment.role || 'Role not found'})</div> 
                 </div>
                 <div class="comment-content">${comment.content}</div>
+                ${translationHTML}
                 <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
                 <div class="comment-actions">
                     <button class="like-button" style="color: black;" data-liked="${likedByUser}">${likesText}</button>
-                    <button class="dislike-button " style="color: black;" data-disliked="${dislikedByUser}">${dislikesText}</button>
+                    <button class="dislike-button" style="color: black;" data-disliked="${dislikedByUser}">${dislikesText}</button>
                     ${token && comment.user_id === currentUserId ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
                                                                     <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
                 </div>
@@ -339,24 +370,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const dislikeButton = commentElement.querySelector('.dislike-button');
 
             likeButton.addEventListener('click', function () {
-                if (this.getAttribute('data-liked') === 'true') {
-                    alert('You have already liked this comment.');
-                    return;
-                }
                 if (dislikeButton.getAttribute('data-disliked') === 'true') {
-                    alert('You can only choose to like or dislike a comment.');
+                    alert('You can only like or dislike a comment.');
                     return;
                 }
                 incrementLikes(comment.id, this, dislikeButton); 
             });
 
             dislikeButton.addEventListener('click', function () {
-                if (this.getAttribute('data-disliked') === 'true') {
-                    alert('You have already disliked this comment.');
-                    return;
-                }
                 if (likeButton.getAttribute('data-liked') === 'true') {
-                    alert('You can only choose to like or dislike a review.');
+                    alert('You can only like or dislike a comment.');
                     return;
                 }
                 incrementDislikes(comment.id, likeButton, this); 
@@ -364,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             commentsSection.appendChild(commentElement);
         });
-    }
+    }        
 
     async function fetchCommentCountByDiscussionId(discussionId) {
         try {

@@ -83,9 +83,13 @@ app.get('/favicon.ico', (req, res) => res.status(204));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
+//--------------------------------------------------------JOEYI---------------------------------------------------------------------------------------------
 // Add Routes for log in & register
 app.post('/register', userValidation, userController.createUser);
 app.post('/login', userController.loginUser);
+
+// API Implementation
+app.get('/quizzes/trivia', quizController.fetchTriviaQuizzes); // route for fetching trivia quizzes
 
 // Add Routes for account management
 app.get('/account', jwtAuthorization.verifyJWT,userController.getUserById); // need token to see account details
@@ -98,19 +102,18 @@ app.put('/account', jwtAuthorization.verifyJWT, updateValidation, userController
 app.delete('/account', jwtAuthorization.verifyJWT,userController.deleteUser); // need token to delete account
 
 // Add Routes for quizzes
-app.get('/quizzes/trivia', jwtAuthorization.verifyJWT, quizController.fetchTriviaQuizzes); // route for fetching trivia quizzes
 app.get('/quizzes/statistics', quizController.getQuizPassFailStatistics); // users not logged in can see
 app.get('/quizzes', quizController.getAllQuizWithCreatorName); // users not logged in can see
 app.get('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizController.getQuizWithQuestions); // question related
 app.get('/quizResult/:attemptId', jwtAuthorization.verifyJWT, quizController.getUserQuizResult); // question related
-app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuiz); // route to create quiz
+app.post('/quizzes', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuiz, quizController.createQuizAndQuestion); // route to create quiz and questions
 app.post('/submitQuiz', jwtAuthorization.verifyJWT, quizController.submitQuiz); // question related
-app.post('/quizzes/:id/questions', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionAfterQuizCreation); // question form AFTER quiz creation // quiz.js
 app.post('/quizzes/:id/questions/update', jwtAuthorization.verifyJWT, quizValidation.validateCreateQuestion, quizController.createQuestionOnUpdate); // question form DURING edit question // editQuestion.js
 app.put('/quizzes/:id', jwtAuthorization.verifyJWT, quizValidation.validateUpdateQuiz, quizController.updateQuiz); // edit quiz
 app.put('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.updateQuestion); // edit question
 app.delete('/quizzes/:id', jwtAuthorization.verifyJWT, quizController.deleteQuiz); // delete quiz by quiz id
 app.delete('/quizzes/:quizId/questions/:questionId', jwtAuthorization.verifyJWT, quizController.deleteQuestion); // delete question
+//--------------------------------------------------------JOEYI---------------------------------------------------------------------------------------------
 
 
 //--------------------------------------------------------RAEANN---------------------------------------------------------------------------------------------
@@ -140,9 +143,9 @@ app.post('/discussions/:id/unpin', jwtAuthorization.verifyJWT, discussionControl
 
 //RAEANN GEMINI API
 app.get('/discussions/:id/suggestions',jwtAuthorization.verifyJWT, discussionController.getSuggestionsForDiscussion);
-
 //--------------------------------------------------------RAEANN---------------------------------------------------------------------------------------------
 
+//--------------------------------------------------------AMELIA---------------------------------------------------------------------------------------------
 // Add Routes for comments
 app.get('/comments', commentController.getComments);
 app.get('/comments/count', commentController.getCommentCount); 
@@ -168,7 +171,9 @@ app.post('/reviews', jwtAuthorization.verifyJWT, reviewValidation, reviewControl
 app.post('/reviews/:reviewId/like', reviewController.incrementLikes); // Dont need jwtAuthorzation middleware bc when not logged in, user unable to go to courses page aka where the reviews are.
 app.post('/reviews/:reviewId/dislike', reviewController.incrementDislikes);
 app.delete('/reviews/:id', jwtAuthorization.verifyJWT, reviewController.deleteReview); // -- jwt
+//--------------------------------------------------------AMELIA---------------------------------------------------------------------------------------------
 
+//--------------------------------------------------------WEIYING---------------------------------------------------------------------------------------------
 // Add Routes for courses
 app.get('/courses/search', courseController.searchCourses);
 app.get('/courses', courseController.getAllCourses);
@@ -182,7 +187,6 @@ app.put('/courses/:id', jwtAuthorization.verifyJWT, upload.single('courseImage')
 app.post('/courses', jwtAuthorization.verifyJWT, upload.single('courseImage'), courseController.createCourse); // Ensure field name matches
 app.delete('/courses/noLectures', courseController.deleteCourseWithNoLectures);
 app.delete('/courses/:id', jwtAuthorization.verifyJWT, courseController.deleteCourse);
-
 
 // route for vimeo API 
 app.get('/lectures/search/vimeo-videos',lectureController.searchVimeoVideo);
@@ -201,6 +205,7 @@ app.get('/video/:lectureID', lectureController.getLectureVideoByID); // for upda
 app.post('/lectures', jwtAuthorization.verifyJWT, multiUpload, lectureController.createLecture);
 app.delete('/lectures/:id', jwtAuthorization.verifyJWT, lectureController.deleteLecture); 
 app.delete('/lectures/course/:courseID/chapter/:chapterName', jwtAuthorization.verifyJWT, lectureController.deletingChapterName); 
+//--------------------------------------------------------WEIYING---------------------------------------------------------------------------------------------
 
 
 app.listen(port, async () => {

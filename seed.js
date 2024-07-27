@@ -64,9 +64,12 @@ async function run() {
             likes INT DEFAULT 0,
             dislikes INT DEFAULT 0,
             views INT DEFAULT 0,
-            pinned BIT DEFAULT 0,  
+            pinned BIT DEFAULT 0,
+            liked_by NVARCHAR(MAX), -- New column to store user IDs who liked the discussion
+            disliked_by NVARCHAR(MAX), -- New column to store user IDs who disliked the discussion
             FOREIGN KEY (user_id) REFERENCES Users(id)
         );
+
 
         CREATE TABLE Follow (
             Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -88,6 +91,22 @@ async function run() {
             discussion_id INT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES Users(id),
             FOREIGN KEY (discussion_id) REFERENCES Discussions(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE CommentLikes (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            comment_id INT NOT NULL,
+            user_id INT NOT NULL,
+            FOREIGN KEY (comment_id) REFERENCES user_comments(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE CommentDislikes (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            comment_id INT NOT NULL,
+            user_id INT NOT NULL,
+            FOREIGN KEY (comment_id) REFERENCES user_comments(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
         );
 
         CREATE TABLE Courses (
@@ -129,6 +148,22 @@ async function run() {
             course_id INT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES Users(id),
             FOREIGN KEY (course_id) REFERENCES Courses(CourseID) ON DELETE CASCADE
+        );
+
+        CREATE TABLE ReviewLikes (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            review_id INT NOT NULL,
+            user_id INT NOT NULL,
+            FOREIGN KEY (review_id) REFERENCES user_reviews(review_id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE ReviewDislikes (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            review_id INT NOT NULL,
+            user_id INT NOT NULL,
+            FOREIGN KEY (review_id) REFERENCES user_reviews(review_id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
         );
 
         CREATE TABLE Quizzes (
@@ -354,31 +389,31 @@ async function run() {
         const insertQuestions = `
         INSERT INTO Questions (quiz_id, question_text, qnsImg, option_1, option_2, option_3, option_4, correct_option) VALUES
         -- Color Blindness Assessment Questions
-        (1, 'What number do you see in the image?', @colorBlindQns1, '8', '12', '5', 'None', '8'),
-        (1, 'What number do you see in the image?', @colorBlindQns2, '1', 'No', 'Not sure', 'I see nothing', '1'),
-        (1, 'What number do you see in the image?', @colorBlindQns3, '3', 'Blue and Yellow', 'Only Red', 'Only Green', '3'),
-        (1, 'What number do you see in the image?', @colorBlindQns4, '6', 'Squares', 'Triangles', 'None', '6'),
-        (1, 'Do you see a number in this image?', @colorBlindQns5, 'Yes, it is 5', 'Yes, it is 3', 'No', 'Not sure', 'Yes, it is 5'),
+        (1, 'What number do you see in the image?', @colorBlindQns1, '8', '12', '7', 'None', '7'),
+        (1, 'What number do you see in the image?', @colorBlindQns2, '1', '8', 'Not sure', 'I see nothing', '8'),
+        (1, 'What number do you see in the image?', @colorBlindQns3, '3', '5', '8', 'I do not see anything', '5'),
+        (1, 'What number do you see in the image?', @colorBlindQns4, '8', 'I do not see anything', '3', '6', '8'),
+        (1, 'Do you see a number in this image?', @colorBlindQns5, 'Yes, it is 5', 'Yes, it is 42', '41', 'Not sure', 'Yes, it is 42'),
 
         -- Visual Acuity Test Questions
-        (2, 'What is the smallest line you can read in this image?', @visualAcuityQns1, 'Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 3'),
-        (2, 'What letter do you see in the middle of this image?', @visualAcuityQns2, 'A', 'B', 'C', 'D', 'C'),
-        (2, 'Identify the direction of the "E" in this image.', @visualAcuityQns3, 'Up', 'Down', 'Left', 'Right', 'Right'),
-        (2, 'How many letters do you see in this image?', @visualAcuityQns4, '4', '5', '6', '7', '5'),
+        (2, 'What is the smallest line you can read in this image?', @visualAcuityQns1, 'Line 1: "T O Z"', 'Line 2: "L P E D"', 'Line 3: "E C F"', 'I am not sure', 'Line 3: "E C F"'),
+        (2, 'What letter do you see in the middle of this image?', @visualAcuityQns2, 'A', 'B', 'C', 'There are letters, but they are not in the middle', 'There are letters, but they are not in the middle'),
+        (2, 'Identify the direction of the "E" in this image.', @visualAcuityQns3, 'Up', 'Down', 'Left', 'There is no "E" in this image', 'There is no "E" in this image'),
+        (2, 'How many letters are there in the first row?', @visualAcuityQns4, '4', '2', '6', '7', '2'),
         (2, 'What is the color of the largest letter in this image?', @visualAcuityQns5, 'Red', 'Blue', 'Green', 'Black', 'Black'),
 
         -- Astigmatism Test Questions
         (3, 'Do the lines in this image appear to be straight and parallel?', @astigmatismQns1, 'Yes', 'No', 'Not sure', 'Somewhat', 'Yes'),
         (3, 'Do the circles in this image look equally clear?', @astigmatismQns2, 'Yes', 'No', 'Not sure', 'Somewhat', 'Yes'),
-        (3, 'What shape do you see in this image?', @astigmatismQns3, 'Circle', 'Oval', 'Square', 'Rectangle', 'Circle'),
+        (3, 'What shape do you see in this image?', @astigmatismQns3, 'Circle', 'Oval', 'Square', 'Rectangle', 'Square'),
         (3, 'Are there any blurry areas in this image?', @astigmatismQns4, 'Yes', 'No', 'Not sure', 'Somewhat', 'No'),
         (3, 'Do you see any wavy lines in this image?', @astigmatismQns5, 'Yes', 'No', 'Not sure', 'Somewhat', 'No'),
 
         -- Macular Degeneration Assessment Questions
-        (4, 'Do you see a grid of straight lines in this image?', @macularDegenerationQns1, 'Yes', 'No', 'Some lines are wavy', 'Some lines are missing', 'Yes'),
-        (4, 'Is there any distortion in the lines of this image?', @macularDegenerationQns2, 'Yes', 'No', 'Some lines are wavy', 'Some lines are missing', 'No'),
-        (4, 'Do you see any missing areas in this image?', @macularDegenerationQns3, 'Yes', 'No', 'Some areas are missing', 'Not sure', 'No'),
-        (4, 'What shapes do you see in this image?', @macularDegenerationQns4, 'Circles', 'Squares', 'Triangles', 'None', 'Squares'),
+        (4, 'Do you see a grid of straight lines in this image?', @macularDegenerationQns1, 'Yes', 'No', 'Some lines are wavy', 'Some lines are missing', 'Some lines are wavy'),
+        (4, 'Is there any distortion in the lines of this image?', @macularDegenerationQns2, 'Yes', 'No', 'Some lines are wavy', 'Some lines are missing', 'Yes'),
+        (4, 'Do you see any missing areas in this image?', @macularDegenerationQns3, 'Yes', 'No, but some lines are wavy', 'Some areas are missing', 'Not sure', 'No, but some lines are wavy'),
+        (4, 'What shapes do you see in this image?', @macularDegenerationQns4, 'Circles', 'Grids of wavy line', 'Triangles', 'None', 'Grids of wavy line'),
         (4, 'Is there any blur in the center of this image?', @macularDegenerationQns5, 'Yes', 'No', 'Somewhat', 'Not sure', 'No');
         `;
 

@@ -324,6 +324,7 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
             likeButton.textContent = `👍 ${data.likes} Likes`;
             likeButton.setAttribute('data-liked', 'true');
             dislikeButton.setAttribute('data-disliked', 'false');
+            dislikeButton.textContent = `👎 0 Dislikes`;
         } else {
             alert('Error adding like.');
         }
@@ -335,34 +336,27 @@ function incrementLikes(discussionId, likeButton, dislikeButton) {
 }
 
 function incrementDislikes(discussionId, likeButton, dislikeButton) {
-    if (dislikeButton.getAttribute('data-disliked') === 'true') {
-        alert('You have already disliked this discussion.');
-        return;
-    }
-
     fetchWithAuth(`/discussions/${discussionId}/dislike`, {
         method: 'POST'
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
             dislikeButton.textContent = `👎 ${data.dislikes} Dislikes`;
             dislikeButton.setAttribute('data-disliked', 'true');
             likeButton.setAttribute('data-liked', 'false');
+            likeButton.textContent = `👍 0 Likes`;
         } else {
             alert('Error adding dislike.');
         }
     })
     .catch(error => {
-        console.error('Error adding dislike:', error);
+        console.error('Error:', error);
         alert('Error adding dislike.');
     });
 }
+
+
 
 function fetchCommentCountForDiscussion(discussionId) {
     console.log(`Fetching comment count for discussion ID: ${discussionId}`);
@@ -472,7 +466,6 @@ function followUser(followeeId, button) {
             button.textContent = 'Unfollow';
             button.classList.remove('follow-button');
             button.classList.add('unfollow-button');
-            alert('Successfully followed the user.'); // Alert for success
             console.log(`Updated follow status for user ID: ${followeeIdNum} to 'Unfollow'`);
         } else {
             alert('Error following user.');
@@ -512,7 +505,6 @@ function unfollowUser(followeeId, button) {
             button.textContent = 'Follow';
             button.classList.remove('unfollow-button');
             button.classList.add('follow-button');
-            alert('Successfully unfollowed the user.'); // Alert for success
             console.log(`Updated follow status for user ID: ${followeeIdNum} to 'Follow'`);
             if (getActiveTab() === 'following') {
                 const postElement = button.closest('.post');
