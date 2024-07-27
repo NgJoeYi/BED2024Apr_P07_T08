@@ -435,21 +435,23 @@ async function fetchReviews(courseId) {
             const likeButton = reviewElement.querySelector('.like-button');
             const dislikeButton = reviewElement.querySelector('.dislike-button');
 
-            likeButton.addEventListener('click', function () {
-                if (dislikeButton.getAttribute('data-disliked') === 'true') {
-                    alert('You can only like or dislike a review.');
-                    return;
-                }
-                incrementLikes(review.review_id, this, dislikeButton);
-            });
-    
-            dislikeButton.addEventListener('click', function () {
-                if (likeButton.getAttribute('data-liked') === 'true') {
-                    alert('You can only like or dislike a review.');
-                    return;
-                }
-                incrementDislikes(review.review_id, likeButton, this);
-            });
+            if (likeButton && dislikeButton) {
+                likeButton.addEventListener('click', function () {
+                    if (dislikeButton.getAttribute('data-disliked') === 'true') {
+                        alert('You can only like or dislike a review.');
+                        return;
+                    }
+                    incrementLikes(review.review_id, this, dislikeButton);
+                });
+
+                dislikeButton.addEventListener('click', function () {
+                    if (likeButton.getAttribute('data-liked') === 'true') {
+                        alert('You can only like or dislike a review.');
+                        return;
+                    }
+                    incrementDislikes(review.review_id, likeButton, this);
+                });
+            }
             
             reviewsContainer.appendChild(reviewElement); // Append the review element to the container
         });
