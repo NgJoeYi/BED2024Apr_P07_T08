@@ -37,17 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
 // Fetch trivia quizzes from the new API route
 function fetchTriviaQuizzes() {
     fetch('/quizzes/trivia?amount=10')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             console.log("Fetched Trivia Quizzes Data:", data); // Log fetched data
-            if (data && Object.keys(data).length > 0) {
+            if (data && Object.keys(data).length > 0 && !data.message) {
                 displayTriviaQuizzes(data);
             } else {
-                console.error('No trivia quizzes found');
-                document.getElementById('trivia-quiz-container').innerHTML = '<div id="no-quizzes-message">No trivia quizzes available.</div>';
+                console.error('No trivia quizzes found or error message received:', data.message);
+                alert('No trivia quizzes found. Please try again later.');
             }
         })
-        .catch(error => console.error('Error fetching trivia quizzes:', error));
+        .catch(error => {
+            console.error('Error fetching trivia quizzes:', error);
+            alert('Error fetching trivia quizzes. Please try reloading the page.');
+        });
 }
 
 
@@ -74,9 +82,14 @@ function displayTriviaQuizzes(groupedQuizzes) {
 
         const quizDetails = document.createElement('p');
         quizDetails.className = 'quiz-details';
+
+        // Safely access the difficulty property and provide a default value if undefined
+        const difficulty = groupedQuizzes[category][0]?.difficulty || 'Not specified';
+        console.log(`Category: ${category}, Difficulty: ${difficulty}`);
+
         quizDetails.innerHTML = `
             <strong>Questions:</strong> ${groupedQuizzes[category].length} | 
-            <strong>Difficulty:</strong> ${groupedQuizzes[category][0].difficulty}`;
+            <strong>Difficulty:</strong> ${difficulty}`;
         quizCardContent.appendChild(quizDetails);
 
         const buttonContainer = document.createElement('div');
@@ -86,7 +99,7 @@ function displayTriviaQuizzes(groupedQuizzes) {
         const startButton = document.createElement('button');
         startButton.innerText = 'Start Quiz';
         startButton.onclick = () => {
-            const token = sessionStorage.getItem('token'); // fetch token from localStorage
+            const token = sessionStorage.getItem('token'); // fetch token from sessionStorage
             if (token) {
                 startTriviaQuiz(groupedQuizzes[category], 0); // Start with the first question
             } else {
@@ -103,6 +116,7 @@ function displayTriviaQuizzes(groupedQuizzes) {
         triviaQuizContainer.appendChild(categoryContainer);
     });
 }
+
 
 
 function startTriviaQuiz(quizList, questionIndex) {
