@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             sessionStorage.removeItem('token');  // Clear the token from session storage
             sessionStorage.removeItem('userId');
             sessionStorage.removeItem('role');
-            window.location.href = 'Index.html'; // Redirect to the index page
+            window.location.href = 'Login.html'; // Redirect to the index page
         } else {
             const errorData = await response.json();
             alert(errorData.message); // Notify user of any errors
