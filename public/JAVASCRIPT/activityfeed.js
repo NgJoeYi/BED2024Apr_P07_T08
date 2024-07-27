@@ -466,7 +466,6 @@ function followUser(followeeId, button) {
             button.textContent = 'Unfollow';
             button.classList.remove('follow-button');
             button.classList.add('unfollow-button');
-            alert('Successfully followed the user.'); // Alert for success
             console.log(`Updated follow status for user ID: ${followeeIdNum} to 'Unfollow'`);
         } else {
             alert('Error following user.');
@@ -506,7 +505,6 @@ function unfollowUser(followeeId, button) {
             button.textContent = 'Follow';
             button.classList.remove('unfollow-button');
             button.classList.add('follow-button');
-            alert('Successfully unfollowed the user.'); // Alert for success
             console.log(`Updated follow status for user ID: ${followeeIdNum} to 'Follow'`);
             if (getActiveTab() === 'following') {
                 const postElement = button.closest('.post');
