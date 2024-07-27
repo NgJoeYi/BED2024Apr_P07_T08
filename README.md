@@ -33,6 +33,7 @@ This is the final submission. All functions and pages proposed during Checkpoint
 
 - [Image by pikisuperstar on Freepik](https://www.freepik.com/free-vector/hand-drawn-glossary-illustration_41099328.htm#fromView=search&page=1&position=4&uuid=6caa4ec3-e237-437b-b17f-5bdb2c55dbef)
 - [Canva](https://www.canva.com/)
+- https://lottiefiles.com/
 
 ### Images
 - astigmatismQns1.jpg: [Source](https://www.nvisioncenters.com/wp-content/uploads//astigmatism-test-2.png)
