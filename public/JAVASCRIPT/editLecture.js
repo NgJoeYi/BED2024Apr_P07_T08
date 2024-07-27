@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             alert('Error fetching lecture details. Please try again later.');
         }
     }
+    document.getElementById('vimeoSearchButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        fetchVimeoVideos();
+    });
+    
 
     // Find the form element for editing the lecture
     const form = document.getElementById('edit-lecture-form');
@@ -28,15 +33,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Add event listener for form submission
         form.addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent default form submission behavior
-
-            // Create FormData object from the form
+        
             const formData = new FormData(form);
             const localFileOption = document.getElementById("localFileOption").checked;
             const videoFileInput = document.getElementById('videoFiles');
-
-            // Remove any existing 'lectureVideo' field from formData to avoid duplication
-            formData.delete('lectureVideo');
-
+            const selectedVideo = document.querySelector('.vimeo-video.selected');
+        
+            
             // Handle local file uploads
             if (localFileOption) {
                 const videoFile = videoFileInput.files[0];
@@ -48,44 +51,50 @@ document.addEventListener('DOMContentLoaded', async function() {
                     }
                     formData.append('lectureVideo', videoFile);
                 } else {
-                    alert('Please select a local file.');
-                    return;
+                    console.log('No new local file selected. Retaining existing video if any.');
                 }
+            } else if (selectedVideo) {
+                // If Vimeo URL is chosen, append it correctly
+                formData.append('vimeoVideoUrl', selectedVideo.getAttribute('data-video-url'));
             } else {
-                // If Vimeo URL is chosen, make sure it is appended correctly
-                const selectedVideo = document.querySelector('.vimeo-video.selected');
-                if (selectedVideo) {
-                    formData.append('vimeoVideoUrl', selectedVideo.getAttribute('data-video-url'));
-                } else {
-                    return;
-                }
+                console.log('No new video selected. Retaining existing video if any.');
+            }
+            formData.delete('lectureVideo'); // Clear previous entry
+            if (localFileOption) {
+            const videoFile = videoFileInput.files[0];
+            if (videoFile) {
+                // validation and appending logic
+                formData.append('lectureVideo', videoFile);
+            } else {
+                console.log('No new local file selected. Retaining existing video if any.');
+            }
             }
 
+        
             console.log('FINAL FORM DATA', Array.from(formData.entries()));
-
+        
             try {
                 // Send the updated lecture data to the server using authenticated request
-                const response = await fetchWithAuth(`/lectures/${lectureID}`, { // headers in jwtutility.js
+                const response = await fetchWithAuth(`/lectures/${lectureID}`, {
                     method: 'PUT',
                     body: formData
                 });
-
+        
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Error response text:', errorText);
                     throw new Error('Network response was not ok');
                 }
-
+        
                 const responseData = await response.json();
                 console.log('Updated Lecture Data:', responseData.data);
-                // Alert user and redirect to lecture page upon successful update
                 alert('Lecture updated successfully!');
                 window.location.href = `lecture.html?courseID=${courseID}`;
             } catch (error) {
                 console.error('Error updating lecture:', error);
                 alert('Error updating lecture. Please try again later.');
             }
-        });
+        });        
     }
 });
 
