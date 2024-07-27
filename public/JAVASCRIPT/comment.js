@@ -144,21 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
         
-    async function fetchDiscussionDetails(discussionId) {
-        try {
-            const response = await fetchWithAuth(`/discussions/${discussionId}`);
-            if (!response.ok) {
-                throw new Error(`Error fetching discussion: ${response.statusText}`);
-            }
-            const discussion = await response.json(); 
-            if (!discussion) {
-                throw new Error('Discussion not found');
-            }
-            displayDiscussionDetails(discussion); 
-        } catch (error) {
-            console.error('Error fetching discussion details:', error);
-        }
-    }
+   
 
     document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
