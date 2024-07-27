@@ -1,6 +1,5 @@
 let startTime; // Variable to hold the start time
 let endTime; // Variable to hold the end time
-let userData = null; // Variable to store user data
 
 document.addEventListener('DOMContentLoaded', () => {
     // Set active state based on the current page
@@ -99,11 +98,13 @@ function displayTriviaQuizzes(groupedQuizzes) {
         // Create and append start quiz button
         const startButton = document.createElement('button'); // Create a button element for start quiz
         startButton.innerText = 'Start Quiz'; // Set button text
-        startButton.onclick = async () => {
-            const userResponse = await fetchWithAuth('/account', {}); // Fetch user information with authentication
-            if (userResponse.ok) {
-                userData = await userResponse.json();
+        startButton.onclick = () => { // Add click event listener to start button
+            const token = sessionStorage.getItem('token'); // fetch token from sessionStorage
+            if (token) {
                 startTriviaQuiz(groupedQuizzes[category], 0); // Start with the first question
+            } else {
+                alert('No token found. Please log in.'); // Alert the user to log in
+                window.location.href = 'login.html'; // Redirect to login page
             }
         };
         buttonContainer.appendChild(startButton); // Append start button to button container
@@ -262,6 +263,10 @@ async function submitQuiz() {
     stopTimer(); // Stop the timer
     console.log("User Answers:", userAnswers); // Log user answers
 
+    // Fetch user information
+    const userResponse = await fetchWithAuth('/account', {}); // Fetch user information with authentication
+    const userData = await userResponse.json(); // Get user data from response
+    
     // Calculate the score
     let score = 0;
     quizData.forEach((question, index) => {  // Iterate through quiz data
