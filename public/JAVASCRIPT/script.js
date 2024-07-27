@@ -17,10 +17,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 //for contact us page 
-document.getElementById('contact-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    showLottieAnimation();
-});
+if(document.getElementById('contact-form')){
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        showLottieAnimation();
+    });
+}
+
 
 function showLottieAnimation() {
     const contactForm = document.getElementById('contact-form');
