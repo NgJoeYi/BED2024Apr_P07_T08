@@ -212,6 +212,7 @@
 /* Edit Account Details */
 .editaccountdetails {
   float: right;
+  width: 30%;
 }
 
 #edit-account-details {
