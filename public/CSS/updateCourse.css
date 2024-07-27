@@ -6,9 +6,15 @@ body {
 }
 
 .container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    height: 100%;
     width: 80%;
     margin: 0 auto;
-}
+  }
 
 .form-section {
     background-color: #fff;
@@ -23,24 +29,24 @@ body {
     color: #1b2b40;
 }
 
-.form-group {
+.form-group, .addVideoContainer {
     margin-bottom: 15px;
 }
 
-.form-group label {
+.form-group label , .addVideoContainer label{
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
 }
-
-.form-group input, .form-group textarea {
+.form-group input, .form-group textarea, .addVideoContainer input {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-button[type="submit"] {
+
+button[type="submit"], .videoInputContainer button{
     background-color: #d9aa52;
     color: white;
     padding: 10px 15px;
@@ -50,7 +56,71 @@ button[type="submit"] {
     font-size: 1em;
     font-weight: bold;
 }
-
+.videoInputContainer button{
+    margin-top: 10px;
+}
 button[type="submit"]:hover {
     background-color: #c49545;
+}
+
+/** Adjust Radio Buttons Container Style **/
+.radioContainer {
+    display: flex;
+    flex-direction: row; /* Ensure the radio buttons and labels are side by side */
+    align-items: center; /* Align items vertically centered */
+    margin-bottom: 10px; /* Space between radio buttons and input fields */
+    justify-content: left;
+    width: 80%;
+}
+
+.radioContainer input[type="radio"] {
+    width: 2%;
+    margin-right: 5px; /* Reduce space between radio button and label */
+}
+
+.radioContainer label {
+    margin-right: 15px; /* Reduce space between each label */
+}
+
+/** Adjust the Input Container Style **/
+.videoInputContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between local file input and Vimeo search */
+}
+
+/** Button Container Style **/
+.buttonContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+/** Vimeo Video Styles **/
+#vimeoVideoResults {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+#vimeoVideoResults h4 {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+}
+
+.vimeo-video {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(50% - 10px); /* Two videos in a row with space in between */
+}
+
+.vimeo-video img {
+    max-width: 100%;
+    height: auto;
 }

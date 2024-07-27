@@ -6,7 +6,6 @@
     <title>EduHelper | Edit Lecture</title>
     <link rel="stylesheet" href="CSS/updateCourse.css">
     <link rel="stylesheet" href="CSS/navbar.css">
-    <link rel="stylesheet" href="CSS/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -38,7 +37,7 @@
 
     <div class="container">
         <main>
-            <form id="edit-lecture-form" enctype="multipart/form-data">
+            <form id="edit-lecture-form" enctype="multipart/form-data" onsubmit="toggleUploadOptions()">
                 <div class="form-group">
                     <label for="lectureTitle">Lecture Title:</label>
                     <input type="text" id="lectureTitle" name="title" required>
@@ -55,9 +54,24 @@
                     <label for="lectureDuration">Lecture Duration (minutes):</label>
                     <input type="number" id="lectureDuration" name="duration" required>
                 </div>
-                <div class="form-group">
-                    <label for="lectureVideoInput">Lecture Video:</label>
-                    <input type="file" id="lectureVideoInput" name="lectureVideo" accept="video/*">                 
+
+                <div class="addVideoContainer">
+                    <div class="radioContainer">
+                    <input type="radio" id="localFileOption" name="videoSource" value="local" onclick="toggleUploadOptions()" checked>
+                    <label for="localFileOption">Upload Local File</label>
+                    <input type="radio" id="vimeoOption" name="videoSource" value="vimeo" onclick="toggleUploadOptions()">
+                    <label for="vimeoOption">Vimeo Video</label>
+                    </div>
+                    <div id="localFileInput" class="videoInputContainer">
+                        <label for="videoFiles">Upload Video Files:</label>
+                        <input type="file" id="videoFiles" name="lectureVideo" accept="video/*">                 
+                    </div>
+                    <div id="vimeoVideosContainer" class="videoInputContainer" style="display: none;">
+                        <label for="vimeoSearch">Search Vimeo Videos:</label>
+                        <input type="text" id="vimeoSearch" placeholder="Enter search term">
+                        <button onclick="fetchVimeoVideos()">Search</button>
+                    <div id="vimeoVideoResults"></div>
+                    </div>
                 </div>
                 <button type="submit">Save Changes</button>
             </form>                                                            
