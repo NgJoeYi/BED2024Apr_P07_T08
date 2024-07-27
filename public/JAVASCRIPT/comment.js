@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error:', error);
         }
-    }
+    }    
 
     async function postComment(text, discussionId) {
         try {
@@ -329,6 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="role"> (${comment.role || 'Role not found'})</div> 
                 </div>
                 <div class="comment-content">${comment.content}</div>
+                <div class="comment-translated-content">Translation:${comment.translatedContent || 'No translation available'}</div>
+                <div class="comment-source-language">Detected language: ${comment.sourceLanguage || 'Unknown'}</div> 
                 <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
                 <div class="comment-actions">
                     <button class="like-button" style="color: black;" data-liked="${likedByUser}">${likesText}</button>
@@ -359,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             commentsSection.appendChild(commentElement);
         });
-    }
+    }        
 
     async function fetchCommentCountByDiscussionId(discussionId) {
         try {

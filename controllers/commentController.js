@@ -2,6 +2,32 @@ const sql = require('mssql'); // Importing the 'mssql' library for SQL Server op
 // const dbConfig = require('../dbConfig'); // Importing database configuration
 const commentModel = require('../models/Comment'); // Importing the Comment model
 
+// Load environment variables (did this for API)
+require('dotenv').config();
+
+const { Translate } = require('@google-cloud/translate').v2;
+const translate = new Translate({
+    key: process.env.GOOGLE_CLOUD_API_KEY
+});
+
+const translateComment = async (text) => {
+    try {
+        // Detect the language of the input text
+        const [detection] = await translate.detect(text);
+        const sourceLanguage = detection.language;
+        console.log('Detected Language:', sourceLanguage);
+
+        // Translate the text to English
+        const [translation] = await translate.translate(text, 'en');
+        console.log('Translated Content:', translation);
+
+        return { translatedContent: translation, sourceLanguage };
+    } catch (error) {
+        console.error('Error in translateComment:', error);
+        return { translatedContent: 'No translation available', sourceLanguage: 'Unknown' };
+    }
+};
+
 
 const getComments = async (req, res) => {
     const { discussionId } = req.query; // Extract discussionId from query parameters
@@ -13,26 +39,40 @@ const getComments = async (req, res) => {
         } else {
             comments = await commentModel.getAllComments(); 
         }
+
+        // Detect and translate comments
+        for (let comment of comments) {
+            const { translatedContent, sourceLanguage } = await translateComment(comment.content);
+            comment.translatedContent = translatedContent;
+            comment.sourceLanguage = sourceLanguage;
+        }
+
         res.json(comments); // Send the comments as a JSON response
     } catch (err) {
         console.error(err); // Log the error
         res.status(500).send("Error fetching comments"); // Send 500 status code if an error occurs
     } 
-}
+};
 
 const createComment = async (req, res) => {
     const { content, discussionId } = req.body;  // Extract content and discussionId from request body
     const userId = req.user.id; // Extract user ID from authenticated user
     try {
+        // Detect and translate the comment content
+        const { translatedContent, sourceLanguage } = await translateComment(content);
+
         // Create a new comment in the database
-        const result = await commentModel.createComment(content, userId, discussionId);
-        // Send the created comment as JSON response with 201 status
-        res.status(201).json(result);
+        const result = await commentModel.createComment(content, userId, discussionId); // Use original content
+
+        console.log('Comment creation result:', result);
+
+        // Send the created comment and its translation as JSON response with 201 status
+        res.status(201).json({ ...result, translatedContent, sourceLanguage });
     } catch (err) {
         console.error('Error creating comment:', err.message);
         res.status(500).send("Error creating comment"); // Send 500 status code if an error occurs
-    } 
-}
+    }
+};
 
 const updateComment = async (req, res) => {
     const { id } = req.params;  // Extract the comment ID from request parameters
