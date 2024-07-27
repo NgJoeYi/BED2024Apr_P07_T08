@@ -257,54 +257,76 @@ class Comment { // Initializing the Comment object with various properties
         }
     }   
 
-    // Function to increment likes for a comment
-    static async incrementLikes(id) { // UPDATE to increase like count, SELECT to retrieve the new like count
+    static async incrementLikes(commentId, userId) {
         const query = `
-            UPDATE user_comments 
-            SET likes = likes + 1
-            WHERE id = @id;
-            SELECT likes FROM user_comments WHERE id = @id;
+            IF EXISTS (SELECT 1 FROM CommentLikes WHERE comment_id = @commentId AND user_id = @userId)
+            BEGIN
+                DELETE FROM CommentLikes WHERE comment_id = @commentId AND user_id = @userId;
+                UPDATE user_comments SET likes = likes - 1 WHERE id = @commentId;
+                SELECT 'Like successfully removed' AS message, (SELECT likes FROM user_comments WHERE id = @commentId) AS likes;
+            END
+            ELSE
+            BEGIN
+                IF EXISTS (SELECT 1 FROM CommentDislikes WHERE comment_id = @commentId AND user_id = @userId)
+                BEGIN
+                    DELETE FROM CommentDislikes WHERE comment_id = @commentId AND user_id = @userId;
+                    UPDATE user_comments SET dislikes = dislikes - 1 WHERE id = @commentId;
+                END
+                INSERT INTO CommentLikes (comment_id, user_id) VALUES (@commentId, @userId);
+                UPDATE user_comments SET likes = likes + 1 WHERE id = @commentId;
+                SELECT 'Like successfully added' AS message, (SELECT likes FROM user_comments WHERE id = @commentId) AS likes;
+            END
         `;
         let connection;
         try {
-            connection = await sql.connect(dbConfig); // Establishing a connection to the database
+            connection = await sql.connect(dbConfig);
             const request = new sql.Request(connection);
-            request.input('id', sql.Int, id); // Setting the input parameter for the query
-            const result = await request.query(query); // Executing the SQL query to increment the likes and retrieve the new count of likes
-            return result.recordset[0].likes; // Returning the updated number of likes
-
-        } catch (err) { // Handling any errors that occur during the process
-            throw new Error('Error incrementing likes: ' + err.message);
-
+            request.input('commentId', sql.Int, commentId);
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(query);
+            return result.recordset[0];
+        } catch (err) {
+            throw new Error('Error toggling like: ' + err.message);
         } finally {
             if (connection) {
-                await connection.close(); // Ensuring that the database connection is closed
+                await connection.close();
             }
         }
     }
 
-    // Function to increment dislikes for a comment
-    static async incrementDislikes(id) {
+    static async incrementDislikes(commentId, userId) {
         const query = `
-            UPDATE user_comments
-            SET dislikes = dislikes + 1
-            WHERE id = @id;
-            SELECT dislikes FROM user_comments WHERE id = @id;
+            IF EXISTS (SELECT 1 FROM CommentDislikes WHERE comment_id = @commentId AND user_id = @userId)
+            BEGIN
+                DELETE FROM CommentDislikes WHERE comment_id = @commentId AND user_id = @userId;
+                UPDATE user_comments SET dislikes = dislikes - 1 WHERE id = @commentId;
+                SELECT 'Dislike successfully removed' AS message, (SELECT dislikes FROM user_comments WHERE id = @commentId) AS dislikes;
+            END
+            ELSE
+            BEGIN
+                IF EXISTS (SELECT 1 FROM CommentLikes WHERE comment_id = @commentId AND user_id = @userId)
+                BEGIN
+                    DELETE FROM CommentLikes WHERE comment_id = @commentId AND user_id = @userId;
+                    UPDATE user_comments SET likes = likes - 1 WHERE id = @commentId;
+                END
+                INSERT INTO CommentDislikes (comment_id, user_id) VALUES (@commentId, @userId);
+                UPDATE user_comments SET dislikes = dislikes + 1 WHERE id = @commentId;
+                SELECT 'Dislike successfully added' AS message, (SELECT dislikes FROM user_comments WHERE id = @commentId) AS dislikes;
+            END
         `;
         let connection;
         try {
-            connection = await sql.connect(dbConfig); // Establishing a connection to the database
+            connection = await sql.connect(dbConfig);
             const request = new sql.Request(connection);
-            request.input('id', sql.Int, id); // Setting the input parameter for the query
-            const result = await request.query(query); // Executing the SQL query to increment the dislikes and retrieve the new count of dislikes
-            return result.recordset[0].dislikes; // Returning the updated number of dislikes
-
-        } catch (err) { // Handling any errors that occur during the process
-            throw new Error('Error incrementing dislikes: ' + err.message);
-
+            request.input('commentId', sql.Int, commentId);
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(query);
+            return result.recordset[0];
+        } catch (err) {
+            throw new Error('Error toggling dislike: ' + err.message);
         } finally {
             if (connection) {
-                await connection.close(); // Ensuring that the database connection is closed
+                await connection.close();
             }
         }
     }
