@@ -308,21 +308,25 @@ class Review { // Initializing the Review object with various properties
         `;
         let connection;
         try {
-            connection = await sql.connect(dbConfig);
-            const request = new sql.Request(connection);
+            connection = await sql.connect(dbConfig); // Establishing a connection to the database
+            const request = new sql.Request(connection); // Create a new SQL request
+            // Setting the input parameter for the query
             request.input('reviewId', sql.Int, reviewId);
             request.input('userId', sql.Int, userId);
-            const result = await request.query(query);
-            return result.recordset[0];
+            const result = await request.query(query); // Executing the SQL query
+            return result.recordset[0]; // Return the result of incrementLikes
+
         } catch (err) {
-            throw new Error('Error toggling like: ' + err.message);
+            throw new Error('Error toggling like: ' + err.message); // Throw an error if increasing and toggling the likes fails
+
         } finally {
             if (connection) {
-                await connection.close();
+                await connection.close(); // Ensuring that the database connection is closed
             }
         }
     }
 
+    // To increment the dislikes of a review
     static async incrementDislikes(reviewId, userId) {
         const query = `
             IF EXISTS (SELECT 1 FROM ReviewDislikes WHERE review_id = @reviewId AND user_id = @userId)
@@ -345,17 +349,20 @@ class Review { // Initializing the Review object with various properties
         `;
         let connection;
         try {
-            connection = await sql.connect(dbConfig);
-            const request = new sql.Request(connection);
+            connection = await sql.connect(dbConfig); // Establishing a connection to the database
+            const request = new sql.Request(connection); // Create a new SQL request
+            // Setting the input parameter for the query
             request.input('reviewId', sql.Int, reviewId);
             request.input('userId', sql.Int, userId);
-            const result = await request.query(query);
-            return result.recordset[0];
+            const result = await request.query(query); // Executing the SQL query
+            return result.recordset[0]; // Return the result of incrementDislikes
+
         } catch (err) {
-            throw new Error('Error toggling dislike: ' + err.message);
+            throw new Error('Error toggling dislike: ' + err.message); // Throw an error if increasing and toggling the dislikes fails
+
         } finally {
             if (connection) {
-                await connection.close();
+                await connection.close(); // Ensuring that the database connection is closed
             }
         }
     }
