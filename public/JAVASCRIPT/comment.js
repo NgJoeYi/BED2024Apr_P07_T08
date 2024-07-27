@@ -69,9 +69,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
     
             if (response.ok) { 
+                const updatedComment = await response.json();
                 if (editMode && currentComment) {
                     currentComment.querySelector('.comment-content').textContent = commentText;
+
+                    // Remove existing translation elements
+                    currentComment.querySelector('.comment-translated-content')?.remove();
+                    currentComment.querySelector('.comment-source-language')?.remove();
+
+                    // Create new translation HTML if necessary
+                    const translationHTML = updatedComment.sourceLanguage && updatedComment.sourceLanguage !== 'en' 
+                        ? `<div class="comment-translated-content">Translation: ${updatedComment.translatedContent || 'No translation available'}</div>
+                        <div class="comment-source-language">Detected language: ${updatedComment.sourceLanguage}</div>`
+                    : '';
+
+                    // Insert translation HTML before the comment-actions element
+                    const commentActions = currentComment.querySelector('.comment-actions');
+                    if (commentActions) {
+                        commentActions.insertAdjacentHTML('beforebegin', translationHTML);
+                    }         
+                               
                     alert('Comment updated successfully!');
+
                 } else {
                     alert('Comment posted successfully!');
                     fetchComments(discussionId);
@@ -319,6 +338,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const likesText = `👍 ${comment.likes || 0} Likes`;
             const dislikesText = `👎 ${comment.dislikes || 0} Dislikes`;
+
+            let translationHTML = '';
+            if (comment.sourceLanguage && comment.sourceLanguage !== 'en') {
+                translationHTML = `
+                    <div class="comment-translated-content">Translation:${comment.translatedContent || 'No translation available'}</div>
+                    <div class="comment-source-language">Detected language: ${comment.sourceLanguage}</div>
+                `;
+            }
     
             commentElement.innerHTML = `
                 <div class="user-info">
@@ -329,12 +356,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="role"> (${comment.role || 'Role not found'})</div> 
                 </div>
                 <div class="comment-content">${comment.content}</div>
-                <div class="comment-translated-content">Translation:${comment.translatedContent || 'No translation available'}</div>
-                <div class="comment-source-language">Detected language: ${comment.sourceLanguage || 'Unknown'}</div> 
+                ${translationHTML}
                 <p class="comment-date">Posted on: ${new Date(comment.created_at).toLocaleDateString()}</p>
                 <div class="comment-actions">
                     <button class="like-button" style="color: black;" data-liked="${likedByUser}">${likesText}</button>
-                    <button class="dislike-button " style="color: black;" data-disliked="${dislikedByUser}">${dislikesText}</button>
+                    <button class="dislike-button" style="color: black;" data-disliked="${dislikedByUser}">${dislikesText}</button>
                     ${token && comment.user_id === currentUserId ? `<button class="delete-btn btn" onclick="deleteComment(this)">Delete</button>
                                                                     <button class="edit-btn btn" onclick="editComment(this)">Edit</button>` : ''}
                 </div>

@@ -50,10 +50,10 @@ function verifyJWT(req, res, next) {
             'GET /following-count': ['student', 'lecturer'], // only student and lecturer logged in can see the count of users they are following
             'GET /follower-count': ['student', 'lecturer'], // only student and lecturer logged in can see the count of their followers
                       
-            'GET /comments': ['student', 'lecturer'],
-            'PUT /comments/:id': ['student', 'lecturer'],
-            'POST /comments': ['student', 'lecturer'],
-            'DELETE /comments/:id': ['student', 'lecturer'],
+            'GET /comments': ['student', 'lecturer'], // only student and lecturer logged in can see all comments
+            'PUT /comments/:id': ['student', 'lecturer'], // only student and lecturer logged in can update their own respective comments
+            'POST /comments': ['student', 'lecturer'], // only student and lecturer logged in can post comments 
+            'DELETE /comments/:id': ['student', 'lecturer'], // only student and lecturer logged in can delete their own respective comments
 
             'GET /quizzes/:id/questions': ['student', 'lecturer'],  // Only student and lecturer logged in can see quiz id's questions
             'GET /quizResult/:attemptId': ['student', 'lecturer'], // Both students and lecturers can view quiz results
@@ -77,9 +77,9 @@ function verifyJWT(req, res, next) {
             'DELETE /lectures/:id': ['lecturer'], // Only lecturers can delete lectures
             'DELETE /lectures/course/:courseID/chapter/:chapterName': ['lecturer'], // Only lecturers can delete the whole chapter of the lecture
 
-            'PUT /reviews/:id': ['student', 'lecturer'],
-            'POST /reviews': ['student', 'lecturer'],
-            'DELETE /reviews/:id': ['student', 'lecturer'],
+            'PUT /reviews/:id': ['student', 'lecturer'], // only student and lecturer logged in can update their own respective comments
+            'POST /reviews': ['student', 'lecturer'], // only student and lecturer logged in can post comments
+            'DELETE /reviews/:id': ['student', 'lecturer'], // only student and lecturer logged in can delete their own respective comments
         };
         // ************************************** ADD ROUTES HERE **************************************
 

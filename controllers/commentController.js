@@ -12,22 +12,23 @@ const translate = new Translate({
 
 const translateComment = async (text) => {
     try {
-        // Detect the language of the input text
         const [detection] = await translate.detect(text);
         const sourceLanguage = detection.language;
         console.log('Detected Language:', sourceLanguage);
 
-        // Translate the text to English
+        if (sourceLanguage === 'en') {
+            return { translatedContent: null, sourceLanguage };
+        }
+
         const [translation] = await translate.translate(text, 'en');
         console.log('Translated Content:', translation);
 
         return { translatedContent: translation, sourceLanguage };
     } catch (error) {
         console.error('Error in translateComment:', error);
-        return { translatedContent: 'No translation available', sourceLanguage: 'Unknown' };
+        return { translatedContent: null, sourceLanguage: 'Unknown' };
     }
 };
-
 
 const getComments = async (req, res) => {
     const { discussionId } = req.query; // Extract discussionId from query parameters
@@ -74,10 +75,31 @@ const createComment = async (req, res) => {
     }
 };
 
+// const updateComment = async (req, res) => {
+//     const { id } = req.params;  // Extract the comment ID from request parameters
+//     const { content } = req.body; // Extract content from request body
+//     const userId = req.user.id; // Extract user ID from authenticated user
+//     try {
+//         const comment = await commentModel.getCommentById(id); // Fetch existing comment by ID
+
+//         if (!comment) {
+//             return res.status(404).json({ error: 'Comment not found' }); // Return 404 if comment not found
+//         }
+
+//         // Update the comment content in the database
+//         const updatedComment = await commentModel.updateComment(id, content);
+//         res.json(updatedComment); // Send the updated comment as JSON response
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send("Error updating comment"); // Send 500 status code if an error occurs
+//     }
+// }
+
 const updateComment = async (req, res) => {
-    const { id } = req.params;  // Extract the comment ID from request parameters
+    const { id } = req.params; // Extract the comment ID from request parameters
     const { content } = req.body; // Extract content from request body
     const userId = req.user.id; // Extract user ID from authenticated user
+    
     try {
         const comment = await commentModel.getCommentById(id); // Fetch existing comment by ID
 
@@ -85,14 +107,20 @@ const updateComment = async (req, res) => {
             return res.status(404).json({ error: 'Comment not found' }); // Return 404 if comment not found
         }
 
+        // Detect and translate the comment content
+        const { translatedContent, sourceLanguage } = await translateComment(content);
+
         // Update the comment content in the database
         const updatedComment = await commentModel.updateComment(id, content);
-        res.json(updatedComment); // Send the updated comment as JSON response
+        
+        // Add translated content and source language to the response
+        res.json({ ...updatedComment, translatedContent, sourceLanguage }); // Send the updated comment and its translation as JSON response
     } catch (err) {
-        console.error(err);
+        console.error('Error updating comment:', err.message);
         res.status(500).send("Error updating comment"); // Send 500 status code if an error occurs
     }
-}
+};
+
 
 const deleteComment = async (req, res) => {
     const { id } = req.params; // Extract comment ID from request params
