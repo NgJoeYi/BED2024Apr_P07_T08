@@ -38,9 +38,19 @@ document.addEventListener('DOMContentLoaded', async function() {
             const localFileOption = document.getElementById("localFileOption").checked;
             const videoFileInput = document.getElementById('videoFiles');
             const selectedVideo = document.querySelector('.vimeo-video.selected');
-        
             
-            // Handle local file uploads
+            // Get the duration input as a number
+            const durationInput = document.getElementById('lectureDuration');
+            const duration = parseInt(durationInput.value, 10);
+        
+            // Check if duration is valid
+            if (isNaN(duration) || duration <= 0) {
+                alert('Duration cannot be less than or equal to 0. Please re-enter a valid duration.');
+                durationInput.focus(); // Optionally, focus on the duration input
+                return;
+            }
+        
+            // Continue with file handling
             if (localFileOption) {
                 const videoFile = videoFileInput.files[0];
                 if (videoFile) {
@@ -59,18 +69,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             } else {
                 console.log('No new video selected. Retaining existing video if any.');
             }
-            formData.delete('lectureVideo'); // Clear previous entry
-            if (localFileOption) {
-            const videoFile = videoFileInput.files[0];
-            if (videoFile) {
-                // validation and appending logic
-                formData.append('lectureVideo', videoFile);
-            } else {
-                console.log('No new local file selected. Retaining existing video if any.');
-            }
-            }
-
-        
+            
+            // Log the final FormData contents
             console.log('FINAL FORM DATA', Array.from(formData.entries()));
         
             try {
