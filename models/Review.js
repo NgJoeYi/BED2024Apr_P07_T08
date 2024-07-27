@@ -286,60 +286,79 @@ class Review { // Initializing the Review object with various properties
     }
     
     // To increment the likes of a review
-    static async incrementLikes(reviewId) { // UPDATE to increase like count, SELECT to retrieve the new like count
-        
+    static async incrementLikes(reviewId, userId) {
         const query = `
-        UPDATE user_reviews 
-        SET likes = likes + 1
-        WHERE review_id = @reviewId;
-        SELECT likes FROM user_reviews WHERE review_id = @reviewId;
+            IF EXISTS (SELECT 1 FROM ReviewLikes WHERE review_id = @reviewId AND user_id = @userId)
+            BEGIN
+                DELETE FROM ReviewLikes WHERE review_id = @reviewId AND user_id = @userId;
+                UPDATE user_reviews SET likes = likes - 1 WHERE review_id = @reviewId;
+                SELECT 'Like successfully removed' AS message, (SELECT likes FROM user_reviews WHERE review_id = @reviewId) AS likes;
+            END
+            ELSE
+            BEGIN
+                IF EXISTS (SELECT 1 FROM ReviewDislikes WHERE review_id = @reviewId AND user_id = @userId)
+                BEGIN
+                    DELETE FROM ReviewDislikes WHERE review_id = @reviewId AND user_id = @userId;
+                    UPDATE user_reviews SET dislikes = dislikes - 1 WHERE review_id = @reviewId;
+                END
+                INSERT INTO ReviewLikes (review_id, user_id) VALUES (@reviewId, @userId);
+                UPDATE user_reviews SET likes = likes + 1 WHERE review_id = @reviewId;
+                SELECT 'Like successfully added' AS message, (SELECT likes FROM user_reviews WHERE review_id = @reviewId) AS likes;
+            END
         `;
-
         let connection;
         try {
-            connection = await sql.connect(dbConfig); // Establishing a connection to the database
-            const request = new sql.Request(connection); // Create a new SQL request
-            request.input('reviewId', sql.Int, reviewId); // Setting the input parameter for the query
-            const result = await request.query(query); // Executing the SQL query
-            return result.recordset[0].likes; // Return the updated likes count
-
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('reviewId', sql.Int, reviewId);
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(query);
+            return result.recordset[0];
         } catch (err) {
-            throw new Error(`Error incrementing likes: ${err.message}`); // Throw an error if incrementing likes fails
-
+            throw new Error('Error toggling like: ' + err.message);
         } finally {
             if (connection) {
-                await connection.close(); // Ensuring that the database connection is closed
+                await connection.close();
             }
         }
     }
-    
-    // To increment the dislikes of a review
-    static async incrementDislikes(reviewId) {
 
+    static async incrementDislikes(reviewId, userId) {
         const query = `
-        UPDATE user_reviews
-        SET dislikes = dislikes + 1
-        WHERE review_id = @reviewId;
-        SELECT dislikes FROM user_reviews WHERE review_id = @reviewId;
+            IF EXISTS (SELECT 1 FROM ReviewDislikes WHERE review_id = @reviewId AND user_id = @userId)
+            BEGIN
+                DELETE FROM ReviewDislikes WHERE review_id = @reviewId AND user_id = @userId;
+                UPDATE user_reviews SET dislikes = dislikes - 1 WHERE review_id = @reviewId;
+                SELECT 'Dislike successfully removed' AS message, (SELECT dislikes FROM user_reviews WHERE review_id = @reviewId) AS dislikes;
+            END
+            ELSE
+            BEGIN
+                IF EXISTS (SELECT 1 FROM ReviewLikes WHERE review_id = @reviewId AND user_id = @userId)
+                BEGIN
+                    DELETE FROM ReviewLikes WHERE review_id = @reviewId AND user_id = @userId;
+                    UPDATE user_reviews SET likes = likes - 1 WHERE review_id = @reviewId;
+                END
+                INSERT INTO ReviewDislikes (review_id, user_id) VALUES (@reviewId, @userId);
+                UPDATE user_reviews SET dislikes = dislikes + 1 WHERE review_id = @reviewId;
+                SELECT 'Dislike successfully added' AS message, (SELECT dislikes FROM user_reviews WHERE review_id = @reviewId) AS dislikes;
+            END
         `;
-
         let connection;
         try {
-            connection = await sql.connect(dbConfig); // Establishing a connection to the database
-            const request = new sql.Request(connection); // Create a new SQL request
-            request.input('reviewId', sql.Int, reviewId); // Setting the input parameter for the query
-            const result = await request.query(query); // Executing the SQL query
-            return result.recordset[0].dislikes; // Return the updated dislikes count
-
+            connection = await sql.connect(dbConfig);
+            const request = new sql.Request(connection);
+            request.input('reviewId', sql.Int, reviewId);
+            request.input('userId', sql.Int, userId);
+            const result = await request.query(query);
+            return result.recordset[0];
         } catch (err) {
-            throw new Error(`Error incrementing dislikes: ${err.message}`); // Throw an error if incrementing dislikes fails
-
+            throw new Error('Error toggling dislike: ' + err.message);
         } finally {
             if (connection) {
-                await connection.close(); // Ensuring that the database connection is closed
+                await connection.close();
             }
         }
-    }            
+    }
 }
 
 module.exports = Review;  // Export the Review class

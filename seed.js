@@ -93,6 +93,22 @@ async function run() {
             FOREIGN KEY (discussion_id) REFERENCES Discussions(id) ON DELETE CASCADE
         );
 
+        CREATE TABLE CommentLikes (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            comment_id INT NOT NULL,
+            user_id INT NOT NULL,
+            FOREIGN KEY (comment_id) REFERENCES user_comments(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE CommentDislikes (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            comment_id INT NOT NULL,
+            user_id INT NOT NULL,
+            FOREIGN KEY (comment_id) REFERENCES user_comments(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+        );
+
         CREATE TABLE Courses (
             CourseID INT PRIMARY KEY IDENTITY(1,1),
             UserID INT NOT NULL,
@@ -132,6 +148,22 @@ async function run() {
             course_id INT NOT NULL,
             FOREIGN KEY (user_id) REFERENCES Users(id),
             FOREIGN KEY (course_id) REFERENCES Courses(CourseID) ON DELETE CASCADE
+        );
+
+        CREATE TABLE ReviewLikes (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            review_id INT NOT NULL,
+            user_id INT NOT NULL,
+            FOREIGN KEY (review_id) REFERENCES user_reviews(review_id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE ReviewDislikes (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            review_id INT NOT NULL,
+            user_id INT NOT NULL,
+            FOREIGN KEY (review_id) REFERENCES user_reviews(review_id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
         );
 
         CREATE TABLE Quizzes (

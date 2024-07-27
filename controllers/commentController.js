@@ -99,25 +99,38 @@ const getCommentCountByDiscussionId = async (req, res) => {
 
 const incrementLikes = async (req, res) => {
     try {
-        const commentId = req.params.commentId; // Get comment ID from request parameters
-        const likes = await commentModel.incrementLikes(commentId); // Increment likes for comment in the database
-        res.json({ success: true, likes }); // Send the new like count as JSON response
+        const commentId = req.params.commentId;
+        const userId = req.body.userId || req.user?.id; // Ensure userId is passed in the request body
+
+        if (!userId) {
+            return res.status(400).json({ success: false, error: 'User ID is required' });
+        }
+
+        const result = await commentModel.incrementLikes(commentId, userId);
+        res.json({ success: true, message: result.message, likes: result.likes });
     } catch (err) {
-        console.error('Error incrementing likes:', err);
-        res.status(500).json({ success: false, error: err.message }); // Send 500 status code if an error occurs
+        console.error('Error toggling like:', err);
+        res.status(500).json({ success: false, error: err.message });
     }
 }
 
 const incrementDislikes = async (req, res) => {
     try {
-        const commentId = req.params.commentId; // Get comment ID from request parameters
-        const dislikes = await commentModel.incrementDislikes(commentId); // Increment dislikes for comment in the database
-        res.json({ success: true, dislikes }); // Send the new dislike count as JSON response
+        const commentId = req.params.commentId;
+        const userId = req.body.userId || req.user?.id; // Ensure userId is passed in the request body
+
+        if (!userId) {
+            return res.status(400).json({ success: false, error: 'User ID is required' });
+        }
+
+        const result = await commentModel.incrementDislikes(commentId, userId);
+        res.json({ success: true, message: result.message, dislikes: result.dislikes });
     } catch (err) {
-        console.error('Error incrementing dislikes:', err);
-        res.status(500).json({ success: false, error: err.message }); // Send 500 status code if an error occurs
+        console.error('Error toggling dislike:', err);
+        res.status(500).json({ success: false, error: err.message });
     }
 }
+
 
 module.exports = {
     getComments,
