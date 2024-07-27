@@ -15,3 +15,29 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+
+//for contact us page 
+document.getElementById('contact-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    showLottieAnimation();
+});
+
+function showLottieAnimation() {
+    const contactForm = document.getElementById('contact-form');
+    const lottieContainer = document.getElementById('lottie-container');
+    
+    // Hide the form
+    contactForm.style.display = 'none';
+    
+    // Display the Lottie container
+    lottieContainer.style.display = 'block';
+
+    // Load and play the Lottie animation
+    lottie.loadAnimation({
+        container: lottieContainer,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        path: 'https://lottie.host/3d88f376-ddaf-4815-825a-2eab7b12d0f7/SAeCRfEoQW.json' // Replace with your own Lottie animation URL
+    });
+}

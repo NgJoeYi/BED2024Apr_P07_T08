@@ -1452,3 +1452,12 @@
 .suggestion-button:hover {
   background-color: #e67e22;
 }
+
+
+/* contact form css lottie  */
+
+#lottie-container {
+  width: 400px;
+  height: 400px;
+  margin: auto;
+}
