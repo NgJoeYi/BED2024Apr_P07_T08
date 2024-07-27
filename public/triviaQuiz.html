@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trivia Quizzes</title>
     <link rel="stylesheet" href="CSS/navbar.css">
-    <link rel="stylesheet" href="CSS/trivia.css"> <!-- Ensure this line is present to include your quiz styles -->
+    <link rel="stylesheet" href="CSS/trivia.css">
     <link rel="stylesheet" href="CSS/result.css">
     <!-- Linking to external stylesheets for icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
@@ -60,8 +60,11 @@
             <button id="prev-button" onclick="prevQuestion()">Previous</button>
             <button id="next-button" onclick="nextQuestion()">Next</button>
         </div>
-        <button id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
+        <div id="submit-quiz-container" class="hidden">
+            <button id="submit-quiz" onclick="submitQuiz()">Submit Quiz</button>
+        </div>
     </section>
+    
 
     <!-- Wrap the results-container in a border-container -->
     <section id="results-quiz" class="hidden">
