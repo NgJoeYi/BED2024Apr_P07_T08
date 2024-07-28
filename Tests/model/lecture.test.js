@@ -1,8 +1,3 @@
-const sql = require('mssql');
-const Lectures = require('../../models/Lectures'); // Import after mock setup
-const dbConfig = require('../../dbConfig');
-
-// Mock the 'mssql' library
 jest.mock('mssql', () => {
   const mockQuery = jest.fn();
   const mockInput = jest.fn().mockReturnThis();
@@ -28,10 +23,12 @@ describe('Lecture Model Tests', () => {
   let mockQuery;
   let mockInput;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks(); // Clear previous mock calls
-    mockQuery = sql.connect().request().query; // Reset mockQuery
-    mockInput = sql.connect().request().input; // Reset mockInput
+    const connection = await sql.connect(); // Ensure the connection is established
+    const request = connection.request();
+    mockQuery = request.query; // Reset mockQuery
+    mockInput = request.input; // Reset mockInput
   });
 
   it('should fetch all lectures from the database', async () => {
