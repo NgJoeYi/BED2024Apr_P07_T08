@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "EduHelper.",
+    "title": "EduHelper",
     "description": "Unlocking potential, one lesson at a time",
     "version": "1.0.0"
   },
@@ -10,33 +10,11 @@
   "schemes": [
     "http"
   ],
-  "tags": [
-    {
-      "name": "Account Management",
-      "description": "Endpoints related to user accounts"
-    },
-    {
-      "name": "Quizzes",
-      "description": "Endpoints related to quizzes and their questions"
-    },
-    {
-      "name": "Follow",
-      "description": "Endpoints related to Follow/unfollow user for discussion"
-    },
-    {
-      "name": "Discussions",
-      "description": "Endpoints related to discussions and comments"
-    },
-    {
-      "name": "Courses",
-      "description": "Endpoints related to courses and lectures"
-    }
-  ],
   "paths": {
     "/favicon.ico": {
       "get": {
-        "description": "",
         "tags": ["General"],
+        "description": "",
         "responses": {
           "204": {
             "description": "No Content"
@@ -46,8 +24,8 @@
     },
     "/register": {
       "post": {
+        "tags": ["Authentication"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "body",
@@ -77,8 +55,8 @@
     },
     "/login": {
       "post": {
+        "tags": ["Authentication"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "body",
@@ -109,10 +87,39 @@
         }
       }
     },
+    "/quizzes/trivia": {
+      "get": {
+        "tags": ["Quizzes"],
+        "description": "",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/account": {
       "get": {
+        "tags": ["Account"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -139,8 +146,8 @@
         }
       },
       "put": {
+        "tags": ["Account"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -197,8 +204,8 @@
         }
       },
       "delete": {
+        "tags": ["Account"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -242,8 +249,8 @@
     },
     "/account/profile": {
       "get": {
+        "tags": ["Account"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -272,8 +279,8 @@
     },
     "/account/getAllAttemptCount": {
       "get": {
+        "tags": ["Account"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -299,8 +306,8 @@
     },
     "/account/getAttemptCountByQuizId": {
       "get": {
+        "tags": ["Account"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -326,8 +333,8 @@
     },
     "/account/quizResult": {
       "get": {
+        "tags": ["Account"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -339,14 +346,14 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "401": {
             "description": "Unauthorized"
           },
           "403": {
             "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -356,8 +363,8 @@
     },
     "/account/uploadProfilePic": {
       "post": {
+        "tags": ["Account"],
         "description": "",
-        "tags": ["Account Management"],
         "parameters": [
           {
             "name": "authorization",
@@ -398,8 +405,8 @@
     },
     "/quizzes/statistics": {
       "get": {
-        "description": "",
         "tags": ["Quizzes"],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -412,8 +419,8 @@
     },
     "/quizzes": {
       "get": {
-        "description": "",
         "tags": ["Quizzes"],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -427,8 +434,8 @@
         }
       },
       "post": {
-        "description": "",
         "tags": ["Quizzes"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -442,6 +449,12 @@
               "type": "object",
               "properties": {
                 "title": {
+                  "example": "any"
+                },
+                "questions": {
+                  "example": "any"
+                },
+                "description": {
                   "example": "any"
                 },
                 "created_by": {
@@ -473,10 +486,10 @@
         }
       }
     },
-    "/quizzes/{id}": {
+    "/quizzes/{id}/questions": {
       "get": {
-        "description": "",
         "tags": ["Quizzes"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -507,10 +520,168 @@
             "description": "Internal Server Error"
           }
         }
-      },
-      "put": {
-        "description": "",
+      }
+    },
+    "/quizResult/{attemptId}": {
+      "get": {
         "tags": ["Quizzes"],
+        "description": "",
+        "parameters": [
+          {
+            "name": "attemptId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/submitQuiz": {
+      "post": {
+        "tags": ["Quizzes"],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "quizId": {
+                  "example": "any"
+                },
+                "responses": {
+                  "example": "any"
+                },
+                "timeTaken": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/quizzes/{id}/questions/update": {
+      "post": {
+        "tags": ["Quizzes"],
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "quiz_id": {
+                  "example": "any"
+                },
+                "qnsImg": {
+                  "example": "any"
+                },
+                "option_1": {
+                  "example": "any"
+                },
+                "option_2": {
+                  "example": "any"
+                },
+                "option_3": {
+                  "example": "any"
+                },
+                "option_4": {
+                  "example": "any"
+                },
+                "correct_option": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/quizzes/{id}": {
+      "put": {
+        "tags": ["Quizzes"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -561,8 +732,8 @@
         }
       },
       "delete": {
-        "description": "",
         "tags": ["Quizzes"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -598,236 +769,10 @@
         }
       }
     },
-    "/quizzes/{id}/questions": {
-      "get": {
-        "description": "",
-        "tags": ["Quizzes"],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "post": {
-        "description": "",
-        "tags": ["Quizzes"],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "qnsImg": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/quizResult/{attemptId}": {
-      "get": {
-        "description": "",
-        "tags": ["Quizzes"],
-        "parameters": [
-          {
-            "name": "attemptId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/submitQuiz": {
-      "post": {
-        "description": "",
-        "tags": ["Quizzes"],
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "quizId": {
-                  "example": "any"
-                },
-                "responses": {
-                  "example": "any"
-                },
-                "timeTaken": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/quizzes/{id}/questions/update": {
-      "post": {
-        "description": "",
-        "tags": ["Quizzes"],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "quiz_id": {
-                  "example": "any"
-                },
-                "qnsImg": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
     "/quizzes/{quizId}/questions/{questionId}": {
       "put": {
-        "description": "",
         "tags": ["Quizzes"],
+        "description": "",
         "parameters": [
           {
             "name": "quizId",
@@ -899,8 +844,8 @@
         }
       },
       "delete": {
-        "description": "",
         "tags": ["Quizzes"],
+        "description": "",
         "parameters": [
           {
             "name": "quizId",
@@ -927,9 +872,6 @@
           "204": {
             "description": "No Content"
           },
-          "400": {
-            "description": "Bad Request"
-          },
           "401": {
             "description": "Unauthorized"
           },
@@ -945,10 +887,10 @@
         }
       }
     },
-      "/follow": {
+    "/follow": {
       "post": {
-        "description": "Follow a user",
-        "tags": ["Follow"],
+        "tags": ["Social"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -962,8 +904,7 @@
               "type": "object",
               "properties": {
                 "followeeId": {
-                  "type": "integer",
-                  "example": 2
+                  "example": "any"
                 }
               }
             }
@@ -974,10 +915,13 @@
             "description": "OK"
           },
           "400": {
-            "description": "Invalid followee ID"
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -986,9 +930,9 @@
       }
     },
     "/unfollow": {
-      "delete": {
-        "description": "Unfollow a user",
-        "tags": ["Follow"],
+      "post": {
+        "tags": ["Social"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -1002,8 +946,7 @@
               "type": "object",
               "properties": {
                 "followeeId": {
-                  "type": "integer",
-                  "example": 2
+                  "example": "any"
                 }
               }
             }
@@ -1014,10 +957,13 @@
             "description": "OK"
           },
           "400": {
-            "description": "Invalid followee ID"
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1027,8 +973,8 @@
     },
     "/followed-discussions": {
       "get": {
-        "description": "Get discussions followed by the user",
-        "tags": ["Discussions"],
+        "tags": ["Social"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -1042,6 +988,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1049,29 +998,29 @@
         }
       }
     },
-    "/following-status": {
+    "/follow-status": {
       "get": {
-        "description": "Check if the user is following another user",
-        "tags": ["Follow"],
+        "tags": ["Social"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "followeeId",
-            "in": "query",
-            "type": "integer",
-            "example": 2
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1081,8 +1030,8 @@
     },
     "/following-count": {
       "get": {
-        "description": "Get the number of users the user is following",
-        "tags": ["Follow"],
+        "tags": ["Social"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -1096,6 +1045,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1105,8 +1057,8 @@
     },
     "/follower-count": {
       "get": {
-        "description": "Get the number of followers the user has",
-        "tags": ["Follow"],
+        "tags": ["Social"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -1121,6 +1073,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1129,8 +1084,8 @@
     },
     "/discussions": {
       "get": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "category",
@@ -1158,8 +1113,8 @@
         }
       },
       "post": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -1203,8 +1158,8 @@
     },
     "/discussions/user": {
       "get": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -1230,8 +1185,8 @@
     },
     "/discussions/{id}": {
       "get": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -1264,8 +1219,8 @@
         }
       },
       "put": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -1313,8 +1268,8 @@
         }
       },
       "delete": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -1349,8 +1304,8 @@
     },
     "/discussions/{discussionId}/like": {
       "post": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "discussionId",
@@ -1382,8 +1337,8 @@
     },
     "/discussions/{discussionId}/dislike": {
       "post": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "discussionId",
@@ -1415,8 +1370,8 @@
     },
     "/discussions/{discussionId}/view": {
       "post": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "discussionId",
@@ -1448,8 +1403,8 @@
     },
     "/discussions/{id}/pin": {
       "post": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -1481,8 +1436,8 @@
     },
     "/discussions/{id}/unpin": {
       "post": {
-        "description": "",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -1514,8 +1469,8 @@
     },
     "/discussions/{id}/suggestions": {
       "get": {
-        "description": "Get suggestions for a specific discussion",
         "tags": ["Discussions"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -1539,17 +1494,19 @@
           "403": {
             "description": "Forbidden"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
       }
     },
-
     "/comments": {
       "get": {
+        "tags": ["Comments"],
         "description": "",
-        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "discussionId",
@@ -1567,8 +1524,8 @@
         }
       },
       "post": {
+        "tags": ["Comments"],
         "description": "",
-        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "authorization",
@@ -1612,8 +1569,8 @@
     },
     "/comments/count": {
       "get": {
+        "tags": ["Comments"],
         "description": "",
-        "tags": ["Discussions"],
         "responses": {
           "200": {
             "description": "OK"
@@ -1626,8 +1583,8 @@
     },
     "/comments/discussion/{discussionId}/count": {
       "get": {
+        "tags": ["Comments"],
         "description": "",
-        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "discussionId",
@@ -1648,8 +1605,8 @@
     },
     "/comments/{id}": {
       "put": {
+        "tags": ["Comments"],
         "description": "",
-        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1697,8 +1654,8 @@
         }
       },
       "delete": {
+        "tags": ["Comments"],
         "description": "",
-        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "id",
@@ -1733,19 +1690,34 @@
     },
     "/comments/{commentId}/like": {
       "post": {
+        "tags": ["Comments"],
         "description": "",
-        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "commentId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1755,19 +1727,34 @@
     },
     "/comments/{commentId}/dislike": {
       "post": {
+        "tags": ["Comments"],
         "description": "",
-        "tags": ["Discussions"],
         "parameters": [
           {
             "name": "commentId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1777,8 +1764,8 @@
     },
     "/reviews": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1806,8 +1793,8 @@
         }
       },
       "post": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -1854,8 +1841,8 @@
     },
     "/reviews/rating/{rating}": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "rating",
@@ -1876,8 +1863,8 @@
     },
     "/reviews/sort/{sort}": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "sort",
@@ -1898,8 +1885,8 @@
     },
     "/reviews/course/{courseId}": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1920,8 +1907,8 @@
     },
     "/reviews/course/{courseId}/rating/{rating}": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1948,8 +1935,8 @@
     },
     "/reviews/course/{courseId}/sort/{sort}": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -1976,8 +1963,8 @@
     },
     "/reviews/count": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -1990,8 +1977,8 @@
     },
     "/reviews/course/{courseId}/count": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseId",
@@ -2012,8 +1999,8 @@
     },
     "/reviews/user/{userId}/count": {
       "get": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "userId",
@@ -2034,8 +2021,8 @@
     },
     "/reviews/{id}": {
       "put": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2089,8 +2076,8 @@
         }
       },
       "delete": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2125,19 +2112,34 @@
     },
     "/reviews/{reviewId}/like": {
       "post": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "reviewId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -2147,19 +2149,34 @@
     },
     "/reviews/{reviewId}/dislike": {
       "post": {
+        "tags": ["Reviews"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "reviewId",
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -2169,8 +2186,8 @@
     },
     "/courses/search": {
       "get": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "parameters": [
           {
             "name": "term",
@@ -2196,8 +2213,8 @@
     },
     "/courses": {
       "get": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -2208,8 +2225,8 @@
         }
       },
       "post": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -2222,7 +2239,19 @@
             "schema": {
               "type": "object",
               "properties": {
-                "courseImage": {
+                "title": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "category": {
+                  "example": "any"
+                },
+                "level": {
+                  "example": "any"
+                },
+                "duration": {
                   "example": "any"
                 }
               }
@@ -2250,8 +2279,8 @@
     },
     "/courses/categories": {
       "get": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -2267,8 +2296,8 @@
     },
     "/courses/filter": {
       "get": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "parameters": [
           {
             "name": "category",
@@ -2291,8 +2320,8 @@
     },
     "/courses/mostRecent": {
       "get": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -2308,8 +2337,8 @@
     },
     "/courses/earliest": {
       "get": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -2325,8 +2354,8 @@
     },
     "/courses/{id}": {
       "get": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -2348,8 +2377,8 @@
         }
       },
       "put": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -2368,6 +2397,9 @@
             "schema": {
               "type": "object",
               "properties": {
+                "noImageChange": {
+                  "example": "any"
+                },
                 "courseImage": {
                   "example": "any"
                 }
@@ -2394,8 +2426,8 @@
         }
       },
       "delete": {
-        "description": "",
         "tags": ["Courses"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -2430,11 +2462,65 @@
     },
     "/courses/image/{filename}": {
       "get": {
-        "description": "",
         "tags": ["Courses"],
-        "produces": [
-          "image/jpeg"
+        "description": "",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/courses/noLectures": {
+      "delete": {
+        "tags": ["Courses"],
+        "description": "",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/lectures/search/vimeo-videos": {
+      "get": {
+        "tags": ["Lectures"],
+        "description": "",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/lectures/vimeo-video/{id}": {
+      "get": {
+        "tags": ["Lectures"],
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -2447,8 +2533,8 @@
           "200": {
             "description": "OK"
           },
-          "404": {
-            "description": "Not Found"
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -2456,33 +2542,10 @@
         }
       }
     },
-    "/courses/noLectures": {
-      "delete": {
-        "description": "Deletes courses that have no lectures. If no such courses exist, a 404 status is returned.",
-        "tags": ["Courses"],
-        "responses": {
-          "204": {
-            "description": "Courses with no lectures deleted successfully."
-          },
-          "401": {
-            "description": "Unauthorized - Authentication required."
-          },
-          "403": {
-            "description": "Forbidden - You do not have permission to delete courses."
-          },
-          "404": {
-            "description": "Not Found - No courses with no lectures found."
-          },
-          "500": {
-            "description": "Internal Server Error - An error occurred while attempting to delete courses."
-          }
-        }
-      }
-    },    
     "/lectures/checking": {
       "get": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -2505,8 +2568,8 @@
     },
     "/lectures/last-chapter": {
       "get": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -2535,8 +2598,8 @@
     },
     "/lectures": {
       "get": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -2547,8 +2610,8 @@
         }
       },
       "post": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "authorization",
@@ -2561,19 +2624,22 @@
             "schema": {
               "type": "object",
               "properties": {
-                "Title": {
+                "vimeoVideoUrl": {
                   "example": "any"
                 },
-                "Duration": {
+                "title": {
                   "example": "any"
                 },
-                "Description": {
+                "duration": {
                   "example": "any"
                 },
-                "ChapterName": {
+                "description": {
                   "example": "any"
                 },
-                "CourseID": {
+                "chapterName": {
+                  "example": "any"
+                },
+                "courseID": {
                   "example": "any"
                 }
               }
@@ -2601,8 +2667,8 @@
     },
     "/lectures/max-course-id": {
       "get": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "responses": {
           "200": {
             "description": "OK"
@@ -2615,8 +2681,8 @@
     },
     "/lectures/course/{courseID}": {
       "get": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseID",
@@ -2640,8 +2706,8 @@
     },
     "/lectures/{id}": {
       "get": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2654,6 +2720,9 @@
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -2663,8 +2732,8 @@
         }
       },
       "put": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2694,6 +2763,9 @@
                 },
                 "duration": {
                   "example": "any"
+                },
+                "vimeoVideoUrl": {
+                  "example": "any"
                 }
               }
             }
@@ -2718,8 +2790,8 @@
         }
       },
       "delete": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2754,8 +2826,8 @@
     },
     "/lectures/lecture-details/{id}": {
       "get": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "id",
@@ -2779,8 +2851,8 @@
     },
     "/video/{lectureID}": {
       "get": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "lectureID",
@@ -2790,6 +2862,9 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
             "description": "Bad Request"
           },
@@ -2804,8 +2879,8 @@
     },
     "/lectures/course/{courseID}/chapter/{chapterName}": {
       "delete": {
+        "tags": ["Lectures"],
         "description": "",
-        "tags": ["Courses"],
         "parameters": [
           {
             "name": "courseID",
@@ -2858,106 +2933,7 @@
           }
         }
       }
-    },
-    "/lectures/search/vimeo-videos": {
-  "get": {
-    "description": "Search for Vimeo videos based on a query string.",
-    "tags": ["Courses"],
-    "parameters": [
-      {
-        "name": "search",
-        "in": "query",
-        "description": "The search query for Vimeo videos.",
-        "required": false,
-        "type": "string"
-      },
-      {
-        "name": "authorization",
-        "in": "header",
-        "description": "Bearer token for Vimeo API authorization.",
-        "required": true,
-        "type": "string"
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "Successful search",
-        "schema": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string"
-            },
-            "videos": {
-              "type": "object",
-              "additionalProperties": true
-            }
-          }
-        }
-      },
-      "400": {
-        "description": "Bad Request"
-      },
-      "401": {
-        "description": "Unauthorized"
-      },
-      "500": {
-        "description": "Internal Server Error"
-      }
-    }
-  }
-},
-"/lectures/vimeo-video/{id}": {
-  "get": {
-    "description": "Fetch details of a specific Vimeo video based on lecture ID.",
-    "tags": ["Courses"],
-    "parameters": [
-      {
-        "name": "id",
-        "in": "path",
-        "description": "ID of the lecture containing the Vimeo video URL.",
-        "required": true,
-        "type": "integer"
-      },
-      {
-        "name": "authorization",
-        "in": "header",
-        "description": "Bearer token for Vimeo API authorization.",
-        "required": true,
-        "type": "string"
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "Successful retrieval of Vimeo video details",
-        "schema": {
-          "type": "object",
-          "properties": {
-            "message": {
-              "type": "string"
-            },
-            "video": {
-              "type": "object",
-              "additionalProperties": true
-            }
-          }
-        }
-      },
-      "400": {
-        "description": "Bad Request"
-      },
-      "401": {
-        "description": "Unauthorized"
-      },
-      "404": {
-        "description": "Not Found"
-      },
-      "500": {
-        "description": "Internal Server Error"
-      }
     }
   }
 }
 
-  }
-}
