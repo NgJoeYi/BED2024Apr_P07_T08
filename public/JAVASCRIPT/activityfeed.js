@@ -486,17 +486,11 @@ function fetchCommentCountForDiscussion(discussionId) {
             } else {
                 console.error('Error fetching comment count for discussion:', data);
                 // Logging an error if the data does not contain the comment count
-
-                alert('Error fetching comment count.');
-                // Alerting the user that there was an error fetching the comment count
             }
         })
         .catch(error => {
             console.error('Network or server error:', error);
             // Logging any network or server errors that occur during the fetch
-
-            alert('Error fetching comment count.');
-            // Alerting the user that there was an error fetching the comment count
         });
 }
 
