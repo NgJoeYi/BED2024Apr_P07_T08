@@ -561,4 +561,59 @@ button:hover {
   margin: 0% 3%;
 }
 }
+
+/* Medium Laptops */
+@media (min-width: 1280px) and (max-width: 1440px) {
+
+   /* Container styling */
+   .container {
+    flex-direction: row; /* Align items horizontally */
+    padding: 16px; /* Add padding for better spacing */
+    max-width: 1200px; /* Set a max-width for the container */
+    margin: 0 auto; /* Center the container */
+  }
+  .main-content{
+    max-width: 1200px; 
+  }
+  .video-container{
+    max-width: 700px;
+    max-height: 400px;
+  }
+
+  /* Sidebar styling */
+  .sidebar {
+    width: 350px; /* Adjust width for medium laptops */
+    margin-right: 20px; /* Reduce margin for better fit */
+    margin-top: 100px; /* Adjust top margin */
+  }
+
+  /* Video container styling */
+  .video-container {
+    width: 900px; /* Adjust width for medium laptops */
+    height: 600px; /* Adjust height for medium laptops */
+  }
+
+  /* Main content styling */
+  .main-content {
+    padding: 24px; /* Adjust padding for medium laptops */
+    margin-top: 80px; /* Adjust top margin for better fit */
+  }
+
+  /* Review section styling */
+  .review-section {
+    width: 85%; /* Adjust width for medium laptops */
+    padding: 40px; /* Adjust padding for medium laptops */
+  }
+
+  /* Popup styling */
+  .popup-content {
+    width: 90%; /* Adjust width for medium laptops */
+    max-width: 700px; /* Adjust max-width for medium laptops */
+    height: 50%; /* Adjust height for medium laptops */
+    max-height: 500px; /* Adjust max-height for medium laptops */
+  }
+
+
+}
+
   
