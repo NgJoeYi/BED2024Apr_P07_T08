@@ -52,7 +52,7 @@ async function deleteCourseWithNoLectures() {
     }
 
     console.log('Deleted courses with no lectures'); // Log success
-    fetchCourses(); // Refresh the courses list
+    await fetchCourses(); // Refresh the courses list
   } catch (error) {
     console.error('Error deleting courses with no lectures:', error);
   }
@@ -130,10 +130,12 @@ function updatePaginationControls() {
 }
 
 // Initialize on DOM load
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   handleAddButtonVisibility();
-  fetchCourses();
+  await deleteCourseWithNoLectures();
+  await fetchCourses();
   filter();
+
 
   // To GET INTO SPECIFIC COURSE PAGE
   const courseElements = document.querySelectorAll('.course-cd-unique a');
