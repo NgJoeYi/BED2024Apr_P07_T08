@@ -95,11 +95,14 @@ function verifyJWT(req, res, next) {
         const authorizedRole = Object.entries(authorizedRoles).find(
             ([endpoint, roles]) => {
                 const [method, path] = endpoint.split(' ');
-                const pathPattern = path.replace(/:\w+/g, '\\w+'); // Replace: param with regex pattern
+                // Create a regex pattern that replaces dynamic segments with a word character pattern
+                const pathPattern = path.replace(/:\w+/g, '[^/]+'); // Replace :param with regex to match any segment
                 const regex = new RegExp(`^${pathPattern}$`);
                 return method === req.method && regex.test(requestEndpoint) && roles.includes(userRole);
             }
         );
+        
+        
 
         if (!authorizedRole) {
             console.log('Role not authorized for this endpoint'); 

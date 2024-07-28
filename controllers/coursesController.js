@@ -219,15 +219,16 @@ const deleteCourseWithNoLectures = async (req, res) => {
     console.log('success of deleting courses with no lectures:', success);
     if (!success) {
       console.log('No courses were deleted.'); // Log if no courses were deleted
-      return res.status(200).send('No courses with no lectures found.'); // Use 204 No Content
+      return res.status(204).send(); // Use 204 No Content
     }
     console.log('Courses with no lectures deleted successfully.'); // Log success
-    res.status(204).send('Course deleted successfully!!');
+    res.status(200).json({ message: 'Courses with no lectures deleted successfully!' }); // Use 200 OK
   } catch (error) {
-    console.error('Error deleting course with no lectures:', error);
-    res.status(500).json({ message: "Error deleting course with no lectures:(" });
+    console.error('Error deleting courses with no lectures:', error);
+    res.status(500).json({ message: 'Error deleting courses with no lectures.' });
   }
 };
+
 
 
 // For users to search for courses in the search container 

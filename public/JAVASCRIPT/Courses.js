@@ -45,13 +45,15 @@ async function deleteCourseWithNoLectures() {
     if (response.status === 204) {
       console.log('No courses found to delete'); // Log if no courses found
       return; // Exit if no courses were found
+    } else if (response.status === 200) {
+      alert('Course is NOT created because you did not fill in lecture details...');
+      console.log('Deleted courses with no lectures'); // Log success
     } else if (!response.ok) {
       const errorMessage = await response.text();
       console.error('Network response was not ok:', errorMessage);
       throw new Error(`Network response was not ok: ${errorMessage}`);
     }
-    alert('Course is NOT created because you did not fill in lecture details...');
-    console.log('Deleted courses with no lectures'); // Log success
+    await fetchCourses(); // Refresh the courses list
   } catch (error) {
     console.error('Error deleting courses with no lectures:', error);
   }
@@ -131,7 +133,6 @@ function updatePaginationControls() {
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', async function () {
   handleAddButtonVisibility();
-  await deleteCourseWithNoLectures();
   await fetchCourses();
   filter();
 

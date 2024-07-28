@@ -21,11 +21,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             alert('Error fetching lecture details. Please try again later.');
         }
     }
+
     document.getElementById('vimeoSearchButton').addEventListener('click', function(event) {
         event.preventDefault(); // Prevent the default form submission
         fetchVimeoVideos();
     });
-    
 
     // Find the form element for editing the lecture
     const form = document.getElementById('edit-lecture-form');
@@ -33,24 +33,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Add event listener for form submission
         form.addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent default form submission behavior
-        
+
             const formData = new FormData(form);
             const localFileOption = document.getElementById("localFileOption").checked;
             const videoFileInput = document.getElementById('videoFiles');
             const selectedVideo = document.querySelector('.vimeo-video.selected');
-            
+
+            // Remove existing 'lectureVideo' if it exists
+            if (formData.has('lectureVideo')) {
+                formData.delete('lectureVideo');
+            }
+
             // Get the duration input as a number
             const durationInput = document.getElementById('lectureDuration');
             const duration = parseInt(durationInput.value, 10);
-        
+
             // Check if duration is valid
             if (isNaN(duration) || duration <= 0) {
                 alert('Duration cannot be less than or equal to 0. Please re-enter a valid duration.');
                 durationInput.focus(); // Optionally, focus on the duration input
                 return;
             }
-        
-            // Continue with file handling
+
+            // Ensure only one 'lectureVideo' field is appended
             if (localFileOption) {
                 const videoFile = videoFileInput.files[0];
                 if (videoFile) {
@@ -64,28 +69,28 @@ document.addEventListener('DOMContentLoaded', async function() {
                     console.log('No new local file selected. Retaining existing video if any.');
                 }
             } else if (selectedVideo) {
-                // If Vimeo URL is chosen, append it correctly
-                formData.append('vimeoVideoUrl', selectedVideo.getAttribute('data-video-url'));
+                // If Vimeo URL is chosen, append it correctly as 'lectureVideo'
+                formData.append('lectureVideo', selectedVideo.getAttribute('data-video-url'));
             } else {
                 console.log('No new video selected. Retaining existing video if any.');
             }
-            
+
             // Log the final FormData contents
             console.log('FINAL FORM DATA', Array.from(formData.entries()));
-        
+
             try {
                 // Send the updated lecture data to the server using authenticated request
                 const response = await fetchWithAuth(`/lectures/${lectureID}`, {
                     method: 'PUT',
                     body: formData
                 });
-        
+
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Error response text:', errorText);
                     throw new Error('Network response was not ok');
                 }
-        
+
                 const responseData = await response.json();
                 console.log('Updated Lecture Data:', responseData.data);
                 alert('Lecture updated successfully!');
@@ -94,8 +99,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.error('Error updating lecture:', error);
                 alert('Error updating lecture. Please try again later.');
             }
-        });        
+        });
     }
+
 });
 
 // Populate form fields with lecture details

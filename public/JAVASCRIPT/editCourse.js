@@ -54,6 +54,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Append a flag indicating that no new image was provided
         formData.append('noImageChange', 'true');
       }
+
+       // Check if the duration is a positive number
+      if (duration <= 0) {
+        alert('The duration cannot be lesser than or equal to 0.');
+        return;
+    }
     
       // Log form data before sending
       formData.forEach((value, key) => {
