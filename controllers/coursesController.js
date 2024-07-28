@@ -219,7 +219,7 @@ const deleteCourseWithNoLectures = async (req, res) => {
     console.log('success of deleting courses with no lectures:', success);
     if (!success) {
       console.log('No courses were deleted.'); // Log if no courses were deleted
-      return res.status(204).send('No courses with no lectures found.'); // Use 204 No Content
+      return res.status(200).send('No courses with no lectures found.'); // Use 204 No Content
     }
     console.log('Courses with no lectures deleted successfully.'); // Log success
     res.status(204).send('Course deleted successfully!!');

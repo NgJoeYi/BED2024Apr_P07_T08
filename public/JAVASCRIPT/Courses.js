@@ -50,9 +50,8 @@ async function deleteCourseWithNoLectures() {
       console.error('Network response was not ok:', errorMessage);
       throw new Error(`Network response was not ok: ${errorMessage}`);
     }
-
+    alert('Course is NOT created because you did not fill in lecture details...');
     console.log('Deleted courses with no lectures'); // Log success
-    await fetchCourses(); // Refresh the courses list
   } catch (error) {
     console.error('Error deleting courses with no lectures:', error);
   }
