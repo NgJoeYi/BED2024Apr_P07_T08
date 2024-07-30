@@ -79,6 +79,75 @@ async function deleteLecture(button) {
     }
 }
 
+// Allows user to delete the entire chapter of the lecture if they have permission
+async function deleteChapter(button) {
+    const chapterName = button.dataset.chapterName;
+    const courseID = new URLSearchParams(window.location.search).get('courseID');
+
+    const userConfirmed = confirm('Are you sure you want to delete this chapter?');
+    if (!userConfirmed) {
+        return; 
+        // Prompts the user for confirmation before proceeding with chapter deletion.
+    }
+
+    const lecturesResponse = await fetch(`/lectures/course/${courseID}`);
+    const lectures = await lecturesResponse.json();
+    const lectureIDs = lectures.filter(lecture => lecture.ChapterName === chapterName).map(lecture => lecture.LectureID);
+
+    if (lectureIDs.length === 0) {
+        alert(`No lectures found for chapter: ${chapterName}`);
+        return;
+        // Alerts if no lectures are found for the chapter and exits the function.
+    }
+
+    try {
+        const response = await fetchWithAuth(`/lectures/course/${courseID}/chapter/${chapterName}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ lectureIDs })
+        });
+
+        if (response.status === 200) {
+            alert(`Chapter ${chapterName} deleted successfully!`);
+            button.closest('.nav-item').remove();
+
+            const remainingLecturesResponse = await fetch(`/lectures/course/${courseID}`);
+            const remainingLectures = await remainingLecturesResponse.json();
+
+            if (remainingLectures.length === 0) {
+                const deleteCourseResponse = await fetchWithAuth(`/courses/${courseID}`, {
+                    method: 'DELETE'
+                });
+                if (deleteCourseResponse.ok) {
+                    alert('Course deleted successfully!');
+                    window.location.href = 'courses.html';
+                } else {
+                    console.error('Failed to delete course. Status:', deleteCourseResponse.status);
+                    alert('Failed to delete the course.');
+                }
+            } else {
+                getLecturesByCourse();
+                window.location.href = `lecture.html?courseID=${courseID}`;
+            }
+        } else if (response.status === 403) {
+            alert('You do not have permission to delete this lecture chapter.');
+        } else if (response.status === 404) {
+            alert('Chapter or lecture not found.');
+        } else if (response.status === 400) {
+            alert('Invalid request. Please check the data and try again.');
+        } else {
+            console.error('Failed to delete chapter. Status:', response.status);
+            alert('Failed to delete the chapter.');
+        }
+    } catch (error) {
+        console.error('Error deleting chapter:', error);
+        alert('Error deleting chapter.');
+    }
+}
+
+
 // Clears video playing in the container when the user deletes the lecture 
 function clearVideo() {
     const videoIframe = document.querySelector('.main-content iframe');
@@ -110,10 +179,13 @@ async function deleteChapter(button) {
     try {
         const response = await fetchWithAuth(`/lectures/course/${courseID}/chapter/${chapterName}`, {
             method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ lectureIDs })
         });
 
-        if (response.status === 204) {
+        if (response.status === 200) {
             alert(`Chapter ${chapterName} deleted successfully!`);
             button.closest('.nav-item').remove();
 
@@ -137,6 +209,10 @@ async function deleteChapter(button) {
             }
         } else if (response.status === 403) {
             alert('You do not have permission to delete this lecture chapter.');
+        } else if (response.status === 404) {
+            alert('Chapter or lecture not found.');
+        } else if (response.status === 400) {
+            alert('Invalid request. Please check the data and try again.');
         } else {
             console.error('Failed to delete chapter. Status:', response.status);
             alert('Failed to delete the chapter.');
@@ -146,6 +222,8 @@ async function deleteChapter(button) {
         alert('Error deleting chapter.');
     }
 }
+
+
 
 // Populates details of the lectures in the lecture details container below the lecture video 
 async function displayLectureDetails(lectureID) {

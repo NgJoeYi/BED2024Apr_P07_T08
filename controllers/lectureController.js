@@ -108,36 +108,35 @@ const deletingChapterName = async (req, res) => {
                 return res.status(404).json({ message: `Lecture with ID ${lectureID} not found` });
             }
             if (lecture.userID !== userID) {
-                return res.status(403).send({ message: "You do not have permission to delete this chapter." });
+                return res.status(403).json({ message: "You do not have permission to delete this chapter." });
             }
         }
 
         const success = await Lectures.deletingChapterName(courseID, chapterName, lectureIDs);
         if (!success) {
-            return res.status(404).send("Chapter not found");
+            return res.status(404).json({ message: "Chapter not found" });
         }
-        res.status(204).send("Chapter successfully deleted");
+        res.status(200).json({ message: "Chapter successfully deleted" });
     } catch (error) {
         console.error(error);
-        res.status(500).send("Error deleting chapter");
+        res.status(500).json({ message: "Error deleting chapter" });
     }
 };
+
 
 // Update a lecture's information, ensuring the user has permission
 const updateLecture = async (req, res) => {
     console.log('REQUEST BODY:', req.body);
     const userID = req.user.id;
     const id = req.params.id;
-    const { title, description, chapterName, duration, vimeoVideoUrl } = req.body;
+    const { title, description, chapterName, duration } = req.body;
     let videoFilename = null;
 
-    if (vimeoVideoUrl) {
-        // Vimeo URL is provided, use it for the video field
-        videoFilename = vimeoVideoUrl;
-    } else if (req.file) {
-        // Handle new video file if uploaded
-        console.log('Uploaded file:', req.file);
-        videoFilename = req.file.filename;
+    // Check for 'lectureVideo' field in the request
+    const lectureVideo = req.body.lectureVideo || (req.file && req.file.filename);
+
+    if (lectureVideo) {
+        videoFilename = lectureVideo;
     } else {
         // If no new video is uploaded or no Vimeo URL is provided, keep the existing video filename
         const existingLecture = await Lectures.getLectureByID(id);
@@ -172,10 +171,6 @@ const updateLecture = async (req, res) => {
         res.status(500).send('Error updating lecture');
     }
 };
-
-
-
-
 
 
 // Retrieve the name of the last chapter for the current user, so user can add multiple lecture under chapter

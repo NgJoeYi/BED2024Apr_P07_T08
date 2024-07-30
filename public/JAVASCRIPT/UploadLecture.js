@@ -25,17 +25,14 @@ function closeModal() {
 }
 
 // so user can add multiple lectures under the same chapter name asa the previous 
-async function fetchLastChapterName() {
+async function fetchLastChapterName(courseID) {
     try {
-        const response = await fetchWithAuth(`/lectures/last-chapter`); // ------------------------------------------------- headers in jwtutility.js
-        if (!response) return; // ********************** jwt
-        if (response.ok) {
-            const data = await response.json();
-            return data.chapterName;
-        } else {
-            console.error("Failed to fetch last chapter name. Status:", response.status);
-            return null;
+        const response = await fetchWithAuth(`/lectures/last-chapter?courseID=${courseID}`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch last chapter name");
         }
+        const data = await response.json();
+        return data.chapterName;
     } catch (error) {
         console.error('Error fetching last chapter name:', error);
         return null;
@@ -43,18 +40,16 @@ async function fetchLastChapterName() {
 }
 
 // UPLOAD LECTURES
+let lectureCounter = 0; // track lecture made
+// UPLOAD LECTURES
 async function addLecture() {
-    // Fetch the last chapter name from the server
-    const previousChapterName = await fetchLastChapterName();
     const title = document.getElementById('lectureName').value.trim();
     const duration = document.getElementById('duration-lecture').value.trim();
     const description = document.getElementById('description').value.trim();
     const localFileOption = document.getElementById("localFileOption").checked;
     const videoFileInput = document.getElementById('videoFiles');
-    const chapterNameInput = document.getElementById('chapterName').value.trim();
-    
-    // Determine the chapter name to use
-    let chapterName = chapterNameInput || previousChapterName;
+    let chapterNameInput = document.getElementById('chapterName').value.trim(); // Change const to let
+    console.log('HI', chapterNameInput);
 
     // Check if all required fields are filled
     if (!title || !duration || !description || (localFileOption && videoFileInput.files.length === 0)) {
@@ -78,10 +73,27 @@ async function addLecture() {
         return;
     }
 
-    // Check if chapter name is empty and if it's the first upload
-    if (!chapterName && !previousChapterName) {
-        alert('Please enter a chapter name.');
-        return;
+    // Fetch the max course ID
+    const courseIDResponse = await fetchWithAuth('/lectures/max-course-id');
+    if (!courseIDResponse.ok) {
+        throw new Error('Failed to fetch max course ID');
+    }
+    const courseIDData = await courseIDResponse.json();
+    const courseID = courseIDData.maxCourseID;
+
+    // Check if chapter name is empty and if it's the first upload for a new course
+    if (!chapterNameInput) {
+        if (lectureCounter === 0) { // First upload
+            alert('Please enter a chapter name for the first lecture in a new course.');
+            return;
+        } else { // Subsequent uploads
+            const previousChapterName = await fetchLastChapterName(courseID);
+            if (!previousChapterName) {
+                alert('Please enter a chapter name for the first lecture in a new course.');
+                return;
+            }
+            chapterNameInput = previousChapterName; // Reassign chapterNameInput
+        }
     }
 
     // Create a FormData object to hold the form data
@@ -89,7 +101,7 @@ async function addLecture() {
     formData.append('title', title);
     formData.append('duration', duration);
     formData.append('description', description);
-    formData.append('chapterName', chapterName);
+    formData.append('chapterName', chapterNameInput);
 
     // Add the video file or Vimeo URL to the FormData
     if (localFileOption) {
@@ -109,13 +121,6 @@ async function addLecture() {
     }
 
     try {
-        // Fetch the max course ID
-        const courseIDResponse = await fetchWithAuth('/lectures/max-course-id');
-        if (!courseIDResponse.ok) {
-            throw new Error('Failed to fetch max course ID');
-        }
-        const courseIDData = await courseIDResponse.json();
-        const courseID = courseIDData.maxCourseID;
         formData.append('courseID', courseID);
 
         // Log FormData entries again to ensure courseID is included
@@ -140,11 +145,15 @@ async function addLecture() {
         alert('Lecture uploaded successfully');
         displayNewLecture(newLecture, videoFileInput.files);
         closeModal();
+
+        lectureCounter++; // Increment the counter after a successful upload
     } catch (error) {
         console.error('Error uploading lecture:', error);
         alert('Error uploading lecture.');
     }
 }
+
+
 
 
 // Search Vimeo videos
